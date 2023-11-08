@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,17 +12,49 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin strings are defined here.
+ * Strings for mod_vuejsdemo, language en
  *
- * @package     local_adele
- * @category    string
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_vuejsdemo
+ * @copyright  2019 Martin Gauk, innoCampus, TU Berlin
  */
 
-defined('MOODLE_INTERNAL') || die();
+// Required strings.
+$string['modulename'] = 'Vue.js Demonstration';
+$string['modulenameplural'] = 'Vue.js Demonstrations';
+$string['modulename_help'] = 'Vue.js Demonstration';
+$string['pluginadministration'] = 'Vue.js Demonstration Administration';
+$string['pluginname'] = 'Vue.js Demonstration';
 
-$string['pluginname'] = 'Adele';
+// Capabilities.
+$string['vuejsdemo:addinstance'] = 'Add a new Vue.js demonstration instance';
+$string['vuejsdemo:view'] = 'View Vue.js Demonstration';
+
+// Vue component route not found.
+$string['route_not_found'] = 'Error: Page (route) not found!';
+
+// Vue component rooms edit.
+$string['rooms_edit_site_name'] = 'Rooms configuration';
+$string['rooms_edit_site_description'] = 'You may add a new room or edit existing rooms.';
+$string['rooms_edit_no_rooms'] = 'There are no rooms to show.';
+
+// Room form.
+$string['room'] = 'Room';
+$string['room_name'] = 'Room name';
+$string['room_description'] = 'Room description';
+$string['room_form_title_add'] = 'Add a new room';
+$string['room_form_title_edit'] = 'Edit a room';
+
+// Required strings.
+$string['pluginname'] = 'Adaptive Learning Paths';
+$string['adele'] = 'Adele';
+$string['adelemanager'] = 'Manage Adele';
+$string['create_context_description'] = 'Adele context {$a} created.';
+$string['update_context_description'] = 'Adele context updated.';
+$string['context_updated'] = 'Adele Context updated';
+$string['context_created'] = 'Adele Context created';
+
+// Role.
+$string['adeleroledescription'] = 'Adele Manager';
