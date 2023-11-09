@@ -37,11 +37,11 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
     }
 
     $output = '<div class="popover-region nav-link icon-no-margin dropdown">
-        <a class="btn btn-tertiary"
+        <a class="btn btn-secondary"
         id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
-            . $CFG->wwwroot . '/local/adele/manage_adaptive_learning_paths.php"
+            . $CFG->wwwroot . '/local/adele/index.php"
         role="button">
-        '. get_string('adele', 'local_adele') .'
+        '. get_string('btnadelebtn', 'local_adele') .'
         </a>
     </div>';
 
@@ -49,12 +49,103 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
 }
 
 /**
- * Validate the data in the new field when the form is submitted
+ * Saves a new differentiator instance into the database.
  *
- * @param moodleform_mod $fromform
- * @param array $fields
- * @return void
+ * Given an object containing all the necessary data,
+ * (defined by the form in mod_form.php) this function
+ * will create a new instance and return the id number
+ * of the new instance.
+ *
+ * @param object $differentiator an object from the form in mod_form.php
+ * @return int the id of the newly inserted record
  */
-function local_catquiz_coursemodule_standard_elements($fromform, $fields) {
+function adele_add_instance($differentiator) {
+    global $DB;
 
+    $differentiator->timecreated = time();
+    $differentiator->timemodified = time();
+
+    $id = $DB->insert_record('differentiator', $differentiator);
+    return $id;
+}
+
+/**
+ * Updates a differentiator instance.
+ *
+ * Given an object containing all the necessary data,
+ * (defined by the form in mod_form.php) this function
+ * will update an existing instance with new data.
+ *
+ * @param object $differentiator an object from the form in mod_form.php
+ * @return boolean Success/Fail
+ */
+function adele_update_instance($differentiator) {
+    global $DB;
+
+    $differentiator->timemodified = time();
+    $differentiator->id = $differentiator->instance;
+
+    $ret = $DB->update_record('differentiator', $differentiator);
+    return $ret;
+}
+
+/**
+ * List of features supported in differentiator.
+ *
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return bool True if feature is supported
+ */
+function adele_supports($feature) {
+    switch ($feature) {
+        case FEATURE_GROUPS:
+            return false;
+        case FEATURE_GROUPINGS:
+            return false;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+
+        default:
+            return null;
+    }
+}
+
+/**
+ * View or submit an mform.
+ *
+ * Returns the HTML to view an mform.
+ * If form data is delivered and the data is valid, this returns 'ok'.
+ *
+ * @param array $args
+ * @return string
+ * @throws moodle_exception
+ */
+function local_adele_output_fragment_mform($args) {
+    $differentiator = new \local_differentiator\differentiator();
+
+    $formdata = [];
+    if (!empty($args['jsonformdata'])) {
+        $serialiseddata = json_decode($args['jsonformdata']);
+        if (is_string($serialiseddata)) {
+            parse_str($serialiseddata, $formdata);
+        }
+    }
+
+    $moreargs = (isset($args['moreargs'])) ? json_decode($args['moreargs']) : new stdClass;
+    $formname = $args['form'] ?? '';
+
+    $form = \local_differentiator\form\form_controller::get_controller($formname, $differentiator, $formdata, $moreargs);
+
+    if ($form->success()) {
+        $ret = 'ok';
+        if ($msg = $form->get_message()) {
+            $ret .= ' ' . $msg;
+        }
+        return $ret;
+    } else {
+        return $form->render();
+    }
 }

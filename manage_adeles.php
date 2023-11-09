@@ -33,17 +33,18 @@ $PAGE->set_context($context);
 require_login();
 require_capability('local/adele:canmanage', $context);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/manage_adeles.php', []));
+$PAGE->set_url(new moodle_url('/local/adele/manage_adeles.php', []));
 
 $title = get_string('adelemanager', 'local_adele');
-
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
+$PAGE->requires->js_call_amd('local_adele/app-lazy');
+
 echo $OUTPUT->header();
 
-echo "<h1>Testing</h1>";
-var_dump($USER);
-echo "<h1>Testing</h1>";
+echo <<<'EOT'
+<div id="app"></div>
+EOT;
 
 echo $OUTPUT->footer();

@@ -15,32 +15,59 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Quiz external functions and service definitions.
+ * adele plugin external functions and service definitions.
  *
- * @package local_adele
- * @category external
- * @copyright 2023 Wunderbyte GmbH (info@wunderbyte.at)
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 4.0
+ * @package     local_adele
+ * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = [
-        'local_adele_delete_adele' => [
-                'classname' => 'local_adele\external\delete_adele',
-                'classpath' => '',
-                'description' => 'Delete a Adele',
-                'type' => 'write',
-                'capabilities' => 'local/adele:canmanage',
-                'ajax' => 1,
-        ],
-        'local_adele_create_adele' => [
-                'classname' => 'local_adele\external\manage_adele',
-                'classpath' => '',
-                'description' => 'Manage or create a Adele',
-                'type' => 'write',
-                'capabilities' => 'local/adele:canmanage',
-                'ajax' => 1,
-        ],
-];
+$functions = array(
+    'local_adele_get_learninggoals' => array(
+        'classname' => 'local_adele\external\learninggoals',
+        'methodname' => 'get_learninggoals',
+        'description' => 'Get all learning goals.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
+    'local_adele_get_learninggoal' => array(
+        'classname' => 'local_adele\external\learninggoal',
+        'methodname' => 'get_learninggoal',
+        'description' => 'Get a specific learning goal.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
+    'local_adele_get_handlers' => array(
+        'classname' => 'local_adele\external\handlers',
+        'methodname' => 'get_handlers',
+        'description' => 'Get the adele handlers.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
+    'local_adele_save_learninggoal' => array(
+        'classname' => 'local_adele\external\learninggoal',
+        'methodname' => 'save_learninggoal',
+        'description' => 'Save a specific learning goal.',
+        'type' => 'write',
+        'ajax' => true,
+    ),
+    'local_adele_delete_learninggoal' => array(
+        'classname' => 'local_adele\external\learninggoal',
+        'methodname' => 'delete_learninggoal',
+        'description' => 'Delete a specific learning goal.',
+        'type' => 'write',
+        'ajax' => true,
+    ),
+    'local_adele_duplicate_learninggoal' => array(
+        'classname' => 'local_adele\external\learninggoal',
+        'methodname' => 'duplicate_learninggoal',
+        'description' => 'Duplicate a specific learning goal.',
+        'type' => 'write',
+        'ajax' => true,
+    ),
+);

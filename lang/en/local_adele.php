@@ -15,46 +15,78 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for mod_vuejsdemo, language en
+ * Plugin strings are defined here.
  *
- * @package    mod_vuejsdemo
- * @copyright  2019 Martin Gauk, innoCampus, TU Berlin
+ * @package     local_adele
+ * @category    string
+ * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 // Required strings.
-$string['modulename'] = 'Vue.js Demonstration';
-$string['modulenameplural'] = 'Vue.js Demonstrations';
-$string['modulename_help'] = 'Vue.js Demonstration';
-$string['pluginadministration'] = 'Vue.js Demonstration Administration';
-$string['pluginname'] = 'Vue.js Demonstration';
+$string['modulename'] = 'adele';
+$string['modulenameplural'] = 'adeles';
+$string['modulename_help'] = 'adele';
+$string['pluginadministration'] = 'adele Administration';
+$string['pluginname'] = 'adele';
 
 // Capabilities.
-$string['vuejsdemo:addinstance'] = 'Add a new Vue.js demonstration instance';
-$string['vuejsdemo:view'] = 'View Vue.js Demonstration';
+$string['adele:edit'] = 'Edit adele';
+$string['adele:view'] = 'View adele';
 
 // Vue component route not found.
-$string['route_not_found'] = 'Error: Page (route) not found!';
+$string['route_not_found_site_name'] = 'Error: Page (route) not found!';
+$string['route_not_found'] = 'Page was not found. Please consider going back and and trying it again.';
 
-// Vue component rooms edit.
-$string['rooms_edit_site_name'] = 'Rooms configuration';
-$string['rooms_edit_site_description'] = 'You may add a new room or edit existing rooms.';
-$string['rooms_edit_no_rooms'] = 'There are no rooms to show.';
+// Vue component learning goal edit.
+$string['learninggoals_edit_site_name'] = 'adele learning goals';
+$string['learninggoals_edit_site_description'] = 'You may add a new goal or edit existing goals.';
+$string['learninggoals_edit_no_learninggoals'] = 'There are no goals to show.';
 
-// Room form.
-$string['room'] = 'Room';
-$string['room_name'] = 'Room name';
-$string['room_description'] = 'Room description';
-$string['room_form_title_add'] = 'Add a new room';
-$string['room_form_title_edit'] = 'Edit a room';
+// Learning goals overview.
+$string['edit'] = 'Edit';
+$string['delete'] = 'Delete';
+$string['deletepromptpre'] = 'Do you really want to delete the learning goal "';
+$string['deletepromptpost'] = '"?';
+$string['btnconfirmdelete'] = 'Confirm delete';
+$string['duplicate'] = 'Duplicate';
+$string['toclipboard'] = 'Copy to clipboard';
+$string['goalnameplaceholder'] = 'Learning goal name';
+$string['toclipboarddone'] = 'Copied to clipboard';
+$string['subject'] = 'Subject';
 
-// Required strings.
-$string['pluginname'] = 'Adaptive Learning Paths';
-$string['adele'] = 'Adele';
-$string['adelemanager'] = 'Manage Adele';
-$string['create_context_description'] = 'Adele context {$a} created.';
-$string['update_context_description'] = 'Adele context updated.';
-$string['context_updated'] = 'Adele Context updated';
-$string['context_created'] = 'Adele Context created';
 
-// Role.
-$string['adeleroledescription'] = 'Adele Manager';
+// Learning goal form.
+$string['learninggoal'] = 'Goal';
+$string['learninggoal_name'] = 'Goal name';
+$string['learninggoal_description'] = 'Goal description';
+$string['learninggoal_form_title_add'] = 'Add a new learning path';
+$string['learninggoal_form_title_edit'] = 'Edit a learning path';
+$string['save'] = 'Save';
+$string['cancel'] = 'Cancel';
+
+// Tabs.
+$string['thinkingskill'] = 'Thinking Skill';
+$string['content'] = 'Content';
+$string['resources'] = 'Resources';
+$string['products'] = 'Products';
+$string['groups'] = 'Groups';
+
+// Words.
+$string['prethinkingskill'] = 'Students will';
+$string['clicktoedit'] = '[click to edit]';
+$string['preresource'] = 'using';
+$string['preproduct'] = 'and create';
+$string['pregroup'] = 'in groups of';
+
+// Button strings.
+$string['btnadelebtn'] = 'Learning Paths';
+$string['btnbacktooverview'] = 'Going back to overview';
+
+// From strings.
+$string['fromlearningtitel'] = 'Learning Path Tiel';
+$string['fromlearningdescription'] = 'Description of Learning Path';
+$string['fromlearningtitelplaceholder'] = 'Please provide a titel';
+$string['fromlearningdescriptionplaceholder'] = 'Please provide a short description';

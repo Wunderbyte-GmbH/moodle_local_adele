@@ -25,8 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
-
+$capabilities = array(
         'local/adele:canmanage' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_SYSTEM,
@@ -34,4 +33,18 @@ $capabilities = [
                 'manager' => CAP_ALLOW,
             ],
         ],
-];
+        'local/adele:view' => [
+            'captype' => 'view',
+            'contextlevel' => CONTEXT_SYSTEM,
+            'archetypes' => [
+                'user' => CAP_ALLOW
+            ]
+        ],
+        'local/adele:edit' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_SYSTEM,
+            'archetypes' => [
+                'user' => CAP_ALLOW
+            ]
+        ],
+    );

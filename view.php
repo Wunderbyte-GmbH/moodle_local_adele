@@ -29,14 +29,6 @@ if ($coursemoduleid > 0) {
     $path = '/local/adele/view.php/' . $coursemoduleid . '/';
     redirect(new \moodle_url($path));
 }
-// Support for Vue.js Router and its URL structure.
-// /mod/vuejsdemo/view.php/[course module id]/.../...
-$paths = explode('/', $_SERVER['REQUEST_URI']);
-$baseindex = array_search('view.php', $paths);
-if (count($paths) > $baseindex + 1) {
-    $coursemoduleid = intval($paths[$baseindex + 1]);
-}
-
 
 $title = get_string('modulename', 'local_adele');
 
@@ -48,7 +40,7 @@ $PAGE->set_pagelayout('standard');
 $url = new moodle_url('/local/adele/view.php', ['id' => $coursemoduleid]);
 $PAGE->set_url($url);
 
-$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init', []);
+$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
 echo $OUTPUT->header();
 
