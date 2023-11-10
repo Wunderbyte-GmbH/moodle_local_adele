@@ -83,25 +83,25 @@
 <template>
     <div class="learninggoals-edit">
         <div v-if="editingadding == false">
-            <h3>{{strings.learninggoals_edit_site_name}}</h3>
+            <h3>{{strings.pluginname}}</h3>
+            <div class="learninggoals-edit-add">
+                <router-link :to="{ name: 'learninggoal-new' }" tag="button" class="btn btn-primary">{{strings.learninggoal_form_title_add}}</router-link>
+            </div>
+            <h2>{{strings.overviewlearningpaths}}</h2>
             <div class="description">{{strings.learninggoals_edit_site_description}}</div>
                 <span v-if="learninggoals && learninggoals[0].name !== 'not found' && learninggoals[0].description !== ''">
                     <ul class="learninggoals-edit-list">
                         <li v-for="singlelearninggoal in learninggoals" style="margin-bottom: 10px">
                             <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
-                                <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="strings.edit">
-                                    <b>{{ singlelearninggoal.name }}</b>
-                                </router-link>
-                                <div>{{ singlelearninggoal.description }}
+                                <div>
+                                    <b>
+                                        {{ singlelearninggoal.description }}
+                                    </b>
                                     <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="strings.edit">
                                         <i class="icon fa fa-pencil fa-fw iconsmall m-r-0" :title="strings.edit"></i>
                                     </router-link>
                                     <a href="" v-on:click.prevent="duplicateLearninggoal(singlelearninggoal.id)" :title="strings.duplicate">
                                         <i class="icon fa fa-copy fa-fw iconsmall m-r-0" :title="strings.duplicate"></i>
-                                    </a>
-                                    <a href="" v-on:click.prevent="addToClipboard(singlelearninggoal.description)">
-                                        <i
-                                            class="icon fa fa-clipboard fa-fw iconsmall" :title="strings.toclipboard"></i>
                                     </a>
                                     <a href="" v-on:click.prevent="showDeleteConfirm(singlelearninggoal.id)" :title="strings.delete">
                                         <i class="icon fa fa-trash fa-fw iconsmall" :title="strings.delete"></i>
@@ -125,130 +125,37 @@
                         {{strings.learninggoals_edit_no_learninggoals}}
                     </p>
                 </span>
-            <div class="learninggoals-edit-add">
-                <router-link :to="{ name: 'learninggoal-new' }" tag="button" class="btn btn-primary">{{strings.learninggoal_form_title_add}}</router-link>
-            </div>
         </div>
         <div v-if="editingadding == true">
             <h3>{{strings.learninggoal_form_title_edit}}</h3>
             <div class="learninggoals-edit-add-form">
+                <div class="mt-3">
+                    <button type=button @click.prevent="onSavePath" class="btn btn-primary" :title="strings.save">Save Learning path</button>
+                    <button type=button @click.prevent="onSave" class="btn btn-primary" :title="strings.save">{{strings.save}}</button>
+                    <button type=button @click.prevent="onCancel" class="btn btn-secondary" :title="strings.cancel">{{strings.cancel}}</button>
+                </div>
                 <div v-for="goal in learninggoal">
                     <div v-if="$store.state.learningGoalID == 0">
                         <p>
                             <h4>{{ strings.fromlearningtitel }}</h4>
-                            <input v-model="goalname" placeholder={{ strings.fromlearningtitelplaceholder }}/>
+                            <input v-model="goalname" :placeholder="strings.fromlearningtitelplaceholder" style="min-width: 40%;"/>
                         </p>
                         <p>
                             <h4>{{ strings.fromlearningdescription }}</h4>
-                            <p style="white-space: pre-line;">{{ goalname }}</p>
-                            <textarea v-model="goalname" placeholder={{ strings.fromlearningdescriptionplaceholder }}></textarea>
+                            <textarea v-model="goalsubject" :placeholder='strings.fromlearningdescriptionplaceholder' style="min-width: 40%;"></textarea>
+                        </p>
+                        <p>
+                            <h4>{{ strings.fromavailablecourses }}</h4>
+                            <div v-for="availablecourse in availablecourses">
+                                <li>
+                                    {{ availablecourse.fullname }}
+                                </li>
+                            </div>
+                            
                         </p>
                     </div>
-                    <p>
-                        <input v-if="$store.state.learningGoalID == 0"
-                               v-bind:placeholder="strings.goalnameplaceholder"
-                               autofocus
-                               type="text"
-                               v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                               v-model="goalname">
-                        <input v-else
-                               type="text"
-                               v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                               v-model="goal.name">
-                    </p>
-                    <p>
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.pre_thinking_skill">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.thinking_skill"
-                            class="thinking_skill"
-                            @click="switchTab(0)">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.content"
-                            class="content"
-                            @click="switchTab(1)">
-                        <input v-if="$store.state.learningGoalID == 0"
-                            type="text"
-                            v-bind:placeholder="strings.subject"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goalsubject">
-                        <input v-else
-                            type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.subject">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.pre_resource">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.resource"
-                            class="resource"
-                            @click="switchTab(2)">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.pre_product">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.product"
-                            class="product"
-                            @click="switchTab(3)">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.pre_group">
-                        <input type="text"
-                            v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
-                            v-model="goal.group"
-                            class="group"
-                            @click="switchTab(4)">
-                        .
-                    </p>
                 </div>
-                <div v-for="tabelements in handlers">
-                    <div v-for="tabs in tabelements">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item"
-                                :class=" { 'active show': selectedTabId === tab.id }"
-                                v-for="(tab, index) in tabs"
-                                :ref="'tab'+index"
-                                :key="index"
-                                @click="selectedTabId = tab.id">
-                                <a class="nav-link" :href="'#link' + index" data-toggle="tab" role="tab" aria-selected="false"
-                                   v-bind:style="[selectedTabId === tab.id ? {borderRightColor: tab.tabcolor, borderTopColor: tab.tabcolor, borderLeftColor: tab.tabcolor, 'border-top-width': '2px', 'padding-top': '8px'} : {}, {'color': tab.tabcolor}]">{{ tab.tabtitle }}</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane"
-                                 :class=" { 'active show': selectedTabId === tab.id }"
-                                 v-for="(tab, index) in tabs"
-                                 :id="'#link' + index"
-                                 role="tabpanel">
-                                <div class="col-12 mt-3">
-                                    <div class="row">
-                                        <template v-for="category in tab.categories">
-                                            <div class="col-2 mb-1 pr-1 pl-0" v-if="selectedTabId == category.parenttabid">
-                                                <div class="pt-2 pr-2 pl-2 pb-0"
-                                                     v-bind:style="[selectedTabId == tab.id ? {borderColor: tab.tabcolor, 'border-width': '1px', 'border-style': 'solid', 'border-radius': '.5rem'} : {}]">
-                                                    <h5 class="pb-2" v-bind:style="[selectedTabId === tab.id ? {color: tab.tabcolor, 'word-break': 'break-word'} : {'word-break': 'break-word'}]">{{category.cattitle}}</h5>
-                                                    <p v-for="word in category.words" v-bind:style="[selectedTabId === tab.id ? {borderTopColor: tab.tabcolor, 'border-top-width': '1px', 'border-top-style': 'solid'} : {}]" class="mb-2 pt-1">
-                                                        <button class="pl-0" v-bind:style="[selectedTabId == tab.id ? {'background-color': 'transparent', 'border': '0', 'word-break': 'break-word', 'width': '100%'} : {}]"
-                                                                v-on:click="fillword($event, tabs.id, index, word.targetinput, word.text)">{{ word.title }}</button>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <button type=button @click.prevent="onSave" class="btn btn-primary" :title="strings.save">{{strings.save}}</button>
-                    <button type=button @click.prevent="onCancel" class="btn btn-secondary" :title="strings.cancel">{{strings.cancel}}</button>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -256,7 +163,7 @@
 
 <script>
     import { mapState } from 'vuex';
-
+    
     export default {
         name: "learninggoals-edit",
         data: function() {
@@ -268,7 +175,7 @@
                 clicked: {},
             };
         },
-        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID']),
+        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses']),
         watch: {
             goalname: function () {
                 this.learninggoal[0].name = this.goalname
@@ -342,6 +249,15 @@
                 this.$store.dispatch('fetchLearninggoals');
                 window.scrollTo(0,0);
             },
+            onSavePath() {
+                let result = {
+                    learninggoalid: this.$store.state.learningGoalID,
+                    name: this.learninggoal[0].name,
+                    description: this.learninggoal[0].subject,
+                };
+                this.$store.dispatch('saveLearningpath', result);
+                window.scrollTo(0,0);
+            },
             fillword: function (event, id, index, field, text) {
                 switch(field) {
                     case "content":
@@ -388,6 +304,7 @@
         },
         created: function() {
             this.$store.dispatch('fetchLearninggoals');
+            this.$store.dispatch('fetchAvailablecourses');
             this.$store.dispatch('getHandlers');
             this.checkRoute(this.$route);
         },

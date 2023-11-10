@@ -30,7 +30,7 @@ $string['modulename'] = 'adele';
 $string['modulenameplural'] = 'adeles';
 $string['modulename_help'] = 'adele';
 $string['pluginadministration'] = 'adele Administration';
-$string['pluginname'] = 'adele';
+$string['pluginname'] = 'Adele';
 
 // Capabilities.
 $string['adele:edit'] = 'Edit adele';
@@ -42,7 +42,7 @@ $string['route_not_found'] = 'Page was not found. Please consider going back and
 
 // Vue component learning goal edit.
 $string['learninggoals_edit_site_name'] = 'adele learning goals';
-$string['learninggoals_edit_site_description'] = 'You may add a new goal or edit existing goals.';
+$string['learninggoals_edit_site_description'] = 'You may add a new learning path or edit existing paths.';
 $string['learninggoals_edit_no_learninggoals'] = 'There are no goals to show.';
 
 // Learning goals overview.
@@ -82,11 +82,16 @@ $string['preproduct'] = 'and create';
 $string['pregroup'] = 'in groups of';
 
 // Button strings.
-$string['btnadelebtn'] = 'Learning Paths';
+$string['btnadele'] = 'Learning Paths';
 $string['btnbacktooverview'] = 'Going back to overview';
 
-// From strings.
+// From Strings.
 $string['fromlearningtitel'] = 'Learning Path Tiel';
 $string['fromlearningdescription'] = 'Description of Learning Path';
+$string['fromavailablecourses'] = 'List of available courses';
 $string['fromlearningtitelplaceholder'] = 'Please provide a titel';
 $string['fromlearningdescriptionplaceholder'] = 'Please provide a short description';
+
+// Overview String.
+$string['overviewlearningpaths'] = 'Overview of all Learningpaths';
+$string['overviewaddingbtn'] = 'Create new learning path';

@@ -23,8 +23,6 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_adele\adelecontext;
-
 /**
  * Custom code to be run on installing the plugin.
  */
@@ -75,10 +73,6 @@ function xmldb_local_adele_install() {
             ]);
         }
     }
-
-    // Make sure the database contains a default context.
-    $defaultcontext = new adelecontext();
-    $defaultcontext->create_default_context();
 
     return true;
 }

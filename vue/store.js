@@ -14,6 +14,7 @@ export const store = new Vuex.Store({
         strings: {},
         handlers: null,
         learninggoals: null,
+        availablecourses: null,
         learninggoal: null,
     },
     //strict: process.env.NODE_ENV !== 'production',
@@ -33,6 +34,9 @@ export const store = new Vuex.Store({
         },
         setLearninggoals(state, ajaxdata) {
             state.learninggoals = ajaxdata;
+        },
+        setAvailablecourses(state, ajaxdata) {
+            state.availablecourses = ajaxdata;
         },
         setLearninggoal(state, ajaxdata) {
             state.learninggoal = ajaxdata;
@@ -59,7 +63,7 @@ export const store = new Vuex.Store({
          */
         async loadComponentStrings(context) {
             const lang = $('html').attr('lang').replace(/-/g, '_');
-            const cacheKey = 'local_differentiator/strings/' + lang;
+            const cacheKey = 'local_adele/strings/' + lang;
             const cachedStrings = moodleStorage.get(cacheKey);
             if (cachedStrings) {
                 context.commit('setStrings', JSON.parse(cachedStrings));
@@ -67,7 +71,7 @@ export const store = new Vuex.Store({
                 const request = {
                     methodname: 'core_get_component_strings',
                     args: {
-                        'component': 'local_differentiator',
+                        'component': 'local_adele',
                         lang,
                     },
                 };
@@ -104,6 +108,17 @@ export const store = new Vuex.Store({
             context.commit('setLearninggoals', learninggoals);
         },
         /**
+         * Fetches all of a user's learning goal.
+         *
+         * @param context
+         *
+         * @returns {Promise<void>}
+         */
+        async fetchAvailablecourses(context) {
+            const availablecourses = await ajax('local_adele_get_availablecourses');
+            context.commit('setAvailablecourses', availablecourses);
+        },
+        /**
          * Fetches the differentiator handlers.
          *
          * @param context
@@ -125,6 +140,22 @@ export const store = new Vuex.Store({
         async saveLearninggoal(context, payload) {
             const result = await ajax('local_adele_save_learninggoal', payload);
             context.dispatch('fetchLearninggoals');
+            return result.result;
+        },
+
+        /**
+         * Saves a learning goal.
+         *
+         * @param context
+         * @param payload
+         *
+         * @returns {Promise<void>}
+         */
+        async saveLearningpath(context, payload) {
+            console.log(payload);
+            const result = await ajax('local_adele_save_learningpath',
+            { name: payload.name, description: payload.description });
+            //context.dispatch('fetchLearninggoals');
             return result.result;
         },
         /**

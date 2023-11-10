@@ -41,7 +41,7 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
         id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
             . $CFG->wwwroot . '/local/adele/index.php"
         role="button">
-        '. get_string('btnadelebtn', 'local_adele') .'
+        '. get_string('btnadele', 'local_adele') .'
         </a>
     </div>';
 

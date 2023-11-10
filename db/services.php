@@ -25,6 +25,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = array(
+    'local_adele_get_availablecourses' => array(
+        'classname' => 'local_adele\external\get_availablecourses',
+        'classpath' => '',
+        'description' => 'Get all available courses.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
+    'local_adele_save_learningpath' => array(
+        'classname' => 'local_adele\external\save_learningpath',
+        'classpath' => '',
+        'description' => 'Save a specific learning path.',
+        'type' => 'write',
+        'ajax' => true,
+    ),
     'local_adele_get_learninggoals' => array(
         'classname' => 'local_adele\external\learninggoals',
         'methodname' => 'get_learninggoals',

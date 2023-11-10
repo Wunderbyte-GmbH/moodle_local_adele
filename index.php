@@ -18,8 +18,8 @@
  * Local Differentiator main view.
  *
  * @package     local_differentiator
- * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');
@@ -49,10 +49,7 @@ $PAGE->navbar->ignore_active(true);
 $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/local/adele/index.php'));
 $PAGE->set_pagelayout('admin');
 
-$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init', [
-    'learninggoalid' => $learninggoalid,
-    'contextid' => context_system::instance()->id]
-);
+$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
 $output = $PAGE->get_renderer('local_adele');
 

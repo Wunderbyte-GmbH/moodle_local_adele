@@ -37,14 +37,14 @@ use external_single_structure;
  * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class learninggoals extends external_api {
+class availablecourses extends external_api {
     /**
      * Definition of parameters for {@see get_learninggoals()}.
      * Returns description of method parameters.
      *
      * @return external_function_parameters
      */
-    public static function get_learninggoals_parameters() {
+    public static function get_availablecourses_parameters() {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'userid'),
             'learninggoalid' => new external_value(PARAM_INT, 'learninggoalid'),
@@ -57,7 +57,7 @@ class learninggoals extends external_api {
      *
      * @return external_multiple_structure
      */
-    public static function get_learninggoals_returns() {
+    public static function get_availablecourses_returns() {
         return new external_multiple_structure(
             exporter\learninggoal::get_read_structure()
         );
@@ -71,9 +71,9 @@ class learninggoals extends external_api {
      * @return array
      * @throws \invalid_parameter_exception
      */
-    public static function get_learninggoals($userid, $learninggoalid) {
+    public static function get_availablecourses($userid, $learninggoalid) {
         global $USER;
-        $params = self::validate_parameters(self::get_learninggoals_parameters(),
+        $params = self::validate_parameters(self::get_availablecourses_parameters(),
             array(
                 'userid' => $userid,
                 'learninggoalid' => $learninggoalid
@@ -89,39 +89,10 @@ class learninggoals extends external_api {
 
         $ctx = \context_system::instance();
 
-        $concat = $DB->sql_concat('COALESCE(lg.pre_thinking_skill, \'\')', '\' \'',
-            'COALESCE(lg.thinking_skill, \'\')', '\' \'',
-            'COALESCE(lg.lgcontent, \'\')', '\' \'',
-            'COALESCE(lg.subject, \'\')', '\' \'',
-            'COALESCE(lg.pre_resource, \'\')', '\' \'',
-            'COALESCE(lg.resource, \'\')', '\' \'',
-            'COALESCE(lg.pre_product, \'\')', '\' \'',
-            'COALESCE(lg.product, \'\')', '\' \'',
-            'COALESCE(lg.pre_group, \'\')', '\' \'',
-            'COALESCE(lg.lggroup, \'\')', '\'.\'');
+        $sql = "SELECT id, fullname, shortname FROM {course} LIMIT 40";
 
-        $sql = "SELECT lg.id, lg.title AS name, " . $concat . " as description
-            FROM {local_differentiator_lg} lg
-            WHERE userid = :userid
-            ORDER BY lg.title ASC";
+        $learninggoals = $DB->get_records_sql($sql);
 
-        $params['userid'] = $userid;
-
-        $learninggoals = $DB->get_records_sql($sql, $params);
-
-        if (!empty($learninggoals)) {
-            foreach ($learninggoals as $learninggoal) {
-                $exporter = new exporter\learninggoal($learninggoal, $ctx);
-                $list[] = $exporter->export($renderer);
-            }
-        } else {
-            $learninggoal = new \stdClass();
-            $learninggoal->id = 0;
-            $learninggoal->name = 'not found';
-            $learninggoal->description = '';
-            $exporter = new exporter\learninggoal($learninggoal, $ctx);
-            $list[] = $exporter->export($renderer);
-        }
-        return $list;
+        return $learninggoals;
     }
 }

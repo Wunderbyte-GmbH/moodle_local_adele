@@ -35,7 +35,7 @@ function init() {
                     path: '/learninggoals/edit/:learninggoalId(\\d+)',
                     component: learninggoalsEdit,
                     name: 'learninggoal-edit',
-                    meta: { title: 'learninggoal_form_title_edit' },
+                    meta: { title: 'learninggoal_form_title_edit' }
                 }, {
                     path: '/learninggoals/edit/new',
                     component: learninggoalsEdit,
@@ -71,8 +71,6 @@ function init() {
 
     new Vue({
         el: '#local-adele-app',
-        data: {
-        },
         store,
         router,
         editingadding: false,

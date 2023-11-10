@@ -18,15 +18,9 @@
  * Local Differentiator renderer.
  *
  * @package     local_adele
- * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Renderer for displaying code-checker reports as HTML.
- *
- * @copyright  2011 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class local_adele_renderer extends plugin_renderer_base {
 }

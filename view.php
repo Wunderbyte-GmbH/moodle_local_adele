@@ -17,13 +17,13 @@
 /**
  * This page is the entry page into the mod.
  *
- * @package    mod_vuejsdemo
- * @copyright  2019 Martin Gauk, innoCampus, TU Berlin
+ * @package    local_adele
+ * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');
 
-// if url has form view.php?id=xy then redirect to to view.php/xy
 $coursemoduleid = optional_param('id', 0, PARAM_INT);
 if ($coursemoduleid > 0) {
     $path = '/local/adele/view.php/' . $coursemoduleid . '/';
