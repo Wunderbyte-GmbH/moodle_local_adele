@@ -84,7 +84,7 @@ class get_learningpaths extends external_api {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 
-        return learning_path_courses::get_availablecourses();
+        return learning_path_courses::get_learning_paths();
     }
 
     /**
@@ -96,8 +96,8 @@ class get_learningpaths extends external_api {
         return new external_multiple_structure(
             new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Item id'),
-                    'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'shortname' => new external_value(PARAM_TEXT, 'Item name'),
+                    'name' => new external_value(PARAM_TEXT, 'Historyid id'),
+                    'description' => new external_value(PARAM_TEXT, 'Item name'),
                 ]
             )
         );

@@ -48,6 +48,14 @@ $functions = array(
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ),
+    'local_adele_get_learningpaths' => array(
+        'classname' => 'local_adele\external\get_learningpaths',
+        'classpath' => '',
+        'description' => 'Get all learning goals.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
     'local_adele_get_learninggoal' => array(
         'classname' => 'local_adele\external\learninggoal',
         'methodname' => 'get_learninggoal',

@@ -57,4 +57,21 @@ class learning_path_courses {
 
         return array_map(fn($a) => (array)$a, $learninggoals);
     }
+
+    /**
+     * Start a new attempt for a user.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return array
+     */
+    public static function get_learning_paths() {
+
+        global $DB;
+        $sql = "SELECT id, name, description FROM {local_learning_paths}";
+
+        $learninggoals = $DB->get_records_sql($sql);
+
+        return array_map(fn($a) => (array)$a, $learninggoals);
+    }
 }

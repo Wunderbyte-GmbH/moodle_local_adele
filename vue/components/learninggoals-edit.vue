@@ -89,9 +89,9 @@
             </div>
             <h2>{{strings.overviewlearningpaths}}</h2>
             <div class="description">{{strings.learninggoals_edit_site_description}}</div>
-                <span v-if="learninggoals && learninggoals[0].name !== 'not found' && learninggoals[0].description !== ''">
+                <span v-if="learningpaths && learningpaths[0].name !== 'not found' && learningpaths[0].description !== ''">
                     <ul class="learninggoals-edit-list">
-                        <li v-for="singlelearninggoal in learninggoals" style="margin-bottom: 10px">
+                        <li v-for="singlelearninggoal in learningpaths" style="margin-bottom: 10px">
                             <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
                                 <div>
                                     <b>
@@ -119,19 +119,12 @@
                         </li>
                     </ul>
                 </span>
-                <span v-if="learninggoals && learninggoals[0].name == 'not found' && learninggoals[0].description == ''">
-                    <p>&#160;</p>
-                    <p v-for="singlelearninggoal in learninggoals">
-                        {{strings.learninggoals_edit_no_learninggoals}}
-                    </p>
-                </span>
         </div>
         <div v-if="editingadding == true">
             <h3>{{strings.learninggoal_form_title_edit}}</h3>
             <div class="learninggoals-edit-add-form">
                 <div class="mt-3">
                     <button type=button @click.prevent="onSavePath" class="btn btn-primary" :title="strings.save">Save Learning path</button>
-                    <button type=button @click.prevent="onSave" class="btn btn-primary" :title="strings.save">{{strings.save}}</button>
                     <button type=button @click.prevent="onCancel" class="btn btn-secondary" :title="strings.cancel">{{strings.cancel}}</button>
                 </div>
                 <div v-for="goal in learninggoal">
@@ -175,7 +168,7 @@
                 clicked: {},
             };
         },
-        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses']),
+        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses', 'learningpaths']),
         watch: {
             goalname: function () {
                 this.learninggoal[0].name = this.goalname
@@ -226,29 +219,6 @@
                 this.$router.push({name: 'learninggoals-edit-overview'});
                 this.$store.dispatch('fetchLearninggoals');
             },
-            onSave() {
-                let result = {
-                    learninggoalid: this.$store.state.learningGoalID,
-                    name: this.learninggoal[0].name,
-                    pre_thinking_skill: this.learninggoal[0].pre_thinking_skill,
-                    thinking_skill: this.learninggoal[0].thinking_skill,
-                    content: this.learninggoal[0].content,
-                    subject: this.learninggoal[0].subject,
-                    pre_resource: this.learninggoal[0].pre_resource,
-                    resource: this.learninggoal[0].resource,
-                    pre_product: this.learninggoal[0].pre_product,
-                    product: this.learninggoal[0].product,
-                    pre_group: this.learninggoal[0].pre_group,
-                    group: this.learninggoal[0].group,
-                };
-                this.$store.dispatch('saveLearninggoal', result);
-                this.$store.state.learningGoalID = 0;
-                this.editingadding = false;
-                this.selectedTabId = 0;
-                this.$router.push({name: 'learninggoals-edit-overview'});
-                this.$store.dispatch('fetchLearninggoals');
-                window.scrollTo(0,0);
-            },
             onSavePath() {
                 let result = {
                     learninggoalid: this.$store.state.learningGoalID,
@@ -256,6 +226,9 @@
                     description: this.learninggoal[0].subject,
                 };
                 this.$store.dispatch('saveLearningpath', result);
+                this.$store.state.learningGoalID = 0;
+                this.editingadding = false;
+                this.$router.push({name: 'learninggoals-edit-overview'});
                 window.scrollTo(0,0);
             },
             fillword: function (event, id, index, field, text) {
@@ -304,6 +277,7 @@
         },
         created: function() {
             this.$store.dispatch('fetchLearninggoals');
+            this.$store.dispatch('fetchLearningpaths');
             this.$store.dispatch('fetchAvailablecourses');
             this.$store.dispatch('getHandlers');
             this.checkRoute(this.$route);

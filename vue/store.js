@@ -14,6 +14,7 @@ export const store = new Vuex.Store({
         strings: {},
         handlers: null,
         learninggoals: null,
+        learningpaths: null,
         availablecourses: null,
         learninggoal: null,
     },
@@ -34,6 +35,9 @@ export const store = new Vuex.Store({
         },
         setLearninggoals(state, ajaxdata) {
             state.learninggoals = ajaxdata;
+        },
+        setLearningpaths(state, ajaxdata) {
+            state.learningpaths = ajaxdata;
         },
         setAvailablecourses(state, ajaxdata) {
             state.availablecourses = ajaxdata;
@@ -107,6 +111,33 @@ export const store = new Vuex.Store({
             const learninggoals = await ajax('local_adele_get_learninggoals');
             context.commit('setLearninggoals', learninggoals);
         },
+
+        /**
+         * Fetches all of a user's learning goal.
+         *
+         * @param context
+         *
+         * @returns {Promise<void>}
+         */
+        async fetchLearningpaths(context) {
+            const learninggpaths = await ajax('local_adele_get_learningpaths');
+            context.commit('setLearningpaths', learninggpaths);
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /**
          * Fetches all of a user's learning goal.
          *
