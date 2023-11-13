@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
         handlers: null,
         learninggoals: null,
         learningpaths: null,
+        learningpath: null,
         availablecourses: null,
         learninggoal: null,
     },
@@ -38,6 +39,9 @@ export const store = new Vuex.Store({
         },
         setLearningpaths(state, ajaxdata) {
             state.learningpaths = ajaxdata;
+        },
+        setLearningpath(state, ajaxdata) {
+            state.learningpath = ajaxdata;
         },
         setAvailablecourses(state, ajaxdata) {
             state.availablecourses = ajaxdata;
@@ -98,7 +102,20 @@ export const store = new Vuex.Store({
         async fetchLearninggoal(context) {
             const learninggoal = await ajax('local_adele_get_learninggoal',
                 { userid: 0, learninggoalid: store.state.learningGoalID });
+            console.log(learninggoal)
             context.commit('setLearninggoal', learninggoal);
+        },
+        /**
+         * Fetches a learning goal.
+         *
+         * @param context
+         *
+         * @returns {Promise<void>}
+         */
+        async fetchLearningpath(context) {
+            const learningpath = await ajax('local_adele_get_learningpath',
+                { userid: 0, learninggoalid: store.state.learningGoalID });
+            context.commit('setLearninggoal', learningpath);
         },
         /**
          * Fetches all of a user's learning goal.
@@ -210,9 +227,9 @@ export const store = new Vuex.Store({
          *
          * @returns {Promise<void>}
          */
-        async duplicateLearninggoal(context, payload) {
-            const result = await ajax('local_adele_duplicate_learninggoal', payload);
-            context.dispatch('fetchLearninggoals');
+        async duplicateLearningpath(context, payload) {
+            const result = await ajax('local_adele_duplicate_learningpath', payload);
+            context.dispatch('fetchLearningpaths');
             return result.result;
         },
     }

@@ -32,7 +32,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
-use local_adele\learning_paths;
+use local_adele\learning_path_courses;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,7 +47,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_learningpath extends external_api {
+class duplicate_learningpath extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -57,7 +57,7 @@ class get_learningpath extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -71,9 +71,10 @@ class get_learningpath extends external_api {
      *
      * @return array
      */
-    public static function execute($userid, $learninggoalid): array {
+    public static function execute($userid, $learningpathid, $learninggoalid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
+            'learningpathid' => $learningpathid,
             'learninggoalid' => $learninggoalid,
         ]);
 
@@ -96,9 +97,8 @@ class get_learningpath extends external_api {
         return new external_multiple_structure(
             new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Item id'),
-                    'name' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'description' => new external_value(PARAM_TEXT, 'Item name'),
-                    'json' => new external_value(PARAM_RAW, 'Item name'),
+                    'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
+                    'shortname' => new external_value(PARAM_TEXT, 'Item name'),
                 ]
             )
         );

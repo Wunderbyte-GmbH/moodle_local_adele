@@ -100,7 +100,7 @@
                                     <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="strings.edit">
                                         <i class="icon fa fa-pencil fa-fw iconsmall m-r-0" :title="strings.edit"></i>
                                     </router-link>
-                                    <a href="" v-on:click.prevent="duplicateLearninggoal(singlelearninggoal.id)" :title="strings.duplicate">
+                                    <a href="" v-on:click.prevent="duplicateLearningpath(singlelearninggoal.id)" :title="strings.duplicate">
                                         <i class="icon fa fa-copy fa-fw iconsmall m-r-0" :title="strings.duplicate"></i>
                                     </a>
                                     <a href="" v-on:click.prevent="showDeleteConfirm(singlelearninggoal.id)" :title="strings.delete">
@@ -128,14 +128,31 @@
                     <button type=button @click.prevent="onCancel" class="btn btn-secondary" :title="strings.cancel">{{strings.cancel}}</button>
                 </div>
                 <div v-for="goal in learninggoal">
-                    <div v-if="$store.state.learningGoalID == 0">
                         <p>
                             <h4>{{ strings.fromlearningtitel }}</h4>
-                            <input v-model="goalname" :placeholder="strings.fromlearningtitelplaceholder" style="min-width: 40%;"/>
+                            <input v-if="$store.state.learningGoalID == 0"
+                                v-bind:placeholder="strings.goalnameplaceholder"
+                                autofocus
+                                type="text"
+                                v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
+                                v-model="goalname">
+                            <input v-else
+                                type="text"
+                                v-autowidth="{maxWidth: '960px', minWidth: '20px', comfortZone: 0}"
+                                v-model="goal.name">
                         </p>
                         <p>
                             <h4>{{ strings.fromlearningdescription }}</h4>
-                            <textarea v-model="goalsubject" :placeholder='strings.fromlearningdescriptionplaceholder' style="min-width: 40%;"></textarea>
+                            <input v-if="$store.state.learningGoalID == 0"
+                                v-bind:placeholder="strings.goalsubjectplaceholder"
+                                autofocus
+                                type="textarea"
+                                v-autowidth="{maxWidth: '960px', minWidth: '40%', comfortZone: 0}"
+                                v-model="goalsubject">
+                            <input v-else
+                                type="textarea"
+                                v-autowidth="{maxWidth: '960px', minWidth: '40%', comfortZone: 0}"
+                                v-model="goal.description">
                         </p>
                         <p>
                             <h4>{{ strings.fromavailablecourses }}</h4>
@@ -146,7 +163,6 @@
                             </div>
                             
                         </p>
-                    </div>
                 </div>
                 
             </div>
@@ -168,7 +184,7 @@
                 clicked: {},
             };
         },
-        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses', 'learningpaths']),
+        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses', 'learningpaths', 'learningpath']),
         watch: {
             goalname: function () {
                 this.learninggoal[0].name = this.goalname
@@ -191,7 +207,7 @@
                 let args = {};
                 if (learninggoalId) {
                     this.$store.state.learningGoalID = learninggoalId;
-                    this.$store.dispatch('fetchLearninggoal');
+                    this.$store.dispatch('fetchLearningpath');
                     this.editingadding = true;
                     // Do something here in case of an edit.
                 } else {
@@ -267,12 +283,11 @@
                 this.$store.dispatch('fetchLearninggoals');
                 this.clicked = {};
             },
-            duplicateLearninggoal(learninggoalid) {
+            duplicateLearningpath(learninggoalid) {
                 let result = {
                     learninggoalid: learninggoalid,
                 };
-                this.$store.dispatch('duplicateLearninggoal', result);
-                this.$store.dispatch('fetchLearninggoals');
+                this.$store.dispatch('duplicateLearningpath', result);
             }
         },
         created: function() {

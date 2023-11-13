@@ -67,4 +67,36 @@ class learning_paths {
         return 0;
     }
 
+    /**
+     * Start a new attempt for a user.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return array
+     */
+    public static function get_learning_paths() {
+
+        global $DB;
+        $sql = "SELECT id, name, description FROM {local_learning_paths}";
+
+        $learninggoals = $DB->get_records_sql($sql);
+
+        return array_map(fn($a) => (array)$a, $learninggoals);
+    }
+
+    /**
+     * Start a new attempt for a user.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return array
+     */
+    public static function get_learning_path($params) {
+
+        global $DB;
+        $sql = "SELECT id, name, description, json FROM {local_learning_paths} where id = :learninggoalid";
+        $learninggoal = $DB->get_record_sql($sql, $params);
+        return [(array) $learninggoal];
+    }
+
 }

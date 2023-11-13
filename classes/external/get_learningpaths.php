@@ -32,7 +32,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
-use local_adele\learning_path_courses;
+use local_adele\learning_paths;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -84,7 +84,7 @@ class get_learningpaths extends external_api {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 
-        return learning_path_courses::get_learning_paths();
+        return learning_paths::get_learning_paths();
     }
 
     /**

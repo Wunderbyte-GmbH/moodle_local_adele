@@ -64,6 +64,14 @@ $functions = array(
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ),
+    'local_adele_get_learningpath' => array(
+        'classname' => 'local_adele\external\get_learningpath',
+        'classpath' => '',
+        'description' => 'Get a specific learning goal.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ),
     'local_adele_get_handlers' => array(
         'classname' => 'local_adele\external\handlers',
         'methodname' => 'get_handlers',
@@ -86,9 +94,9 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
     ),
-    'local_adele_duplicate_learninggoal' => array(
-        'classname' => 'local_adele\external\learninggoal',
-        'methodname' => 'duplicate_learninggoal',
+    'local_adele_duplicate_learningpath' => array(
+        'classname' => 'local_adele\external\duplicate_learningpath',
+        'classpath' => '',
         'description' => 'Duplicate a specific learning goal.',
         'type' => 'write',
         'ajax' => true,
