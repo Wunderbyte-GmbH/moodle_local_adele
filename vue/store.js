@@ -200,9 +200,9 @@ export const store = new Vuex.Store({
          * @returns {Promise<void>}
          */
         async saveLearningpath(context, payload) {
-            console.log(payload);
             const result = await ajax('local_adele_save_learningpath',
             { name: payload.name, description: payload.description });
+            context.dispatch('fetchLearningpaths');
             //context.dispatch('fetchLearninggoals');
             return result.result;
         },

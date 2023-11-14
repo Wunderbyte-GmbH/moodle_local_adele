@@ -89,7 +89,7 @@
             </div>
             <h2>{{strings.overviewlearningpaths}}</h2>
             <div class="description">{{strings.learninggoals_edit_site_description}}</div>
-                <span v-if="learningpaths && learningpaths[0].name !== 'not found' && learningpaths[0].description !== ''">
+                <span v-if="learningpaths != null && learningpaths[0].name !== 'not found' && learningpaths[0].description !== ''">
                     <ul class="learninggoals-edit-list">
                         <li v-for="singlelearninggoal in learningpaths" style="margin-bottom: 10px">
                             <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
@@ -233,17 +233,16 @@
                 this.editingadding = false;
                 this.selectedTabId = 0;
                 this.$router.push({name: 'learninggoals-edit-overview'});
-                this.$store.dispatch('fetchLearninggoals');
+                this.$store.dispatch('fetchLearningpaths');
             },
             onSavePath() {
                 let result = {
                     learninggoalid: this.$store.state.learningGoalID,
                     name: this.learninggoal[0].name,
-                    description: this.learninggoal[0].subject,
+                    description: this.learninggoal[0].description,
                 };
-                console.log('inside');
-
                 this.$store.dispatch('saveLearningpath', result);
+                this.$store.dispatch('fetchLearningpaths');
                 this.$store.state.learningGoalID = 0;
                 this.editingadding = false;
                 this.$router.push({name: 'learninggoals-edit-overview'});
@@ -292,11 +291,12 @@
             }
         },
         created: function() {
-            this.$store.dispatch('fetchLearninggoals');
             this.$store.dispatch('fetchLearningpaths');
             this.$store.dispatch('fetchAvailablecourses');
             this.$store.dispatch('getHandlers');
             this.checkRoute(this.$route);
+            console.log(this.learningpaths);
+            console.log(this.learningpaths);
         },
         beforeRouteUpdate(to, from, next) {
             this.checkRoute(to);

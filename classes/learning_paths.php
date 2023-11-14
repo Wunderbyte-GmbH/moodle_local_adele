@@ -55,12 +55,18 @@ class learning_paths {
         $data = new stdClass;
         $data->name = $params['name'];
         $data->description = $params['description'];
-        $data->timecreated = time();
         $data->timemodified = time();
-        $data->createdby = $params['userid'];
         $data->json = json_encode('tbd');
 
-        $id = $DB->insert_record('local_learning_paths', (object)$data);
+        if ($params['learninggoalid'] == 0) {
+            $data->timecreated = time();
+            $data->createdby = $params['userid'];
+            $id = $DB->insert_record('local_learning_paths', (object)$data);
+        } else {
+            $data->id = $params['learninggoalid'];
+            $id = $DB->update_record('local_learning_paths', $data);
+        }
+
         if ($id > 0) {
             return 1;
         }
