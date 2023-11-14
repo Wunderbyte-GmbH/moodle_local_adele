@@ -83,10 +83,7 @@ class learning_paths {
     public static function get_learning_paths() {
 
         global $DB;
-        $sql = "SELECT id, name, description FROM {local_learning_paths}";
-
-        $learninggoals = $DB->get_records_sql($sql);
-
+        $learninggoals = $DB->get_records('local_learning_paths', null, '' , 'id, name, description');
         return array_map(fn($a) => (array)$a, $learninggoals);
     }
 
@@ -108,8 +105,7 @@ class learning_paths {
             return [$learninggoal];
         }
         global $DB;
-        $sql = "SELECT id, name, description, json FROM {local_learning_paths} where id = :learninggoalid";
-        $learninggoal = $DB->get_record_sql($sql, $params);
+        $learninggoal = $DB->get_record('local_learning_paths', ['id' => $params['learninggoalid']], 'id, name, description, json');
         return [(array) $learninggoal];
     }
 
@@ -122,13 +118,8 @@ class learning_paths {
      */
     public static function duplicate_learning_path($params) {
         global $DB, $USER;
-        $sql = "SELECT name,
-        description,
-        json
-        FROM {local_learning_paths}
-        WHERE id = :learninggoalid";
 
-        $learningpath = $DB->get_record_sql($sql, $params);
+        $learningpath = $DB->get_record('local_learning_paths', ['id' => $params['learninggoalid']], 'name, description, json');
 
         if (isset($learningpath)) {
             $learningpath->id = null;

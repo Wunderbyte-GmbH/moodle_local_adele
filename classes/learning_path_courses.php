@@ -35,13 +35,6 @@ namespace local_adele;
 class learning_path_courses {
 
     /**
-     * Entities constructor.
-     */
-    public function __construct() {
-
-    }
-
-    /**
      * Start a new attempt for a user.
      *
      * @param int $userid
@@ -49,11 +42,8 @@ class learning_path_courses {
      * @return array
      */
     public static function get_availablecourses() {
-
         global $DB;
-        $sql = "SELECT id, fullname, shortname FROM {course} LIMIT 40";
-
-        $learninggoals = $DB->get_records_sql($sql);
+        $learninggoals = $DB->get_records('course', null, '', 'id, fullname, shortname', 0 , 15);
 
         return array_map(fn($a) => (array)$a, $learninggoals);
     }
