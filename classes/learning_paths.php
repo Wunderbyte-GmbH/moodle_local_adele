@@ -98,7 +98,15 @@ class learning_paths {
      * @return array
      */
     public static function get_learning_path($params) {
-
+        if ($params['learninggoalid'] == 0) {
+            $learninggoal = array(
+                'id' => 0,
+                'name' => '',
+                'description' => '',
+                'json' => ''
+            );
+            return [$learninggoal];
+        }
         global $DB;
         $sql = "SELECT id, name, description, json FROM {local_learning_paths} where id = :learninggoalid";
         $learninggoal = $DB->get_record_sql($sql, $params);

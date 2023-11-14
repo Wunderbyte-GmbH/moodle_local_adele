@@ -148,7 +148,7 @@
                                 autofocus
                                 type="textarea"
                                 v-autowidth="{maxWidth: '960px', minWidth: '40%', comfortZone: 0}"
-                                v-model="goalsubject">
+                                v-model="goaldescription">
                             <input v-else
                                 type="textarea"
                                 v-autowidth="{maxWidth: '960px', minWidth: '40%', comfortZone: 0}"
@@ -177,7 +177,7 @@
         data: function() {
             return {
                 goalname: '',
-                goalsubject: '',
+                goaldescription: '',
                 editingadding: false,
                 selectedTabId: 0,
                 clicked: {},
@@ -188,8 +188,8 @@
             goalname: function () {
                 this.learninggoal[0].name = this.goalname
             },
-            goalsubject: function () {
-                this.learninggoal[0].subject = this.goalsubject
+            goaldescription: function () {
+                this.learninggoal[0].description = this.goaldescription
             }
         },
         methods: {
