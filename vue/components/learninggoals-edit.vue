@@ -172,7 +172,6 @@
 
 <script>
     import { mapState } from 'vuex';
-    
     export default {
         name: "learninggoals-edit",
         data: function() {
@@ -184,7 +183,7 @@
                 clicked: {},
             };
         },
-        computed: mapState(['strings', 'learninggoals', 'learninggoal', 'handlers', 'learningGoalID', 'availablecourses', 'learningpaths', 'learningpath']),
+        computed: mapState(['strings', 'learninggoal', 'learningGoalID', 'availablecourses', 'learningpaths', 'learningpath']),
         watch: {
             goalname: function () {
                 this.learninggoal[0].name = this.goalname
@@ -194,13 +193,6 @@
             }
         },
         methods: {
-            switchTab: function (id) {
-                this.$refs['tab'+id][0].click()
-            },
-            addToClipboard: function (data) {
-                navigator.clipboard.writeText(data);
-                this.$toasted.show(this.strings.toclipboarddone);
-            },
             async showForm(learninggoalId = null, selectedTabId = 0) {
                 this.goalname = '';
                 this.goalsubject = '';
@@ -211,7 +203,7 @@
                     this.editingadding = true;
                     // Do something here in case of an edit.
                 } else {
-                    this.$store.dispatch('fetchLearninggoal');
+                    this.$store.dispatch('fetchLearningpath');
                     this.editingadding = true;
                     // Do something here in case of an add.
                 }
@@ -233,7 +225,6 @@
                 this.editingadding = false;
                 this.selectedTabId = 0;
                 this.$router.push({name: 'learninggoals-edit-overview'});
-                this.$store.dispatch('fetchLearningpaths');
             },
             onSavePath() {
                 let result = {
@@ -247,24 +238,6 @@
                 this.editingadding = false;
                 this.$router.push({name: 'learninggoals-edit-overview'});
                 window.scrollTo(0,0);
-            },
-            fillword: function (event, id, index, field, text) {
-                switch(field) {
-                    case "content":
-                        this.learninggoal[0].content = text;
-                        break;
-                    case "resource":
-                        this.learninggoal[0].resource = text;
-                        break;
-                    case "product":
-                        this.learninggoal[0].product = text;
-                        break;
-                    case "group":
-                        this.learninggoal[0].group = text;
-                        break;
-                    default:
-                        this.learninggoal[0].thinking_skill = text;
-                }
             },
             showDeleteConfirm(index){
                 // Dismiss other open confirm delete prompts.
@@ -293,10 +266,7 @@
         created: function() {
             this.$store.dispatch('fetchLearningpaths');
             this.$store.dispatch('fetchAvailablecourses');
-            this.$store.dispatch('getHandlers');
             this.checkRoute(this.$route);
-            console.log(this.learningpaths);
-            console.log(this.learningpaths);
         },
         beforeRouteUpdate(to, from, next) {
             this.checkRoute(to);

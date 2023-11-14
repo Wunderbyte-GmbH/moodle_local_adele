@@ -12,7 +12,6 @@ export const store = new Vuex.Store({
         learningGoalID: 0,
         contextID: 0,
         strings: {},
-        handlers: null,
         learninggoals: null,
         learningpaths: null,
         learningpath: null,
@@ -30,9 +29,6 @@ export const store = new Vuex.Store({
         },
         setStrings(state, strings) {
             state.strings = strings;
-        },
-        setHandlers(state, ajaxdata) {
-            state.handlers = ajaxdata;
         },
         setLearninggoals(state, ajaxdata) {
             state.learninggoals = ajaxdata;
@@ -93,20 +89,7 @@ export const store = new Vuex.Store({
             }
         },
         /**
-         * Fetches a learning goal.
-         *
-         * @param context
-         *
-         * @returns {Promise<void>}
-         */
-        async fetchLearninggoal(context) {
-            const learninggoal = await ajax('local_adele_get_learninggoal',
-                { userid: 0, learninggoalid: store.state.learningGoalID });
-            console.log(learninggoal)
-            context.commit('setLearninggoal', learninggoal);
-        },
-        /**
-         * Fetches a learning goal.
+         * Fetches a learning path.
          *
          * @param context
          *
@@ -124,37 +107,10 @@ export const store = new Vuex.Store({
          *
          * @returns {Promise<void>}
          */
-        async fetchLearninggoals(context) {
-            const learninggoals = await ajax('local_adele_get_learninggoals');
-            context.commit('setLearninggoals', learninggoals);
-        },
-
-        /**
-         * Fetches all of a user's learning goal.
-         *
-         * @param context
-         *
-         * @returns {Promise<void>}
-         */
         async fetchLearningpaths(context) {
             const learninggpaths = await ajax('local_adele_get_learningpaths');
             context.commit('setLearningpaths', learninggpaths);
         },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /**
          * Fetches all of a user's learning goal.
          *
@@ -167,32 +123,7 @@ export const store = new Vuex.Store({
             context.commit('setAvailablecourses', availablecourses);
         },
         /**
-         * Fetches the differentiator handlers.
-         *
-         * @param context
-         *
-         * @returns {Promise<void>}
-         */
-        async getHandlers(context) {
-            const handlers = await ajax('local_adele_get_handlers');
-            context.commit('setHandlers', handlers);
-        },
-        /**
-         * Saves a learning goal.
-         *
-         * @param context
-         * @param payload
-         *
-         * @returns {Promise<void>}
-         */
-        async saveLearninggoal(context, payload) {
-            const result = await ajax('local_adele_save_learninggoal', payload);
-            context.dispatch('fetchLearninggoals');
-            return result.result;
-        },
-
-        /**
-         * Saves a learning goal.
+         * Saves a learning path.
          *
          * @param context
          * @param payload
@@ -203,11 +134,10 @@ export const store = new Vuex.Store({
             const result = await ajax('local_adele_save_learningpath',
             { name: payload.name, description: payload.description });
             context.dispatch('fetchLearningpaths');
-            //context.dispatch('fetchLearninggoals');
             return result.result;
         },
         /**
-         * Deletes a learning goal.
+         * Deletes a learning path.
          *
          * @param context
          * @param payload
