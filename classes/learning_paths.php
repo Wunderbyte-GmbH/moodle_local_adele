@@ -126,4 +126,26 @@ class learning_paths {
         }
         return ['success' => false];
     }
+
+    /**
+     * Start a new attempt for a user.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return array
+     */
+    public static function delete_learning_path($params) {
+        global $DB;
+
+        $result = $DB->delete_records('local_learning_paths', ['id' => $params['learninggoalid']]);
+        if ($result) {
+            return [
+                'success' => true,
+            ];
+        } else {
+            return [
+                'success' => false,
+            ];
+        }
+    }
 }

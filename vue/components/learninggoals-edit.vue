@@ -110,7 +110,7 @@
                                 <div class="alert-danger p-3 m-t-1 m-b-1" v-show="clicked[singlelearninggoal.id]">
                                     <div>{{strings.deletepromptpre}}{{singlelearninggoal.name}}{{strings.deletepromptpost}}</div>
                                     <div class="m-t-1">
-                                        <button class="btn btn-danger m-r-0" @click="deleteLearninggoalConfirm(singlelearninggoal.id)" :title="strings.btnconfirmdelete">
+                                        <button class="btn btn-danger m-r-0" @click="deleteLearningpathConfirm(singlelearninggoal.id)" :title="strings.btnconfirmdelete">
                                         {{ strings.btnconfirmdelete }}</button>
                                         <button type=button @click="cancelDeleteConfirm(singlelearninggoal.id)" class="btn btn-secondary">{{strings.cancel}}</button>
                                     </div>
@@ -277,13 +277,11 @@
                 if (this.clicked.hasOwnProperty(index))
                     this.$set(this.clicked, index, !this.clicked[index])
             },
-            deleteLearninggoalConfirm(learninggoalid) {
-                console.log('inside');
+            deleteLearningpathConfirm(learninggoalid) {
                 let result = {
                     learninggoalid: learninggoalid,
                 };
-                this.$store.dispatch('deleteLearninggoal', result);
-                this.$store.dispatch('fetchLearninggoals');
+                this.$store.dispatch('deleteLearningpath', result);
                 this.clicked = {};
             },
             duplicateLearningpath(learninggoalid) {

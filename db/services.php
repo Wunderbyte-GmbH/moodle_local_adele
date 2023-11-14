@@ -87,10 +87,10 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
     ),
-    'local_adele_delete_learninggoal' => array(
-        'classname' => 'local_adele\external\learninggoal',
-        'methodname' => 'delete_learninggoal',
-        'description' => 'Delete a specific learning goal.',
+    'local_adele_delete_learningpath' => array(
+        'classname' => 'local_adele\external\delete_learningpath',
+        'classpath' => '',
+        'description' => 'Delete a specific learning path.',
         'type' => 'write',
         'ajax' => true,
     ),

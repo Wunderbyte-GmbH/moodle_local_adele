@@ -214,9 +214,9 @@ export const store = new Vuex.Store({
          *
          * @returns {Promise<void>}
          */
-        async deleteLearninggoal(context, payload) {
-            const result = await ajax('local_adele_delete_learninggoal', payload);
-            context.dispatch('fetchLearninggoals');
+        async deleteLearningpath(context, payload) {
+            const result = await ajax('local_adele_delete_learningpath', payload);
+            context.dispatch('fetchLearningpaths');
             return result.result;
         },
         /**

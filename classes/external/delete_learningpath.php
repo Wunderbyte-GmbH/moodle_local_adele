@@ -31,8 +31,7 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
-use core_external\external_multiple_structure;
-use local_adele\learning_path_courses;
+use local_adele\learning_paths;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,7 +46,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_availablecourses extends external_api {
+class delete_learningpath extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -84,7 +83,7 @@ class get_availablecourses extends external_api {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 
-        return learning_path_courses::get_availablecourses();
+        return learning_paths::delete_learning_path($params);
     }
 
     /**
@@ -92,14 +91,10 @@ class get_availablecourses extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
-                    'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'shortname' => new external_value(PARAM_TEXT, 'Item name'),
-                ]
-            )
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
+            ]
         );
     }
 }
