@@ -32,7 +32,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
-use local_adele\learning_path_courses;
+use local_adele\learning_paths;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -57,7 +57,7 @@ class duplicate_learningpath extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
+            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
             ]
         );
     }
@@ -71,11 +71,10 @@ class duplicate_learningpath extends external_api {
      *
      * @return array
      */
-    public static function execute($userid, $learningpathid, $learninggoalid): array {
+    public static function execute($userid, $learningpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
-            'learningpathid' => $learningpathid,
-            'learninggoalid' => $learninggoalid,
+            'learninggoalid' => $learningpathid,
         ]);
 
         require_login();
@@ -85,7 +84,7 @@ class duplicate_learningpath extends external_api {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 
-        return learning_paths::get_learning_path($params);
+        return learning_paths::duplicate_learning_path($params);
     }
 
     /**
@@ -93,14 +92,10 @@ class duplicate_learningpath extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
-                    'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'shortname' => new external_value(PARAM_TEXT, 'Item name'),
-                ]
-            )
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
+            ]
         );
     }
 }

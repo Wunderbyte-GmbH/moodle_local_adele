@@ -241,6 +241,8 @@
                     name: this.learninggoal[0].name,
                     description: this.learninggoal[0].subject,
                 };
+                console.log('inside');
+
                 this.$store.dispatch('saveLearningpath', result);
                 this.$store.state.learningGoalID = 0;
                 this.editingadding = false;
@@ -276,6 +278,7 @@
                     this.$set(this.clicked, index, !this.clicked[index])
             },
             deleteLearninggoalConfirm(learninggoalid) {
+                console.log('inside');
                 let result = {
                     learninggoalid: learninggoalid,
                 };

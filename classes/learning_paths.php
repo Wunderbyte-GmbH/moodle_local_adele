@@ -99,4 +99,31 @@ class learning_paths {
         return [(array) $learninggoal];
     }
 
+    /**
+     * Start a new attempt for a user.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return array
+     */
+    public static function duplicate_learning_path($params) {
+        global $DB, $USER;
+        $sql = "SELECT name,
+        description,
+        json
+        FROM {local_learning_paths}
+        WHERE id = :learninggoalid";
+
+        $learningpath = $DB->get_record_sql($sql, $params);
+
+        if (isset($learningpath)) {
+            $learningpath->id = null;
+            $learningpath->createdby = $USER->id;
+            $learningpath->timecreated = time();
+            $learningpath->timemodified = time();
+            $DB->insert_record('local_learning_paths', $learningpath);
+            return ['success' => true];
+        }
+        return ['success' => false];
+    }
 }
