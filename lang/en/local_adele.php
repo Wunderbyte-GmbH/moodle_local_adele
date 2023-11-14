@@ -43,6 +43,7 @@ $string['route_not_found'] = 'Page was not found. Please consider going back and
 // Vue component learning goal edit.
 $string['learninggoals_edit_site_name'] = 'adele learning goals';
 $string['learninggoals_edit_site_description'] = 'You may add a new learning path or edit existing paths.';
+$string['learninggoals_edit_site_no_learningpaths'] = 'No learning paths to show yet.';
 $string['learninggoals_edit_no_learninggoals'] = 'There are no goals to show.';
 
 // Learning goals overview.

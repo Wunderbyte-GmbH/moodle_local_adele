@@ -89,7 +89,10 @@
             </div>
             <h2>{{strings.overviewlearningpaths}}</h2>
             <div class="description">{{strings.learninggoals_edit_site_description}}</div>
-                <span v-if="learningpaths != null && learningpaths[0].name !== 'not found' && learningpaths[0].description !== ''">
+                <span v-if="learningpaths == ''">
+                    {{strings.learninggoals_edit_site_no_learningpaths}}
+                </span>
+                <span v-else>
                     <ul class="learninggoals-edit-list">
                         <li v-for="singlelearninggoal in learningpaths" style="margin-bottom: 10px">
                             <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
