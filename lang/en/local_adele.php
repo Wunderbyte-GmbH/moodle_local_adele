@@ -59,7 +59,6 @@ $string['goalsubjectplaceholder'] = 'Learning path description';
 $string['toclipboarddone'] = 'Copied to clipboard';
 $string['subject'] = 'Subject';
 
-
 // Learning goal form.
 $string['learninggoal'] = 'Goal';
 $string['learninggoal_name'] = 'Goal name';
@@ -97,3 +96,21 @@ $string['fromlearningdescriptionplaceholder'] = 'Please provide a short descript
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all Learningpaths';
 $string['overviewaddingbtn'] = 'Create new learning path';
+
+// Adele Settings.
+$string['activefilter'] = 'Activate filter';
+$string['activefilter_desc'] = 'The filters will effect the available courses for the creation of learningpaths';
+
+$string['courselevel'] = 'Choose course level';
+$string['courselevel_desc'] = 'Decide which course level is shown inside the creation of learningpaths';
+
+$string['tagsinclude'] = 'Define included tags';
+$string['tagsinclude_desc'] = 'Define which courses according to their tags will be filtered. Courses with one of those tags will be filtered';
+
+$string['tagsexclude'] = 'Define excluded tags';
+$string['tagsexclude_desc'] = 'Define which courses according to their tags will not filtered. Courses with one of those tags will not be filtered';
+
+$string['categories'] = 'Define category level';
+$string['categories_desc'] = 'Define course-level should be included';
+
+$string['tag_invalid'] = 'Following tags were not found: {$a}';

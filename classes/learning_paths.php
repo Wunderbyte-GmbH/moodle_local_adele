@@ -81,7 +81,6 @@ class learning_paths {
      * @return array
      */
     public static function get_learning_paths() {
-
         global $DB;
         $learninggoals = $DB->get_records('local_learning_paths', null, '' , 'id, name, description');
         return array_map(fn($a) => (array)$a, $learninggoals);

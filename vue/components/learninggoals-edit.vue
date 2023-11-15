@@ -198,7 +198,7 @@
         methods: {
             async showForm(learninggoalId = null, selectedTabId = 0) {
                 this.goalname = '';
-                this.goalsubject = '';
+                this.goaldescription = '';
                 let args = {};
                 if (learninggoalId) {
                     this.$store.state.learningGoalID = learninggoalId;
