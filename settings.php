@@ -17,15 +17,13 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     local_shopping_cart
- * @category    admin
- * @copyright   2021 Wunderbyte GmbH<info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use local_adele\admin_setting_course_tags;
-use local_shopping_cart\admin_setting_taxcategories;
-use local_shopping_cart\shopping_cart;
 
 defined('MOODLE_INTERNAL') || die();
 

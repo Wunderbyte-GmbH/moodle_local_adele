@@ -19,16 +19,16 @@ namespace local_adele;
 use admin_setting_configtextarea;
 
 /**
- * The tax categories settings class - show tax categories settings
+ * Validate if the string does excist.
  *
- * @package    local_shopping_cart
- * @copyright  2022 Maurice Wohlkönig <maurice@whlk.at>
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_course_tags extends admin_setting_configtextarea {
     /**
-     * Validate the contents of the textarea as taxcategories
-     * Used to validate a new line separated list of tax categories collected from a textarea control.
+     * Validate the contents of the tags
      *
      * @param string $data A list of categories separated by new lines
      * @return mixed bool true for success or string:error on failure

@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This class contains a list of webservice functions related to the catquiz Module by Wunderbyte.
+ * This class contains a list of webservice functions related to the adele Module by Wunderbyte.
  *
- * @package    local_catquiz
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -39,12 +40,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 
 /**
- * External Service for local catquiz.
+ * External Service for local adele.
  *
- * @package   local_catquiz
- * @copyright 2022 Wunderbyte GmbH {@link http://www.wunderbyte.at}
- * @author    Georg Maißer
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_learningpath extends external_api {
 
@@ -64,10 +65,9 @@ class delete_learningpath extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $attemptid
-     * @param int $quizid
+     * @param int $userid
+     * @param int $learninggoalid
      * @param string $component
-     *
      * @return array
      */
     public static function execute($userid, $learninggoalid): array {

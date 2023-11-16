@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This class contains a list of webservice functions related to the catquiz Module by Wunderbyte.
+ * This class contains a list of webservice functions related to the adele Module by Wunderbyte.
  *
- * @package    local_catquiz
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,10 +42,10 @@ require_once($CFG->libdir . '/externallib.php');
 /**
  * External Service for local catquiz.
  *
- * @package   local_catquiz
- * @copyright 2022 Wunderbyte GmbH {@link http://www.wunderbyte.at}
- * @author    Georg Maißer
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_learningpath extends external_api {
 
@@ -66,11 +67,11 @@ class save_learningpath extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $attemptid
-     * @param int $quizid
-     * @param string $component
-     *
-     * @return array
+     * @param int $userid
+     * @param int $learninggoalid
+     * @param string $name
+     * @param string $description
+     * @return bool
      */
     public static function execute($userid, $learninggoalid, $name, $description): array {
         $params = self::validate_parameters(self::execute_parameters(), [

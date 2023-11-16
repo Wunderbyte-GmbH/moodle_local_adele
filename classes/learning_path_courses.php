@@ -25,19 +25,18 @@
 namespace local_adele;
 
 /**
- * Class catquiz
+ * Class learning_path_courses
  *
- * @author Georg Maißer
- * @copyright 2022 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_path_courses {
 
     /**
      * Start a new attempt for a user.
      *
-     * @param int $userid
-     * @param int $categoryid
      * @return array
      */
     public static function get_availablecourses() {
@@ -47,10 +46,8 @@ class learning_path_courses {
     }
 
     /**
-     * Start a new attempt for a user.
+     * Build sql query with config filters.
      *
-     * @param int $userid
-     * @param int $categoryid
      * @return array
      */
     public static function buildsqlquery() {
@@ -140,7 +137,14 @@ class learning_path_courses {
 
     }
 
-    protected static function get_course_records($whereclause, $params, $usersql ) {
+    /**
+     * Build sql query with config filters.
+     * @param str $whereclause
+     * @param array $params
+     * @param str $usersql
+     * @return object
+     */
+    protected static function get_course_records($whereclause, $params, $usersql) {
         global $DB;
         $fields = ['c.id', 'c.fullname', 'c.shortname'];
         // TODO  user query includieren 154-157 && available courses anzeigen.
