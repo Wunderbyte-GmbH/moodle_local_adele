@@ -127,7 +127,6 @@ class learning_path_courses {
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            //$usercourses = enrol_get_all_users_courses($USER->id);
             $usersql = " JOIN (SELECT DISTINCT e.courseid
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON
@@ -151,7 +150,7 @@ class learning_path_courses {
                 $usersql .
                 "JOIN {context} ctx ON c.id = ctx.instanceid
                 AND ctx.contextlevel = :contextcourse
-                WHERE ".
+                WHERE " .
                 $whereclause."ORDER BY c.sortorder";
         $list = $DB->get_records_sql($sql,
             array('contextcourse' => CONTEXT_COURSE) + $params);

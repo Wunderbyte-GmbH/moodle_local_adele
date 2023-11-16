@@ -23,6 +23,7 @@
  */
 
 require('../../config.php');
+require_login();
 
 $coursemoduleid = optional_param('id', 0, PARAM_INT);
 if ($coursemoduleid > 0) {
