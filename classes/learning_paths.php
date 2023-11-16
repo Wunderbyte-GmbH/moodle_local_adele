@@ -17,10 +17,10 @@
 /**
  * Entities Class to display list of entity records.
  *
- * @package local_catquiz
- * @author Thomas Winkler
- * @copyright 2021 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_adele;
@@ -28,11 +28,12 @@ namespace local_adele;
 use stdClass;
 
 /**
- * Class catquiz
+ * Class learning_paths
  *
- * @author Georg Maißer
- * @copyright 2022 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_paths {
 
@@ -44,11 +45,10 @@ class learning_paths {
     }
 
     /**
-     * Start a new attempt for a user.
+     * Save learning path.
      *
-     * @param int $userid
-     * @param int $categoryid
-     * @return array
+     * @param array $params
+     * @return bool
      */
     public static function save_learning_path($params) {
         global $DB;
@@ -61,10 +61,10 @@ class learning_paths {
         if ($params['learninggoalid'] == 0) {
             $data->timecreated = time();
             $data->createdby = $params['userid'];
-            $id = $DB->insert_record('local_learning_paths', (object)$data);
+            $id = $DB->insert_record('local_adele_learning_paths', (object)$data);
         } else {
             $data->id = $params['learninggoalid'];
-            $id = $DB->update_record('local_learning_paths', $data);
+            $id = $DB->update_record('local_adele_learning_paths', $data);
         }
 
         if ($id > 0) {
@@ -74,74 +74,69 @@ class learning_paths {
     }
 
     /**
-     * Start a new attempt for a user.
+     * Get all learning paths.
      *
-     * @param int $userid
-     * @param int $categoryid
      * @return array
      */
     public static function get_learning_paths() {
         global $DB;
-        $learninggoals = $DB->get_records('local_learning_paths', null, '' , 'id, name, description');
+        $learninggoals = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description');
         return array_map(fn($a) => (array)$a, $learninggoals);
     }
 
     /**
-     * Start a new attempt for a user.
+     * Get one specific learning path.
      *
-     * @param int $userid
-     * @param int $categoryid
+     * @param array $params
      * @return array
      */
     public static function get_learning_path($params) {
         if ($params['learninggoalid'] == 0) {
-            $learninggoal = array(
+            $learninggoal = [
                 'id' => 0,
                 'name' => '',
                 'description' => '',
-                'json' => ''
-            );
+                'json' => '',
+            ];
             return [$learninggoal];
         }
         global $DB;
-        $learninggoal = $DB->get_record('local_learning_paths', ['id' => $params['learninggoalid']], 'id, name, description, json');
+        $learninggoal = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']], 'id, name, description, json');
         return [(array) $learninggoal];
     }
 
     /**
-     * Start a new attempt for a user.
+     * Duplicate a learning path.
      *
-     * @param int $userid
-     * @param int $categoryid
+     * @param array $params
      * @return array
      */
     public static function duplicate_learning_path($params) {
         global $DB, $USER;
 
-        $learningpath = $DB->get_record('local_learning_paths', ['id' => $params['learninggoalid']], 'name, description, json');
+        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']], 'name, description, json');
 
         if (isset($learningpath)) {
             $learningpath->id = null;
             $learningpath->createdby = $USER->id;
             $learningpath->timecreated = time();
             $learningpath->timemodified = time();
-            $DB->insert_record('local_learning_paths', $learningpath);
+            $DB->insert_record('local_adele_learning_paths', $learningpath);
             return ['success' => true];
         }
         return ['success' => false];
     }
 
     /**
-     * Start a new attempt for a user.
+     * Delete a learning path.
      *
-     * @param int $userid
-     * @param int $categoryid
+     * @param array $params
      * @return array
      */
     public static function delete_learning_path($params) {
         global $DB;
 
-        $result = $DB->delete_records('local_learning_paths', ['id' => $params['learninggoalid']]);
+        $result = $DB->delete_records('local_adele_learning_paths', ['id' => $params['learninggoalid']]);
         if ($result) {
             return [
                 'success' => true,

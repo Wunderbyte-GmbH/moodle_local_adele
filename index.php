@@ -17,9 +17,10 @@
 /**
  * Local Differentiator main view.
  *
- * @package     local_differentiator
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../config.php');

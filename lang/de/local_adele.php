@@ -15,17 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for mod_vuejsdemo, language en
+ * Strings for local:adele, language de
  *
- * @package    mod_vuejsdemo
- * @copyright  2019 Martin Gauk, innoCampus, TU Berlin
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // Required strings.
 $string['modulename'] = 'Adele';
 $string['modulenameplural'] = 'Adeles';
 $string['modulename_help'] = 'Adele';
-$string['pluginadministration'] = 'Adele-Verwaltung';
+$string['pluginadministration'] = 'Adele Verwaltung';
 $string['pluginname'] = 'Adele';
 
 // Capabilities.
@@ -39,7 +41,8 @@ $string['route_not_found'] = 'Seite wurde nicht gefunden. Bitte gehen Sie zurüc
 // Vue component learning goal edit.
 $string['learninggoals_edit_site_name'] = 'Adele Lernziele';
 $string['learninggoals_edit_site_description'] = 'Sie können einen neuen Lernpfad hinzufügen oder vorhandene Pfade bearbeiten.';
-$string['learninggoals_edit_no_learninggoals'] = 'Es gibt keine Ziele zum Anzeigen.';
+$string['learninggoals_edit_site_no_learningpaths'] = 'Noch keine Lernpfade vorhanden.';
+$string['learninggoals_edit_no_learninggoals'] = 'Es gibt keine Ziele zu zeigen.';
 
 // Learning goals overview.
 $string['edit'] = 'Bearbeiten';
@@ -49,7 +52,8 @@ $string['deletepromptpost'] = '" wirklich löschen?';
 $string['btnconfirmdelete'] = 'Löschen bestätigen';
 $string['duplicate'] = 'Duplizieren';
 $string['toclipboard'] = 'In die Zwischenablage kopieren';
-$string['goalnameplaceholder'] = 'Name des Lernziels';
+$string['goalnameplaceholder'] = 'Name des Lernpfads';
+$string['goalsubjectplaceholder'] = 'Beschreibung des Lernpfads';
 $string['toclipboarddone'] = 'In die Zwischenablage kopiert';
 $string['subject'] = 'Thema';
 
@@ -57,8 +61,8 @@ $string['subject'] = 'Thema';
 $string['learninggoal'] = 'Ziel';
 $string['learninggoal_name'] = 'Zielname';
 $string['learninggoal_description'] = 'Zielbeschreibung';
-$string['learninggoal_form_title_add'] = 'Neuen Lernpfad hinzufügen';
-$string['learninggoal_form_title_edit'] = 'Lernpfad bearbeiten';
+$string['learninggoal_form_title_add'] = 'Einen neuen Lernpfad hinzufügen';
+$string['learninggoal_form_title_edit'] = 'Einen Lernpfad bearbeiten';
 $string['save'] = 'Speichern';
 $string['cancel'] = 'Abbrechen';
 
@@ -71,8 +75,8 @@ $string['groups'] = 'Gruppen';
 
 // Words.
 $string['prethinkingskill'] = 'Die Schüler werden';
-$string['clicktoedit'] = '[Zum Bearbeiten klicken]';
-$string['preresource'] = 'unter Verwendung von';
+$string['clicktoedit'] = '[zum Bearbeiten klicken]';
+$string['preresource'] = 'verwenden';
 $string['preproduct'] = 'und erstellen';
 $string['pregroup'] = 'in Gruppen von';
 
@@ -84,9 +88,27 @@ $string['btnbacktooverview'] = 'Zurück zur Übersicht';
 $string['fromlearningtitel'] = 'Titel des Lernpfads';
 $string['fromlearningdescription'] = 'Beschreibung des Lernpfads';
 $string['fromavailablecourses'] = 'Liste der verfügbaren Kurse';
-$string['fromlearningtitelplaceholder'] = 'Bitte einen Titel angeben';
-$string['fromlearningdescriptionplaceholder'] = 'Bitte eine kurze Beschreibung angeben';
+$string['fromlearningtitelplaceholder'] = 'Bitte geben Sie einen Titel an';
+$string['fromlearningdescriptionplaceholder'] = 'Bitte geben Sie eine kurze Beschreibung an';
 
 // Overview String.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
 $string['overviewaddingbtn'] = 'Neuen Lernpfad erstellen';
+
+// Adele Settings.
+$string['activefilter'] = 'Filter aktivieren';
+$string['activefilter_desc'] = 'Die Filter wirken sich auf die verfügbaren Kurse für die Erstellung von Lernpfaden aus';
+
+$string['courselevel'] = 'Kursniveau wählen';
+$string['courselevel_desc'] = 'Entscheiden Sie, welches Kursniveau innerhalb der Erstellung von Lernpfaden angezeigt wird';
+
+$string['tagsinclude'] = 'Eingeschlossene Tags definieren';
+$string['tagsinclude_desc'] = 'Definieren Sie, welche Kurse nach ihren Tags gefiltert werden sollen. Kurse mit einem dieser Tags werden gefiltert';
+
+$string['tagsexclude'] = 'Ausgeschlossene Tags definieren';
+$string['tagsexclude_desc'] = 'Definieren Sie, welche Kurse nach ihren Tags nicht gefiltert werden sollen. Kurse mit einem dieser Tags werden nicht gefiltert';
+
+$string['categories'] = 'Kategorieniveau definieren';
+$string['categories_desc'] = 'Definieren Sie, welches Kursniveau einbezogen werden soll';
+
+$string['tag_invalid'] = 'Folgende Tags wurden nicht gefunden: {$a}';

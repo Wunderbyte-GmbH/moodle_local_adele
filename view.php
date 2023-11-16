@@ -17,12 +17,14 @@
 /**
  * This page is the entry page into the mod.
  *
- * @package    local_adele
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');
+require_login();
 
 $coursemoduleid = optional_param('id', 0, PARAM_INT);
 if ($coursemoduleid > 0) {

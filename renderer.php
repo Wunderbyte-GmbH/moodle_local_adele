@@ -18,9 +18,19 @@
  * Local Differentiator renderer.
  *
  * @package     local_adele
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
+/**
+ * Class local_adele_renderer
+ *
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_adele_renderer extends plugin_renderer_base {
 }
