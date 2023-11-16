@@ -101,7 +101,8 @@ class learning_paths {
             return [$learninggoal];
         }
         global $DB;
-        $learninggoal = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']], 'id, name, description, json');
+        $learninggoal = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']],
+            'id, name, description, json');
         return [(array) $learninggoal];
     }
 
@@ -114,7 +115,8 @@ class learning_paths {
     public static function duplicate_learning_path($params) {
         global $DB, $USER;
 
-        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']], 'name, description, json');
+        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']],
+            'name, description, json');
 
         if (isset($learningpath)) {
             $learningpath->id = null;

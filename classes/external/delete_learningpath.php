@@ -67,7 +67,6 @@ class delete_learningpath extends external_api {
      *
      * @param int $userid
      * @param int $learninggoalid
-     * @param string $component
      * @return array
      */
     public static function execute($userid, $learninggoalid): array {
