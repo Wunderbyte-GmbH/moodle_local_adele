@@ -18,14 +18,13 @@
  * Plugin capabilities are defined here.
  *
  * @package     local_adele
- * @category    access
- * @copyright   2022 Wunderbyte Gmbh <info@wunderbyte.at>
+ * @copyright  2023 Wunderbyte GmbH
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
+$capabilities = [
         'local/adele:canmanage' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_SYSTEM,
@@ -37,14 +36,14 @@ $capabilities = array(
             'captype' => 'view',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => [
-                'user' => CAP_ALLOW
-            ]
+                'user' => CAP_ALLOW,
+            ],
         ],
         'local/adele:edit' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => [
-                'user' => CAP_ALLOW
-            ]
+                'user' => CAP_ALLOW,
+            ],
         ],
-    );
+    ];

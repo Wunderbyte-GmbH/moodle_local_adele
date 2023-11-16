@@ -18,56 +18,56 @@
  * adele plugin external functions and service definitions.
  *
  * @package     local_adele
- * @copyright   2019 Luca Bösch <luca.boesch@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array(
-    'local_adele_get_availablecourses' => array(
+$functions = [
+    'local_adele_get_availablecourses' => [
         'classname' => 'local_adele\external\get_availablecourses',
         'classpath' => '',
         'description' => 'Get all available courses.',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
-    ),
-    'local_adele_save_learningpath' => array(
+    ],
+    'local_adele_save_learningpath' => [
         'classname' => 'local_adele\external\save_learningpath',
         'classpath' => '',
         'description' => 'Save a specific learning path.',
         'type' => 'write',
         'ajax' => true,
-    ),
-    'local_adele_get_learningpaths' => array(
+    ],
+    'local_adele_get_learningpaths' => [
         'classname' => 'local_adele\external\get_learningpaths',
         'classpath' => '',
         'description' => 'Get all learning goals.',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
-    ),
-    'local_adele_get_learningpath' => array(
+    ],
+    'local_adele_get_learningpath' => [
         'classname' => 'local_adele\external\get_learningpath',
         'classpath' => '',
         'description' => 'Get a specific learning goal.',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
-    ),
-    'local_adele_delete_learningpath' => array(
+    ],
+    'local_adele_delete_learningpath' => [
         'classname' => 'local_adele\external\delete_learningpath',
         'classpath' => '',
         'description' => 'Delete a specific learning path.',
         'type' => 'write',
         'ajax' => true,
-    ),
-    'local_adele_duplicate_learningpath' => array(
+    ],
+    'local_adele_duplicate_learningpath' => [
         'classname' => 'local_adele\external\duplicate_learningpath',
         'classpath' => '',
         'description' => 'Duplicate a specific learning goal.',
         'type' => 'write',
         'ajax' => true,
-    ),
-);
+    ],
+];

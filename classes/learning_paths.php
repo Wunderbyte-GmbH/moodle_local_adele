@@ -95,12 +95,12 @@ class learning_paths {
      */
     public static function get_learning_path($params) {
         if ($params['learninggoalid'] == 0) {
-            $learninggoal = array(
+            $learninggoal = [
                 'id' => 0,
                 'name' => '',
                 'description' => '',
-                'json' => ''
-            );
+                'json' => '',
+            ];
             return [$learninggoal];
         }
         global $DB;

@@ -46,7 +46,7 @@ if ($hassiteconfig) {
                 'only_subscribed',
                 [
                     'only_subscribed' => 'Only courses the theacher is subscribed to.',
-                    'all_courses' => 'All courses meeting the other criterias.'
+                    'all_courses' => 'All courses meeting the other criterias.',
                 ]));
 
     // Included tags.

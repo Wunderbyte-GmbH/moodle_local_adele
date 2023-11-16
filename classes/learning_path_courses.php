@@ -17,9 +17,8 @@
 /**
  * Entities Class to display list of entity records.
  *
- * @package local_catquiz
- * @author Thomas Winkler
- * @copyright 2021 Wunderbyte GmbH
+ * @package     local_adele
+ * @copyright  2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -143,7 +142,7 @@ class learning_path_courses {
 
     protected static function get_course_records($whereclause, $params, $usersql ) {
         global $DB;
-        $fields = array('c.id', 'c.fullname', 'c.shortname');
+        $fields = ['c.id', 'c.fullname', 'c.shortname'];
         // TODO  user query includieren 154-157 && available courses anzeigen.
         $sql = "SELECT ". join(',', $fields).
                 " FROM {course} c" .
@@ -153,7 +152,7 @@ class learning_path_courses {
                 WHERE " .
                 $whereclause."ORDER BY c.sortorder";
         $list = $DB->get_records_sql($sql,
-            array('contextcourse' => CONTEXT_COURSE) + $params);
+            ['contextcourse' => CONTEXT_COURSE] + $params);
         return $list;
     }
 }
