@@ -166,6 +166,9 @@
                             </div>
                             
                         </p>
+                        <a href="/course/edit.php?category=0" target="_blank" rel="noreferrer noopener">
+                            <button type=button class="btn btn-secondary" :title="strings.btncreatecourse">{{strings.btncreatecourse}}</button>
+                        </a>
                 </div>
                 
             </div>
