@@ -55,7 +55,7 @@ class learning_path_courses {
      * @return array
      */
     public static function buildsqlquery() {
-        global $DB;
+        global $DB, $USER;
         $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t WHERE (";
         $configadele = get_config('local_adele');
 
@@ -63,13 +63,15 @@ class learning_path_courses {
         $configtags['OR'] = explode(',', str_replace(' ', '', $configadele->includetags));
         $configtags['AND'] = explode(',', str_replace(' ', '', $configadele->excludetags));
 
+        $params = [];
+        $usersql = ' ';
+
         // Filter according to the tags.
         if ($configtags['OR'][0] != null || $configtags['AND'][0] != null) {
             $concat = false;
             if ($configtags['OR'][0] != null && $configtags['AND'][0] != null) {
                 $concat = true;
             }
-            $params = [];
             $indexparam = 0;
             foreach ($configtags as $operator => $tags) {
                 if (!empty($tags[0])) {
@@ -100,36 +102,57 @@ class learning_path_courses {
             $configcategories = explode(',', str_replace(' ', '', $configadele->catfilter));
             $sqlcategories = "SELECT id FROM {course_categories} WHERE ";
             foreach ($configcategories as $index => $configcategory) {
-                $sqlcategories .= "path LIKE '%/" . $configcategory . "%'";
+                $sqlcategories .= "path LIKE '%/" . $configcategory . "/%'";
                 if ($index + 1 < count($configcategories)) {
                     $sqlcategories .= ' OR ';
                 }
             }
             $categorylist = $DB->get_records_sql($sqlcategories);
-            if (!empty($categorylist) ) {
-                $categorylist = array_values($categorylist);
+            foreach ($categorylist as $category) {
+                $configcategories[] = $category->id;
+            }
+            if (!empty($configcategories) ) {
                 $where .= ' AND (';
-                foreach ($categorylist as $catindex => $catid) {
+                foreach ($configcategories as $catindex => $catid) {
                     $where .= 'category = :catid' . $catindex;
-                    $params['catid' . $catindex] = $catid->id;
-                    if ($catindex + 1 < count($categorylist)) {
+                    $params['catid' . $catindex] = $catid;
+                    if ($catindex + 1 < count($configcategories)) {
                         $where .= ' OR ';
                     }
                 }
                 $where .= ')';
             }
         }
+
+        // Filter according to select button.
+        if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
+            global $USER;
+            //$usercourses = enrol_get_all_users_courses($USER->id);
+            $usersql = " JOIN (SELECT DISTINCT e.courseid
+                FROM {enrol} e
+                JOIN {user_enrolments} ue ON
+                (ue.enrolid = e.id AND ue.userid = :userid)
+                ) en ON (en.courseid = c.id) ";
+
+            $params["userid"] = $USER->id;
+        }
+
         $where .= ")";
-        return self::get_course_records($where, $params);
+        return self::get_course_records($where, $params, $usersql);
 
     }
 
-    protected static function get_course_records($whereclause, $params) {
+    protected static function get_course_records($whereclause, $params, $usersql ) {
         global $DB;
         $fields = array('c.id', 'c.fullname', 'c.shortname');
+        // TODO  user query includieren 154-157 && available courses anzeigen.
         $sql = "SELECT ". join(',', $fields).
-                " FROM {course} c JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse WHERE ".
-                $whereclause." ORDER BY c.sortorder";
+                " FROM {course} c" .
+                $usersql .
+                "JOIN {context} ctx ON c.id = ctx.instanceid
+                AND ctx.contextlevel = :contextcourse
+                WHERE ".
+                $whereclause."ORDER BY c.sortorder";
         $list = $DB->get_records_sql($sql,
             array('contextcourse' => CONTEXT_COURSE) + $params);
         return $list;
