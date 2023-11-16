@@ -38,12 +38,14 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
     $ADMIN->add($componentname, $settings);
 
-    // Checkbox options.
+    // Select options.
     $settings->add(
-        new admin_setting_configmulticheckbox($componentname . '/multicheck',
+        new admin_setting_configselect($componentname . '/selectconfig',
                 get_string('activefilter', $componentname),
-                get_string('activefilter_desc', $componentname), '', [
-                    'only_subscribed' => 'Only courses the theatcher is subscribed to.',
+                get_string('activefilter_desc', $componentname),
+                'only_subscribed',
+                [
+                    'only_subscribed' => 'Only courses the theacher is subscribed to.',
                     'all_courses' => 'All courses meeting the other criterias.'
                 ]));
 
@@ -53,7 +55,7 @@ if ($hassiteconfig) {
                     $componentname . '/includetags',
                     get_string('tagsinclude', $componentname),
                     get_string('tagsinclude_desc', $componentname),
-                    'none',
+                    '',
                     PARAM_TEXT
             )
     );
@@ -64,7 +66,7 @@ if ($hassiteconfig) {
                 $componentname . '/excludetags',
                 get_string('tagsexclude', $componentname),
                 get_string('tagsexclude_desc', $componentname),
-                'none',
+                '',
                 PARAM_TEXT
         )
     );
