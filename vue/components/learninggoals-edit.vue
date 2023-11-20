@@ -84,6 +84,7 @@
     <div class="learninggoals-edit">
         <div v-if="editingadding == false">
             <h3>{{strings.pluginname}}</h3>
+            <h3>{{strings.pluginname}}</h3>
             <div class="learninggoals-edit-add">
                 <router-link :to="{ name: 'learninggoal-new' }" tag="button" class="btn btn-primary">{{strings.learninggoal_form_title_add}}</router-link>
             </div>
@@ -249,11 +250,11 @@
                 // Dismiss other open confirm delete prompts.
                 this.clicked = {};
                 // Show the confirm delete prompt.
-                this.$set(this.clicked, index, true)
+                this.clicked[index] = true;
             },
             cancelDeleteConfirm(index){
                 if (this.clicked.hasOwnProperty(index))
-                    this.$set(this.clicked, index, !this.clicked[index])
+                    this.clicked[index] = !this.clicked[index];
             },
             deleteLearningpathConfirm(learninggoalid) {
                 let result = {

@@ -56,7 +56,7 @@ class learning_paths {
         $data->name = $params['name'];
         $data->description = $params['description'];
         $data->timemodified = time();
-        $data->json = json_encode('tbd');
+        $data->json = $params['json'];
 
         if ($params['learninggoalid'] == 0) {
             $data->timecreated = time();
