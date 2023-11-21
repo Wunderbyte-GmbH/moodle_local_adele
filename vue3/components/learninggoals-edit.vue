@@ -142,12 +142,6 @@
         <div v-if="$store.state.editingadding == true">
       <h3>{{ store.state.strings.learninggoal_form_title_edit }}</h3>
       <div class="learninggoals-edit-add-form">
-        <div class="mt-3">
-          <button @click.prevent="onSavePath" class="btn btn-primary" :title="store.state.strings.save">
-            {{ store.state.strings.saveLearningPath }}
-          </button>
-          <button @click.prevent="onCancel" class="btn btn-secondary" :title="store.state.strings.cancel">{{ store.state.strings.cancel }}</button>
-        </div>
         <div v-for="goal in store.state.learninggoal">
           <p>
             <h4>{{ store.state.strings.fromlearningtitel }}</h4>
@@ -182,13 +176,22 @@
               v-model="goal.description"
             />
           </p>
-
           <div class="dndflow" @drop="onDrop">
-            <VueFlow @dragover="onDragOver" :style="{ backgroundColor: '#1A192B' }" />
-            <Controls :learninggoal="store.state.learninggoal[0]" />
+            <VueFlow @dragover="onDragOver" :style="{ backgroundColor: '#1A192B' }" :connection-radius="30" auto-connect  >
+              <template #connection-line="{ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition }">
+                <ConnectionLine
+                  :source-x="sourceX"
+                  :source-y="sourceY"
+                  :target-x="targetX"
+                  :target-y="targetY"
+                  :source-position="sourcePosition"
+                  :target-position="targetPosition"
+                />
+              </template>
+            </VueFlow>
+            <Controls :learninggoal="store.state.learninggoal[0]" @node-count-changed="updateNumberOfNodesInChild"/>
             <Sidebar :courses="store.state.availablecourses" :strings="store.state.strings" />
           </div>
-
           <p>
             <a href="/course/edit.php?category=0" target="_blank" rel="noreferrer noopener">
               <button class="btn btn-secondary" :title="store.state.strings.btncreatecourse">{{ store.state.strings.btncreatecourse }}</button>
@@ -201,15 +204,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick, watchEffect } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { VueFlow, useVueFlow } from '@vue-flow/core';
-import { mapState, useStore } from 'vuex';
+import { useStore } from 'vuex';
 import Sidebar from './flowchart/Sidebar.vue';
 import Controls from './flowchart/Controls.vue';
+import ConnectionLine from './flowchart/ConnectionLine.vue'
 import { useRouter } from 'vue-router';
 
-const { findNode, onConnect, addEdges, addNodes, project, vueFlowRef } = useVueFlow({
+
+const store = useStore();
+const router = useRouter();
+
+const goalname = ref('');
+const goaldescription = ref('');
+const clicked = ref({});
+
+let id = ref(0);
+// Update the variable when the custom event is emitted
+const updateNumberOfNodesInChild = (count) => {
+  id.value = count;
+};
+
+function getId() {
+  id.value = id.value+1;
+  return `dndnode_${id.value}`
+}
+
+const { nodes, findNode, onConnect, addEdges, addNodes, project, vueFlowRef } = useVueFlow({
   nodes: [
     {
       id: '1',
@@ -218,73 +241,68 @@ const { findNode, onConnect, addEdges, addNodes, project, vueFlowRef } = useVueF
       position: { x: 250, y: 25 },
     },
   ],
+})
+// Watch for changes in the number of nodes
+const numberOfNodes = ref(nodes.length);
+watch(nodes, () => {
+  numberOfNodes.value = nodes.length;
 });
 
-const store = useStore();
-const router = useRouter();
-
-let id = 0;
-function getId() {
-  return `dndnode_${id++}`;
-}
-
-const goalname = ref('');
-const goaldescription = ref('');
-const selectedTabId = ref(0);
-const clicked = ref({});
-
-const onDragOver = (event) => {
-  event.preventDefault();
+function onDragOver(event) {
+  event.preventDefault()
 
   if (event.dataTransfer) {
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = 'move'
   }
-};
+}
 
-onConnect((params) => addEdges(params));
+onConnect((params) => addEdges(params))
 
-const onDrop = (event) => {
-  const type = event.dataTransfer?.getData('application/vueflow');
+function onDrop(event) {
+  const type = event.dataTransfer?.getData('application/vueflow')
 
-  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  const { left, top } = vueFlowRef.value.getBoundingClientRect()
 
   const position = project({
     x: event.clientX - left,
     y: event.clientY - top,
-  });
+  })
 
   const newNode = {
     id: getId(),
     type,
     position,
     label: `${type} node`,
-  };
+  }
+  addNodes([newNode])
 
   // align node position after drop, so it's centered to the mouse
   nextTick(() => {
-    const node = findNode(newNode.id);
-    const stop = watchEffect(() => {
-      if (node.dimensions.width > 0 && node.dimensions.height > 0) {
-        node.position = {
-          x: node.position.x - node.dimensions.width / 2,
-          y: node.position.y - node.dimensions.height / 2,
-        };
-        stop();
-      }
-    });
-  });
-};
+    const node = findNode(newNode.id)
+    const stop = watch(
+      () => node.dimensions,
+      (dimensions) => {
+        if (dimensions.width > 0 && dimensions.height > 0) {
+          node.position = { x: node.position.x - node.dimensions.width / 2, y: node.position.y - node.dimensions.height / 2 }
+          stop()
+        }
+      },
+      { deep: true, flush: 'post' },
+    )
+  })
+}
 
 const checkRoute = (currentRoute) => {
     if(currentRoute == undefined){
         router.push({ name: 'learninggoals-edit-overview' });
     }
   else if (currentRoute.name === 'learninggoal-edit') {
+
     store.state.editingadding = true;
-    nextTick(() => showForm(currentRoute.params.learninggoalId, 0));
+    nextTick(() => showForm(currentRoute.params.learninggoalId));
   } else if (currentRoute.name === 'learninggoal-new') {
     store.state.editingadding = true;
-    nextTick(() => showForm(null, 0));
+    nextTick(() => showForm(null));
   }
 };
 
@@ -293,32 +311,6 @@ onMounted(() => {
   store.dispatch('fetchAvailablecourses');
   checkRoute(router.value);
 });
-
-watchEffect(() => {
-  checkRoute(router.value);
-});
-
-const onCancel = () => {
-  store.state.learningGoalID = 0;
-  store.state.editingadding = false;
-  selectedTabId.value = 0;
-  router.push({ name: 'learninggoals-edit-overview' });
-};
-
-const onSavePath = () => {
-  const result = {
-    learninggoalid: store.state.learningGoalID,
-    name: store.state.learninggoal[0].name,
-    description: store.state.learninggoal[0].description,
-  };
-
-  store.dispatch('saveLearningpath', result);
-  store.dispatch('fetchLearningpaths');
-  store.state.learningGoalID = 0;
-  store.state.editingadding = false;
-  router.push({ name: 'learninggoals-edit-overview' });
-  window.scrollTo(0, 0);
-};
 
 const showDeleteConfirm = (index) => {
   // Dismiss other open confirm delete prompts.
@@ -346,30 +338,29 @@ const duplicateLearningpath = (learninggoalid) => {
   store.dispatch('duplicateLearningpath', result);
 };
 
-const showForm = async (learninggoalId = null, selectedTabId = 0) => {
-  goalname.value = '';
-  goaldescription.value = '';
+const showForm = async (learninggoalId = null) => {
+  goalname.value = ''
+  goaldescription.value = ''
   if (learninggoalId) {
     store.state.learningGoalID = learninggoalId;
-    store.dispatch('fetchLearningpath');
-    store.state.editingadding = true;
+    store.dispatch('fetchLearningpath')
+    store.state.editingadding = true
     // Do something here in case of an edit.
   } else {
-    store.dispatch('fetchLearningpath');
-    store.state.editingadding = true;
+    store.dispatch('fetchLearningpath')
+    store.state.editingadding = true
     // Do something here in case of an add.
   }
-  window.scrollTo(0, 0);
+  window.scrollTo(0, 0)
   // This has to happen after the save button is hit.
 };
 
-const learninggoal = ref(/* initialize as needed */);
 watch(goalname, (newGoalName) => {
-  learninggoal.value[0].name = newGoalName;
+  store.state.learninggoal[0].name = newGoalName;
 });
 
 watch(goaldescription, (newGoalDescription) => {
-  learninggoal.value[0].description = newGoalDescription;
+  store.state.learninggoal[0].description = newGoalDescription;
 });
 
 onBeforeRouteUpdate((to, from, next) => {

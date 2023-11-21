@@ -2,24 +2,57 @@
 import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { watch, onUnmounted } from 'vue';
+
 
 const store = useStore();
 const router = useRouter();
 
-const { toObject, setNodes, setEdges, setTransform } = useVueFlow()
+const { nodes, toObject, setNodes, setEdges, setTransform } = useVueFlow()
 
 const props = defineProps(['learninggoal']); // Define props in the setup block
 
-if (props.learninggoal.json.tree != undefined) {
-  console.log('props.learninggoal');
-  const flow = props.learninggoal.json.tree;
+const flowchart = (flow) => {
   if (flow) {
-    const [x = 0, y = 0] = flow.position
-    setNodes(flow.nodes)
-    setEdges(flow.edges)
-    setTransform({ x, y, zoom: flow.zoom || 0 })
+      const [x = 0, y = 0] = flow.position
+      setNodes(flow.nodes)
+      setEdges(flow.edges)
+      setTransform({ x, y, zoom: flow.zoom || 0 })
+    }
+};
+
+let stopNodeWatcher;
+const emit = defineEmits();
+const emitNodeCount = (count) => {
+  emit('node-count-changed', count);
+};
+
+// Watch for changes in the number of nodes
+watch(nodes, () => {
+  emitNodeCount(nodes.value.length);
+});
+
+watch(() => store.state.learninggoal, (newValue, oldValue) => {
+  if (newValue[0].json.tree != undefined) {
+    flowchart(newValue[0].json.tree)
+  }else{
+    setNodes([
+      {
+        id: '1',
+        type: 'input',
+        label: 'input node',
+        position: { x: 250, y: 25 },
+      },
+    ])
+    setEdges([])
   }
+});
+
+if (store.state.learninggoal[0].json.tree != undefined) {
+    flowchart(store.state.learninggoal[0].json.tree)
 }
+
+
 
 
 const onSave = () => {

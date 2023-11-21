@@ -1,27 +1,37 @@
 <script setup>
+import { ref, computed } from 'vue';
+
+const searchTerm = ref('');
+
 function onDragStart(event, nodeType) {
   if (event.dataTransfer) {
     event.dataTransfer.setData('application/vueflow', nodeType)
     event.dataTransfer.effectAllowed = 'move'
   }
 }
-</script>
+const props = defineProps({
+  courses: Array,
+  strings: Object,
+});
 
-<script>
-export default {
-  props: {
-    courses: Array, // Define a prop named 'message'
-    strings: Object, // Define a prop named 'message'
-  },
-};
+const filteredCourses = computed(() => {
+  return props.courses.filter(course =>
+    course.fullname.toLowerCase().includes(searchTerm.value.toLowerCase())
+  );
+});
+
 </script>
 
 <template>
   <aside>
-    <div class="description">{{ strings.fromavailablecourses }}</div>
+    <div class="description" type="text">{{ strings.fromavailablecourses }}</div>
+
+    <input v-model="searchTerm" placeholder="Search courses" />
     <div class="nodes">
-      <template v-for="course in courses">
-        <div class="vue-flow__node-input" :draggable="true" @dragstart="onDragStart($event, course.shortname)">{{course.fullname}}</div>
+      <template v-for="course in filteredCourses">
+        <div class="vue-flow__node-input" :draggable="true" @dragstart="onDragStart($event, course.shortname)">
+          {{course.fullname}}
+        </div>
       </template>
     </div>
   </aside>
