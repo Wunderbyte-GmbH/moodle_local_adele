@@ -4,6 +4,7 @@ import notFound from './components/not-found';
 import learninggoalsEdit from './components/learninggoals-edit';
 import VueInputAutowidth from 'vue-input-autowidth';
 import { store } from './store';
+import Notifications from '@kyvg/vue3-notification'
 
 window.__VUE_OPTIONS_API__ = true; // Enables the Composition API
 window.__VUE_PROD_DEVTOOLS__ = false; // Disable devtools in production
@@ -14,6 +15,7 @@ function init() {
     const app = createApp({});
     
     app.use(VueInputAutowidth);
+    app.use(Notifications);
 
     store.dispatch('loadComponentStrings');
 

@@ -3,6 +3,7 @@ import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { watch, onUnmounted } from 'vue';
+import { notify } from "@kyvg/vue3-notification";
 
 
 const store = useStore();
@@ -53,9 +54,9 @@ if (store.state.learninggoal[0].json.tree != undefined) {
 }
 
 
-
-
 const onSave = () => {
+    let action = props.learninggoal.id == 0 ? 'saved' : 'edited';
+
     let obj = {};
     obj['tree'] = toObject();
     obj = JSON.stringify(obj);
@@ -71,6 +72,12 @@ const onSave = () => {
     store.state.editingadding = false;
     router.push({name: 'learninggoals-edit-overview'});
     window.scrollTo(0,0);
+
+    notify({
+    title: "Learning Path " + action,
+    text: "You have " + action + " the Learning Path!",
+    type: 'success'
+  });
     
 };
 

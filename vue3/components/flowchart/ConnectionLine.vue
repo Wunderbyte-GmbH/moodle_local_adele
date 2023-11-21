@@ -1,6 +1,7 @@
 <script setup>
 import { connectionExists, getBezierPath, useVueFlow } from '@vue-flow/core'
 import { computed, reactive, ref, watch } from 'vue'
+import { notify } from "@kyvg/vue3-notification";
 
 const props = defineProps({
   sourceX: {
@@ -21,7 +22,7 @@ const props = defineProps({
   },
   targetPosition: {
     type: String,
-    require: true, // Corrected typo
+    required: true,
   },
   sourcePosition: {
     type: String,
@@ -34,7 +35,7 @@ const { getNodes, connectionStartHandle, onConnectEnd, addEdges, edges } = useVu
 const closest = reactive({
   node: null,
   handle: null,
-  startHandle: null, // Initialize startHandle
+  startHandle: null,
 })
 
 const canSnap = ref(false)
@@ -48,7 +49,69 @@ const MIN_DISTANCE = 75
 const SNAP_DISTANCE = 30
 
 watch([() => props.targetY, () => props.targetX], (_, __, onCleanup) => {
-  // Existing watch logic...
+  const closestNode = getNodes.value.reduce(
+    (res, n) => {
+      if (n.id !== connectionStartHandle.value?.nodeId) {
+        const dx = props.targetX - (n.computedPosition.x + n.dimensions.width / 2)
+        const dy = props.targetY - (n.computedPosition.y + n.dimensions.height / 2)
+        const d = Math.sqrt(dx * dx + dy * dy)
+
+        if (d < res.distance && d < MIN_DISTANCE) {
+          res.distance = d
+          res.node = n
+        }
+      }
+
+      return res
+    },
+    {
+      distance: Number.MAX_VALUE,
+      node: null,
+    },
+  )
+
+  if (!closestNode.node) {
+    return
+  }
+
+  canSnap.value = closestNode.distance < SNAP_DISTANCE
+
+  const type = connectionStartHandle.value.type === 'source' ? 'target' : 'source'
+
+  const closestHandle = closestNode.node.handleBounds[type]?.reduce((prev, curr) => {
+    const prevDistance = Math.sqrt((prev.x - props.targetX) ** 2 + (prev.y - props.targetY) ** 2)
+    const currDistance = Math.sqrt((curr.x - props.targetX) ** 2 + (curr.y - props.targetY) ** 2)
+
+    return prevDistance < currDistance ? prev : curr
+  })
+
+  if (
+    connectionExists(
+      {
+        source: connectionStartHandle.value.nodeId,
+        sourceHandle: connectionStartHandle.value.handleId,
+        target: closestNode.node.id,
+        targetHandle: closestHandle.id,
+      },
+      edges.value,
+    )
+  ) {
+    return
+  }
+
+  if (closestHandle) {
+    const el = document.querySelector(`[data-handleid='${closestHandle.id}']`)
+
+    const prevStyle = el.style.backgroundColor
+    el.style.backgroundColor = canSnap.value ? SNAP_HIGHLIGHT_COLOR : HIGHLIGHT_COLOR
+    closest.node = closestNode.node
+    closest.handle = closestHandle
+    onCleanup(() => {
+      el.style.backgroundColor = prevStyle
+      closest.node = null
+      closest.handle = null
+    })
+  }
 })
 
 const path = computed(() => getBezierPath(props))
@@ -84,6 +147,7 @@ const strokeColor = computed(() => {
 const onConnectionStart = (startHandle) => {
   closest.startHandle = startHandle
 }
+
 </script>
 
 <template>

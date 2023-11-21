@@ -98,6 +98,8 @@
 
 <template>
     <div class="learninggoals-edit">
+      <notifications width="100%" />
+
         <div v-if="$store.state.editingadding == false">
             <h3>{{store.state.strings.pluginname}}</h3>
             <div class="learninggoals-edit-add">
@@ -212,6 +214,8 @@ import Sidebar from './flowchart/Sidebar.vue';
 import Controls from './flowchart/Controls.vue';
 import ConnectionLine from './flowchart/ConnectionLine.vue'
 import { useRouter } from 'vue-router';
+
+import { notify } from "@kyvg/vue3-notification";
 
 
 const store = useStore();
@@ -329,6 +333,11 @@ const deleteLearningpathConfirm = (learninggoalid) => {
   };
   store.dispatch('deleteLearningpath', result);
   clicked.value = {};
+  notify({
+    title: "Leaerning Path deleted",
+    text: "You have deleted the Learning Path!",
+    type: 'warn'
+  });
 };
 
 const duplicateLearningpath = (learninggoalid) => {
@@ -336,6 +345,11 @@ const duplicateLearningpath = (learninggoalid) => {
     learninggoalid: learninggoalid,
   };
   store.dispatch('duplicateLearningpath', result);
+  notify({
+    title: "Learning Path duplicated",
+    text: "You have duplicated the Learning Path!",
+    type: 'success'
+  });
 };
 
 const showForm = async (learninggoalId = null) => {

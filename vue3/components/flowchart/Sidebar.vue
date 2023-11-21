@@ -1,14 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { defineProps, ref, computed } from 'vue';
 
 const searchTerm = ref('');
 
 function onDragStart(event, nodeType) {
   if (event.dataTransfer) {
-    event.dataTransfer.setData('application/vueflow', nodeType)
-    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/vueflow', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
   }
 }
+
 const props = defineProps({
   courses: Array,
   strings: Object,
@@ -27,12 +28,22 @@ const filteredCourses = computed(() => {
     <div class="description" type="text">{{ strings.fromavailablecourses }}</div>
 
     <input v-model="searchTerm" placeholder="Search courses" />
-    <div class="nodes">
-      <template v-for="course in filteredCourses">
-        <div class="vue-flow__node-input" :draggable="true" @dragstart="onDragStart($event, course.shortname)">
-          {{course.fullname}}
-        </div>
-      </template>
+    <div class="nodes-container">
+      <div class="nodes">
+        <template v-for="course in filteredCourses" :key="course.id">
+          <div class="vue-flow__node-input" :draggable="true" @dragstart="onDragStart($event, course.shortname)">
+            {{ course.fullname }}
+          </div>
+        </template>
+      </div>
     </div>
   </aside>
 </template>
+
+<style scoped>
+.nodes-container {
+  margin-top: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+</style>
