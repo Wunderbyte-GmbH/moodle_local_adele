@@ -63,7 +63,9 @@ class learning_path_courses {
         $usersql = ' ';
 
         if ($configtags['OR'][0] != null || $configtags['AND'][0] != null || $configadele->catfilter[0] != null) {
-            $where = "JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse WHERE c.id IN (SELECT t.itemid FROM {tag_instance} t WHERE (";
+            $where = "JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
+                WHERE c.id IN (SELECT t.itemid
+                FROM {tag_instance} t WHERE (";
             $concat = false;
 
             // Filter according to the tags.

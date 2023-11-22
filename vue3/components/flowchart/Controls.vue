@@ -40,7 +40,7 @@ watch(() => store.state.learninggoal, (newValue, oldValue) => {
     setNodes([
       {
         id: '1',
-        type: 'input',
+        type: 'custom',
         label: 'input node',
         position: { x: 250, y: 25 },
       },

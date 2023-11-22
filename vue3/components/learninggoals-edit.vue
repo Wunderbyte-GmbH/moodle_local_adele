@@ -1,4 +1,3 @@
-
 <style scoped>
     .learninggoals-edit-list {
         padding-top: 1rem;
@@ -179,7 +178,7 @@
             />
           </p>
           <div class="dndflow" @drop="onDrop">
-            <VueFlow @dragover="onDragOver" :style="{ backgroundColor: '#1A192B' }" :connection-radius="30" auto-connect  >
+            <VueFlow @dragover="onDragOver" :style="{ backgroundColor: 'black' }"  >
               <template #connection-line="{ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition }">
                 <ConnectionLine
                   :source-x="sourceX"
@@ -190,6 +189,11 @@
                   :target-position="targetPosition"
                 />
               </template>
+
+              <template #node-custom="{ data }">
+                <CustomrNode :data="data" />
+              </template>
+
             </VueFlow>
             <Controls :learninggoal="store.state.learninggoal[0]" @node-count-changed="updateNumberOfNodesInChild"/>
             <Sidebar :courses="store.state.availablecourses" :strings="store.state.strings" />
@@ -213,6 +217,8 @@ import { useStore } from 'vuex';
 import Sidebar from './flowchart/Sidebar.vue';
 import Controls from './flowchart/Controls.vue';
 import ConnectionLine from './flowchart/ConnectionLine.vue'
+import CustomrNode from './flowchart/CustomNode.vue'
+
 import { useRouter } from 'vue-router';
 
 import { notify } from "@kyvg/vue3-notification";
@@ -240,8 +246,9 @@ const { nodes, findNode, onConnect, addEdges, addNodes, project, vueFlowRef } = 
   nodes: [
     {
       id: '1',
-      type: 'input',
+      type: 'custom',
       label: 'input node',
+      data: { color: '#A8D8B9' },
       position: { x: 250, y: 25 },
     },
   ],
@@ -334,7 +341,7 @@ const deleteLearningpathConfirm = (learninggoalid) => {
   store.dispatch('deleteLearningpath', result);
   clicked.value = {};
   notify({
-    title: "Leaerning Path deleted",
+    title: "Learning Path deleted",
     text: "You have deleted the Learning Path!",
     type: 'warn'
   });
