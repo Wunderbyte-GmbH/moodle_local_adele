@@ -91,8 +91,8 @@ const onCancel = () => {
 </script>
 
 <template>
-  <Panel position="top-right" class="save-restore-controls">
-    <button style="background-color: #33a6b8" @click="onSave">save</button>
-    <button style="background-color: #6a7071" @click="onCancel">cancel</button>
+  <Panel position="bottom-center" class="save-restore-controls">
+    <button class="btn btn-primary" @click="onSave">save</button>
+    <button class="btn btn-secondary" @click="onCancel">cancel</button>
   </Panel>
 </template>
