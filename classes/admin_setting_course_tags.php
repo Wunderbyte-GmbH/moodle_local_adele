@@ -50,7 +50,7 @@ class admin_setting_course_tags extends admin_setting_configtextarea {
         foreach ($usedtags as $usedtag) {
             if (!in_array($usedtag, $tagsarray)) {
                 if ($usedtag != '') {
-                    $notfoundtags = 'Please watch for whitespaces and do not end with a comma';
+                    $notfoundtags = get_string('warning_empty_space', 'local_adele');
                 } else {
                     $notfoundtags .= $usedtag . ',';
                 }

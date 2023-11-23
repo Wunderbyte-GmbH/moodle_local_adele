@@ -38,7 +38,7 @@ $string['adele:view'] = 'View adele';
 
 // Vue component route not found.
 $string['route_not_found_site_name'] = 'Error: Page (route) not found!';
-$string['route_not_found'] = 'Page was not found. Please consider going back and and trying it again.';
+$string['route_not_found'] = 'Page was not found. Please consider going back and trying it again.';
 
 // Vue component learning goal edit.
 $string['learninggoals_edit_site_name'] = 'adele learning goals';
@@ -68,24 +68,16 @@ $string['learninggoal_form_title_edit'] = 'Edit a learning path';
 $string['save'] = 'Save';
 $string['cancel'] = 'Cancel';
 
-// Tabs.
-$string['thinkingskill'] = 'Thinking Skill';
-$string['content'] = 'Content';
-$string['resources'] = 'Resources';
-$string['products'] = 'Products';
-$string['groups'] = 'Groups';
-
-// Words.
-$string['prethinkingskill'] = 'Students will';
-$string['clicktoedit'] = '[click to edit]';
-$string['preresource'] = 'using';
-$string['preproduct'] = 'and create';
-$string['pregroup'] = 'in groups of';
-
 // Button strings.
 $string['btnadele'] = 'Learning Paths';
 $string['btnbacktooverview'] = 'Going back to overview';
 $string['btncreatecourse'] = 'Go to page and create a course';
+$string['btnsave'] = 'save';
+$string['btncancel'] = 'cancel';
+$string['btnupdate_positions'] = 'update positions';
+$string['btntoggle'] = 'change view';
+
+
 
 // From Strings.
 $string['fromlearningtitel'] = 'Learning Path Tiel';
@@ -110,3 +102,19 @@ $string['tagsexclude_desc'] = 'Define which courses according to their tags will
 $string['categories'] = 'Define category level';
 $string['categories_desc'] = 'Define course-level should be included';
 $string['tag_invalid'] = 'Following tags were not found: {$a}';
+$string['warning_empty_space'] = 'Please watch for whitespaces and do not end with a comma';
+$string['settings_only_subscribed'] = 'Only courses the teacher is subscribed to.';
+$string['settings_all_courses'] = 'All courses meeting the other criteria.';
+
+
+// Notifications.
+$string['title_duplicate'] = 'Learning Path duplicated';
+$string['description_duplicate'] = 'You have duplicated the Learning Path!';
+$string['title_delete'] = 'Learning Path deleted';
+$string['description_delete'] = 'You have deleted the Learning Path!';
+$string['title_save'] = 'Learning Path saved/updated';
+$string['description_save'] = 'You have saved/updated the Learning Path!';
+
+// Node Strings.
+$string['node_coursefullname'] = 'Full Coursename:';
+$string['node_courseshortname'] = 'Short Coursename:';

@@ -1,10 +1,9 @@
 <script setup>
-import { Panel, useVueFlow } from '@vue-flow/core'
+import { Panel, useVueFlow, isNode } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { watch, onUnmounted } from 'vue';
+import { watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
-
 
 const store = useStore();
 const router = useRouter();
@@ -22,7 +21,6 @@ const flowchart = (flow) => {
     }
 };
 
-let stopNodeWatcher;
 const emit = defineEmits();
 const emitNodeCount = (count) => {
   emit('node-count-changed', count);
@@ -55,8 +53,6 @@ if (store.state.learninggoal[0].json.tree != undefined) {
 
 
 const onSave = () => {
-    let action = props.learninggoal.id == 0 ? 'saved' : 'edited';
-
     let obj = {};
     obj['tree'] = toObject();
     obj = JSON.stringify(obj);
@@ -74,8 +70,8 @@ const onSave = () => {
     window.scrollTo(0,0);
 
     notify({
-    title: "Learning Path " + action,
-    text: "You have " + action + " the Learning Path!",
+    title: store.state.strings.title_save,
+    text: store.state.strings.description_save,
     type: 'success'
   });
     
@@ -87,12 +83,30 @@ const onCancel = () => {
     router.push({name: 'learninggoals-edit-overview'});
 };
 
+function updatePos() {
+  let elements = toObject();
+  elements.nodes.forEach((el) => {
+    if (isNode(el)) {
+      el.position = {
+        x: Math.ceil(el.position.x / 10) * 10,
+        y: Math.ceil(el.position.y / 10) * 10,
+      }
+    }
+  })
+  flowchart(elements)
+}
+
+function toggleClass() {
+  emit('change-class');
+}
 
 </script>
 
 <template>
   <Panel position="bottom-center" class="save-restore-controls">
-    <button class="btn btn-primary" @click="onSave">save</button>
-    <button class="btn btn-secondary" @click="onCancel">cancel</button>
+    <button class="btn btn-primary" @click="onSave">{{store.state.strings.save}}</button>
+    <button class="btn btn-secondary" @click="onCancel">{{store.state.strings.btncancel}}</button>
+    <button class="btn btn-info" @click="updatePos">{{store.state.strings.btnupdate_positions}}</button>
+    <button class="btn btn-warning" @click="toggleClass">{{store.state.strings.btntoggle}}</button>
   </Panel>
 </template>

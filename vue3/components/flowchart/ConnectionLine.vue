@@ -1,7 +1,6 @@
 <script setup>
 import { connectionExists, getBezierPath, useVueFlow } from '@vue-flow/core'
 import { computed, reactive, ref, watch } from 'vue'
-import { notify } from "@kyvg/vue3-notification";
 
 const props = defineProps({
   sourceX: {
@@ -142,11 +141,6 @@ const strokeColor = computed(() => {
 
   return '#222'
 })
-
-// Add the onConnectionStart method
-const onConnectionStart = (startHandle) => {
-  closest.startHandle = startHandle
-}
 
 </script>
 

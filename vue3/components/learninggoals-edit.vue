@@ -83,16 +83,8 @@
     @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
     @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
 
-
-.vue-flow__minimap {
-  transform: scale(75%);
-  transform-origin: bottom right;
-  height: '500px';
-}
-
-
 .dndflow{flex-direction:column;display:flex;height:500px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
-
+.basicflow.dark{background:#57534e;}
 </style>
 
 <template>
@@ -104,40 +96,41 @@
             <div class="learninggoals-edit-add">
                 <router-link :to="{ name: 'learninggoal-new' }" tag="button" class="btn btn-primary">{{store.state.strings.learninggoal_form_title_add}}</router-link>
             </div>
-            <h2>{{store.state.stringsoverviewlearningpaths}}</h2>
+            <h2>{{store.state.strings.overviewlearningpaths}}</h2>
             <div class="description">{{store.state.strings.learninggoals_edit_site_description}}</div>
                 <span v-if="store.state.learningpaths == ''">
                     {{store.state.strings.learninggoals_edit_site_no_learningpaths}}
                 </span>
                 <span v-else>
-                    <ul class="learninggoals-edit-list">
-                        <li v-for="singlelearninggoal in store.state.learningpaths" style="margin-bottom: 10px">
-                            <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
-                                <div>
-                                    <b>
-                                        {{ singlelearninggoal.description }}
-                                    </b>
-                                    <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="store.state.strings.edit">
-                                        <i class="icon fa fa-pencil fa-fw iconsmall m-r-0" :title="store.state.strings.edit"></i>
-                                    </router-link>
-                                    <a href="" v-on:click.prevent="duplicateLearningpath(singlelearninggoal.id)" :title="store.state.strings.duplicate">
-                                        <i class="icon fa fa-copy fa-fw iconsmall m-r-0" :title="store.state.strings.duplicate"></i>
-                                    </a>
-                                    <a href="" v-on:click.prevent="showDeleteConfirm(singlelearninggoal.id)" :title="store.state.strings.delete">
-                                        <i class="icon fa fa-trash fa-fw iconsmall" :title="store.state.strings.delete"></i>
-                                    </a>
-                                </div>
-                                <div class="alert-danger p-3 m-t-1 m-b-1" v-show="clicked[singlelearninggoal.id]">
-                                    <div>{{store.state.strings.deletepromptpre}}{{singlelearninggoal.name}}{{store.state.strings.deletepromptpost}}</div>
-                                    <div class="m-t-1">
-                                        <button class="btn btn-danger m-r-0" @click="deleteLearningpathConfirm(singlelearninggoal.id)" :title="store.state.strings.btnconfirmdelete">
-                                        {{ store.state.strings.btnconfirmdelete }}</button>
-                                        <button type=button @click="cancelDeleteConfirm(singlelearninggoal.id)" class="btn btn-secondary">{{store.state.strings.cancel}}</button>
-                                    </div>
+                  <div v-for="singlelearninggoal in store.state.learningpaths" style="margin-bottom: 10px">
+                      <div class="learninggoal-top-level" v-if="singlelearninggoal.name !== 'not found'">
+                          <div>
+                            <div class="card" style="width: 18rem;">
+                              <div class="card-body">
+                                <h5 class="card-title">{{ singlelearninggoal.name }}</h5>
+                                <p class="card-text">{{ singlelearninggoal.description }}</p>
+                                <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="store.state.strings.edit">
+                                  <i class="icon fa fa-pencil fa-fw iconsmall m-r-0" :title="store.state.strings.edit"></i>
+                                </router-link>
+                                <a href="" v-on:click.prevent="duplicateLearningpath(singlelearninggoal.id)" :title="store.state.strings.duplicate">
+                                    <i class="icon fa fa-copy fa-fw iconsmall m-r-0" :title="store.state.strings.duplicate"></i>
+                                </a>
+                                <a href="" v-on:click.prevent="showDeleteConfirm(singlelearninggoal.id)" :title="store.state.strings.delete">
+                                    <i class="icon fa fa-trash fa-fw iconsmall" :title="store.state.strings.delete"></i>
+                                </a>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
+                          </div>
+                          <div class="alert-danger p-3 m-t-1 m-b-1" v-show="clicked[singlelearninggoal.id]">
+                              <div>{{store.state.strings.deletepromptpre}}{{singlelearninggoal.name}}{{store.state.strings.deletepromptpost}}</div>
+                              <div class="m-t-1">
+                                  <button class="btn btn-danger m-r-0" @click="deleteLearningpathConfirm(singlelearninggoal.id)" :title="store.state.strings.btnconfirmdelete">
+                                  {{ store.state.strings.btnconfirmdelete }}</button>
+                                  <button type=button @click="cancelDeleteConfirm(singlelearninggoal.id)" class="btn btn-secondary">{{store.state.strings.cancel}}</button>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
                 </span>
         </div>
         <div v-if="$store.state.editingadding == true">
@@ -178,7 +171,8 @@
             />
           </p>
           <div class="dndflow" @drop="onDrop">
-            <VueFlow @dragover="onDragOver" :style="{ backgroundColor: 'black' }"  >
+            <VueFlow @dragover="onDragOver" :default-viewport="{ zoom: 1.0 }" :class="{ dark }" class="basicflow">
+              <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
               <template #connection-line="{ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition }">
                 <ConnectionLine
                   :source-x="sourceX"
@@ -189,13 +183,14 @@
                   :target-position="targetPosition"
                 />
               </template>
-
               <template #node-custom="{ data }">
                 <CustomrNode :data="data" />
               </template>
-
             </VueFlow>
-            <Controls :learninggoal="store.state.learninggoal[0]" @node-count-changed="updateNumberOfNodesInChild"/>
+            <Controls :learninggoal="store.state.learninggoal[0]" 
+              @node-count-changed="updateNumberOfNodesInChild"
+              @change-class="toggleClass"
+            />
             <Sidebar :courses="store.state.availablecourses" :strings="store.state.strings" />
           </div>
           <p>
@@ -218,18 +213,22 @@ import Sidebar from './flowchart/Sidebar.vue';
 import Controls from './flowchart/Controls.vue';
 import ConnectionLine from './flowchart/ConnectionLine.vue'
 import CustomrNode from './flowchart/CustomNode.vue'
-
 import { useRouter } from 'vue-router';
-
 import { notify } from "@kyvg/vue3-notification";
+import { Background } from '@vue-flow/background'
 
+const store = useStore()
+const router = useRouter()
 
-const store = useStore();
-const router = useRouter();
+const goalname = ref('')
+const goaldescription = ref('')
+const clicked = ref({})
 
-const goalname = ref('');
-const goaldescription = ref('');
-const clicked = ref({});
+const dark = ref(false)
+function toggleClass() {
+  console.log(!dark.value);
+  return (dark.value = !dark.value)
+}
 
 let id = ref(0);
 // Update the variable when the custom event is emitted
@@ -271,7 +270,7 @@ onConnect((params) => addEdges(params))
 
 function onDrop(event) {
   const type = event.dataTransfer?.getData('application/vueflow')
-
+  const data = JSON.parse(event.dataTransfer?.getData('application/data'));
   const { left, top } = vueFlowRef.value.getBoundingClientRect()
 
   const position = project({
@@ -284,6 +283,7 @@ function onDrop(event) {
     type,
     position,
     label: `${type} node`,
+    data: data
   }
   addNodes([newNode])
 
@@ -341,8 +341,8 @@ const deleteLearningpathConfirm = (learninggoalid) => {
   store.dispatch('deleteLearningpath', result);
   clicked.value = {};
   notify({
-    title: "Learning Path deleted",
-    text: "You have deleted the Learning Path!",
+    title: store.state.strings.title_delete,
+    text: store.state.strings.description_delete,
     type: 'warn'
   });
 };
@@ -353,8 +353,8 @@ const duplicateLearningpath = (learninggoalid) => {
   };
   store.dispatch('duplicateLearningpath', result);
   notify({
-    title: "Learning Path duplicated",
-    text: "You have duplicated the Learning Path!",
+    title: store.state.strings.title_duplicate,
+    text: store.state.strings.description_duplicate,
     type: 'success'
   });
 };

@@ -43,8 +43,8 @@ if ($hassiteconfig) {
                 get_string('activefilter_desc', $componentname),
                 'only_subscribed',
                 [
-                    'only_subscribed' => 'Only courses the theacher is subscribed to.',
-                    'all_courses' => 'All courses meeting the other criterias.',
+                    'only_subscribed' => get_string('settings_only_subscribed', $componentname),
+                    'all_courses' => get_string('settings_all_courses', $componentname),
                 ]));
 
     // Included tags.

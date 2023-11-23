@@ -52,97 +52,43 @@ class learning_path_courses {
      */
     public static function buildsqlquery() {
         global $DB, $USER;
-        $where = "";
+
+        $selectagg = $DB->sql_group_concat('tag.name') . ' as s1';
+        $userquery = '';
+        $select = "SELECT s1.*
+        FROM (
+            SELECT ti.itemid AS id, c.fullname, c.shortname, c.category, " . $selectagg . "
+            FROM m_tag_instance ti
+            LEFT JOIN {tag} tag ON ti.tagid = tag.id
+            LEFT JOIN {course} c ON ti.itemid = c.id
+            %USERQUERY%
+            WHERE ti.itemtype = 'course'
+            GROUP BY ti.itemid, c.id
+        ) AS s1 %WHEREQUERY%
+        ";
+
         $configadele = get_config('local_adele');
 
         // Search courses that are tagged with the specified tag.
-        $configtags['OR'] = explode(',', str_replace(' ', '', $configadele->includetags));
-        $configtags['AND'] = explode(',', str_replace(' ', '', $configadele->excludetags));
-
-        $params = [];
-        $usersql = ' ';
-
-        if ($configtags['OR'][0] != null || $configtags['AND'][0] != null || $configadele->catfilter[0] != null) {
-            $where = "JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                WHERE c.id IN (SELECT t.itemid
-                FROM {tag_instance} t WHERE (";
-            $concat = false;
-
-            // Filter according to the tags.
-            if ($configtags['OR'][0] != null || $configtags['AND'][0] != null) {
-                if ($configtags['OR'][0] != null && $configtags['AND'][0] != null) {
-                    $concat = true;
-                }
-                $indexparam = 0;
-                foreach ($configtags as $operator => $tags) {
-                    if (!empty($tags[0])) {
-                        $tagscount = count($tags);
-                        foreach ($tags as $index => $tag) {
-                            $tag = (array) $DB->get_record('tag', ['name' => $tag], 'id, name');
-                            $params['tag'. $indexparam] = $tag['id'];
-                            $where .= "t.tagid";
-                            $where .= $operator == 'OR' ? ' = ' : ' != ';
-                            $where .= ":tag" . $indexparam;
-                            if ($index + 1 < $tagscount) {
-                                $where .= ' ' . $operator .' ';
-                            } else {
-                                $where .= ")";
-                            };
-                            $indexparam += 1;
-                        }
-                        if ($concat) {
-                            $where .= " AND (";
-                            $concat = false;
-                        }
-                    }
-                }
-            }
-
-            // Filter according to the category level.
-            if ($configadele->catfilter[0] != null ) {
-                $configcategories = explode(',', str_replace(' ', '', $configadele->catfilter));
-                $sqlcategories = "SELECT id FROM {course_categories} WHERE ";
-                foreach ($configcategories as $index => $configcategory) {
-                    $sqlcategories .= "path LIKE '%/" . $configcategory . "/%'";
-                    if ($index + 1 < count($configcategories)) {
-                        $sqlcategories .= ' OR ';
-                    }
-                }
-                $categorylist = $DB->get_records_sql($sqlcategories);
-                foreach ($categorylist as $category) {
-                    $configcategories[] = $category->id;
-                }
-                if (!empty($configcategories) ) {
-                    if ($concat) {
-                        $where .= ' AND (';
-                    }
-                    foreach ($configcategories as $catindex => $catid) {
-                        $where .= 'category = :catid' . $catindex;
-                        $params['catid' . $catindex] = $catid;
-                        if ($catindex + 1 < count($configcategories)) {
-                            $where .= ' OR ';
-                        }
-                    }
-                    $where .= ')';
-                }
-            }
-
-            $where .= ")";
-        }
+        $configtags['include'] = explode(',', str_replace(' ', '', $configadele->includetags));
+        $configtags['exclude'] = explode(',', str_replace(' ', '', $configadele->excludetags));
+        $configtags['category'] = self::get_categories($configadele->catfilter);
+        $whereparamsquery = self::build_where_query($configtags);
 
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            $usersql = "JOIN (SELECT DISTINCT e.courseid
+            $userquery = "JOIN (SELECT DISTINCT e.courseid
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON
                 (ue.enrolid = e.id AND ue.userid = :userid)
                 ) en ON (en.courseid = c.id) ";
 
-            $params["userid"] = $USER->id;
+            $whereparamsquery['params']["userid"] = $USER->id;
         }
-        return self::get_course_records($where, $params, $usersql);
-
+        $select = str_replace( ['%USERQUERY%', '%WHEREQUERY%'], [$userquery, $whereparamsquery['wherequery']], $select);
+        return $DB->get_records_sql($select,
+            ['contextcourse' => CONTEXT_COURSE] + $whereparamsquery['params']);
     }
 
     /**
@@ -163,5 +109,71 @@ class learning_path_courses {
         $list = $DB->get_records_sql($sql,
             ['contextcourse' => CONTEXT_COURSE] + $params);
         return $list;
+    }
+
+    /**
+     * Build sql query with config filters.
+     * @param string $categories
+     * @return array
+     */
+    protected static function get_categories($categories) {
+        global $DB;
+        // Filter according to the category level.
+        $configcategories = explode(',', str_replace(' ', '', $categories));
+        $sqlcategories = "SELECT id FROM {course_categories} WHERE ";
+        foreach ($configcategories as $index => $configcategory) {
+            $sqlcategories .= "path LIKE '%/" . $configcategory . "/%'";
+            if ($index + 1 < count($configcategories)) {
+                $sqlcategories .= ' OR ';
+            }
+        }
+        $categorylist = $DB->get_records_sql($sqlcategories);
+        foreach ($categorylist as $category) {
+            $configcategories[] = $category->id;
+        }
+        return $configcategories;
+    }
+    /**
+     * Build sql query with config filters.
+     * @param array $configfilter
+     * @return array
+     */
+    protected static function build_where_query($configfilters) {        $wherequeries = [];
+        $params = [];
+        $wherequery = '';
+        foreach ($configfilters as $index => $configfilter) {
+            $tagquery = "(s1.tags OPERATOR ':TAG' OR s1.tags OPERATOR ':TAG,%' OR s1.tags
+                OPERATOR '%,:TAG' OR s1.tags OPERATOR '%,:TAG,%')";
+            if (!empty($configfilter[0])) {
+                $indexfilter = 0;
+                $filtercount = count($configfilter);
+                if ($index == 'category') {
+                    $wherequery .= '(';
+                    foreach ($configfilter as $filter) {
+                        $wherequery .= 's1.category = :' . $index . $indexfilter;
+                        $params[$index . $indexfilter] = $filter;
+                        if ($indexfilter + 1 < $filtercount) {
+                            $wherequery .= ' OR ';
+                        }
+                        $indexfilter += 1;
+                    }
+                    $wherequery .= ")";
+                } else {
+                    $operator = $index == 'include' ? 'LIKE' : 'NOT LIKE';
+                    foreach ($configfilter as $filter) {
+                        $wherequery .= str_replace(['OPERATOR', ':TAG'], [$operator, $filter], $tagquery);
+                        $indexfilter += 1;
+                    }
+                }
+            }
+        }
+        if ($wherequery != '') {
+            $wherequery = 'WHERE ' . str_replace(')(', ') AND (', $wherequery);
+        }
+        return [
+            'wherequery' => $wherequery,
+            'params' => $params
+        ];
+
     }
 }
