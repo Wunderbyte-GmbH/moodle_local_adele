@@ -135,10 +135,10 @@ class learning_path_courses {
     }
     /**
      * Build sql query with config filters.
-     * @param array $configfilter
+     * @param array $configfilters
      * @return array
      */
-    protected static function build_where_query($configfilters) {        $wherequeries = [];
+    protected static function build_where_query($configfilters) {
         $params = [];
         $wherequery = '';
         foreach ($configfilters as $index => $configfilter) {
@@ -172,7 +172,7 @@ class learning_path_courses {
         }
         return [
             'wherequery' => $wherequery,
-            'params' => $params
+            'params' => $params,
         ];
 
     }
