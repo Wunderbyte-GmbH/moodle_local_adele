@@ -90,7 +90,6 @@
 <template>
     <div class="learninggoals-edit">
       <notifications width="100%" />
-
         <div v-if="$store.state.editingadding == false">
             <h3>{{store.state.strings.pluginname}}</h3>
             <div class="learninggoals-edit-add">
@@ -171,6 +170,10 @@
             />
           </p>
           <div class="dndflow" @drop="onDrop">
+
+          <Modal >
+          </Modal>
+
             <VueFlow @dragover="onDragOver" :default-viewport="{ zoom: 1.0 }" :class="{ dark }" class="basicflow">
               <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
               <template #connection-line="{ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition }">
@@ -184,7 +187,7 @@
                 />
               </template>
               <template #node-custom="{ data }">
-                <CustomrNode :data="data" />
+                <CustomrNode :data="data"/>
               </template>
             </VueFlow>
             <Controls :learninggoal="store.state.learninggoal[0]" 
@@ -205,17 +208,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router';
-import { VueFlow, useVueFlow } from '@vue-flow/core';
-import { useStore } from 'vuex';
-import Sidebar from './flowchart/Sidebar.vue';
-import Controls from './flowchart/Controls.vue';
+import { VueFlow, useVueFlow } from '@vue-flow/core'
+import { useStore } from 'vuex'
+import Sidebar from './flowchart/Sidebar.vue'
+import Controls from './flowchart/Controls.vue'
 import ConnectionLine from './flowchart/ConnectionLine.vue'
 import CustomrNode from './flowchart/CustomNode.vue'
-import { useRouter } from 'vue-router';
-import { notify } from "@kyvg/vue3-notification";
+import { useRouter } from 'vue-router'
+import { notify } from "@kyvg/vue3-notification"
 import { Background } from '@vue-flow/background'
+import Modal from './modals/Modal.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -304,6 +308,7 @@ function onDrop(event) {
 }
 
 const checkRoute = (currentRoute) => {
+  console.log(currentRoute)
     if(currentRoute == undefined){
         router.push({ name: 'learninggoals-edit-overview' });
     }

@@ -16,6 +16,7 @@ const store = createStore({
             availablecourses: null,
             learninggoal: null,
             editingadding: false,
+            node: 'testing',
         };
     },
     mutations: {
@@ -43,6 +44,9 @@ const store = createStore({
         },
         setLearninggoal(state, ajaxdata) {
             state.learninggoal = ajaxdata;
+        },
+        setNode(state, data) {
+            state.node = data;
         },
     },
     actions: {

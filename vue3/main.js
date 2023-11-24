@@ -1,10 +1,8 @@
 import { createApp } from 'vue';
-import { createRouter, createWebHashHistory } from 'vue-router';
-import notFound from './components/not-found';
-import learninggoalsEdit from './components/learninggoals-edit';
 import VueInputAutowidth from 'vue-input-autowidth';
 import { store } from './store';
 import Notifications from '@kyvg/vue3-notification'
+import router from './router/router'
 
 window.__VUE_OPTIONS_API__ = true; // Enables the Composition API
 window.__VUE_PROD_DEVTOOLS__ = false; // Disable devtools in production
@@ -16,57 +14,9 @@ function init() {
     
     app.use(VueInputAutowidth);
     app.use(Notifications);
-
     store.dispatch('loadComponentStrings');
 
     app.use(store);
-    
-    // You have to use child routes if you use the same component. Otherwise, the component's beforeRouteUpdate
-    // will not be called.
-    const routes = [
-        {
-            path: '/',
-            redirect: {
-                name: 'learninggoals-edit-overview'
-            }
-        }, {
-            path: '/learninggoals/edit',
-            component: learninggoalsEdit,
-            name: 'learninggoals-edit-overview',
-            children: [
-                {
-                    path: '/learninggoals/edit/:learninggoalId(\\d+)',
-                    component: learninggoalsEdit,
-                    name: 'learninggoal-edit'
-                }, {
-                    path: '/learninggoals/edit/new',
-                    component: learninggoalsEdit,
-                    name: 'learninggoal-new'
-                 },
-            ],
-        }, {
-            path: '/:catchAll(.*)',
-            component: notFound
-        },
-    ];
-
-    const currenturl = window.location.pathname;
-    const base = currenturl;
-
-    const router = createRouter({
-        history: createWebHashHistory(),
-        routes,
-        base
-    });
-
-    router.beforeEach((to, from, next) => {
-        // Find a translation for the title.
-        if (to.meta && to.meta.title && store.state.strings[to.meta.title]) {
-            document.title = store.state.strings[to.meta.title];
-        }
-        next();
-    });
-
     app.use(router);
     app.mount('#local-adele-app');
 }
