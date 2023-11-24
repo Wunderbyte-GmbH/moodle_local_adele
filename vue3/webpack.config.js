@@ -10,9 +10,9 @@ module.exports = (env, options) => {
     exports = {
         entry: './main.js',
         output: {
-            path: path.resolve(__dirname, '../amd/src'),
+            path: path.resolve(__dirname, '../amd/build'),
             publicPath: '/dist/',
-            filename: 'app-lazy.js',
+            filename: 'app-lazy.min.js',
             chunkFilename: "[id].app-lazy.min.js?v=[hash]",
             libraryTarget: 'amd',
         },
