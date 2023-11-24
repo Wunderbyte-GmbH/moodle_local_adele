@@ -52,8 +52,7 @@ class learning_path_courses {
      */
     public static function buildsqlquery() {
         global $DB, $USER;
-
-        $selectagg = $DB->sql_group_concat('tag.name') . ' as s1';
+        $selectagg = $DB->sql_group_concat('tag.name') . ' as tags';
         $userquery = '';
         $select = "SELECT s1.*
         FROM (
@@ -86,29 +85,9 @@ class learning_path_courses {
 
             $whereparamsquery['params']["userid"] = $USER->id;
         }
-        $select = str_replace( ['%USERQUERY%', '%WHEREQUERY%'], [$userquery, $whereparamsquery['wherequery']], $select);
-        return $DB->get_records_sql($select,
-            ['contextcourse' => CONTEXT_COURSE] + $whereparamsquery['params']);
-    }
 
-    /**
-     * Build sql query with config filters.
-     * @param str $whereclause
-     * @param array $params
-     * @param str $usersql
-     * @return object
-     */
-    protected static function get_course_records($whereclause, $params, $usersql) {
-        global $DB;
-        $fields = ['c.id', 'c.fullname', 'c.shortname'];
-        // TODO  user query includieren 154-157 && available courses anzeigen.
-        $sql = "SELECT ". join(',', $fields).
-                " FROM {course} c " .
-                $usersql .
-                $whereclause."ORDER BY c.sortorder";
-        $list = $DB->get_records_sql($sql,
-            ['contextcourse' => CONTEXT_COURSE] + $params);
-        return $list;
+        $select = str_replace( ['%USERQUERY%', '%WHEREQUERY%'], [$userquery, $whereparamsquery['wherequery']], $select);
+        return $DB->get_records_sql($select, $whereparamsquery['params']);
     }
 
     /**
@@ -142,8 +121,12 @@ class learning_path_courses {
         $params = [];
         $wherequery = '';
         foreach ($configfilters as $index => $configfilter) {
-            $tagquery = "(s1.tags OPERATOR ':TAG' OR s1.tags OPERATOR ':TAG,%' OR s1.tags
-                OPERATOR '%,:TAG' OR s1.tags OPERATOR '%,:TAG,%')";
+            $tagqueries = [
+                "(s1.tags OPERATOR :TAG OR ",
+                "s1.tags OPERATOR :TAG OR ",
+                "s1.tags OPERATOR :TAG OR ",
+                "s1.tags OPERATOR :TAG)",
+            ];
             if (!empty($configfilter[0])) {
                 $indexfilter = 0;
                 $filtercount = count($configfilter);
@@ -161,8 +144,18 @@ class learning_path_courses {
                 } else {
                     $operator = $index == 'include' ? 'LIKE' : 'NOT LIKE';
                     foreach ($configfilter as $filter) {
-                        $wherequery .= str_replace(['OPERATOR', ':TAG'], [$operator, $filter], $tagquery);
-                        $indexfilter += 1;
+                        $tagwildcards = [
+                            $filter,
+                            $filter . ",%",
+                            "%," . $filter,
+                            "%," . $filter .",%",
+                        ];
+                        foreach ($tagqueries as $indexquery => $tagquery) {
+                            $wherequery .= str_replace(['OPERATOR', 'TAG'], [$operator, $index . $indexfilter], $tagquery);
+
+                            $params[$index . $indexfilter] = $tagwildcards[$indexquery];
+                            $indexfilter += 1;
+                        }
                     }
                 }
             }

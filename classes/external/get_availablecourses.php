@@ -98,7 +98,7 @@ class get_availablecourses extends external_api {
                     'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
                     'shortname' => new external_value(PARAM_TEXT, 'Item name'),
                     'category' => new external_value(PARAM_TEXT, 'Category level'),
-                    's1' => new external_value(PARAM_TEXT, 'Item tags'),
+                    'tags' => new external_value(PARAM_TEXT, 'Item tags'),
                 ]
             )
         );

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "webpack serve --config config/webpack.dev.js",
-    "prod": "webpack --config config/webpack.prod.js",
-    "watch": "cross-env webpack --mode development --watch"
+    "dev": "cross-env webpack --mode development --progress",
+    "watch": "cross-env webpack --mode development --watch",
+    "build": "cross-env webpack --mode production --progress"
   },
   "keywords": [],
   "author": "",

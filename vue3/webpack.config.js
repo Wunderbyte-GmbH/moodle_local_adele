@@ -115,9 +115,7 @@ module.exports = (env, options) => {
         exports.optimization = {
             minimizer: [
                 new TerserPlugin({
-                    cache: true,
                     parallel: true,
-                    sourceMap: true,
                     terserOptions: {
                         // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
                     }
