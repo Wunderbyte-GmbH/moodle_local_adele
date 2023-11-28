@@ -1,8 +1,30 @@
-<script setup>
-import { connectionExists, getBezierPath, useVueFlow } from '@vue-flow/core'
-import { computed, reactive, ref, watch } from 'vue'
+<!-- // This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-const props = defineProps({
+/**
+ * Validate if the string does excist.
+ *
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */ -->
+
+ <!-- Setup props for connection lines -->
+<script setup>
+defineProps({
   sourceX: {
     type: Number,
     required: true,
@@ -19,134 +41,31 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  targetPosition: {
-    type: String,
-    required: true,
-  },
-  sourcePosition: {
-    type: String,
-    required: true,
-  },
 })
-
-const { getNodes, connectionStartHandle, onConnectEnd, addEdges, edges } = useVueFlow()
-
-const closest = reactive({
-  node: null,
-  handle: null,
-  startHandle: null,
-})
-
-const canSnap = ref(false)
-
-const HIGHLIGHT_COLOR = '#f59e0b'
-
-const SNAP_HIGHLIGHT_COLOR = '#10b981'
-
-const MIN_DISTANCE = 75
-
-const SNAP_DISTANCE = 30
-
-watch([() => props.targetY, () => props.targetX], (_, __, onCleanup) => {
-  const closestNode = getNodes.value.reduce(
-    (res, n) => {
-      if (n.id !== connectionStartHandle.value?.nodeId) {
-        const dx = props.targetX - (n.computedPosition.x + n.dimensions.width / 2)
-        const dy = props.targetY - (n.computedPosition.y + n.dimensions.height / 2)
-        const d = Math.sqrt(dx * dx + dy * dy)
-
-        if (d < res.distance && d < MIN_DISTANCE) {
-          res.distance = d
-          res.node = n
-        }
-      }
-
-      return res
-    },
-    {
-      distance: Number.MAX_VALUE,
-      node: null,
-    },
-  )
-
-  if (!closestNode.node) {
-    return
-  }
-
-  canSnap.value = closestNode.distance < SNAP_DISTANCE
-
-  const type = connectionStartHandle.value.type === 'source' ? 'target' : 'source'
-
-  const closestHandle = closestNode.node.handleBounds[type]?.reduce((prev, curr) => {
-    const prevDistance = Math.sqrt((prev.x - props.targetX) ** 2 + (prev.y - props.targetY) ** 2)
-    const currDistance = Math.sqrt((curr.x - props.targetX) ** 2 + (curr.y - props.targetY) ** 2)
-
-    return prevDistance < currDistance ? prev : curr
-  })
-
-  if (
-    connectionExists(
-      {
-        source: connectionStartHandle.value.nodeId,
-        sourceHandle: connectionStartHandle.value.handleId,
-        target: closestNode.node.id,
-        targetHandle: closestHandle.id,
-      },
-      edges.value,
-    )
-  ) {
-    return
-  }
-
-  if (closestHandle) {
-    const el = document.querySelector(`[data-handleid='${closestHandle.id}']`)
-
-    const prevStyle = el.style.backgroundColor
-    el.style.backgroundColor = canSnap.value ? SNAP_HIGHLIGHT_COLOR : HIGHLIGHT_COLOR
-    closest.node = closestNode.node
-    closest.handle = closestHandle
-    onCleanup(() => {
-      el.style.backgroundColor = prevStyle
-      closest.node = null
-      closest.handle = null
-    })
-  }
-})
-
-const path = computed(() => getBezierPath(props))
-
-onConnectEnd(() => {
-  if (closest.startHandle && closest.handle && closest.node) {
-    if (canSnap.value) {
-      addEdges([
-        {
-          sourceHandle: closest.startHandle.handleId,
-          source: closest.startHandle.nodeId,
-          target: closest.node.id,
-          targetHandle: closest.handle.id,
-        },
-      ])
-    }
-  }
-})
-
-const strokeColor = computed(() => {
-  if (canSnap.value) {
-    return SNAP_HIGHLIGHT_COLOR
-  }
-
-  if (closest.node) {
-    return HIGHLIGHT_COLOR
-  }
-
-  return '#222'
-})
-
 </script>
 
 <template>
-  <g>
-    <path :d="path[0]" class="vue-flow__connection-path" />
-    <circle :cx="targetX" :cy="targetY" fill="#fff" :stroke="strokeColor" :r="3" :stroke-width="1.5" />
+  <g >
+    <defs>
+      <marker
+        id="arrowhead"
+        markerWidth="10"
+        markerHeight="7"
+        refX="5"
+        refY="3.5"
+        orient="auto"
+        markerUnits="strokeWidth"
+      >
+        <polygon points="0 0, 6 3.5, 0 7" fill="#6F3381" />
+      </marker>
+    </defs>
+    <path @click="toggleColor"
+      class="vue-flow__connection animated"
+      fill="none"
+      stroke="#6F3381"
+      :stroke-width="4"
+      :marker-end="`url(#arrowhead)`"
+      :d="`M${sourceX},${sourceY} C ${sourceX} ${targetY} ${sourceX} ${targetY} ${targetX},${targetY}`"
+    />
   </g>
 </template>

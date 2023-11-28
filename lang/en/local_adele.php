@@ -77,14 +77,16 @@ $string['btncancel'] = 'cancel';
 $string['btnupdate_positions'] = 'update positions';
 $string['btntoggle'] = 'change view';
 
-
-
 // From Strings.
 $string['fromlearningtitel'] = 'Learning Path Tiel';
 $string['fromlearningdescription'] = 'Description of Learning Path';
 $string['fromavailablecourses'] = 'List of available courses';
+$string['tagsearch_description'] = 'To search for courses, start the tag-name with an #';
 $string['fromlearningtitelplaceholder'] = 'Please provide a titel';
 $string['fromlearningdescriptionplaceholder'] = 'Please provide a short description';
+$string['placeholder_search'] = 'Search courses';
+$string['edit_course_node'] = 'Edit course node';
+
 
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all Learningpaths';
@@ -105,7 +107,6 @@ $string['tag_invalid'] = 'Following tags were not found: {$a}';
 $string['warning_empty_space'] = 'Please watch for whitespaces and do not end with a comma';
 $string['settings_only_subscribed'] = 'Only courses the teacher is subscribed to.';
 $string['settings_all_courses'] = 'All courses meeting the other criteria.';
-
 
 // Notifications.
 $string['title_duplicate'] = 'Learning Path duplicated';
