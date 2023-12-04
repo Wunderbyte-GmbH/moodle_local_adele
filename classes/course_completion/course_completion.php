@@ -14,39 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_adele\course_completion;
+
 /**
- * Moodle hooks for local_adele
+ * Validate if the string does excist.
+ *
  * @package     local_adele
  * @author      Jacob Viertel
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('COURSES_COND_MANUALLY', 150);
-define('COURSES_COND_TIMED', 140);
-/**
- * Renders the popup Link.
- *
- * @param renderer_base $renderer
- * @return string The HTML
- */
-function local_adele_render_navbar_output(\renderer_base $renderer) {
-    global $CFG;
+interface course_completion {
 
-    // Early bail out conditions.
-    if (!isloggedin() || isguestuser()
-        || !has_capability('local/adele:canmanage', context_system::instance())) {
-        return;
-    }
-
-    $output = '<div class="popover-region nav-link icon-no-margin dropdown">
-        <a class="btn btn-secondary"
-        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
-            . $CFG->wwwroot . '/local/adele/index.php"
-        role="button">
-        '. get_string('btnadele', 'local_adele') .'
-        </a>
-    </div>';
-
-    return $output;
+    /**
+     * Obtains a string describing this restriction (whether or not
+     * it actually applies). Used to obtain information that is displayed to
+     * students if the activity is not available to them, and for staff to see
+     * what conditions are.
+     *
+     * The $full parameter can be used to distinguish between 'staff' cases
+     * (when displaying all information about the activity) and 'student' cases
+     * (when displaying only conditions they don't meet).
+     *
+     * @return array Information string (for admin) about all restrictions on
+     *   this item
+     */
+    public function get_description();
 }

@@ -28,7 +28,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Edit  store.state.node.fullname </h5>
+            <h5 class="modal-title" id="exampleModalLabel">Edit  {{fullname}} </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -82,6 +82,7 @@ const saveChanges = () => {
 
 // watch values from selected node
 watch(() => store.state.node, (newValue, oldValue) => {
+  console.log(newValue);
   fullname.value = newValue.fullname;
   shortname.value = newValue.shortname;
   tags.value = newValue.tags;

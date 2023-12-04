@@ -71,4 +71,12 @@ $functions = [
         'type' => 'write',
         'ajax' => true,
     ],
+    'local_adele_get_completions' => [
+        'classname' => 'local_adele\external\get_completions',
+        'classpath' => '',
+        'description' => 'Get all completions.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
 ];

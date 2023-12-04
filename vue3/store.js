@@ -44,6 +44,7 @@ const store = createStore({
             editingadding: false,
             node: null,
             startnode: null,
+            editingpretest: false,
         };
     },
     mutations: {
@@ -152,6 +153,10 @@ const store = createStore({
             const result = await ajax('local_adele_duplicate_learningpath', payload);
             context.dispatch('fetchLearningpaths');
             return result.result;
+        },
+        async fetchCompletions() {
+            const result = await ajax('local_adele_get_completions');
+            return result;
         },
     }
 });

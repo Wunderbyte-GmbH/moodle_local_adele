@@ -42,6 +42,13 @@ const setNodeModal = () => {
   store.state.node = props.data
 };
 
+// Set node data for the modal
+const setPretestView = () => {
+  store.state.node = props.data
+  store.state.editingpretest = true
+  store.state.editingadding = false
+};
+
 // Set the node that handle has been clicked
 const setStartNode = (node_id) => {
   store.commit('setstartNode', {
@@ -59,13 +66,19 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
   <div class="custom-node text-center">
     <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
     <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
-    <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
-      {{ store.state.strings.edit_course_node }}
-    </button>
-
+    <div class="mb-2">
+      <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
+        {{ store.state.strings.edit_course_node }}
+      </button>
+    </div>
+    <div class="mb-2">
+      <button type="button" class="btn btn-secondary" @click="setPretestView">
+        {{ store.state.strings.edit_node_pretest }}
+      </button>
+    </div>
   </div>
-  <Handle id="source" type="source" :position="Position.Right" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
-  <Handle id="target" type="target" :position="Position.Left" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
+  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
+  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
 </template>
 
 <style scoped>

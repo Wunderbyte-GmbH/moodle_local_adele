@@ -55,14 +55,10 @@ const flowchart = (flow) => {
 
 // Emit to parent component
 const emit = defineEmits();
-const emitNodeCount = (count) => {
-  emit('node-count-changed', count);
-};
-
-// Watch for changes in the number of nodes
-watch(nodes, () => {
-  emitNodeCount(nodes.value.length);
-});
+// Toggle the dark mode of the flow-chart
+function toggleClass() {
+  emit('change-class');
+}
 
 // Watch for changes of the learning path
 watch(() => store.state.learninggoal, (newValue, oldValue) => {
@@ -137,7 +133,7 @@ function updatePos() {
   sources = sources.filter(onlyUnique);
   let targets = nodeids.filter(x => !sources.includes(x));
 
-  //set all target to one y
+  //set all target to one x
   if(targets.length > 1){
     let targetEndY = null;
     targets.forEach((taregt) => {
@@ -149,15 +145,15 @@ function updatePos() {
         elements.nodes = elements.nodes.map(element_node => {
           if (element_node.id === taregt) {
             let position = {
-              x: targetEndY,
-              y: element_node.position.y,
+              x: element_node.position.x,
+              y: targetEndY,
             }
             return { ...element_node, position: position };
           }
           return element_node;
         });
       }else{
-        targetEndY = target_node[0].position.x;
+        targetEndY = target_node[0].position.y;
       }
     });
 
@@ -181,8 +177,8 @@ function updatePos() {
         elements.nodes = elements.nodes.map(element_node => {
             if (element_node.id === source_node.source) {
               let position = {
-                x: target_node[0].position.x - 400,
-                y: element_node.position.y,
+                x: element_node.position.x,
+                y: target_node[0].position.y - 250,
               }
               new_targets.push(element_node.id);
               return { ...element_node, position: position };
@@ -202,11 +198,6 @@ function updatePos() {
 // Get all nodes id
 function onlyUnique(value, index, array) {
   return array.indexOf(value) === index;
-}
-
-// Toggle the dark mode of the flow-chart
-function toggleClass() {
-  emit('change-class');
 }
 
 </script>
