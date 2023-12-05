@@ -14,18 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Base class for a single booking option availability condition.
+ *
+ * All bo condition types must extend this class.
+ *
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_adele\course_completion\conditions;
 
 use local_adele\course_completion\course_completion;
-
-/**
- * Manually checked Course.
- *
- * @package mod_booking
- * @copyright 2022 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,10 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/adele/lib.php');
 
 /**
- * Base class for a single bo availability condition.
- *
- * All bo condition types must extend this class.
- *
+ * Class for a single learning path course condition.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -47,6 +46,7 @@ class manually implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
+    /** @var string $type of the redered condition in frontend. */
     public $type = 'checkbox';
     /**
      * Obtains a string describing this restriction (whether or not

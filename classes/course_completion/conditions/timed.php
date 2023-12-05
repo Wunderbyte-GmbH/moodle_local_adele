@@ -19,9 +19,10 @@
  *
  * All bo condition types must extend this class.
  *
- * @package mod_booking
- * @copyright 2022 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
  namespace local_adele\course_completion\conditions;
@@ -33,10 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/adele/lib.php');
 
 /**
- * Class for a single bo availability condition.
- *
- * This returns true or false based on the standard booking times
- * OR a custom time passed on via the availability json
+ * Class for a single learning path course condition.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -47,6 +45,7 @@ class timed implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_TIMED;
+    /** @var string $type of the redered condition in frontend. */
     public $type = 'date';
 
     /**
@@ -59,10 +58,6 @@ class timed implements course_completion {
      * (when displaying all information about the activity) and 'student' cases
      * (when displaying only conditions they don't meet).
      *
-     * @param bool $full Set true if this is the 'full information' view
-     * @param booking_option_settings $settings Item we're checking
-     * @param int $userid User ID to check availability for
-     * @param bool $not Set true if we are inverting the condition
      * @return array availability and Information string (for admin) about all restrictions on
      *   this item
      */

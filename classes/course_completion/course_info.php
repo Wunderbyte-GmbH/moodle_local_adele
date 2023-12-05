@@ -49,10 +49,6 @@ class course_info {
     /**
      * Returns conditions depending on the conditions param.
      *
-     * @param int $condparam conditions parameter
-     *  0 ... all conditions (default)
-     *  1 ... hardcoded conditions only
-     *  2 ... customizable conditions only
      * @return array
      */
     public static function get_conditions(): array {

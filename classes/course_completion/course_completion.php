@@ -14,10 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Base class for a single booking option availability condition.
+ *
+ * All bo condition types must extend this class.
+ *
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_adele\course_completion;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/local/adele/lib.php');
+
 /**
- * Validate if the string does excist.
+ * Interface for a learning path course conditions.
  *
  * @package     local_adele
  * @author      Jacob Viertel
