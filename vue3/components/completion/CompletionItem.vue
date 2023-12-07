@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import InputCheckbox from './conditions/InputCheckbox.vue';
 import InputDate from './conditions/InputDate.vue';
 import InfoText from './conditions/InfoText.vue'

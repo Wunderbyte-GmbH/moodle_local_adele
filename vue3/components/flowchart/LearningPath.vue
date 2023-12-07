@@ -37,13 +37,20 @@
 <div class="dndflow" @drop="onDrop">
     <Modal >
     </Modal>
-    <VueFlow @dragover="onDragOver" @node-drag="onNodeDrag" :default-viewport="{ zoom: 1.0 }" :class="{ dark }" class="learning-path-flow">
-    <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8"/>
-    <template #node-custom="{ data }">
-        <CustomrNode :data="data"/>
-    </template>
+    <VueFlow @dragover="onDragOver" @node-drag="onNodeDrag" :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" :class="{ dark }" class="learning-path-flow">
+      <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8"/>
+      <template #node-custom="{ data }">
+          <CustomrNode :data="data"/>
+      </template>
+      <template #node-dropzone="{ data }">
+          <DropzoneNode :data="data"/>
+      </template>
+      <MiniMap nodeColor="grey"/>
     </VueFlow>
-    <Sidebar :courses="store.state.availablecourses" :strings="store.state.strings" />
+    <Sidebar 
+      @nodesIntersected="handleNodesIntersected"
+      :courses="store.state.availablecourses" 
+      :strings="store.state.strings" />
 </div>
 <p>
 <div class="d-flex justify-content-center">
@@ -61,9 +68,13 @@ import { MarkerType, VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './Sidebar.vue'
 import Controls from './Controls.vue'
-import CustomrNode from './CustomNode.vue'
+import CustomrNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
 import Modal from '../modals/Modal.vue'
+import { MiniMap } from '@vue-flow/minimap'
+import getNodeId from '../../composables/getNodeId'
+import DropzoneNode from '../nodes/DropzoneNode.vue'
+import { notify } from "@kyvg/vue3-notification"
 
 // Load Store and Router
 const store = useStore()
@@ -71,45 +82,60 @@ const store = useStore()
 // Define constants that will be referenced
 const dark = ref(false)
 const edgeId = ref('')
-
+// Intersected node
+const intersectedNode = ref(null);
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
 }
 
-// generate a new id
-function getId() {
-    let id = nodes.value.length + 1;
-    return `dndnode_${id}`
-}
-
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, addNodes, project, vueFlowRef, removeEdges } = useVueFlow({
-nodes: [],
+nodes: [
+  // {
+  //     id: 'starting_node',
+  //     type: 'dropzone',
+  //     position: { x: 0 , y: 0 },
+  //     label: `DZ node`,
+  //     data: {
+  //       opacity: '0.6',
+  //       bgcolor: 'grey',
+  //       infotext: 'New Staring node',
+  //       height: '200px',
+  //       width: '400px',
+  //     },
+  //     draggable: false,
+  //   }
+  ],
 })
+
+// Prevent default event if node has been dropped
+function handleNodesIntersected({ intersecting }) {
+  intersectedNode.value = intersecting
+}
 
 // Automatically connect to node if node is close enough
 function onNodeDrag(event) {
-const connectionRadius = 500;
-const { left, top } = vueFlowRef.value.getBoundingClientRect();
-const position = project({
- x: event.event.clientX - left,
- y: event.event.clientY - top,
-});
-const clostestNode = findClosestNode(position, connectionRadius, event.node.id); 
-if(clostestNode){
- let source = clostestNode;
- let target = event.node;
- if(source.position.y < target.position.y){
-   target = clostestNode;
-   source = event.node;
- }
- edgeId.value = source.id + target.id
- showPreviewConnection(source, target)
-}else{
- removeEdges(edgeId.value)
-}
+  const connectionRadius = 500;
+  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  const position = project({
+  x: event.event.clientX - left,
+  y: event.event.clientY - top,
+  });
+  const clostestNode = findClosestNode(position, connectionRadius, event.node.id); 
+  if(clostestNode){
+  let source = clostestNode;
+  let target = event.node;
+  if(source.position.y < target.position.y){
+    target = clostestNode;
+    source = event.node;
+  }
+  edgeId.value = source.id + target.id
+  showPreviewConnection(source, target)
+  }else{
+  removeEdges(edgeId.value)
+  }
 }
 
 // Prevent default event if node has been dropped
@@ -128,7 +154,6 @@ const previewEdge = {
  target: source.id,
  sourceHandle: 'source',
  targetHandle: 'target',
- animated: true,
  style: {
    'stroke-width': 5,
  },
@@ -160,7 +185,6 @@ return closestNode;
 
 // Adjust and add edges if connection was made
 function handleConnect(params) {
-params.animated = true;
 params.style = {
  'stroke-width': 5, 
 };
@@ -179,40 +203,68 @@ onConnect(handleConnect);
 
 // Adding setting up nodes and potentional edges
 function onDrop(event) {
-const type = event.dataTransfer?.getData('application/vueflow')
-const data = JSON.parse(event.dataTransfer?.getData('application/data'));
-const { left, top } = vueFlowRef.value.getBoundingClientRect()
+  console.log(event)
+  if(!intersectedNode.value){
+    const type = event.dataTransfer?.getData('application/vueflow')
+    const data = JSON.parse(event.dataTransfer?.getData('application/data'));
+    const { left, top } = vueFlowRef.value.getBoundingClientRect()
 
-const position = project({
- x: event.clientX - left,
- y: event.clientY - top,
-})
+    const position = project({
+      x: event.clientX - left,
+      y: event.clientY - top,
+    });
+    // const position = {
+    //   x: intersectedNode.value.dropzone.position.x,
+    //   y: intersectedNode.value.dropzone.position.y
+    // }
+    const id = getNodeId('dndnode_', nodes.value);
+    data.node_id = id;
 
-const id = getId();
-data.node_id = id;
+    const newNode = {
+      id: id,
+      type,
+      position,
+      label: `${type} node`,
+      data: data,
+      draggable: false,
+      //parentCourse: intersectedNode.value.closestnode.id
+    }
+    addNodes([newNode])
+    // if(intersectedNode.value.closestnode.id == 'starting_node'){
+    //   shiftingStartingNode(intersectedNode.value.closestnode)
+    // }
 
-const newNode = {
- id: id,
- type,
- position,
- label: `${type} node`,
- data: data
+    // align node position after drop, so it's centered to the mouse
+    nextTick(() => {
+    const node = findNode(newNode.id)
+    const stop = watch(
+      () => node.dimensions,
+      (dimensions) => {
+        if (dimensions.width > 0 && dimensions.height > 0) {
+          node.position = { x: Math.round((node.position.x - node.dimensions.width / 2) * 10)/10, y:  Math.round((node.position.y - node.dimensions.height / 2) * 10)/10 }
+          stop()
+        }
+      },
+      { deep: true, flush: 'post' },
+    )
+    })
+  } else{
+    notify({
+      title: 'Node drop refused',
+      text: 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.',
+      type: 'warn'
+    });
+  }
 }
-addNodes([newNode])
-removeEdges('preview_edge')
-// align node position after drop, so it's centered to the mouse
-nextTick(() => {
- const node = findNode(newNode.id)
- const stop = watch(
-   () => node.dimensions,
-   (dimensions) => {
-     if (dimensions.width > 0 && dimensions.height > 0) {
-       node.position = { x: Math.round((node.position.x - node.dimensions.width / 2) * 10)/10, y:  Math.round((node.position.y - node.dimensions.height / 2) * 10)/10 }
-       stop()
-     }
-   },
-   { deep: true, flush: 'post' },
- )
-})
+
+function shiftingStartingNode(startingNode){
+  startingNode.position.x += 500
+  startingNode.data = {
+    opacity: '0.6',
+    bgcolor: 'grey',
+    infotext: 'New Staring node',
+    height: '200px',
+    width: '400px',
+  };
 }
 </script>

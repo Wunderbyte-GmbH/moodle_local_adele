@@ -55,13 +55,17 @@ function onDrag(event, data ) {
   if(closestNode){
     let takenEdges = []
     props.edges.forEach((edge) => {
-      if(edge.source == closestNode.id ){
-        takenEdges.push(edge.sourceHandle)
-      } else if(edge.target == closestNode.id){
-        takenEdges.push(edge.targetHandle)
+      if ((edge.source == closestNode.id || edge.target == closestNode.id) && !edge.id.includes('source_') 
+        && edge.type != 'default') {
+        if(edge.source == closestNode.id ){
+          takenEdges.push(edge.sourceHandle)
+        } else if(edge.target == closestNode.id){
+          takenEdges.push(edge.targetHandle)
+        }
       }
     })
     const freeEdges = arrayDifference(availableEdges, takenEdges)
+    
     if(freeEdges.length > 0){
       drawDropZones(freeEdges, closestNode)  
       //change color of drop zone if drag position is above 
@@ -79,7 +83,7 @@ function onDrag(event, data ) {
 function checkIntersetcion(event, closestNode) {
   intersectingNode.value = null;
   props.nodes.forEach((node) => {
-    if(node.type == 'dropzone' || node.type == 'selected'){
+    if(node.type == 'dropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,
@@ -88,9 +92,17 @@ function checkIntersetcion(event, closestNode) {
       const nodesIntersecting = areNodesIntersecting(position, node)
       if(nodesIntersecting){
         intersectingNode.value = { closestnode: closestNode, dropzone: node};
-        node.type = 'selected'
+        node.data = {
+          opacity: '0.75',
+          bgcolor: 'chartreuse',
+          infotext: 'Drop to connect here'
+        }
       }else{
-        node.type = 'dropzone'
+        node.data = {
+          opacity: '0.6',
+          bgcolor: 'grey',
+          infotext: 'Drop zone'
+        }
       }
     }
   });
@@ -124,23 +136,35 @@ function drawDropZones(freeEdges, closestNode) {
     }else if(freeEdge == 'target_or'){
       position.x -= 450;
     }
-    
-    if(freeEdge == 'source_and' || (freeEdge == 'source_or' && freeEdges.includes('target_and'))){
 
+    if(freeEdge == 'source_and' || (freeEdge == 'source_or' && freeEdges.includes('target_and'))){
+      const data = {
+        opacity: '0.6',
+        bgcolor: 'grey',
+        infotext: 'Drop zone'
+      }
       const newNode = {
         id: freeEdge,
         type: 'dropzone',
         position: position,
         label: `default node`,
+        data: data
       };
+
       addNodes([newNode]);
 
       // Create an edge connecting the new drop zone node to the closest node
+      let edgeData = {
+        type: 'disjunctional',
+        text: 'OR',
+      }
       let targetHandle = 'target_or'
-      let type = 'disjunctional'
       if(freeEdge == 'source_and'){
         targetHandle = 'target_and'
-        type = 'additional'
+        edgeData = {
+          type: 'additional',
+          text: 'AND',
+        }
       }
 
     const newEdge = {
@@ -149,7 +173,8 @@ function drawDropZones(freeEdges, closestNode) {
       sourceHandle: freeEdge,
       target: newNode.id,
       targetHandle: targetHandle,
-      type: type
+      type: 'completion',
+      data: edgeData,
     };
     // Add the new edge
     addEdges([newEdge]);
@@ -175,7 +200,7 @@ function findClosestNode(event) {
 
 
   props.nodes.forEach((node) => {
-    if(node.type != 'dropzone' && node.type != 'selected'){
+    if(node.type != 'dropzone' && node.type != 'selected'  && node.type != 'feedback'){
       const distance = Math.sqrt(
         Math.pow(position.x - node.position.x, 2) +
         Math.pow(position.y - node.position.y, 2)

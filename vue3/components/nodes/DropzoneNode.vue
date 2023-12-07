@@ -27,26 +27,19 @@
  import { Handle, Position } from '@vue-flow/core'
 
  const props = defineProps({
-  opacity: {
-    type: String,
-    default: '0.6',
-  },
-  bgcolor: {
-    type: String,
-    default: "rgba(255, 255, 255, 0.5)",
-  },
-  infotext: {
-    type: String,
-    default: 'Drop zone',
+  data: {
+    type: Object,
+    required: true,
   },
 });
  
  </script>
 <template>
-  <div class="custom-node text-center rounded p-3" 
-    style="background-color: chartreuse; height: 150px; width: 350px;"
-    :style="{ 'background-color': bgcolor, 'opacity' : opacity}">
-    {{ infotext}}
+  <div class="custom-node text-center rounded p-3"
+    :style="{ 'background-color': data.bgcolor, 'opacity' : data.opacity,
+      'height': data.height, 'width': data.width
+    }">
+    {{ data.infotext}}
   </div>
   <Handle id="target_and" type="target" :position="Position.Top"/>
   <Handle id="source_and" type="source" :position="Position.Bottom"/>

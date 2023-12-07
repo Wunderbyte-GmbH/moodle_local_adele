@@ -82,7 +82,6 @@ const saveChanges = () => {
 
 // watch values from selected node
 watch(() => store.state.node, (newValue, oldValue) => {
-  console.log(newValue);
   fullname.value = newValue.fullname;
   shortname.value = newValue.shortname;
   tags.value = newValue.tags;

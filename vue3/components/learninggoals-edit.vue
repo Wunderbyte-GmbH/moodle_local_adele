@@ -31,14 +31,24 @@
 
 .dndflow{flex-direction:column;display:flex;height:500px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
 .learning-path-flow.dark{background:#4e574f;}
+
+.fade-in {
+  animation: fadeIn 2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 </style>
 <template>
     <div>
       <notifications width="100%" />
-        <div v-if="$store.state.editingadding == false && $store.state.editingpretest == false">
+        <div v-if="$store.state.editingadding == false && $store.state.editingpretest == false" class="fade-in">
             <LearningPathList />
         </div>
-        <div v-if="$store.state.editingadding == true">
+        <div v-if="$store.state.editingadding == true" class="fade-in">
           <h3>{{ store.state.strings.learninggoal_form_title_edit }}</h3>
           <div>
             <div v-for="goal in store.state.learninggoal">
@@ -77,12 +87,12 @@
               </p>
               <LearingPath />
             </div>
+          </div>
         </div>
-      </div>
-      <div v-if="$store.state.editingpretest == true">
+        <div v-if="$store.state.editingpretest == true" class="fade-in">
           <Completion />
-      </div>
-  </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -91,10 +101,17 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { notify } from "@kyvg/vue3-notification"
 import Completion from './completion/Completion.vue'
 import LearingPath from './flowchart/LearningPath.vue'
 import LearningPathList from './LearningPathList.vue'
+
+const beforeEnter = (el) => {
+  el.style.opacity = 0;
+};
+
+const afterLeave = (el) => {
+  el.style.opacity = 1;
+};
 
 // Load Store and Router
 const store = useStore()
@@ -103,7 +120,7 @@ const router = useRouter()
 // Define constants that will be referenced
 const goalname = ref('')
 const goaldescription = ref('')
-const clicked = ref({})
+
 
 // Checking routes 
 const checkRoute = (currentRoute) => {

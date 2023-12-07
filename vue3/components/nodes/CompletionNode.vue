@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import CompletionItem from './CompletionItem.vue'
+import CompletionItem from '../completion/CompletionItem.vue'
 
 const props = defineProps({
   data: {
@@ -34,11 +34,23 @@ const props = defineProps({
   },
 });
 
+const toggleVisibility = () => {
+  props.data.visibility = !props.data.visibility;
+};
+
 </script>
 
 <template>
   <div class="custom-node text-center rounded p-3" style="height: 150px; width: 350px;">
     {{ data.name }}
+    <button @click="toggleVisibility" 
+      style="position: absolute; top: 5px; right: 5px; background: none; border: none;">
+      <i class="fas" 
+        :class="{ 'fa-eye': props.data.visibility, 
+          'fa-eye-slash': !props.data.visibility, 
+          'strikethrough': !props.data.visibility }">
+      </i>
+    </button>
     <CompletionItem :completion="data" />
   </div>
   <Handle id="target_and" type="target" :position="Position.Top"/>
@@ -52,6 +64,21 @@ const props = defineProps({
   background-color: white;
   padding: 10px;
   border: 1px solid #ccc;
+}
+
+.fa-eye {
+  color: grey;
+  opacity: 1;
+}
+
+.fa-eye-slash {
+  color: grey;
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.strikethrough {
+  text-decoration: line-through;
 }
 
 </style>

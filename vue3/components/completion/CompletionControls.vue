@@ -27,33 +27,27 @@
 // Import needed libraries
 import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
-import { nextTick } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
+import loadFlowChart from '../../composables/loadFlowChart'
 
 // Load Store and Router
 const store = useStore();
 
-const { setNodes, setEdges, fitView, onPaneReady, setTransform, toObject } = useVueFlow()
+const { onPaneReady, toObject } = useVueFlow()
 
-// Build flow-chart with edges and nodes
-const flowchart = (flow) => {
-  if (flow) {
-      const [x = 0, y = 0] = flow.position
-      setNodes(flow.nodes)
-      setEdges(flow.edges)
-      setTransform({ x, y, zoom: flow.zoom || 0 })
-      nextTick(() => {
-        fitView({ duration: 1000, padding: 0.5 })
-      })
-    }
-};
+// Emit to parent component
+const emit = defineEmits();
+// Toggle the dark mode of the flow-chart
+function toggleClass() {
+  emit('change-class');
+}
 
 // Watch for changes of the learning path
 if (store.state.node != undefined) {
     let completion = store.state.learninggoal[0].json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
-    flowchart(completion[0].completion)
+    loadFlowChart(completion[0].completion)
 }
 
 // Prepare and save learning path
@@ -98,5 +92,6 @@ onPaneReady(({ fitView,}) => {
   <Panel class="save-restore-controls">
     <button class="btn btn-primary m-2" @click="onSave">{{store.state.strings.save}}</button>
     <button class="btn btn-secondary m-2" @click="onCancel">{{store.state.strings.btncancel}}</button>
+    <button class="btn btn-warning m-2" @click="toggleClass">{{store.state.strings.btntoggle}}</button>
   </Panel>
 </template>

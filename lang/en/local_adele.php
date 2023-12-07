@@ -78,7 +78,7 @@ $string['btnupdate_positions'] = 'update positions';
 $string['btntoggle'] = 'change view';
 
 // From Strings.
-$string['fromlearningtitel'] = 'Learning Path Tiel';
+$string['fromlearningtitel'] = 'Learning Path Titel';
 $string['fromlearningdescription'] = 'Description of Learning Path';
 $string['fromavailablecourses'] = 'List of available courses';
 $string['tagsearch_description'] = 'To search for courses, start the tag-name with an #';
@@ -86,7 +86,7 @@ $string['fromlearningtitelplaceholder'] = 'Please provide a titel';
 $string['fromlearningdescriptionplaceholder'] = 'Please provide a short description';
 $string['placeholder_search'] = 'Search courses';
 $string['edit_course_node'] = 'Edit course node';
-$string['edit_node_pretest'] = 'Edit preconditions';
+$string['edit_node_pretest'] = 'Edit completion criteria';
 
 
 // Overview String.

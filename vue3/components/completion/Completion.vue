@@ -1,25 +1,29 @@
 <template>
-    <h3>Edit Completion of course node</h3>
+    <h3>Edit Completion criteria of course node</h3>
+    <h4>Course Title</h4>
+    <p>
+      <b>
+        <!-- {{ store.state.node.fullname }} -->
+      </b>
+    </p>
     <div v-if="completions !== null">
-        <div class="dndflowcompletion" @drop="onDrop">
-            <VueFlow @dragover="onDragOver" :default-viewport="{ zoom: 1.0 }" class="completions">
-                <Background :pattern-color="'#FFFFFF'" gap="8" bgColor="black" />
-                <template #node-custom="{ data }">
+        <div class="dndflowcompletion" @drop="onDrop" >
+            <VueFlow @dragover="onDragOver"
+              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
+                <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
+                <template #node-custom="{ data }" >
                     <CompletionNode :data="data"/>
                 </template>
-                <template #node-dropzone="{ }">
-                    <DropzoneNode />
+                <template #node-dropzone="{ data }">
+                    <DropzoneNode :data="data"/>
                 </template>
-                <template #node-selected="props">
-                  <DropzoneSelectedNode />
+                <template #node-feedback="{ data }">
+                    <FeedbackNode :data="data" />
                 </template>
-                <template #edge-additional="props">
-                  <AdditionalEgde v-bind="props" />
+                <template #edge-completion="props" >
+                  <CompletionLine v-bind="props"/>
                 </template>
-                <template #edge-disjunctional="props">
-                  <DisjunctionalEgde v-bind="props" />
-                </template>
-                <MiniMap />
+                <MiniMap nodeColor="grey" />
             </VueFlow>
             <Sidebar :completions="completions" 
               :strings="store.state.strings" 
@@ -28,7 +32,7 @@
               @nodesIntersected="handleNodesIntersected" />
         </div>
           <div class="d-flex justify-content-center">
-            <Controls />
+            <Controls @change-class="toggleClass" />
           </div>
     </div>
     <div v-else>
@@ -37,25 +41,32 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted, nextTick, watch, onUpdated } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
 import { Background } from '@vue-flow/background'
 import Controls from './CompletionControls.vue'
-import CompletionNode from './CompletionNode.vue'
-import DropzoneNode from './DropzoneNode.vue'
-import DropzoneSelectedNode from './DropzoneNodeIntersected.vue'
+import CompletionNode from '../nodes/CompletionNode.vue'
+import DropzoneNode from '../nodes/DropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
-import AdditionalEgde from './AndCompletionLine.vue'
-import DisjunctionalEgde from './OrCompletionLine.vue'
+import CompletionLine from './CompletionLine.vue'
 import { MiniMap } from '@vue-flow/minimap'
+import getNodeId from '../../composables/getNodeId'
+import FeedbackNode from '../nodes/feedbackNode.vue'
 
-const { nodes, edges, addNodes, project, vueFlowRef, fitView, onConnect, addEdges } = useVueFlow({
+const { nodes, edges, addNodes, project, vueFlowRef, onConnect, addEdges, findNode } = useVueFlow({
   nodes: [],})
 
 // Load Store 
 const store = useStore();
+
+// Define constants that will be referenced
+const dark = ref(false)
+// Toggle the dark mode fi child component emits event
+function toggleClass() {
+    dark.value = !dark.value;
+}
 
 // Get all available completions
 const completions = ref(null);
@@ -90,18 +101,28 @@ function onDrop(event) {
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
     const { left, top } = vueFlowRef.value.getBoundingClientRect()
+    data.visibility = true
+    let parentCondition = ''
 
     let position = project({
       x: event.clientX - left,
       y: event.clientY - top,
     })
-    if(intersectedNode.value){
-      position.x = intersectedNode.value.dropzone.position.x;
-      position.y = intersectedNode.value.dropzone.position.y;
-    }
 
-    const id = getId()
+    const id = getNodeId('condition_', nodes.value)
     data.node_id = id
+
+    if(intersectedNode.value){
+      position.x = intersectedNode.value.dropzone.position.x
+      position.y = intersectedNode.value.dropzone.position.y
+      if(intersectedNode.value.dropzone.id == 'source_and'){
+        parentCondition = intersectedNode.value.closestnode.id
+        let parentConditionNode = findNode(parentCondition)
+        if(parentConditionNode){
+          parentConditionNode.childCondition = id
+        }
+      }
+    }
 
     const newNode = {
       id: id,
@@ -110,16 +131,28 @@ function onDrop(event) {
       label: `${type} node`,
       data: data,
       draggable: false,
+      parentCondition: parentCondition
     };
 
     addNodes([newNode]);
+    if(nodes.value.length == 1){
+      addFeedbackNode(newNode)
+    }
     if(intersectedNode.value){
       // Create an edge connecting the new drop zone node to the closest node
+      let edgeData = {
+        type: 'disjunctional',
+        text: 'OR',
+      }
       let targetHandle = 'target_or'
-      let type = 'disjunctional'
       if(intersectedNode.value.dropzone.id == 'source_and'){
         targetHandle = 'target_and'
-        type = 'additional'
+        edgeData = {
+          type: 'additional',
+          text: 'AND',
+        }
+      }else{
+        addFeedbackNode(newNode)
       }
       const newEdge = {
         id: intersectedNode.value.closestnode.id  + '-' + newNode.id,
@@ -127,7 +160,8 @@ function onDrop(event) {
         sourceHandle: intersectedNode.value.dropzone.id,
         target: newNode.id,
         targetHandle: targetHandle,
-        type: type
+        type: 'completion',
+        data: edgeData,
       };
       // Add the new edge
     addEdges([newEdge]);
@@ -140,21 +174,27 @@ function onDrop(event) {
     });
   }
 }
-// generate a new id
-function getId() {
-  let highestId = 1
 
-  //get target nodes position and targets node sources
-  
-  nodes.value.forEach((node) => {
-    if (node.id.includes('condition_')) {
-      const currentId = Number(node.id.slice(node.id.indexOf('_') + 1));
-      if(highestId <= currentId){
-        highestId = currentId +1
-      }
-    }
-  })
-  return `condition_${highestId}`
+function addFeedbackNode (node) {
+  const newFeedback = {
+    id: node.id + '_feedback',
+    type: 'feedback',
+    position: { x: node.position.x , y: node.position.y-250 },
+    label: `Feedback node`,
+    data: {
+      feedback: '',
+    },
+    draggable: false,
+  };
+  const newEdge = {
+    id: node.id  + '-' + newFeedback.id,
+    source: node.id,
+    sourceHandle: 'target_and',
+    target: newFeedback.id,
+    targetHandle: 'source_feedback',
+  };
+  addNodes([newFeedback]);
+  addEdges([newEdge]);
 }
 
 // Adjust and add edges if connection was made
@@ -178,5 +218,6 @@ onConnect(handleConnection);
 .dndflowcompletion{flex-direction:column;display:flex;height:500px}.dndflowcompletion aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflowcompletion aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflowcompletion aside .description{margin-bottom:10px}.dndflowcompletion .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflowcompletion{flex-direction:row}.dndflowcompletion aside{min-width:25%}}@media screen and (max-width: 639px){.dndflowcompletion aside .nodes{display:flex;flex-direction:row;gap:5px}}
 .learning-path-flow{background:#4e574f;}
 .vue-flow__node.intersecting{background-color:#ff0}
+.completions.dark{background:#4e574f;}
 
 </style>

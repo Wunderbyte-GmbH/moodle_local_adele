@@ -63,15 +63,14 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
 </script>
 
 <template>
-  <div class="custom-node text-center">
+  <div class="custom-node text-center rounded p-3"
+    style="height: 200px; width: 400px;">
     <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
     <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
-    <div class="mb-2">
-      <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
+    <div>
+      <button type="button" class="btn btn-primary m-2" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
         {{ store.state.strings.edit_course_node }}
       </button>
-    </div>
-    <div class="mb-2">
       <button type="button" class="btn btn-secondary" @click="setPretestView">
         {{ store.state.strings.edit_node_pretest }}
       </button>

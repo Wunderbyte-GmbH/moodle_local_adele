@@ -25,9 +25,22 @@
 <script setup>
 // Import needed libraries
 import { defineProps, ref, computed } from 'vue';
+import { useVueFlow } from '@vue-flow/core'
+const { project, vueFlowRef, findNode, nodes, addNodes } = useVueFlow()
 
 // Reference on searchTerm
 const searchTerm = ref('');
+
+// Ref to store intersecting node
+const emit = defineEmits();
+const intersectingNode = ref(null);
+
+// Defined props from the parent component
+const props = defineProps({
+  courses: Array,
+  strings: Object,
+  require: true,
+});
 
 // Function sets up data for nodes
 function onDragStart(event, data) {
@@ -37,12 +50,6 @@ function onDragStart(event, data) {
     event.dataTransfer.effectAllowed = 'move';
   }
 }
-
-// Defined props from the parent component
-const props = defineProps({
-  courses: Array,
-  strings: Object,
-});
 
 // Calculate searched courses
 const filteredCourses = computed(() => {
@@ -56,6 +63,115 @@ const filteredCourses = computed(() => {
   );
 });
 
+// Function sets up data for nodes
+function onDrag(event) {
+  //find closestNode node
+  const startingNode = findNode('starting_node'); 
+  const closestNode = findClosestNode(event); 
+  
+  //add drop zones to this node 
+  //checkIntersetcion(event, startingNode)
+  if(closestNode){
+    //checkIntersetcion(event, closestNode)
+    //drawDropZones(closestNode)
+
+  }
+}
+
+function drawDropZones(closestNode) {
+    let position = {
+      x: closestNode.position.x, 
+      y: closestNode.position.y -= 100
+    }
+
+    const data = {
+      opacity: '0.6',
+      bgcolor: 'grey',
+      infotext: 'Drop zone',
+      height: '200px',
+      width: '400px',
+    }
+    const newNode = {
+      id: 'dropzone',
+      type: 'dropzone',
+      position: position,
+      label: `default node`,
+      data: data
+    }
+    addNodes([newNode]);
+}
+
+function checkIntersetcion(event, closestNode) {
+  intersectingNode.value = null;
+  nodes.value.forEach((node) => {
+    if(node.type == 'dropzone'){
+      const { left, top } = vueFlowRef.value.getBoundingClientRect();
+      const position = project({
+        x: event.clientX - left,
+        y: event.clientY - top,
+      });
+      const nodesIntersecting = areNodesIntersecting(position, node)
+      if(nodesIntersecting){
+        intersectingNode.value = { closestnode: closestNode, dropzone: node};
+        node.data = {
+          opacity: '0.75',
+          bgcolor: 'chartreuse',
+          infotext: 'Drop to connect here',
+          height: '200px',
+          width: '400px',
+        }
+      }else{
+        node.data = {
+          opacity: '0.6',
+          bgcolor: 'grey',
+          infotext: 'New Staring node',
+          height: '200px',
+          width: '400px',
+        }
+      }
+    }
+  });
+  emit('nodesIntersected', { intersecting: intersectingNode.value });
+}
+
+// Function to check if two nodes intersect
+function areNodesIntersecting(position, node) {
+  return (
+    position.x < node.position.x + node.dimensions.width &&
+    position.x > node.position.x &&
+    position.y < node.position.y + node.dimensions.height &&
+    position.y > node.position.y 
+  );
+}
+
+// Find the closest node within a set boundary
+function findClosestNode(event) {
+  const connectionRadius = 800;
+  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  const position = project({
+    x: event.clientX - left,
+    y: event.clientY - top,
+  });
+  let closestNode = null;
+  let closestDistance = Infinity;
+
+
+  nodes.value.forEach((node) => {
+    if(node.type != 'dropzone'){
+
+      const distance = Math.sqrt(
+        Math.pow(position.x - node.position.x, 2) +
+        Math.pow(position.y - node.position.y, 2)
+      );
+      if (distance < closestDistance && distance < connectionRadius) {
+        closestDistance = distance;
+        closestNode = node;
+      }
+    }
+  });
+  return closestNode;
+}
+
 </script>
 
 <template>
@@ -66,7 +182,10 @@ const filteredCourses = computed(() => {
     <div class="learning-path-nodes-container">
       <div class="nodes">
         <template v-for="course in filteredCourses" :key="course.id">
-          <div class="vue-flow__node-input mt-1" :draggable="true" @dragstart="onDragStart($event, course)" :data="course" style="width: 100%;">
+          <div class="vue-flow__node-input mt-1" :draggable="true" 
+            @dragstart="onDragStart($event, course)" 
+            @drag="onDrag($event)"
+            :data="course" style="width: 100%;">
             {{ course.fullname }}
           </div>
         </template>

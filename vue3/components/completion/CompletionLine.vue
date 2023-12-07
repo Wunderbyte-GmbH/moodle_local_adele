@@ -24,10 +24,14 @@
 
  <!-- Setup props for connection lines -->
  <script setup>
- import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow } from '@vue-flow/core'
+ import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@vue-flow/core'
  import { computed } from 'vue'
  
  const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
    id: {
      type: String,
      required: true,
@@ -95,7 +99,7 @@
         color: '#fff',  // Text color 
        }"
        class="nodrag nopan"
-     >AND
+     >{{ data.text }}
      </div>
    </EdgeLabelRenderer>
  </template>

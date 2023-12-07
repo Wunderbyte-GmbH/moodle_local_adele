@@ -40,7 +40,14 @@ const store = createStore({
             learningpaths: null,
             learningpath: null,
             availablecourses: null,
+            // availablecourses: [ 
+            //     { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
+            //     { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
+            // ],
             learninggoal: null,
+            // learninggoal: [ 
+            //     { "id": 0, "name": "", "description": "", "json": "" } 
+            // ],
             editingadding: false,
             node: null,
             startnode: null,
@@ -84,7 +91,6 @@ const store = createStore({
             state.node.fullname = data.fullname;
             //save learning path
             state.learninggoal[0].json.tree.nodes = state.learninggoal[0].json.tree.nodes.map(element_node => {
-                console.log(element_node);
                 if (element_node.id === data.node_id) {
                   return { ...element_node, fullname: data.fullname };
                 }

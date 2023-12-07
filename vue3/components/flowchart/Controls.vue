@@ -28,30 +28,17 @@
 import { Panel, useVueFlow, isNode } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { watch, nextTick } from 'vue';
+import { watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
+import loadFlowChart from '../../composables/loadFlowChart'
 
 // Load Store and Router
 const store = useStore();
 const router = useRouter();
 
-const { nodes, toObject, setNodes, setEdges, fitView, onPaneReady, setTransform } = useVueFlow()
+const { toObject, setNodes, setEdges, onPaneReady } = useVueFlow()
 // Define props in the setup block
 const props = defineProps(['learninggoal']); 
-
-
-// Build flow-chart with edges and nodes
-const flowchart = (flow) => {
-  if (flow) {
-      const [x = 0, y = 0] = flow.position
-      setNodes(flow.nodes)
-      setEdges(flow.edges)
-      setTransform({ x, y, zoom: flow.zoom || 0 })
-      nextTick(() => {
-        fitView({ duration: 1000, padding: 0.5 })
-      })
-    }
-};
 
 // Emit to parent component
 const emit = defineEmits();
@@ -63,7 +50,7 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => store.state.learninggoal, (newValue, oldValue) => {
   if (newValue[0].json.tree != undefined) {
-    flowchart(newValue[0].json.tree)
+    loadFlowChart(newValue[0].json.tree)
   }else{
     setNodes([])
     setEdges([])
@@ -72,7 +59,7 @@ watch(() => store.state.learninggoal, (newValue, oldValue) => {
 
 // Watch for changes of the learning path
 if (store.state.learninggoal[0].json.tree != undefined) {
-    flowchart(store.state.learninggoal[0].json.tree)
+  loadFlowChart(store.state.learninggoal[0].json.tree)
 }
 
 // Prepare and save learning path
@@ -178,7 +165,7 @@ function updatePos() {
             if (element_node.id === source_node.source) {
               let position = {
                 x: element_node.position.x,
-                y: target_node[0].position.y - 250,
+                y: target_node[0].position.y - 350,
               }
               new_targets.push(element_node.id);
               return { ...element_node, position: position };
@@ -192,7 +179,7 @@ function updatePos() {
       break;
     }
   }
-  flowchart(elements)
+  loadFlowChart(elements)
 }
 
 // Get all nodes id
@@ -208,7 +195,7 @@ function onlyUnique(value, index, array) {
     <button class="btn btn-secondary m-2" @click="onCancel">{{store.state.strings.btncancel}}</button>
     <button class="btn btn-info m-2" @click="updatePos">{{store.state.strings.btnupdate_positions}}</button>
     <button class="btn btn-warning m-2" @click="toggleClass">{{store.state.strings.btntoggle}}</button>
-    <a href="/course/edit.php?category=0" target="_blank" rel="noreferrer noopener">
+    <a href="/backup/restorefile.php?contextid=1" target="_blank" rel="noreferrer noopener">
       <button class="btn btn-link" :title="store.state.strings.btncreatecourse">{{ store.state.strings.btncreatecourse }}</button>
     </a>
   </Panel>
