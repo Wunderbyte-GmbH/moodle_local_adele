@@ -68,7 +68,6 @@ class completion_criteria_updated extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        //$contextnamelink = html_writer::link('local/adele/manage_learning_paths.php', $otherarray->contextname);
         return get_string('event_completion_criteria_updated_description', 'local_adele', $data['other']['learningpathname']);
     }
 

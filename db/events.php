@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin event listeners are defined here.
+ * Plugin capabilities are defined here.
  *
- * @package     local_catquiz
- * @category    event
- * @copyright   2023 Wunderbyte Gmbh <info@wunderbyte.at>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
  defined('MOODLE_INTERNAL') || die();

@@ -132,7 +132,7 @@ $string['course_description_condition_course_completed'] = 'Course has been comp
 $string['course_name_condition_course_completed'] = 'Course completed';
 $string['course_label_condition_course_completed'] = 'info_text';
 
-// Event Strings
+// Event Strings.
 $string['event_learnpath_deleted'] = 'Learning path deleted';
 $string['event_learnpath_deleted_description'] = 'The learning path {$a} was deleted';
 $string['event_learnpath_updated'] = 'Learning path updated';

@@ -68,7 +68,6 @@ class learnpath_created extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        //$contextnamelink = html_writer::link('local/adele/manage_learning_paths.php', $otherarray->contextname);
         return get_string('event_learnpath_created_description', 'local_adele', $data['other']['learningpathname']);
     }
 

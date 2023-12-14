@@ -39,23 +39,20 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class observer_course_enrolled {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $userid
-     * @param int $learninggoalid
-     * @return array
+     * @param object $event
      */
     public static function observe($event) {
         global $DB;
         $params = $event;
-        $learningpaths = self::buildsqlquerypath($params->courseid, $DB);
+        $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
                 $learningpath->json = json_decode($learningpath->json, true);
-                $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid, $DB);
+                $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
                 if (!$userpath) {
                     $userpathrelation = self::getuserpathrelation($learningpath, $params->relateduserid, $DB);
                     $DB->insert_record('local_adele_path_user', [
@@ -73,15 +70,15 @@ class observer_course_enrolled {
                 }
             }
         }
-        return 1;
     }
 
     /**
      * Build sql query with config filters.
      *
-     * @return array
+     * @param object $learningpath
+     * @return string
      */
-    public static function getuserpathrelation($learningpath, $userid, $DB) {
+    public static function getuserpathrelation($learningpath) {
         // Using named parameter :courseid in the SQL query.
         $completioncriteria = false;
         if (!$completioncriteria) {
@@ -102,7 +99,7 @@ class observer_course_enrolled {
     /**
      * Build sql query with config filters.
      *
-     * @return array
+     * @return string
      */
     public static function loopcriteria() {
         global $DB;
@@ -115,7 +112,8 @@ class observer_course_enrolled {
      * @param string $courseid
      * @return array
      */
-    public static function buildsqlquerypath($courseid, $DB) {
+    public static function buildsqlquerypath($courseid) {
+        global $DB;
         // Using named parameter :courseid in the SQL query.
         $likecourseid = $DB->sql_like('lp.json', ':courseidpattern');
         $sql = "SELECT lp.id, lp.json
@@ -134,10 +132,12 @@ class observer_course_enrolled {
     /**
      * Build sql query with config filters.
      *
-     * @param int $courseid
+     * @param int $learningpathid
+     * @param int $userid
      * @return array
      */
-    public static function buildsqlqueryuserpath($learningpathid, $userid, $DB) {
+    public static function buildsqlqueryuserpath($learningpathid, $userid) {
+        global $DB;
         // Using named parameter :courseid in the SQL query.
         $sql = "SELECT *
         FROM {local_adele_path_user} lpu

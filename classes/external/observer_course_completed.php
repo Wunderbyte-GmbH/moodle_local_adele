@@ -41,14 +41,11 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class observer_course_completed {
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Observer for course completed
      *
-     * @param int $userid
-     * @param int $learninggoalid
-     * @return array
+     * @param object $event
      */
     public static function observe($event) {
         global $DB;
@@ -89,6 +86,5 @@ class observer_course_completed {
                 }
             }
         }
-        return 1;
     }
 }
