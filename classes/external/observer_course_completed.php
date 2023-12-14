@@ -51,7 +51,7 @@ class observer_course_completed {
         global $DB;
         $params = $event;
         $userpathrelation = new user_path_relation();
-        $learningpaths = $userpathrelation->get_learning_paths($params['courseid']);
+        $learningpaths = $userpathrelation->get_learning_paths($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
                 $learningpath->json = json_decode($learningpath->json, true);
@@ -59,8 +59,8 @@ class observer_course_completed {
                 if (!$userpath) {
                     $userpath->json = json_decode($userpath->json, true);
                     foreach ($learningpath->json['tree']->nodes as $node) {
-                        if ($node['course_node_id'] == $params['courseid']) {
-                            $learningpath->json['user_path_relaction'][$params['courseid']] = true;
+                        if ($node['course_node_id'] == $params->courseid) {
+                            $learningpath->json['user_path_relaction'][$params->courseid] = true;
                             // Revision old user path relation.
                             $data = [
                                 'id' => $userpath->id,
