@@ -23,7 +23,20 @@
  */ -->
 
 <template>
-    USER LIST TBD
+    <table class="table table-margin-top">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="relation in store.state.lpuserpathrelations" :key="relation.id">
+          <td>{{ relation.id }}</td>
+          <td>{{ relation.user_id }}</td>
+        </tr>
+      </tbody>
+    </table>
 </template>
 
 <script setup>
@@ -34,7 +47,14 @@ import { useStore } from 'vuex'
 const store = useStore()
 
 onMounted(() => {
-  store.dispatch('fetchUserPathRelation', 1);
+  store.dispatch('fetchUserPathRelation', 1)
 })
 
 </script>
+
+<style scoped>
+.table-margin-top{
+  margin-top: 5rem;
+}
+
+</style>
