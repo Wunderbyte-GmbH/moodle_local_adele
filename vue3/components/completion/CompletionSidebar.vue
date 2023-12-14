@@ -95,13 +95,17 @@ function checkIntersetcion(event, closestNode) {
         node.data = {
           opacity: '0.75',
           bgcolor: 'chartreuse',
-          infotext: 'Drop to connect here'
+          infotext: 'Drop to connect here',
+          height: '150px',
+          width: '350px',
         }
       }else{
         node.data = {
           opacity: '0.6',
           bgcolor: 'grey',
-          infotext: 'Drop zone'
+          infotext: 'Drop zone',
+          height: '150px',
+          width: '350px',
         }
       }
     }
@@ -141,7 +145,9 @@ function drawDropZones(freeEdges, closestNode) {
       const data = {
         opacity: '0.6',
         bgcolor: 'grey',
-        infotext: 'Drop zone'
+        infotext: 'Drop zone',
+        height: '150px',
+        width: '350px',
       }
       const newNode = {
         id: freeEdge,

@@ -15,17 +15,27 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Plugin event listeners are defined here.
  *
- * @package     local_adele
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @package     local_catquiz
+ * @category    event
+ * @copyright   2023 Wunderbyte Gmbh <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+ defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_adele';
-$plugin->release = '0.1.0';
-$plugin->version = 2023110332;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+ $observers = [
+    [
+        'eventname' => '\local_adele\event\learnpath_created',
+        'callback' => 'local_adele_observer::course_completed',
+    ],
+    [
+        'eventname' => '\core\event\course_completed',
+        'callback' => 'local_adele_observer::course_completed',
+    ],
+    [
+        'eventname' => '\core\event\user_enrolment_created',
+        'callback' => 'local_adele_observer::user_enrolment_created',
+    ],
+ ];

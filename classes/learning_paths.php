@@ -25,7 +25,11 @@
 
 namespace local_adele;
 
+use local_adele\event\learnpath_created;
+use local_adele\event\learnpath_updated;
 use stdClass;
+use context_system;
+use local_adele\event\learnpath_deleted;
 
 /**
  * Class learning_paths
@@ -51,7 +55,7 @@ class learning_paths {
      * @return bool
      */
     public static function save_learning_path($params) {
-        global $DB;
+        global $DB, $USER;
         $data = new stdClass;
         $data->name = $params['name'];
         $data->description = $params['description'];
@@ -62,10 +66,31 @@ class learning_paths {
             $data->timecreated = time();
             $data->createdby = $params['userid'];
             $id = $DB->insert_record('local_adele_learning_paths', (object)$data);
+            // Trigger catscale created event.
+            $event = learnpath_created::create([
+                'objectid' => $id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'learningpathname' => $data->name,
+                    'learningpathid' => $id,
+                    'userid' => $data->createdb,
+                ],
+            ]);
         } else {
             $data->id = $params['learninggoalid'];
             $id = $DB->update_record('local_adele_learning_paths', $data);
+            // Trigger catscale created event.
+            $event = learnpath_updated::create([
+                'objectid' => $id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'learningpathname' => $data->name,
+                    'learningpathid' => $id,
+                    'userid' => $USER->id,
+                ],
+            ]);
         }
+        $event->trigger();
 
         if ($id > 0) {
             return 1;
@@ -123,7 +148,18 @@ class learning_paths {
             $learningpath->createdby = $USER->id;
             $learningpath->timecreated = time();
             $learningpath->timemodified = time();
-            $DB->insert_record('local_adele_learning_paths', $learningpath);
+            $id = $DB->insert_record('local_adele_learning_paths', $learningpath);
+            // Trigger catscale created event.
+            $event = learnpath_created::create([
+                'objectid' => $id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'learningpathname' => $learningpath->name,
+                    'learningpathid' => $id,
+                    'userid' => $USER->id,
+                ],
+            ]);
+            $event->trigger();
             return ['success' => true];
         }
         return ['success' => false];
@@ -136,10 +172,21 @@ class learning_paths {
      * @return array
      */
     public static function delete_learning_path($params) {
-        global $DB;
+        global $DB, $USER;
 
         $result = $DB->delete_records('local_adele_learning_paths', ['id' => $params['learninggoalid']]);
         if ($result) {
+            // Trigger catscale created event.
+            $event = learnpath_deleted::create([
+                'objectid' => $params['learninggoalid'],
+                'context' => context_system::instance(),
+                'other' => [
+                    'learningpathname' => $params['name'] ?? 'TBD',
+                    'learningpathid' => $params['learninggoalid'],
+                    'userid' => $USER->id,
+                ],
+            ]);
+            $event->trigger();
             return [
                 'success' => true,
             ];

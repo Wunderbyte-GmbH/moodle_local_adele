@@ -56,7 +56,7 @@ class learning_path_courses {
         $userquery = '';
         $select = "SELECT s1.*
         FROM (
-            SELECT ti.itemid AS id, c.fullname, c.shortname, c.category, " . $selectagg . "
+            SELECT ti.itemid AS course_node_id, c.fullname, c.shortname, c.category, " . $selectagg . "
             FROM m_tag_instance ti
             LEFT JOIN {tag} tag ON ti.tagid = tag.id
             LEFT JOIN {course} c ON ti.itemid = c.id

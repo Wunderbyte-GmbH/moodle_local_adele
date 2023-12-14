@@ -26,7 +26,7 @@
 // Import needed libraries
 import { defineProps, ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
-const { project, vueFlowRef, findNode, nodes, addNodes } = useVueFlow()
+const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } = useVueFlow()
 
 // Reference on searchTerm
 const searchTerm = ref('');
@@ -34,6 +34,9 @@ const searchTerm = ref('');
 // Ref to store intersecting node
 const emit = defineEmits();
 const intersectingNode = ref(null);
+
+// Prev closest node
+const prevClosestNode = ref(null);
 
 // Defined props from the parent component
 const props = defineProps({
@@ -70,35 +73,93 @@ function onDrag(event) {
   const closestNode = findClosestNode(event); 
   
   //add drop zones to this node 
-  //checkIntersetcion(event, startingNode)
+  checkIntersetcion(event, startingNode)
   if(closestNode){
-    //checkIntersetcion(event, closestNode)
-    //drawDropZones(closestNode)
+    drawDropZones(closestNode)
+    checkIntersetcion(event, closestNode)
+  }else{
+    removeNodes(['dropzone'])
+  }
 
+  // Check if the closest node has changed
+  if (closestNode !== prevClosestNode.value) {
+    removeNodes(['dropzone_parent', 'dropzone_child'])
+    prevClosestNode.value = closestNode;
   }
 }
 
 function drawDropZones(closestNode) {
-    let position = {
-      x: closestNode.position.x, 
-      y: closestNode.position.y -= 100
-    }
+  const dropZoneCourseNodes = {
+    parent: {
+      name: ' Parent',
+      positionY: -250,
+      positionX: 0,
+    },
+    child: {
+      name: ' Child',
+      positionY: 250,
+      positionX: 0,
+    },
+  }
+  let data = {
+    opacity: '0.6',
+    bgcolor: 'grey',
+    infotext: 'Drop zone',
+    height: '200px',
+    width: '400px',
+  }
 
-    const data = {
-      opacity: '0.6',
-      bgcolor: 'grey',
-      infotext: 'Drop zone',
-      height: '200px',
-      width: '400px',
+  //check if closest node has childerns TODO   
+  for (const key in dropZoneCourseNodes){
+    data.infotext += dropZoneCourseNodes[key].name 
+
+    let position = {
+      x: getOffsetX(closestNode, key), 
+      y: closestNode.position.y + dropZoneCourseNodes[key].positionY
     }
     const newNode = {
-      id: 'dropzone',
+      id: 'dropzone_' + key,
       type: 'dropzone',
       position: position,
       label: `default node`,
       data: data
     }
     addNodes([newNode]);
+
+    let targetHandle = 'source_and'
+    let sourceHandle =  'target'
+
+    if(key == 'child'){
+      targetHandle = 'target_and'
+      sourceHandle =  'source'
+    }
+
+    const newEdge = {
+      id: `${closestNode.id}-${key}`,
+      source: closestNode.id,
+      sourceHandle: sourceHandle,
+      target: newNode.id,
+      targetHandle: targetHandle,
+      type: 'default',
+    };
+    // Add the new edge
+    addEdges([newEdge]);
+  }
+}
+
+function getOffsetX(closestNode, relation){
+  let relationHandle = closestNode.childCourse
+  if(relation == 'parent'){
+    relationHandle = closestNode.parentCourse
+  }
+
+  if(relationHandle.length == 0 ||
+  relationHandle.indexOf('starting_node') != -1){
+    return closestNode.position.x
+  }
+
+  return closestNode.position.x + 500
+
 }
 
 function checkIntersetcion(event, closestNode) {
@@ -127,6 +188,11 @@ function checkIntersetcion(event, closestNode) {
           infotext: 'New Staring node',
           height: '200px',
           width: '400px',
+        }
+        if(node.id == 'dropzone_parent'){
+          node.data.infotext = 'Drop zone Parent'
+        }else if(node.id == 'dropzone_child'){
+          node.data.infotext = 'Drop zone Child'
         }
       }
     }
@@ -172,6 +238,10 @@ function findClosestNode(event) {
   return closestNode;
 }
 
+function onDragEnd(){
+  removeNodes(['dropzone_parent', 'dropzone_child'])
+}
+
 </script>
 
 <template>
@@ -185,6 +255,7 @@ function findClosestNode(event) {
           <div class="vue-flow__node-input mt-1" :draggable="true" 
             @dragstart="onDragStart($event, course)" 
             @drag="onDrag($event)"
+            @dragend="onDragEnd()"
             :data="course" style="width: 100%;">
             {{ course.fullname }}
           </div>

@@ -131,3 +131,13 @@ $string['course_label_condition_timed'] = 'timed';
 $string['course_description_condition_course_completed'] = 'Course has been completed by student';
 $string['course_name_condition_course_completed'] = 'Course completed';
 $string['course_label_condition_course_completed'] = 'info_text';
+
+// Event Strings
+$string['event_learnpath_deleted'] = 'Learning path deleted';
+$string['event_learnpath_deleted_description'] = 'The learning path {$a} was deleted';
+$string['event_learnpath_updated'] = 'Learning path updated';
+$string['event_learnpath_updated_description'] = 'The learning path {$a} was updated';
+$string['event_learnpath_created'] = 'Learning path created';
+$string['event_learnpath_created_description'] = 'The learning path {$a} was created';
+$string['event_completion_criteria_updated'] = 'Completion criteria updated';
+$string['event_completion_criteria_updated_description'] = 'The completion criteria {$a} was updated';

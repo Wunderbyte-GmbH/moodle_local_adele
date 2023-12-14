@@ -28,15 +28,19 @@
 import { Panel, useVueFlow, isNode } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { watch } from 'vue';
+import { nextTick, watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
-import loadFlowChart from '../../composables/loadFlowChart'
+import loadFlowChart from '../../composables/loadFlowChart';
+import setStartingNode from '../../composables/setStartingNode';
+
 
 // Load Store and Router
 const store = useStore();
 const router = useRouter();
 
-const { toObject, setNodes, setEdges, onPaneReady } = useVueFlow()
+const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
+  addNodes, nodes } = useVueFlow()
+
 // Define props in the setup block
 const props = defineProps(['learninggoal']); 
 
@@ -48,14 +52,18 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-watch(() => store.state.learninggoal, (newValue, oldValue) => {
-  if (newValue[0].json.tree != undefined) {
-    loadFlowChart(newValue[0].json.tree)
+watch(() => store.state.learninggoal[0], (newValue, oldValue) => {
+  if (newValue.json.tree != undefined) {
+    setNodes(newValue.json.tree.nodes)
+    setEdges(newValue.json.tree.edges)
   }else{
     setNodes([])
     setEdges([])
   }
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value)
 });
+
+
 
 // Watch for changes of the learning path
 if (store.state.learninggoal[0].json.tree != undefined) {
@@ -64,6 +72,7 @@ if (store.state.learninggoal[0].json.tree != undefined) {
 
 // Prepare and save learning path
 const onSave = () => {
+    removeNodes(['starting_node'])
     let obj = {};
     obj['tree'] = toObject();
     obj = JSON.stringify(obj);

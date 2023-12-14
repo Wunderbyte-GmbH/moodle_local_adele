@@ -39,15 +39,15 @@ const store = createStore({
             learninggoals: null,
             learningpaths: null,
             learningpath: null,
-            availablecourses: null,
-            // availablecourses: [ 
-            //     { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
-            //     { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
-            // ],
-            learninggoal: null,
-            // learninggoal: [ 
-            //     { "id": 0, "name": "", "description": "", "json": "" } 
-            // ],
+            // availablecourses: null,
+            availablecourses: [ 
+                { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
+                { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
+            ],
+            // learninggoal: null,
+            learninggoal: [ 
+                { "id": 0, "name": "", "description": "", "json": "" } 
+            ],
             editingadding: false,
             node: null,
             startnode: null,
@@ -135,6 +135,9 @@ const store = createStore({
                 learningpath[0].json = JSON.parse(learningpath[0].json); 
             }
             context.commit('setLearninggoal', learningpath);
+        },
+        async fetchUserPathRelation({ commit }, variable) {
+            console.log(variable)
         },
         async fetchLearningpaths(context) {
             const learningpaths = await ajax('local_adele_get_learningpaths');

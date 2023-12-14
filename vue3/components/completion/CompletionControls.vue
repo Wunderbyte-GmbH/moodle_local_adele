@@ -43,7 +43,7 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-if (store.state.node != undefined) {
+if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
     let completion = store.state.learninggoal[0].json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })

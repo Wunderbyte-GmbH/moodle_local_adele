@@ -59,6 +59,11 @@
 />
 </div>
 </p>
+
+<p>
+  <UserList />
+</p>
+
 </template>
 
 <script setup>
@@ -75,6 +80,9 @@ import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
+import shiftNodesDown from '../../composables/shiftNodesDown'
+import setStartingNode from '../../composables/setStartingNode';
+import UserList from '../user_view/UserList.vue'
 
 // Load Store and Router
 const store = useStore()
@@ -91,23 +99,10 @@ function toggleClass() {
 }
 
 // load useVueFlow properties / functions
-const { nodes, findNode, onConnect, addEdges, addNodes, project, vueFlowRef, removeEdges } = useVueFlow({
-nodes: [
-  // {
-  //     id: 'starting_node',
-  //     type: 'dropzone',
-  //     position: { x: 0 , y: 0 },
-  //     label: `DZ node`,
-  //     data: {
-  //       opacity: '0.6',
-  //       bgcolor: 'grey',
-  //       infotext: 'New Staring node',
-  //       height: '200px',
-  //       width: '400px',
-  //     },
-  //     draggable: false,
-  //   }
-  ],
+const { nodes, findNode, onConnect, addEdges, 
+    addNodes, project, vueFlowRef, removeEdges, removeNodes,
+    toObject, fitView } = useVueFlow({
+nodes: [],
 })
 
 // Prevent default event if node has been dropped
@@ -140,10 +135,10 @@ function onNodeDrag(event) {
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {
-event.preventDefault()
-if (event.dataTransfer) {
- event.dataTransfer.dropEffect = 'move'
-}
+  event.preventDefault()
+  if (event.dataTransfer) {
+  event.dataTransfer.dropEffect = 'move'
+  }
 }
 
 // Show a preview node if nodes are close enough
@@ -203,22 +198,46 @@ onConnect(handleConnect);
 
 // Adding setting up nodes and potentional edges
 function onDrop(event) {
-  console.log(event)
-  if(!intersectedNode.value){
+  if(intersectedNode.value){
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
-    const { left, top } = vueFlowRef.value.getBoundingClientRect()
 
-    const position = project({
-      x: event.clientX - left,
-      y: event.clientY - top,
-    });
-    // const position = {
-    //   x: intersectedNode.value.dropzone.position.x,
-    //   y: intersectedNode.value.dropzone.position.y
-    // }
+    const position = {
+      x: intersectedNode.value.dropzone.position.x + intersectedNode.value.dropzone.dimensions.width/2,
+      y: intersectedNode.value.dropzone.position.y + intersectedNode.value.dropzone.dimensions.height/2,
+    }
+
     const id = getNodeId('dndnode_', nodes.value);
     data.node_id = id;
+
+    //if is starting node dz
+    let parentCourse = []
+    let childCourse = []
+    if(intersectedNode.value.closestnode.id == 'starting_node'){
+      parentCourse.push('starting_node')
+    }
+    else if (intersectedNode.value.dropzone.id == 'dropzone_parent'){
+        childCourse.push(intersectedNode.value.closestnode.id)
+        parentCourse.push('starting_node')
+        intersectedNode.value.closestnode.parentCourse.push(data.node_id)
+        // Check if the array contains the value
+        const index = intersectedNode.value.closestnode.parentCourse.indexOf('starting_node');
+        // If the value is found, remove it
+        if (index !== -1) {
+          intersectedNode.value.closestnode.parentCourse.splice(index, 1)
+          shiftNodesDown(data.node_id, nodes.value)
+        }
+        position.y = intersectedNode.value.dropzone.dimensions.height/2
+    }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
+      parentCourse.push(intersectedNode.value.closestnode.id)
+      intersectedNode.value.closestnode.childCourse.push(data.node_id)
+      position.y += 300
+    }
+
+    if (intersectedNode.value.closestnode.position.x < intersectedNode.value.dropzone.position.x) {
+      position.x += intersectedNode.value.closestnode.dimensions.width
+    }
+
 
     const newNode = {
       id: id,
@@ -226,13 +245,15 @@ function onDrop(event) {
       position,
       label: `${type} node`,
       data: data,
-      draggable: false,
-      //parentCourse: intersectedNode.value.closestnode.id
+      draggable: true,
+      parentCourse: parentCourse,
+      childCourse: childCourse,
     }
     addNodes([newNode])
-    // if(intersectedNode.value.closestnode.id == 'starting_node'){
-    //   shiftingStartingNode(intersectedNode.value.closestnode)
-    // }
+
+    if(intersectedNode.value.closestnode.id == 'starting_node'){
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value)
+    }
 
     // align node position after drop, so it's centered to the mouse
     nextTick(() => {
@@ -248,6 +269,30 @@ function onDrop(event) {
       { deep: true, flush: 'post' },
     )
     })
+    store.state.learninggoal[0].json = {
+      tree: toObject(),
+    }
+    if(intersectedNode.value.dropzone.id.includes('dropzone_')){
+      let targetHandle = 'source'
+      let sourceHandle =  'target'
+
+      if(intersectedNode.value.dropzone.id.includes('child')){
+        targetHandle = 'target'
+        sourceHandle =  'source'
+      }
+
+      const newEdge = {
+        id: `${intersectedNode.value.closestnode.id}-${newNode.id}`,
+        source: intersectedNode.value.closestnode.id,
+        sourceHandle: sourceHandle,
+        target: newNode.id,
+        targetHandle: targetHandle,
+        type: 'default',
+      };
+
+      // Add the new edge
+      addEdges([newEdge]);
+    }
   } else{
     notify({
       title: 'Node drop refused',
@@ -257,14 +302,21 @@ function onDrop(event) {
   }
 }
 
-function shiftingStartingNode(startingNode){
-  startingNode.position.x += 500
-  startingNode.data = {
-    opacity: '0.6',
-    bgcolor: 'grey',
-    infotext: 'New Staring node',
-    height: '200px',
-    width: '400px',
-  };
-}
+// Watch for changes in the nodes
+watch(
+  () => nodes.value,
+  () => {
+    fitView({ duration: 1000, padding: 0.5 })
+  },
+  { deep: true } // Enable deep watching to capture changes in nested properties
+);
+watch(
+  () => nodes.value.length,
+  (newNodes, oldNodes) => {
+    if(oldNodes > newNodes){
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, true)
+    }
+  },
+);
+
 </script>
