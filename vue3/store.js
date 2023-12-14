@@ -52,6 +52,7 @@ const store = createStore({
             node: null,
             startnode: null,
             editingpretest: false,
+            lpuserpathrelations: []
         };
     },
     mutations: {
@@ -97,6 +98,10 @@ const store = createStore({
                 return element_node;
             });
         },
+        setLpUserPathRelations(state, data){
+            console.log(data)
+            state.lpuserpathrelations = data;
+        }
     },
     actions: {
         // Actions are asynchronous.
@@ -136,8 +141,11 @@ const store = createStore({
             }
             context.commit('setLearninggoal', learningpath);
         },
-        async fetchUserPathRelation({ commit }, variable) {
-            console.log(variable)
+
+        async fetchUserPathRelation(context, learningpathid) {
+            const lpUserPathRelations = await ajax('local_adele_get_user_path_relations',
+                { learningpathid: learningpathid});
+            context.commit('setLpUserPathRelations', lpUserPathRelations);
         },
         async fetchLearningpaths(context) {
             const learningpaths = await ajax('local_adele_get_learningpaths');

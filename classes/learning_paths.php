@@ -196,4 +196,22 @@ class learning_paths {
             ];
         }
     }
+
+    /**
+     * Delete a learning path.
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function get_learning_user_relations($params) {
+        global $DB;
+
+        $learninggoals = $DB->get_records('local_adele_path_user',
+            [
+                'learning_path_id' => $params['learningpathid'],
+                'status' => 'active'
+            ], null,
+            'id, user_id, json');
+        return array_map(fn($a) => (array)$a, $learninggoals);
+    }
 }

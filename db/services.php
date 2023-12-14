@@ -79,4 +79,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_user_path_relations' => [
+        'classname' => 'local_adele\external\get_lp_user_path_relations',
+        'classpath' => '',
+        'description' => 'Get all users enrolled in a learningpath',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
 ];

@@ -73,8 +73,8 @@ function onDrag(event) {
   const closestNode = findClosestNode(event); 
   
   //add drop zones to this node 
-  checkIntersetcion(event, startingNode)
-  if(closestNode){
+  let startingNodeIntersecting = checkIntersetcion(event, startingNode)
+  if(closestNode && startingNodeIntersecting){
     drawDropZones(closestNode)
     checkIntersetcion(event, closestNode)
   }else{
@@ -163,6 +163,7 @@ function getOffsetX(closestNode, relation){
 }
 
 function checkIntersetcion(event, closestNode) {
+  let insideStartingNode = false;
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
     if(node.type == 'dropzone'){
@@ -193,11 +194,14 @@ function checkIntersetcion(event, closestNode) {
           node.data.infotext = 'Drop zone Parent'
         }else if(node.id == 'dropzone_child'){
           node.data.infotext = 'Drop zone Child'
+        }else {
+          insideStartingNode = true;
         }
       }
     }
   });
   emit('nodesIntersected', { intersecting: intersectingNode.value });
+  return insideStartingNode
 }
 
 // Function to check if two nodes intersect

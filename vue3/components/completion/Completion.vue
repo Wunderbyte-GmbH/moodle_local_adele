@@ -102,7 +102,7 @@ function onDrop(event) {
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
     const { left, top } = vueFlowRef.value.getBoundingClientRect()
     data.visibility = true
-    let parentCondition = ''
+    let parentCondition = 'starting_condition'
 
     let position = project({
       x: event.clientX - left,
@@ -121,6 +121,8 @@ function onDrop(event) {
         if(parentConditionNode){
           parentConditionNode.childCondition = id
         }
+      }else{
+        parentCondition = 'starting_condition'
       }
     }
 
@@ -131,7 +133,8 @@ function onDrop(event) {
       label: `${type} node`,
       data: data,
       draggable: false,
-      parentCondition: parentCondition
+      parentCondition: parentCondition,
+      childCondition: '',
     };
 
     addNodes([newNode]);
