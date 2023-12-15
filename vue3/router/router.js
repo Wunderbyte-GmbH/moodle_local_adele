@@ -25,6 +25,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import notFound from '../components/not-found';
 import learninggoalsEdit from '../components/learninggoals-edit';
+import userPath from '../components/user_view/UserPath';
 
 // All available routes
 const routes = [
@@ -33,7 +34,8 @@ const routes = [
         redirect: {
             name: 'learninggoals-edit-overview'
         }
-    }, {
+    },
+    {
         path: '/learninggoals/edit',
         component: learninggoalsEdit,
         name: 'learninggoals-edit-overview',
@@ -41,14 +43,19 @@ const routes = [
             {
                 path: '/learninggoals/edit/:learninggoalId(\\d+)',
                 component: learninggoalsEdit,
-                name: 'learninggoal-edit'
+                name: 'learninggoal-edit',
             }, {
                 path: '/learninggoals/edit/new',
                 component: learninggoalsEdit,
                 name: 'learninggoal-new'
-                },
+            },
         ],
     }, {
+            path: '/learninggoals/edit/:learninggoalId(\\d+)/:userId(\\d+)',
+            component: userPath,
+            name: 'userDetails'
+    },
+    {
         path: '/:catchAll(.*)',
         component: notFound
     },

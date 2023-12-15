@@ -198,20 +198,98 @@ class learning_paths {
     }
 
     /**
-     * Delete a learning path.
+     * Get user path relations.
      *
      * @param array $params
      * @return array
      */
-    public static function get_learning_user_relations($params) {
+    public static function get_learning_user_relations($data) {
         global $DB;
 
-        $learninggoals = $DB->get_records('local_adele_path_user',
-            [
-                'learning_path_id' => $params['learningpathid'],
-                'status' => 'active'
-            ], null,
-            'id, user_id, json');
-        return array_map(fn($a) => (array)$a, $learninggoals);
+        $params = [
+            'learning_path_id' => (int)$data['learninggoalid']
+        ];
+
+        $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
+            usr.firstname, usr.lastname, usr.email
+            FROM {local_adele_path_user} lpu
+            LEFT JOIN {user} usr ON lpu.user_id = usr.id
+            WHERE lpu.learning_path_id = :learning_path_id
+            AND lpu.status = 'active'";
+
+        $userpathlist = [];
+        $records = $DB->get_records_sql($sql, $params);
+        foreach ($records as $record) {
+            $progress = 0;
+            $record->json = json_decode($record->json);
+            $userpathlist[] = [
+                'id' => (int)$record->user_id,
+                'username' => $record->username,
+                'firstname' => $record->firstname,
+                'lastname' => $record->lastname,
+                'progress' => $progress,
+            ];
+        }
+        return $userpathlist;
     }
+
+    /**
+     * Get user path relation.
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function get_learning_user_relation($data) {
+        global $DB;
+
+        $params = [
+            'learning_path_id' => (int)$data['learningpathid'],
+            'userpathid' => (int)$data['userpathid'],
+        ];
+
+        $sql = "SELECT lpu.user_id, lpu.json, usr.username,
+            usr.firstname, usr.lastname, usr.email, lpu.json
+            FROM {local_adele_path_user} lpu
+            LEFT JOIN {user} usr ON lpu.user_id = usr.id
+            WHERE lpu.learning_path_id = :learning_path_id
+            AND lpu.status = 'active'
+            AND lpu.user_id = :userpathid ";
+
+        $record = $DB->get_record_sql($sql, $params);
+        if ($record) {
+            $record->json = self::addnodemanualcondition($record->json);
+            return (array)$record;
+        }
+        return [
+            'user_id' => 0,
+            'username' => 'not found',
+            'firstname' => 'not found',
+            'lastname' => 'not found',
+            'email' => 'not found',
+            'json' => 'not found',
+        ];
+    }
+
+    /**
+     * Get user path relation.
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function addnodemanualcondition($json) {
+        $json = json_decode($json);
+        foreach ($json->tree->nodes as $node) {
+            $node->data->manual = false;
+            if ($node->completion && $node->completion->nodes) {
+                foreach ($node->completion->nodes as $completionnode) {
+                    if ($completionnode->data->type == 'manual') {
+                        $node->data->manual = true;
+                    }
+                }
+            }
+        }
+        return json_encode($json);
+    }
+
+
 }

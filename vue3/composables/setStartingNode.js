@@ -21,8 +21,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, backwards = fa
     nextTick(() => {
         let rightStartingNode = 0
         let shifted = false
-        //calculate starting node 
-        console.log(nodes)
+        //calculate starting node
         nodes.forEach((node) => {
         if(node.parentCourse == 'starting_node'  && 
             node.position.x >= rightStartingNode){

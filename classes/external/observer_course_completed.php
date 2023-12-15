@@ -56,11 +56,11 @@ class observer_course_completed {
             foreach ($learningpaths as $learningpath) {
                 $learningpath->json = json_decode($learningpath->json, true);
                 $userpath = $userpathrelation->get_user_path_relation($learningpath, $params->relateduserid);
-                if (!$userpath) {
+                if ($userpath) {
                     $userpath->json = json_decode($userpath->json, true);
-                    foreach ($learningpath->json['tree']->nodes as $node) {
-                        if ($node['course_node_id'] == $params->courseid) {
-                            $learningpath->json['user_path_relaction'][$params->courseid] = true;
+                    foreach ($learningpath->json['tree']['nodes'] as $node) {
+                        if ($node['data']['course_node_id'] == $params->courseid) {
+                            $learningpath->json['user_path_relaction'][$node['id']] = true;
                             // Revision old user path relation.
                             $data = [
                                 'id' => $userpath->id,

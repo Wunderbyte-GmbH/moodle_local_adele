@@ -54,7 +54,7 @@ class observer_course_enrolled {
                 $learningpath->json = json_decode($learningpath->json, true);
                 $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
                 if (!$userpath) {
-                    $userpathrelation = self::getuserpathrelation($learningpath, $params->relateduserid, $DB);
+                    $userpathrelation = self::getuserpathrelation($learningpath);
                     $DB->insert_record('local_adele_path_user', [
                         'user_id' => $params->relateduserid,
                         'learning_path_id' => $learningpath->id,
@@ -80,20 +80,18 @@ class observer_course_enrolled {
      */
     public static function getuserpathrelation($learningpath) {
         // Using named parameter :courseid in the SQL query.
-        $completioncriteria = false;
-        if (!$completioncriteria) {
-            foreach ($learningpath->json['tree']->nodes as $node) {
-                if ($node['completion'] && count($node['completion']['nodes'])) {
-                    $test = $node['completion']['nodes'];
-                    foreach ($node['completion']['nodes'] as $complitionnode) {
-                        if ($complitionnode['type'] == 'feedback') {
-                            self::loopcriteria();
-                        }
+        $userpathrelation = [];
+        foreach ($learningpath->json['tree']['nodes'] as $node) {
+            if ($node['completion'] && count($node['completion']['nodes'])) {
+                foreach ($node['completion']['nodes'] as $complitionnode) {
+                    if ($complitionnode['type'] == 'feedback') {
+                        self::loopcriteria();
                     }
                 }
             }
+            $userpathrelation[$node['id']] = false;
         }
-        return 'tbd';
+        return $userpathrelation;
     }
 
     /**
