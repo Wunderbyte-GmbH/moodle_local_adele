@@ -35,6 +35,10 @@ $string['pluginname'] = 'Adele';
 // Capabilities.
 $string['adele:edit'] = 'Edit adele';
 $string['adele:view'] = 'View adele';
+$string['adele:canmanage'] = 'Is allowed to manage Adele Plugins';
+
+// Role.
+$string['adeleroledescription'] = 'Adele Manager';
 
 // Vue component route not found.
 $string['route_not_found_site_name'] = 'Error: Page (route) not found!';
