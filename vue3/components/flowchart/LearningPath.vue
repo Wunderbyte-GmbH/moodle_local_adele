@@ -29,7 +29,7 @@
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
 
-.dndflow{flex-direction:column;display:flex;height:500px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
+.dndflow{flex-direction:column;display:flex;height:600px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
 .learning-path-flow.dark{background:#4e574f;}
 </style>
 <template>
@@ -40,7 +40,7 @@
     <VueFlow @dragover="onDragOver" @node-drag="onNodeDrag" :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" :class="{ dark }" class="learning-path-flow">
       <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8"/>
       <template #node-custom="{ data }">
-          <CustomrNode :data="data"/>
+          <CustomNode :data="data"/>
       </template>
       <template #node-dropzone="{ data }">
           <DropzoneNode :data="data"/>
@@ -61,7 +61,7 @@
 </p>
 
 <p>
-  <UserList />
+  <UserList :learningPathId = "store.state.learninggoal[0]"/>
 </p>
 
 </template>
@@ -73,7 +73,7 @@ import { MarkerType, VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './Sidebar.vue'
 import Controls from './Controls.vue'
-import CustomrNode from '../nodes/CustomNode.vue'
+import CustomNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
 import Modal from '../modals/Modal.vue'
 import { MiniMap } from '@vue-flow/minimap'

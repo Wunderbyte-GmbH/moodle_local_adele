@@ -128,7 +128,6 @@ const checkRoute = (currentRoute) => {
         router.push({ name: 'learninggoals-edit-overview' });
     }
   else if (currentRoute.name === 'learninggoal-edit') {
-
     store.state.editingadding = true;
     nextTick(() => showForm(currentRoute.params.learninggoalId));
   } else if (currentRoute.name === 'learninggoal-new') {
@@ -142,7 +141,6 @@ onMounted(() => {
   store.dispatch('fetchLearningpaths');
   store.dispatch('fetchAvailablecourses');
   checkRoute(router.value);
-
 });
 
 // Showing form to generate or edit learning path
@@ -152,6 +150,8 @@ const showForm = async (learninggoalId = null) => {
   if (learninggoalId) {
     store.state.learningGoalID = learninggoalId;
     store.dispatch('fetchLearningpath')
+    store.dispatch('fetchUserPathRelations')
+
     store.state.editingadding = true
     // Do something here in case of an edit.
   } else {

@@ -22,19 +22,88 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
-<template>
-    USER PATH TBD
-</template>
+ <template>
+    <div>
+      <button @click="goBack" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left"></i> Go Back to Overview
+      </button>
+      <h2 class="mt-3">User path for:</h2>
+      <div class="card">
+    <div v-if="store.state.lpuserpathrelation">
+      <div class="card-body">
+          <h5 class="card-title">
+              <i class="fas fa-user-circle"></i> {{ store.state.lpuserpathrelation.username }}
+          </h5>
+          <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                  <i class="fas fa-user"></i> Firstname: {{ store.state.lpuserpathrelation.firstname }}
+              </li>
+              <li class="list-group-item">
+                  <i class="fas fa-user"></i> Lastname: {{ store.state.lpuserpathrelation.lastname }}
+              </li>
+              <li class="list-group-item">
+                  <i class="fas fa-envelope"></i> Email: {{ store.state.lpuserpathrelation.email }}
+              </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="width: 100%; height: 600px;">
+        <VueFlow :nodes="nodes" :edges="edges" :viewport="viewport" 
+          :default-viewport="viewport" class="learning-path-flow">
+          <template #node-custom="{ data }">
+            <CustomNodeEdit :data="data"/>
+          </template>
+        </VueFlow>
+      </div>
+    </div>
+      <!-- Your content goes here -->
+    </div>
+  </template>
+  
+  <script setup>
+  // Import needed libraries
+import { onMounted, ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+import { useStore } from 'vuex';
+import { VueFlow, useVueFlow } from '@vue-flow/core'
+import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
 
-<script setup>
-import { onMounted } from 'vue'
-import { useStore } from 'vuex'
-
+// Load Router
+const router = useRouter()
+const route = useRoute()
 // Load Store 
 const store = useStore()
 
-onMounted(() => {
-  store.dispatch('fetchUserPathRelation', 1);
-})
+const { fitView } = useVueFlow()
+  
+// Function to go back
+const goBack = () => {
+  router.go(-1) // Go back one step in the history
+}
 
+// Declare reactive variable for nodes
+const nodes = ref([]);
+const edges = ref([]);
+const viewport = ref({});
+
+onMounted(() => {
+  store.dispatch('fetchUserPathRelation', route.params)
+})
+// Watch for changes in the nodes
+watch(
+  () => store.state.lpuserpathrelation,
+  () => {
+    const flowchart = JSON.parse(store.state.lpuserpathrelation.json)
+    nodes.value = flowchart.tree.nodes;
+    console.log(flowchart)
+    edges.value = flowchart.tree.edges;
+    viewport.value = flowchart.tree.viewport;
+    setTimeout(() => {
+      fitView({ duration: 1000, padding: 0.5 });
+    }, 100);
+
+  },
+  { deep: true } // Enable deep watching to capture changes in nested properties
+);
 </script>

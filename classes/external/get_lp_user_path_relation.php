@@ -32,7 +32,6 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
-use core_external\external_multiple_structure;
 use local_adele\learning_paths;
 use moodle_exception;
 
@@ -48,7 +47,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_lp_user_path_relations extends external_api {
+class get_lp_user_path_relation extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -57,8 +56,10 @@ class get_lp_user_path_relations extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
+            'learningpathid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'userpathid'  => new external_value(PARAM_INT, 'userpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -69,10 +70,12 @@ class get_lp_user_path_relations extends external_api {
      * @param int $learningpathid
      * @return array
      */
-    public static function execute($userid, $learninggoalid): array {
+    public static function execute($learningpathid, $userid, $learninggoalid, $userpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learninggoalid' => $learninggoalid,
+            'learningpathid' => $learningpathid,
+            'userpathid' => $userpathid,
         ]);
 
         require_login();
@@ -81,8 +84,7 @@ class get_lp_user_path_relations extends external_api {
         if (!has_capability('local/adele:canmanage', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
-
-        return learning_paths::get_learning_user_relations($params);
+        return learning_paths::get_learning_user_relation($params);
     }
 
     /**
@@ -90,16 +92,15 @@ class get_lp_user_path_relations extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+                    'user_id' => new external_value(PARAM_INT, 'Item id'),
                     'username' => new external_value(PARAM_TEXT, 'Username'),
                     'firstname' => new external_value(PARAM_TEXT, 'Firstname'),
                     'lastname' => new external_value(PARAM_TEXT, 'Lastname'),
-                    'progress' => new external_value(PARAM_INT, 'Item name'),
-                ]
-            )
+                    'email' => new external_value(PARAM_RAW, 'email'),
+                    'json' => new external_value(PARAM_RAW, 'Flow Chart'),
+            ]
         );
     }
 }

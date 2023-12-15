@@ -26,29 +26,34 @@
     <table class="table table-margin-top">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Status</th>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Progress</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="relation in store.state.lpuserpathrelations" :key="relation.id">
-          <td>{{ relation.id }}</td>
-          <td>{{ relation.user_id }}</td>
+          <td>
+            <router-link :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}">
+              {{ relation.id }}
+            </router-link>
+          </td>
+          <td>{{ relation.username }}</td>
+          <td>{{ relation.firstname }}</td>
+          <td>{{ relation.lastname }}</td>
+          <td>{{ relation.progress }}</td>
         </tr>
       </tbody>
     </table>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
 import { useStore } from 'vuex'
 
 // Load Store 
 const store = useStore()
-
-onMounted(() => {
-  store.dispatch('fetchUserPathRelation', 1)
-})
 
 </script>
 
