@@ -67,6 +67,8 @@ interface course_completion {
      * (when displaying all information about the activity) and 'student' cases
      * (when displaying only conditions they don't meet).
      *
+     * @param array $node
+     * @param int $userid
      * @return array Information string (for admin) about all restrictions on
      *   this item
      */

@@ -68,6 +68,9 @@ class get_lp_user_path_relation extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $learningpathid
+     * @param int $userid
+     * @param int $learninggoalid
+     * @param int $userpathid
      * @return array
      */
     public static function execute($learningpathid, $userid, $learninggoalid, $userpathid): array {
