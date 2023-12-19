@@ -27,11 +27,13 @@
 
 namespace local_adele\course_completion\conditions;
 
+use completion_info;
 use local_adele\course_completion\course_completion;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/adele/lib.php');
+require_once("{$CFG->libdir}/completionlib.php");
 
 /**
  * Class for a single learning path course condition.
@@ -46,7 +48,7 @@ class course_completed implements course_completion {
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
     /** @var string $type of the redered condition in frontend. */
-    public $type = 'info_text';
+    public $type = 'course_completed';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -102,5 +104,26 @@ class course_completed implements course_completion {
     private function get_label_string() {
         $label = get_string('course_label_condition_course_completed', 'local_adele');
         return $label;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return boolean
+     */
+    public function get_completion_status($node, $userid) {
+        // Load the course
+        $course = get_course($node['data']['course_node_id']);
+        // Check if the course completion is enabled
+        if ($course->enablecompletion) {
+            // Get the course completion instance
+            $completion = new completion_info($course);
+            // Check if the user has completed the course
+            $coursecompleted = $completion->is_course_complete($userid);
+            if ($coursecompleted) {
+                return true;
+            }
+        }
+        return false;
     }
 }

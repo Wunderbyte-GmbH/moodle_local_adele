@@ -104,4 +104,16 @@ class manual implements course_completion {
         $label = get_string('course_label_condition_manually', 'local_adele');
         return $label;
     }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return boolean
+     */
+    public function get_completion_status($node, $userid) {
+        if ($node['data']['manual'] && $node['data']['value']) {
+            return true;
+        }
+        return false;
+    }
 }

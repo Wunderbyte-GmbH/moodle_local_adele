@@ -23,8 +23,9 @@
  */
 
 use core\event\base;
-use local_adele\external\observer_course_completed;
-use local_adele\external\observer_course_enrolled;
+use local_adele\completion;
+use local_adele\enrollment;
+use local_adele\relation_update;
 
 /**
  * Event observer for local_adele.
@@ -37,7 +38,7 @@ class local_adele_observer {
      * @param base $event
      */
     public static function course_completed(base $event) {
-        $observer = observer_course_completed::observe($event);
+        $observer = completion::completed($event);
     }
 
     /**
@@ -46,6 +47,15 @@ class local_adele_observer {
      * @param base $event
      */
     public static function user_enrolment_created(base $event) {
-        $observer = observer_course_enrolled::observe($event);
+        $observer = enrollment::enrolled($event);
+    }
+
+    /**
+     * Observer for the update_catscale event
+     *
+     * @param base $event
+     */
+    public static function user_path_updated(base $event) {
+        $observer = relation_update::updated_single($event);
     }
 }

@@ -95,4 +95,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_save_user_path_relation' => [
+        'classname' => 'local_adele\external\save_lp_user_path_relation',
+        'classpath' => '',
+        'description' => 'Save single users path relation',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
 ];

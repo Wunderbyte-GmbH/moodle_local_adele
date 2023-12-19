@@ -25,7 +25,7 @@
 
 declare(strict_types=1);
 
-namespace local_adele\external;
+namespace local_adele;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,13 +39,13 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observer_course_enrolled {
+class enrollment {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param object $event
      */
-    public static function observe($event) {
+    public static function enrolled($event) {
         global $DB;
         $params = $event;
         $learningpaths = self::buildsqlquerypath($params->courseid);
@@ -64,7 +64,7 @@ class observer_course_enrolled {
                         'createdby' => $params->userid,
                         'json' => json_encode([
                             'tree' => $learningpath->json['tree'],
-                            'user_path_relaction' => $userpathrelation,
+                            'user_path_relation' => $userpathrelation,
                         ]),
                     ]);
                 }

@@ -38,4 +38,8 @@
         'eventname' => '\core\event\user_enrolment_created',
         'callback' => 'local_adele_observer::user_enrolment_created',
     ],
+    [
+        'eventname' => '\local_adele\event\user_path_updated',
+        'callback' => 'local_adele_observer::user_path_updated',
+    ],
  ];
