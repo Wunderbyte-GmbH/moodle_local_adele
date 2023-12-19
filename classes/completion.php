@@ -70,7 +70,8 @@ class completion {
                                                 break;
                                             }
                                             // Get next Condition and return null if no child node exsists.
-                                            $currentcondition = self::searchnestedarray($node['completion']['nodes'], $currentcondition['childCondition'], 'childCondition');
+                                            $currentcondition = self::searchnestedarray($node['completion']['nodes'],
+                                                $currentcondition['childCondition'], 'childCondition');
                                         }
                                     }
                                 }
@@ -103,6 +104,13 @@ class completion {
         }
     }
 
+    /**
+     * Observer for course completed
+     *
+     * @param array $haystack
+     * @param string $needle
+     * @param string $key
+     */
     public function searchnestedarray($haystack, $needle, $key) {
         foreach ($haystack as $item) {
             if (isset($item[$key]) && $item[$key] === $needle) {

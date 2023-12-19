@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timed  {
+class timed {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_TIMED;

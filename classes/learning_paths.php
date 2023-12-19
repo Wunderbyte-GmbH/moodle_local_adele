@@ -202,14 +202,14 @@ class learning_paths {
     /**
      * Get user path relations.
      *
-     * @param array $params
+     * @param array $data
      * @return array
      */
     public static function get_learning_user_relations($data) {
         global $DB;
 
         $params = [
-            'learning_path_id' => (int)$data['learninggoalid']
+            'learning_path_id' => (int)$data['learninggoalid'],
         ];
 
         $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
@@ -238,7 +238,7 @@ class learning_paths {
     /**
      * Get user path relation.
      *
-     * @param array $params
+     * @param array $data
      * @return array
      */
     public static function get_learning_user_relation($data) {
@@ -275,7 +275,7 @@ class learning_paths {
     /**
      * Get user path relation.
      *
-     * @param array $params
+     * @param string $json
      * @return array
      */
     public static function addnodemanualcondition($json) {

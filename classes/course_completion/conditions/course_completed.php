@@ -109,16 +109,17 @@ class course_completed implements course_completion {
     /**
      * Helper function to return localized description strings.
      *
+     * @param array $node
+     * @param int $userid
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        // Load the course
         $course = get_course($node['data']['course_node_id']);
-        // Check if the course completion is enabled
+        // Check if the course completion is enabled.
         if ($course->enablecompletion) {
-            // Get the course completion instance
+            // Get the course completion instance.
             $completion = new completion_info($course);
-            // Check if the user has completed the course
+            // Check if the user has completed the course.
             $coursecompleted = $completion->is_course_complete($userid);
             if ($coursecompleted) {
                 return true;

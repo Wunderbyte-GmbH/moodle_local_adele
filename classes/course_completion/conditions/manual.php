@@ -107,7 +107,8 @@ class manual implements course_completion {
 
     /**
      * Helper function to return localized description strings.
-     *
+     * @param array $node
+     * @param int $userid
      * @return boolean
      */
     public function get_completion_status($node, $userid) {

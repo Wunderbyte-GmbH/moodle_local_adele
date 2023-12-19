@@ -49,6 +49,8 @@ class course_completion_status {
     /**
      * Returns conditions depending on the conditions param.
      *
+     * @param array $node
+     * @param int $userid
      * @return array
      */
     public static function get_condition_status($node, $userid): array {
