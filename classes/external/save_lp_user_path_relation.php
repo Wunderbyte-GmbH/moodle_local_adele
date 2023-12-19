@@ -66,7 +66,7 @@ class save_lp_user_path_relation extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $learningpathid
+     * @param int $learninggoalid
      * @param int $userid
      * @param array $params
      * @return array
