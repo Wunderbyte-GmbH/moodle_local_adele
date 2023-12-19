@@ -154,6 +154,11 @@ const store = createStore({
                 { learningpathid: route.learninggoalId, userpathid: route.userId});
             context.commit('setLpUserPathRelation', lpUserPathRelation);
         },
+        async saveUserPathRelation(context, params) {
+            console.log(params)
+            const lpUserPathRelation = await ajax('local_adele_save_user_path_relation',
+                { params: JSON.stringify(params)});
+        },
         async fetchLearningpaths(context) {
             const learningpaths = await ajax('local_adele_get_learningpaths');
             context.commit('setLearningpaths', learningpaths);

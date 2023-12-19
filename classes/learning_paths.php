@@ -30,6 +30,8 @@ use local_adele\event\learnpath_updated;
 use stdClass;
 use context_system;
 use local_adele\event\learnpath_deleted;
+use local_adele\event\user_path_updated;
+use local_adele\helper\user_path_relation;
 
 /**
  * Class learning_paths
@@ -279,6 +281,9 @@ class learning_paths {
     public static function addnodemanualcondition($json) {
         $json = json_decode($json);
         foreach ($json->tree->nodes as $node) {
+            $node->draggable = false;
+            $node->deletable = false;
+            $node->data->completion = $json->user_path_relation->{$node->id} ?? false;
             $node->data->manual = false;
             if ($node->completion && $node->completion->nodes) {
                 foreach ($node->completion->nodes as $completionnode) {
@@ -289,6 +294,31 @@ class learning_paths {
             }
         }
         return json_encode($json);
+    }
+
+
+    /**
+     * Duplicate a learning path.
+     *
+     * @param array $params
+     * @return array
+     */
+    public static function save_learning_user_relation($params) {
+        $userpathrelation = new user_path_relation();
+        $params = json_decode($params['params']);
+        $userpath = $userpathrelation->get_user_path_relation($params->route->learninggoalId, $params->route->userId);
+        if ($userpath) {
+            $event = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $event->trigger();
+            return ['success' => true];
+        }
+        return ['success' => false];
     }
 
 

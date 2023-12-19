@@ -25,7 +25,7 @@
 
 declare(strict_types=1);
 
-namespace local_adele\external;
+namespace local_adele;
 
 use local_adele\helper\user_path_relation;
 
@@ -41,13 +41,13 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observer_course_completed {
+class completion {
     /**
      * Observer for course completed
      *
      * @param object $event
      */
-    public static function observe($event) {
+    public static function completed($event) {
         global $DB;
         $params = $event;
         $userpathrelation = new user_path_relation();
@@ -60,7 +60,22 @@ class observer_course_completed {
                     $userpath->json = json_decode($userpath->json, true);
                     foreach ($learningpath->json['tree']['nodes'] as $node) {
                         if ($node['data']['course_node_id'] == $params->courseid) {
-                            $learningpath->json['user_path_relaction'][$node['id']] = true;
+                            if ($node['completion'] && $node['completion']['nodes']) {
+                                foreach ($node['completion']['nodes'] as $completionnode) {
+                                    if ($completionnode['parentCondition'] == 'starting_condition') {
+                                        $currentcondition = $node;
+                                        while ( $currentcondition ) {
+                                            // Check if the conditon is true and break if one condition is not met.
+                                            if (!$learningpath->json['user_path_relation'][$node['id']]) {
+                                                break;
+                                            }
+                                            // Get next Condition and return null if no child node exsists.
+                                            $currentcondition = self::searchnestedarray($node['completion']['nodes'], $currentcondition['childCondition'], 'childCondition');
+                                        }
+                                    }
+                                }
+                            }
+                            $learningpath->json['user_path_relation'][$node['id']] = true;
                             // Revision old user path relation.
                             $data = [
                                 'id' => $userpath->id,
@@ -78,7 +93,7 @@ class observer_course_completed {
                                 'createdby' => $userpath->createdby,
                                 'json' => json_encode([
                                     'tree' => $learningpath->json['tree'],
-                                    'user_path_relaction' => $learningpath->json['user_path_relaction'],
+                                    'user_path_relation' => $learningpath->json['user_path_relation'],
                                 ]),
                             ]);
                         }
@@ -86,5 +101,14 @@ class observer_course_completed {
                 }
             }
         }
+    }
+
+    public function searchnestedarray($haystack, $needle, $key) {
+        foreach ($haystack as $item) {
+            if (isset($item[$key]) && $item[$key] === $needle) {
+                return $item;
+            }
+        }
+        return null;
     }
 }

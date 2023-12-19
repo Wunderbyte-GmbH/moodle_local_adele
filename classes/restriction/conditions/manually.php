@@ -25,9 +25,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_adele\course_completion\conditions;
+namespace local_adele\restriction\conditions;
 
- use local_adele\course_completion\course_completion;
+
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,13 +41,12 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timed implements course_completion {
+class manually {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_TIMED;
+    public $id = COURSES_COND_MANUALLY;
     /** @var string $type of the redered condition in frontend. */
-    public $type = 'date';
-
+    public $type = 'checkbox';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -81,7 +80,7 @@ class timed implements course_completion {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_timed', 'local_adele');
+        $description = get_string('course_description_condition_manually', 'local_adele');
         return $description;
     }
 
@@ -91,7 +90,7 @@ class timed implements course_completion {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_timed', 'local_adele');
+        $description = get_string('course_name_condition_manually', 'local_adele');
         return $description;
     }
 
@@ -101,7 +100,7 @@ class timed implements course_completion {
      * @return string
      */
     private function get_label_string() {
-        $label = get_string('course_label_condition_timed', 'local_adele');
+        $label = get_string('course_label_condition_manually', 'local_adele');
         return $label;
     }
 }

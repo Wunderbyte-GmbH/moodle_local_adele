@@ -186,6 +186,7 @@ function addFeedbackNode (node) {
     label: `Feedback node`,
     data: {
       feedback: '',
+      childCondition: node.id,
     },
     draggable: false,
   };

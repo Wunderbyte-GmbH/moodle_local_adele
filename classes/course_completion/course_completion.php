@@ -56,4 +56,20 @@ interface course_completion {
      *   this item
      */
     public function get_description();
+
+    /**
+     * Obtains a string describing this restriction (whether or not
+     * it actually applies). Used to obtain information that is displayed to
+     * students if the activity is not available to them, and for staff to see
+     * what conditions are.
+     *
+     * The $full parameter can be used to distinguish between 'staff' cases
+     * (when displaying all information about the activity) and 'student' cases
+     * (when displaying only conditions they don't meet).
+     *
+     * @return array Information string (for admin) about all restrictions on
+     *   this item
+     */
+    public function get_completion_status($node, $userid);
+
 }

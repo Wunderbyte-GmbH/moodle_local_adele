@@ -145,3 +145,5 @@ $string['event_learnpath_created'] = 'Learning path created';
 $string['event_learnpath_created_description'] = 'The learning path {$a} was created';
 $string['event_completion_criteria_updated'] = 'Completion criteria updated';
 $string['event_completion_criteria_updated_description'] = 'The completion criteria {$a} was updated';
+$string['event_user_path_updated'] = 'User path relation was updated';
+$string['event_user_path_updated_description'] = 'The user path path relation for user {$a->user} and learning path {$a->path} was updated';

@@ -85,4 +85,35 @@ class user_path_relation {
         $record = $DB->get_record_sql($sql, $params);
         return $record;
     }
+
+    /**
+     * Get active user path relation.
+     *
+     * @param object $userpath
+     * @param array $nodes
+     *
+     */
+    public function revision_user_path_relation($userpath, $nodes) {
+        global $DB;
+        $data = [
+            'id' => $userpath->id,
+            'status' => 'revision',
+            'timemodified' => time(),
+        ];
+        $DB->update_record('local_adele_path_user', $data);
+
+        // Update nodes and save new user path relation.
+        $userpath->json = json_decode($userpath->json, true);
+        $userpath->json['tree']['nodes'] = $nodes;
+
+        return $DB->insert_record('local_adele_path_user', [
+            'user_id' => $userpath->user_id,
+            'learning_path_id' => $userpath->learning_path_id,
+            'status' => 'active',
+            'timecreated' => $userpath->timecreated,
+            'timemodified' => time(),
+            'createdby' => $userpath->createdby,
+            'json' => json_encode($userpath->json),
+        ]);
+    }
 }

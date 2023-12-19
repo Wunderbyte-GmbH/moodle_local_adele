@@ -38,12 +38,12 @@ const props = defineProps({
   },
 });
 
-// Set the node that handle has been clicked
-const setStartNode = (node_id) => {
-  store.commit('setstartNode', {
-    startnode: node_id, 
-  });
-};
+// Dynamic background color based on data.completion
+const nodeBackgroundColor = computed(() => {
+  return {
+    backgroundColor: props.data.completion ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+  };
+});
 
 // Connection handles
 const sourceHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
@@ -53,7 +53,7 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
 
 <template>
   <div class="custom-node text-center rounded p-3"
-    style="height: 200px; width: 400px;">
+    :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]">
     <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
     <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
     <div v-if="data.manual">
@@ -68,7 +68,6 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
 
 <style scoped>
 .custom-node {
-  background-color: white;
   padding: 10px;
   border: 1px solid #ccc;
 }

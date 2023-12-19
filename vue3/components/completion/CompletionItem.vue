@@ -6,7 +6,7 @@
 import { computed } from 'vue';
 import InputCheckbox from './conditions/InputCheckbox.vue';
 import InputDate from './conditions/InputDate.vue';
-import InfoText from './conditions/InfoText.vue'
+import course_completed from './conditions/course_completed.vue'
 import ManualOutput from '../completion/conditions_output/ManualOutput.vue'
 
 const props = defineProps(['completion']);
@@ -17,8 +17,8 @@ const dynamicComponent = computed(() => {
       return InputCheckbox;
     case 'InputDate':
       return InputDate;
-    case 'InfoText':
-      return InfoText;
+    case 'course_completed':
+      return course_completed;
     case 'Manual':
       return ManualOutput;
     default:
@@ -31,7 +31,7 @@ const getInputType = () => {
   const typeToComponent = {
     checkbox: 'InputCheckbox',
     date: 'InputDate',
-    info_text: 'InfoText',
+    course_completed: 'course_completed',
   };
   if(props.completion.manual){
     return 'Manual';

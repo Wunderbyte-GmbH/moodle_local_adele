@@ -23,6 +23,7 @@
  */ -->
 
  <template>
+  <notifications width="100%" />
     <div>
       <button @click="goBack" class="btn btn-outline-primary">
         <i class="fas fa-arrow-left"></i> Go Back to Overview
@@ -56,6 +57,9 @@
           </template>
         </VueFlow>
       </div>
+      <div class="d-flex justify-content-center">
+        <Controls />
+      </div>
     </div>
       <!-- Your content goes here -->
     </div>
@@ -68,6 +72,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
+import Controls from '../user_view/UserControls.vue'
 
 // Load Router
 const router = useRouter()
@@ -96,7 +101,6 @@ watch(
   () => {
     const flowchart = JSON.parse(store.state.lpuserpathrelation.json)
     nodes.value = flowchart.tree.nodes;
-    console.log(flowchart)
     edges.value = flowchart.tree.edges;
     viewport.value = flowchart.tree.viewport;
     setTimeout(() => {
