@@ -49,45 +49,55 @@
             <LearningPathList />
         </div>
         <div v-if="$store.state.editingadding == true" class="fade-in">
-          <h3>{{ store.state.strings.learninggoal_form_title_edit }}</h3>
-          <div>
-            <div v-for="goal in store.state.learninggoal">
-              <p>
-                <h4>{{ store.state.strings.fromlearningtitel }}</h4>
-                <input
-                  v-if="$store.state.learningGoalID == 0"
-                  :placeholder="store.state.strings.goalnameplaceholder"
-                  autofocus
-                  type="text"
-                  v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                  v-model="goalname"
-                />
-                <input
-                  v-else
-                  type="text"
-                  v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                  v-model="goal.name"
-                />
-              </p>
-              <p>
-                <h4>{{ store.state.strings.fromlearningdescription }}</h4>
-                <input
-                  v-if="$store.state.learningGoalID == 0"
-                  :placeholder="store.state.strings.goalsubjectplaceholder"
-                  type="textarea"
-                  v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                  v-model="goaldescription"
-                />
-                <input
-                  v-else
-                  type="textarea"
-                  v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                  v-model="goal.description"
-                />
-              </p>
-              <LearingPath />
+
+          <div class="card p-4">
+            <h2 class="mt-3">{{ store.state.strings.learninggoal_form_title_edit }}</h2>
+            <div class="card-body">
+              <div>
+                <div v-for="goal in store.state.learninggoal">
+                  <h4 class="font-weight-bold">{{ store.state.strings.fromlearningtitel }}</h4>
+                  <div>
+                    <input
+                      v-if="$store.state.learningGoalID == 0"
+                      class="form-control fancy-input"
+                      :placeholder="store.state.strings.goalnameplaceholder"
+                      autofocus
+                      type="text"
+                      v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
+                      v-model="goalname"
+                    />
+                    <input
+                      v-else
+                      class="form-control fancy-input"
+                      type="text"
+                      v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
+                      v-model="goal.name"
+                    />
+                  </div>
+                  <div class="mb-4">
+                    <h4 class="font-weight-bold">{{ store.state.strings.fromlearningdescription }}</h4>
+                    <div>
+                      <textarea
+                        v-if="$store.state.learningGoalID == 0"
+                        class="form-control fancy-input"
+                        :placeholder="store.state.strings.goalsubjectplaceholder"
+                        v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
+                        v-model="goaldescription"
+                      ></textarea>
+                      <textarea
+                        v-else
+                        class="form-control fancy-input"
+                        v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
+                        v-model="goal.description"
+                      ></textarea>
+                    </div>
+                  </div>
+                  <LearingPath />
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
         <div v-if="$store.state.editingpretest == true" class="fade-in">
           <Completion />

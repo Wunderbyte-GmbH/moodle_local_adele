@@ -306,7 +306,9 @@ function onDrop(event) {
 watch(
   () => nodes.value,
   () => {
-    fitView({ duration: 1000, padding: 0.5 })
+    setTimeout(() => {
+      fitView({ duration: 1000, padding: 0.5 });
+    }, 100);
   },
   { deep: true } // Enable deep watching to capture changes in nested properties
 );

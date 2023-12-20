@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed  } from 'vue';
+import { defineProps, computed, ref  } from 'vue';
 import { useStore } from 'vuex';
 import CompletionItem from '../completion/CompletionItem.vue'
 
@@ -41,13 +41,19 @@ const props = defineProps({
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
   return {
-    backgroundColor: props.data.completion ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+    backgroundColor: props.data.completion.completionnode.valid ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
   };
 });
 
 // Connection handles
 const sourceHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+
+const isTableVisible = ref(false);
+
+const toggleTable = () => {
+  isTableVisible.value = !isTableVisible.value;
+};
 
 </script>
 
@@ -59,11 +65,34 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
     <div v-if="data.manual">
       <CompletionItem :completion="data" />
     </div>
+    <div v-if="data.completion.singlecompletionnode">
+      <button class="btn btn-link" @click="toggleTable" aria-expanded="false" aria-controls="collapseTable">
+        Show Completion Criteria
+      </button>
+      <div v-show="isTableVisible">
+        <table class="table table-bordered table-hover fancy-table">
+          <thead class="thead-light">
+            <tr>
+              <th>Key</th>
+              <th>Checkmark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(value, key) in data.completion.singlecompletionnode" :key="key">
+              <td>{{ key }}</td>
+              <td>
+                <span v-if="value" class="text-success">&#10004;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div>
     </div>
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
-  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
+  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" />
+  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" />
 </template>
 
 <style scoped>
@@ -71,5 +100,31 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
   padding: 10px;
   border: 1px solid #ccc;
 }
+.table-hover tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Fancy table styles */
+.fancy-table {
+  border-radius: 10px; /* Rounded corners */
+}
+
+.fancy-table thead th {
+  background-color: #3498db; /* Header background color */
+  color: #fff; /* Header text color */
+}
+
+.fancy-table tbody {
+  background-color: #ecf0f1; /* Body background color */
+}
+
+.fancy-table tbody tr:nth-child(odd) {
+  background-color: #d1d1d1; /* Alternate row background color */
+}
+
+.fancy-table tbody tr:hover {
+  background-color: #bdc3c7; /* Hovered row background color */
+}
+
 
 </style>
