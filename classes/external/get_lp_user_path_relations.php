@@ -98,7 +98,10 @@ class get_lp_user_path_relations extends external_api {
                     'username' => new external_value(PARAM_TEXT, 'Username'),
                     'firstname' => new external_value(PARAM_TEXT, 'Firstname'),
                     'lastname' => new external_value(PARAM_TEXT, 'Lastname'),
-                    'progress' => new external_value(PARAM_TEXT, 'Item name'),
+                    'progress' => new external_single_structure([
+                        'completed_nodes' => new external_value(PARAM_TEXT, 'completed nodes'),
+                        'progress' => new external_value(PARAM_FLOAT, 'progress'),
+                    ]),
                 ]
             )
         );
