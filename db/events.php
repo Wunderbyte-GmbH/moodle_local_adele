@@ -27,8 +27,8 @@
 
  $observers = [
     [
-        'eventname' => '\local_adele\event\learnpath_created',
-        'callback' => 'local_adele_observer::course_completed',
+        'eventname' => '\local_adele\event\learnpath_updated',
+        'callback' => 'local_adele_observer::learnpath_updated',
     ],
     [
         'eventname' => '\core\event\course_completed',
