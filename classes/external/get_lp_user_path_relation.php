@@ -63,7 +63,6 @@ class get_lp_user_path_relation extends external_api {
             ]
         );
     }
-
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
@@ -80,9 +79,7 @@ class get_lp_user_path_relation extends external_api {
             'learningpathid' => $learningpathid,
             'userpathid' => $userpathid,
         ]);
-
         require_login();
-
         $context = context_system::instance();
         if (!has_capability('local/adele:canmanage', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_adele');
