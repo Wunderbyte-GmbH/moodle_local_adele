@@ -32,6 +32,9 @@ import { nextTick, watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart';
 import setStartingNode from '../../composables/setStartingNode';
+import removeDropzoneNodes from '../../composables/removeDropzoneNodes';
+import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
+import recalculateParentChild from '../../composables/recalculateParentChild';
 
 
 // Load Store and Router
@@ -75,26 +78,36 @@ const onSave = () => {
     removeNodes(['starting_node'])
     let obj = {};
     obj['tree'] = toObject();
-    obj = JSON.stringify(obj);
-    let result = {
-        learninggoalid: props.learninggoal.id,
-        name: props.learninggoal.name,
-        description: props.learninggoal.description,
-        json: obj,
-    };
-    store.dispatch('saveLearningpath', result);
-    store.dispatch('fetchLearningpaths');
-    store.state.learningGoalID = 0;
-    store.state.editingadding = false;
-    router.push({name: 'learninggoals-edit-overview'});
-    window.scrollTo(0,0);
-
-    notify({
-    title: store.state.strings.title_save,
-    text: store.state.strings.description_save,
-    type: 'success'
-  });
-    
+    obj['tree']['nodes'] = removeDropzoneNodes(obj['tree']['nodes'])
+    const singleNodes = standaloneNodeCheck(obj['tree'])
+    if (singleNodes) {
+      notify({
+        title: 'Invalid Path',
+        text: 'Found standalone nodes. Every node must be connected to the path',
+        type: 'error'
+      });
+    } else {
+      obj['tree'] = recalculateParentChild(obj['tree'], 'parentCourse', 'childCourse', 'starting_node')
+      obj = JSON.stringify(obj);
+      let result = {
+          learninggoalid: props.learninggoal.id,
+          name: props.learninggoal.name,
+          description: props.learninggoal.description,
+          json: obj,
+      };
+      store.dispatch('saveLearningpath', result);
+      store.dispatch('fetchLearningpaths');
+      store.state.learningGoalID = 0;
+      store.state.editingadding = false;
+      router.push({name: 'learninggoals-edit-overview'});
+      window.scrollTo(0,0);
+  
+      notify({
+        title: store.state.strings.title_save,
+        text: store.state.strings.description_save,
+        type: 'success'
+      });
+    }
 };
 
 // Cancel learning path edition and return to overview

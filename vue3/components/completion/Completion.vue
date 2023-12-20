@@ -1,12 +1,43 @@
 <template>
     <h3>Edit Completion criteria of course node</h3>
-    <h4>Course Title</h4>
-    <p>
-      <b>
-        <!-- {{ store.state.node.fullname }} -->
-      </b>
-    </p>
+    <div class="card">
+    <h4></h4>
+
+    <div class="card-body">
+      <h5 class="card-title">
+          <i class="fas fa-check-circle"></i> Completion Criteria for:
+      </h5>
+      <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+              <i class="fas fa-header"></i> Course Title: {{ store.state.node.fullname }}
+          </li>
+          <li class="list-group-item">
+              <i class="fas fa-tag"></i> Tags: {{ store.state.node.tags }}
+          </li>
+      </ul>
+    </div>
+
     <div v-if="completions !== null">
+      <div class="card-body">
+        <h5 class="card-title">
+            <i class="fas fa-arrow-circle-up"></i> Parent Nodes:
+        </h5>
+        <ul class="list-group list-group-flush">
+          <template v-if="parentNodes.length > 0">
+            <div v-for="parent in parentNodes">
+              <li class="list-group-item">
+                {{ parent.data.fullname }}
+              </li>
+            </div>
+          </template>
+          <template v-else>
+            <li class="list-group-item">
+              No parent nodes found.
+            </li>
+          </template>
+        </ul>
+      </div>
+
         <div class="dndflowcompletion" @drop="onDrop" >
             <VueFlow @dragover="onDragOver"
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
@@ -31,12 +62,33 @@
               :edges = edges
               @nodesIntersected="handleNodesIntersected" />
         </div>
+
+        <div class="card-body">
+          <h5 class="card-title">
+              <i class="fas fa-arrow-circle-down"></i> Child Nodes:
+          </h5>
+          <ul class="list-group list-group-flush">
+            <template v-if="childNodes.length > 0">
+              <div v-for="child in childNodes">
+                <li class="list-group-item">
+                  {{ child.data.fullname }}
+                </li>
+              </div>
+            </template>
+            <template v-else>
+              <li class="list-group-item">
+                No child nodes found.
+              </li>
+            </template>
+          </ul>
+        </div>
           <div class="d-flex justify-content-center">
             <Controls @change-class="toggleClass" />
           </div>
     </div>
     <div v-else>
         Loading completion...
+    </div>
     </div>
 </template>
 <script setup>
@@ -74,11 +126,25 @@ const completions = ref(null);
 // Intersected node
 const intersectedNode = ref(null);
 
+// Intersected node
+const parentNodes = ref([]);
+const childNodes = ref([]);
+
 onMounted(async () => {
     try {
         completions.value = await store.dispatch('fetchCompletions');
     } catch (error) {
         console.error('Error fetching completions:', error);
+    }
+    const learningGoal = store.state.learninggoal[0];
+    if (learningGoal && learningGoal.json && learningGoal.json.tree && learningGoal.json.tree.nodes) {
+        learningGoal.json.tree.nodes.forEach((node) => {
+            if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {
+                parentNodes.value.push(node);
+            } else if (node.parentCourse && node.parentCourse.includes(store.state.node.node_id)) {
+                childNodes.value.push(node);
+            }
+        });
     }
 });
 
@@ -219,7 +285,7 @@ onConnect(handleConnection);
     @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
     @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
 
-.dndflowcompletion{flex-direction:column;display:flex;height:500px}.dndflowcompletion aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflowcompletion aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflowcompletion aside .description{margin-bottom:10px}.dndflowcompletion .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflowcompletion{flex-direction:row}.dndflowcompletion aside{min-width:25%}}@media screen and (max-width: 639px){.dndflowcompletion aside .nodes{display:flex;flex-direction:row;gap:5px}}
+.dndflowcompletion{flex-direction:column;display:flex;height:600px}.dndflowcompletion aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflowcompletion aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflowcompletion aside .description{margin-bottom:10px}.dndflowcompletion .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflowcompletion{flex-direction:row}.dndflowcompletion aside{min-width:25%}}@media screen and (max-width: 639px){.dndflowcompletion aside .nodes{display:flex;flex-direction:row;gap:5px}}
 .learning-path-flow{background:#4e574f;}
 .vue-flow__node.intersecting{background-color:#ff0}
 .completions.dark{background:#4e574f;}

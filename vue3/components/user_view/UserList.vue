@@ -31,6 +31,7 @@
           <th>Firstname</th>
           <th>Lastname</th>
           <th>Progress</th>
+          <th>Nodes</th>
         </tr>
       </thead>
       <tbody>
@@ -43,7 +44,21 @@
           <td>{{ relation.username }}</td>
           <td>{{ relation.firstname }}</td>
           <td>{{ relation.lastname }}</td>
-          <td>{{ relation.progress }}</td>
+          <td>
+            <div class="progress">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="{ width: relation.progress.progress + '%' }"
+                aria-valuenow="{{ relation.progress.progress }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                {{ relation.progress.progress }}%
+              </div>
+            </div>
+          </td>
+          <td>{{ relation.progress.completed_nodes }}</td>
         </tr>
       </tbody>
     </table>
@@ -60,6 +75,20 @@ const store = useStore()
 <style scoped>
 .table-margin-top{
   margin-top: 5rem;
+}
+
+.progress {
+  height: 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+  text-align: center;
+  line-height: 20px;
+  color: #fff;
+  border-radius: 10px;
 }
 
 </style>

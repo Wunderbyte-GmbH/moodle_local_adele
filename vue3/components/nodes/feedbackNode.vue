@@ -74,8 +74,6 @@ const formattingState = ref({
 });
 
 const toggleFormatting = (format) => {
-  console.log(format)
-  console.log(formattingState.value[format])
   formattingState.value[format] = !formattingState.value[format];
   applyFormatting();
 };
@@ -96,8 +94,6 @@ const applyFormatting = () => {
   if (formattingState.value.code) {
     formattedText = `\`${formattedText}\``;
   }
-  console.log(formattedText)
-  
   props.data.feedback = formattedText;
   calculateExpandedHeight();
 };
