@@ -80,15 +80,16 @@ class learning_paths {
             ]);
         } else {
             $data->id = $params['learninggoalid'];
-            $id = $DB->update_record('local_adele_learning_paths', $data);
+            $DB->update_record('local_adele_learning_paths', $data);
             // Trigger catscale created event.
             $event = learnpath_updated::create([
-                'objectid' => $id,
+                'objectid' => $data->id ,
                 'context' => context_system::instance(),
                 'other' => [
                     'learningpathname' => $data->name,
-                    'learningpathid' => $id,
+                    'learningpathid' => $data->id,
                     'userid' => $USER->id,
+                    'json' => $data->json,
                 ],
             ]);
         }
@@ -222,8 +223,8 @@ class learning_paths {
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
         foreach ($records as $record) {
-            $progress = 0;
             $record->json = json_decode($record->json);
+            $progress = self::getnodeprogress($record->json);
             $userpathlist[] = [
                 'id' => (int)$record->user_id,
                 'username' => $record->username,
@@ -233,6 +234,82 @@ class learning_paths {
             ];
         }
         return $userpathlist;
+    }
+
+    /**
+     * Get user path relation.
+     *
+     * @param string $json
+     * @return array
+     */
+    public static function getnodeprogress($relationnodes) {
+        $validnodes = 0;
+        foreach ($relationnodes->user_path_relation as $node) {
+            if ($node->completionnode->valid) {
+                $validnodes++;
+            }
+        }
+
+        $pathnodes = $relationnodes->tree->nodes;
+        $startingcondition = "starting_node";
+        $paths = [];
+
+        foreach ($pathnodes as $node) {
+            $node = (array)$node;
+            if (isset($node['parentCourse']) && in_array($startingcondition, $node['parentCourse'])) {
+                self::findpaths($node, [], $paths, $pathnodes);
+            }
+        }
+
+        // Filter paths ending with childCondition null
+        $filteredpaths = array_filter($paths, function ($path) use ($pathnodes) {
+            $lastnode = self::findNodeById(end($path), $pathnodes);
+            return isset($lastnode['childCourse']) && empty($lastnode['childCourse']);
+        });
+        $progress = 0;
+        foreach ($filteredpaths as $filteredpath) {
+            $completednodes = 0;
+            foreach ($filteredpath as $node) {
+                if ($relationnodes->user_path_relation->{$node}->completionnode->valid) {
+                    $completednodes++;
+                }
+            }
+            $pathprogression = $completednodes / count($filteredpath);
+            if ($pathprogression > $progress) {
+                $progress = $pathprogression;
+            }
+        }
+        return [
+            'completed_nodes' => $validnodes . '/' . count((array)$relationnodes->user_path_relation),
+            'progress' => round(100 * $progress, 2),
+        ];
+    }
+
+    public static function findpaths($node, $currentpath, &$paths, $nodes) {
+        $currentpath[] = $node['id'];
+
+        if (isset($node['childCourse']) && empty($node['childCourse'])) {
+            $paths[] = $currentpath;
+            return;
+        }
+
+        foreach ($node['childCourse'] as $childid) {
+            $childnode = self::findnodebyid($childid, $nodes);
+            if ($childnode) {
+                self::findpaths($childnode, $currentpath, $paths, $nodes);
+            }
+        }
+    }
+
+    public static function findnodebyid($id, $nodes) {
+        global $data;
+        foreach ($nodes as $node) {
+            $node = (array)$node;
+            if ($node['id'] === $id) {
+                return $node;
+            }
+        }
+        return null;
     }
 
     /**
@@ -249,7 +326,7 @@ class learning_paths {
             'userpathid' => (int)$data['userpathid'],
         ];
 
-        $sql = "SELECT lpu.user_id, lpu.json, usr.username,
+        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, usr.username,
             usr.firstname, usr.lastname, usr.email, lpu.json
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
@@ -308,6 +385,8 @@ class learning_paths {
         $params = json_decode($params['params']);
         $userpath = $userpathrelation->get_user_path_relation($params->route->learninggoalId, $params->route->userId);
         if ($userpath) {
+            $userpath->json = json_decode($userpath->json, true);
+            $userpath->json['tree']['nodes'] = json_decode(json_encode($params->nodes), true);
             $event = user_path_updated::create([
                 'objectid' => $userpath->id,
                 'context' => context_system::instance(),
