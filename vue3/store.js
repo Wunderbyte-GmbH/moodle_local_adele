@@ -155,7 +155,6 @@ const store = createStore({
             context.commit('setLpUserPathRelation', lpUserPathRelation);
         },
         async saveUserPathRelation(context, params) {
-            console.log(params)
             const lpUserPathRelation = await ajax('local_adele_save_user_path_relation',
                 { params: JSON.stringify(params)});
         },
