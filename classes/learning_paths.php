@@ -239,7 +239,7 @@ class learning_paths {
     /**
      * Get user path relation.
      *
-     * @param string $json
+     * @param object $relationnodes
      * @return array
      */
     public static function getnodeprogress($relationnodes) {
@@ -261,7 +261,7 @@ class learning_paths {
             }
         }
 
-        // Filter paths ending with childCondition null
+        // Filter paths ending with childCondition null.
         $filteredpaths = array_filter($paths, function ($path) use ($pathnodes) {
             $lastnode = self::findNodeById(end($path), $pathnodes);
             return isset($lastnode['childCourse']) && empty($lastnode['childCourse']);
@@ -285,6 +285,15 @@ class learning_paths {
         ];
     }
 
+    /**
+     * Find a paths in learning path.
+     *
+     * @param array $node
+     * @param array $currentpath
+     * @param array $paths
+     * @param array $nodes
+     * @return array
+     */
     public static function findpaths($node, $currentpath, &$paths, $nodes) {
         $currentpath[] = $node['id'];
 
@@ -301,6 +310,13 @@ class learning_paths {
         }
     }
 
+    /**
+     * Find a node by its id.
+     *
+     * @param int $id
+     * @param array $nodes
+     * @return array
+     */
     public static function findnodebyid($id, $nodes) {
         global $data;
         foreach ($nodes as $node) {

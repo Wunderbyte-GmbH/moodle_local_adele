@@ -114,7 +114,7 @@ class user_path_relation {
      * Get active user path relation.
      *
      * @param object $userpath
-     * @param array $nodes
+     * @return object
      *
      */
     public function revision_user_path_relation($userpath) {

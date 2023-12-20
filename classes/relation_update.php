@@ -98,7 +98,7 @@ class relation_update {
      * Observer for course completed
      *
      * @param array $completionnodepaths
-     * @param string $key
+     * @return array
      */
     public static function getcompletionnode($completionnodepaths) {
         // TODO sort the valid completion paths.
@@ -115,6 +115,7 @@ class relation_update {
      * @param array $haystack
      * @param array $needle
      * @param string $key
+     * @return array
      */
     public static function searchnestedarray($haystack, $needle, $key) {
         foreach ($haystack as $item) {
