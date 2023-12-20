@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace local_adele;
 
 use local_adele\course_completion\course_completion_status;
+use local_adele\helper\user_path_relation;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,17 +49,83 @@ class relation_update {
      * @param object $event
      */
     public static function updated_single($event) {
-        global $DB;
-        $params = $event;
         // Get the user path relation.
-        $userpath = $DB->get_record('local_adele_path_user', ['id' => $params->objectid],
-            'id, user_id, json');
+        $userpath = $event->other['userpath'];
         if ($userpath) {
-            $userpath->json = json_decode($userpath->json, true);
             foreach ($userpath->json['tree']['nodes'] as $node) {
-                $completions = course_completion_status::get_condition_status($node, $userpath->user_id);
+                $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
+                $completionnodepaths = [];
+                $singlecompletionnode = [];
+                if (isset($node['completion'])) {
+                    foreach ($node['completion']['nodes'] as $completionnode) {
+                        $failedcompletion = false;
+                        $validationconditionstring = [];
+                        if ($completionnode['parentCondition'][0] == 'starting_condition') {
+                            $currentcondition = $completionnode;
+                            $validationcondition = false;
+                            while ( $currentcondition ) {
+                                $validationcondition = $completioncriteria[$currentcondition['data']['type']];
+                                $singlecompletionnode[$currentcondition['data']['type']] = $validationcondition;
+                                $validationconditionstring[] = $currentcondition['data']['type'];
+                                // Check if the conditon is true and break if one condition is not met.
+                                if (!$validationcondition) {
+                                    $failedcompletion = true;
+                                }
+                                // Get next Condition and return null if no child node exsists.
+                                $currentcondition = self::searchnestedarray($node['completion']['nodes'],
+                                    $currentcondition['childCondition'], 'id');
+                            }
+                            if ($validationcondition && !$failedcompletion) {
+                                $completionnodepaths[] = $validationconditionstring;
+                            }
+                        }
+                    }
+                }
+                $completionnode = self::getcompletionnode($completionnodepaths);
+                $userpath->json['user_path_relation'][$node['id']] = [
+                    'completioncriteria' => $completioncriteria,
+                    'completionnode' => $completionnode,
+                    'singlecompletionnode' => $singlecompletionnode,
+                ];
                 // Match completions.
             }
+            $userpathrelationhelper = new user_path_relation();
+            $userpathrelationhelper->revision_user_path_relation($userpath);
         }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param array $completionnodepaths
+     * @param string $key
+     */
+    public static function getcompletionnode($completionnodepaths) {
+        // TODO sort the valid completion paths.
+        $valid = count($completionnodepaths) ? true : false;
+        return [
+            'valid' => $valid,
+            'conditions' => $completionnodepaths,
+        ];
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param array $haystack
+     * @param array $needle
+     * @param string $key
+     */
+    public static function searchnestedarray($haystack, $needle, $key) {
+        foreach ($haystack as $item) {
+            foreach ($needle as $need) {
+                if ( !str_contains($need, '_feedback' )) {
+                    if (isset($item[$key]) && $item[$key] === $need) {
+                        return $item;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

@@ -112,7 +112,8 @@ class manual implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        if ($node['data']['manual'] && $node['data']['value']) {
+        if (isset($node['data']['manual'] ) && $node['data']['manual']
+            && $node['data']['value']) {
             return true;
         }
         return false;

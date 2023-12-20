@@ -25,6 +25,7 @@
 use core\event\base;
 use local_adele\completion;
 use local_adele\enrollment;
+use local_adele\learning_path_update;
 use local_adele\relation_update;
 
 /**
@@ -57,5 +58,14 @@ class local_adele_observer {
      */
     public static function user_path_updated(base $event) {
         $observer = relation_update::updated_single($event);
+    }
+
+    /**
+     * Observer for the update_catscale event
+     *
+     * @param base $event
+     */
+    public static function learnpath_updated(base $event) {
+        $observer = learning_path_update::updated_learning_path($event);
     }
 }
