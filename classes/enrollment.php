@@ -26,6 +26,9 @@
 declare(strict_types=1);
 
 namespace local_adele;
+use context_system;
+
+use local_adele\event\user_path_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -54,8 +57,7 @@ class enrollment {
                 $learningpath->json = json_decode($learningpath->json, true);
                 $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
                 if (!$userpath) {
-                    $userpathrelation = self::getuserpathrelation($learningpath);
-                    $DB->insert_record('local_adele_path_user', [
+                    $id = $DB->insert_record('local_adele_path_user', [
                         'user_id' => $params->relateduserid,
                         'learning_path_id' => $learningpath->id,
                         'status' => 'active',
@@ -64,44 +66,21 @@ class enrollment {
                         'createdby' => $params->userid,
                         'json' => json_encode([
                             'tree' => $learningpath->json['tree'],
-                            'user_path_relation' => $userpathrelation,
                         ]),
                     ]);
+                    $userpath = $DB->get_record('local_adele_path_user', ['id' => $id]);
+                    $userpath->json = json_decode($userpath->json, true);
+                    $eventsingle = user_path_updated::create([
+                        'objectid' => $id,
+                        'context' => context_system::instance(),
+                        'other' => [
+                            'userpath' => $userpath,
+                        ],
+                    ]);
+                    $eventsingle->trigger();
                 }
             }
         }
-    }
-
-    /**
-     * Build sql query with config filters.
-     *
-     * @param object $learningpath
-     * @return string
-     */
-    public static function getuserpathrelation($learningpath) {
-        // Using named parameter :courseid in the SQL query.
-        $userpathrelation = [];
-        foreach ($learningpath->json['tree']['nodes'] as $node) {
-            if ($node['completion'] && count($node['completion']['nodes'])) {
-                foreach ($node['completion']['nodes'] as $complitionnode) {
-                    if ($complitionnode['type'] == 'feedback') {
-                        self::loopcriteria();
-                    }
-                }
-            }
-            $userpathrelation[$node['id']] = false;
-        }
-        return $userpathrelation;
-    }
-
-    /**
-     * Build sql query with config filters.
-     *
-     * @return string
-     */
-    public static function loopcriteria() {
-        global $DB;
-        return 1;
     }
 
     /**

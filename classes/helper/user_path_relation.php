@@ -63,6 +63,30 @@ class user_path_relation {
      * Get active user path relation.
      *
      * @param int $learningpathid
+     * @return object
+     *
+     */
+    public function get_user_path_relations($learningpathid) {
+        global $DB;
+        $sql = "SELECT *
+            FROM {local_adele_path_user} lpu
+            WHERE lpu.learning_path_id = :learningpathid
+            AND lpu.status = 'active'";
+
+        // Providing the named parameter in the $params array.
+        $params = [
+            'learningpathid' => (int)$learningpathid,
+        ];
+        // Using get_records_sql function to execute the query with parameters.
+        $records = $DB->get_records_sql($sql, $params);
+        return $records;
+    }
+
+
+    /**
+     * Get active user path relation.
+     *
+     * @param int $learningpathid
      * @param int $userid
      * @return object
      *
@@ -93,7 +117,7 @@ class user_path_relation {
      * @param array $nodes
      *
      */
-    public function revision_user_path_relation($userpath, $nodes) {
+    public function revision_user_path_relation($userpath) {
         global $DB;
         $data = [
             'id' => $userpath->id,
@@ -103,8 +127,7 @@ class user_path_relation {
         $DB->update_record('local_adele_path_user', $data);
 
         // Update nodes and save new user path relation.
-        $userpath->json = json_decode($userpath->json, true);
-        $userpath->json['tree']['nodes'] = $nodes;
+        $userpath->json = json_encode($userpath->json, true);
 
         return $DB->insert_record('local_adele_path_user', [
             'user_id' => $userpath->user_id,
@@ -113,7 +136,7 @@ class user_path_relation {
             'timecreated' => $userpath->timecreated,
             'timemodified' => time(),
             'createdby' => $userpath->createdby,
-            'json' => json_encode($userpath->json),
+            'json' => $userpath->json,
         ]);
     }
 }
