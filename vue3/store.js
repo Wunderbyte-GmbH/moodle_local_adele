@@ -46,7 +46,7 @@ const store = createStore({
             ],
             // learninggoal: null,
             learninggoal: [ 
-                { "id": 0, "name": "", "description": "", "json": "" } 
+                { "id": 22, "name": "", "description": "", "json": "" } 
             ],
             editingadding: false,
             node: null,
@@ -157,6 +157,8 @@ const store = createStore({
         async saveUserPathRelation(context, params) {
             const lpUserPathRelation = await ajax('local_adele_save_user_path_relation',
                 { params: JSON.stringify(params)});
+            context.dispatch('fetchUserPathRelation', params.route);
+            context.dispatch('fetchUserPathRelations');
         },
         async fetchLearningpaths(context) {
             const learningpaths = await ajax('local_adele_get_learningpaths');
@@ -184,6 +186,14 @@ const store = createStore({
         },
         async fetchCompletions() {
             const result = await ajax('local_adele_get_completions');
+            return result;
+        },
+        async fetchCatquizTests() {
+            const result = await ajax('local_adele_get_catquiz_tests');
+            return result;
+        },
+        async fetchCatquizScales(context, payload) {
+            const result = await ajax('local_adele_get_catquiz_scales', payload);
             return result;
         },
     }
