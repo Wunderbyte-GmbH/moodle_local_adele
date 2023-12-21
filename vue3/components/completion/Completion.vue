@@ -102,7 +102,7 @@ import Controls from './CompletionControls.vue'
 import CompletionNode from '../nodes/CompletionNode.vue'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
-import CompletionLine from './CompletionLine.vue'
+import CompletionLine from '../edges/CompletionLine.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import FeedbackNode from '../nodes/feedbackNode.vue'
