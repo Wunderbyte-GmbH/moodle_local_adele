@@ -135,6 +135,8 @@ $string['course_label_condition_timed'] = 'timed';
 $string['course_description_condition_course_completed'] = 'Course has been completed by student';
 $string['course_name_condition_course_completed'] = 'Course completed';
 $string['course_label_condition_course_completed'] = 'info_text';
+$string['course_description_condition_catquiz'] = 'Accroding to catquiz results/attempts';
+$string['course_name_condition_catquiz'] = 'Catquiz Quiz';
 
 // Event Strings.
 $string['event_learnpath_deleted'] = 'Learning path deleted';

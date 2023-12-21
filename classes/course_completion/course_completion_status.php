@@ -68,7 +68,7 @@ class course_completion_status {
             // We instantiate all the classes, because we need some information.
             if (class_exists($filename)) {
                 $conditionclass = new $filename();
-                $completionstatus[$path['filename']] = $conditionclass->get_completion_status($node, $userid);
+                $completionstatus[] = $conditionclass->get_completion_status($node, $userid);
             }
         }
         return $completionstatus;
