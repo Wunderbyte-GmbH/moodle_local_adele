@@ -4,23 +4,20 @@
 
 <script setup>
 import { computed } from 'vue';
-import InputCheckbox from './conditions/InputCheckbox.vue';
-import InputDate from './conditions/InputDate.vue';
 import course_completed from './conditions/course_completed.vue'
-import ManualOutput from '../completion/conditions_output/ManualOutput.vue'
+import manual_output from '../completion/conditions_output/manual_output.vue'
+import catquiz from './conditions/catquiz.vue'
 
 const props = defineProps(['completion']);
 
 const dynamicComponent = computed(() => {
   switch (getInputType()) {
-    case 'InputCheckbox':
-      return InputCheckbox;
-    case 'InputDate':
-      return InputDate;
     case 'course_completed':
       return course_completed;
-    case 'Manual':
-      return ManualOutput;
+    case 'manual':
+      return manual_output;
+    case 'catquiz':
+      return catquiz;
     default:
       return null;
   }
@@ -29,14 +26,13 @@ const dynamicComponent = computed(() => {
 const getInputType = () => {
   // Map completion types to input components
   const typeToComponent = {
-    checkbox: 'InputCheckbox',
-    date: 'InputDate',
     course_completed: 'course_completed',
+    catquiz: 'catquiz',
   };
   if(props.completion.manual){
-    return 'Manual';
+    return 'manual';
   }
-  return typeToComponent[props.completion.type] || 'InfoText';
+  return typeToComponent[props.completion.type] || 'manual';
 };
 
 </script>

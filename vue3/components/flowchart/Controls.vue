@@ -32,7 +32,7 @@ import { nextTick, watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart';
 import setStartingNode from '../../composables/setStartingNode';
-import removeDropzoneNodes from '../../composables/removeDropzoneNodes';
+import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 
@@ -78,7 +78,7 @@ const onSave = () => {
     removeNodes(['starting_node'])
     let obj = {};
     obj['tree'] = toObject();
-    obj['tree']['nodes'] = removeDropzoneNodes(obj['tree']['nodes'])
+    obj['tree'] = removeDropzones(obj['tree'])
     const singleNodes = standaloneNodeCheck(obj['tree'])
     if (singleNodes) {
       notify({

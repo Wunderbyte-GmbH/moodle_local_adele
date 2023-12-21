@@ -29,7 +29,7 @@ import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart'
-import removeDropzoneNodes from '../../composables/removeDropzoneNodes';
+import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 
@@ -56,7 +56,7 @@ if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
 // Prepare and save learning path
 const onSave = () => {
   let completion = toObject();
-  completion['nodes'] = removeDropzoneNodes(completion['nodes'])
+  completion = removeDropzones(completion)
   const singleNodes = standaloneNodeCheck(completion)
   if (singleNodes) {
     notify({
