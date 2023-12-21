@@ -103,4 +103,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_catquiz_tests' => [
+        'classname' => 'local_adele\external\get_catquiz_tests',
+        'classpath' => '',
+        'description' => 'Get catquiz tests',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
+    'local_adele_get_catquiz_scales' => [
+        'classname' => 'local_adele\external\get_catquiz_scales',
+        'classpath' => '',
+        'description' => 'Get catquiz tests',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
 ];

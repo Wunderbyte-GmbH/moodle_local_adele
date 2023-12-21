@@ -114,8 +114,8 @@ class manual implements course_completion {
     public function get_completion_status($node, $userid) {
         if (isset($node['data']['manual'] ) && $node['data']['manual']
             && $node['data']['value']) {
-            return true;
+            return [$this->type => true];
         }
-        return false;
+        return [$this->type => false];
     }
 }
