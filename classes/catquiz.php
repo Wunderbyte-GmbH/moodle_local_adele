@@ -66,7 +66,7 @@ class catquiz {
 
     /**
      * Get all scales.
-     *
+     * @param array $params
      * @return array
      */
     public static function get_catquiz_scales($params) {
