@@ -37,7 +37,9 @@
 <div class="dndflow" @drop="onDrop">
     <Modal >
     </Modal>
-    <VueFlow @dragover="onDragOver" @node-drag="onNodeDrag" :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" :class="{ dark }" class="learning-path-flow">
+    <VueFlow @dragover="onDragOver" :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
+      :class="{ dark }" :fit-view-on-init="true" :max-zoom="3" :min-zoom="0.3"
+      class="learning-path-flow">
       <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8"/>
       <template #node-custom="{ data }">
           <CustomNode :data="data"/>
@@ -69,7 +71,7 @@
 <script setup>
 // Import needed libraries
 import { ref, watch, nextTick } from 'vue'
-import { MarkerType, VueFlow, useVueFlow } from '@vue-flow/core'
+import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './Sidebar.vue'
 import Controls from './Controls.vue'
@@ -83,6 +85,8 @@ import { notify } from "@kyvg/vue3-notification"
 import shiftNodesDown from '../../composables/shiftNodesDown'
 import setStartingNode from '../../composables/setStartingNode';
 import UserList from '../user_view/UserList.vue'
+import addCustomEdge from '../../composables/addCustomEdge';
+import removeDropzones from '../../composables/removeDropzones';
 
 // Load Store and Router
 const store = useStore()
@@ -100,7 +104,7 @@ function toggleClass() {
 
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
-    addNodes, project, vueFlowRef, removeEdges, removeNodes,
+    addNodes, removeNodes,
     toObject, fitView } = useVueFlow({
 nodes: [],
 })
@@ -111,27 +115,27 @@ function handleNodesIntersected({ intersecting }) {
 }
 
 // Automatically connect to node if node is close enough
-function onNodeDrag(event) {
-  const connectionRadius = 500;
-  const { left, top } = vueFlowRef.value.getBoundingClientRect();
-  const position = project({
-  x: event.event.clientX - left,
-  y: event.event.clientY - top,
-  });
-  const clostestNode = findClosestNode(position, connectionRadius, event.node.id); 
-  if(clostestNode){
-  let source = clostestNode;
-  let target = event.node;
-  if(source.position.y < target.position.y){
-    target = clostestNode;
-    source = event.node;
-  }
-  edgeId.value = source.id + target.id
-  showPreviewConnection(source, target)
-  }else{
-  removeEdges(edgeId.value)
-  }
-}
+// function onNodeDrag(event) {
+//   const connectionRadius = 500;
+//   const { left, top } = vueFlowRef.value.getBoundingClientRect();
+//   const position = project({
+//   x: event.event.clientX - left,
+//   y: event.event.clientY - top,
+//   });
+//   const clostestNode = findClosestNode(position, connectionRadius, event.node.id); 
+//   if(clostestNode){
+//   let source = clostestNode;
+//   let target = event.node;
+//   if(source.position.y < target.position.y){
+//     target = clostestNode;
+//     source = event.node;
+//   }
+//   edgeId.value = source.id + target.id
+//   showPreviewConnection(source, target)
+//   }else{
+//   removeEdges(edgeId.value)
+//   }
+// }
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {
@@ -142,21 +146,10 @@ function onDragOver(event) {
 }
 
 // Show a preview node if nodes are close enough
-function showPreviewConnection(source, target ) {
-const previewEdge = {
- id: source.id + target.id,
- source: target.id,
- target: source.id,
- sourceHandle: 'source',
- targetHandle: 'target',
- style: {
-   'stroke-width': 5,
- },
- markerEnd: MarkerType.ArrowClosed,
-};
-removeEdges(target.id + source.id)
-addEdges([previewEdge]);
-}
+// function showPreviewConnection(source, target ) {
+//   removeEdges(target.id + source.id)
+//   addEdges(addCustomEdge(source.id, target.id));
+// }
 
 // Find the closest node within a set boundary
 function findClosestNode(position, connectionRadius, draggedId) {
@@ -180,17 +173,12 @@ return closestNode;
 
 // Adjust and add edges if connection was made
 function handleConnect(params) {
-params.style = {
- 'stroke-width': 5, 
-};
-params.markerEnd = MarkerType.ArrowClosed;
 if (params.source !== store.state.startnode) {
  // Swap source and target positions
  params.target = params.source;
  params.source = store.state.startnode;
 }
-params.id = params.source + params.target
-addEdges(params);
+addEdges(addCustomEdge( params.target, params.source));
 }
 
 // Triggers handle connect 
@@ -269,29 +257,21 @@ function onDrop(event) {
       { deep: true, flush: 'post' },
     )
     })
-    store.state.learninggoal[0].json = {
-      tree: toObject(),
-    }
     if(intersectedNode.value.dropzone.id.includes('dropzone_')){
-      let targetHandle = 'source'
-      let sourceHandle =  'target'
+      let source = intersectedNode.value.closestnode.id  
+      let target = newNode.id
 
       if(intersectedNode.value.dropzone.id.includes('child')){
-        targetHandle = 'target'
-        sourceHandle =  'source'
+        source = newNode.id 
+        target = intersectedNode.value.closestnode.id 
       }
-
-      const newEdge = {
-        id: `${intersectedNode.value.closestnode.id}-${newNode.id}`,
-        source: intersectedNode.value.closestnode.id,
-        sourceHandle: sourceHandle,
-        target: newNode.id,
-        targetHandle: targetHandle,
-        type: 'default',
-      };
-
       // Add the new edge
-      addEdges([newEdge]);
+      addEdges(addCustomEdge(source, target));
+    }
+    let tree = toObject()
+    tree = removeDropzones(tree)
+    store.state.learninggoal[0].json = {
+      tree: tree,
     }
   } else{
     notify({
