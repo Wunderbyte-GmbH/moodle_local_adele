@@ -17,7 +17,7 @@
 /**
  * Base class for a single booking option availability condition.
  *
- * All bo condition types must extend this class.
+ * All bo condition label must extend this class.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -47,8 +47,8 @@ class course_completed implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
-    /** @var string $type of the redered condition in frontend. */
-    public $type = 'course_completed';
+    /** @var string $label of the redered condition in frontend. */
+    public $label = 'course_completed';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -65,14 +65,13 @@ class course_completed implements course_completion {
     public function get_description():array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
-        $label = $this->get_label_string();
+        $label = $this->label;
 
         return [
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
             'label' => $label,
-            'type' => $this->type,
         ];
     }
 
@@ -99,16 +98,6 @@ class course_completed implements course_completion {
     /**
      * Helper function to return localized description strings.
      *
-     * @return string
-     */
-    private function get_label_string() {
-        $label = get_string('course_label_condition_course_completed', 'local_adele');
-        return $label;
-    }
-
-    /**
-     * Helper function to return localized description strings.
-     *
      * @param array $node
      * @param int $userid
      * @return boolean
@@ -122,9 +111,9 @@ class course_completed implements course_completion {
             // Check if the user has completed the course.
             $coursecompleted = $completion->is_course_complete($userid);
             if ($coursecompleted) {
-                return [$this->type => true];
+                return true;
             }
         }
-        return [$this->type => false];
+        return false;
     }
 }
