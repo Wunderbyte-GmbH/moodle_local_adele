@@ -46,8 +46,8 @@ class manual implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
-    /** @var string $type of the redered condition in frontend. */
-    public $type = 'manual';
+    /** @var string $label of the redered condition in frontend. */
+    public $label = 'manual';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -64,14 +64,13 @@ class manual implements course_completion {
     public function get_description():array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
-        $label = $this->type;
+        $label = $this->label;
 
         return [
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
             'label' => $label,
-            'type' => $this->type,
         ];
     }
 
@@ -97,16 +96,6 @@ class manual implements course_completion {
 
     /**
      * Helper function to return localized description strings.
-     *
-     * @return string
-     */
-    private function get_label_string() {
-        $label = get_string('course_label_condition_manually', 'local_adele');
-        return $label;
-    }
-
-    /**
-     * Helper function to return localized description strings.
      * @param array $node
      * @param int $userid
      * @return boolean
@@ -114,8 +103,8 @@ class manual implements course_completion {
     public function get_completion_status($node, $userid) {
         if (isset($node['data']['manual'] ) && $node['data']['manual']
             && $node['data']['value']) {
-            return [$this->type => true];
+            return true;
         }
-        return [$this->type => false];
+        return false;
     }
 }

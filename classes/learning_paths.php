@@ -380,7 +380,7 @@ class learning_paths {
             $node->data->manual = false;
             if ($node->completion && $node->completion->nodes) {
                 foreach ($node->completion->nodes as $completionnode) {
-                    if ($completionnode->data->type == 'manual') {
+                    if ($completionnode->data->label == 'manual') {
                         $node->data->manual = true;
                     }
                 }
