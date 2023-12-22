@@ -22,30 +22,39 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
-<template>
+ <template>
   <div>
     <div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Edit  {{fullname}} </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="exampleModalLabel">Edit {{fullname}}</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" @click="closeModal">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <div class="mb-2"><b>Longname:</b> 
+            <div class="form-group">
+              <label for="fullname"><b>Longname:</b></label>
               <input
                 type="text"
+                class="form-control"
+                id="fullname"
                 v-model="fullname"
               />
             </div>
-            <div class="mb-2"><b>Shortname:</b> {{shortname}} </div>
-            <div class="mb-2"><b>Tags:</b>  {{tags}} </div>
+            <div class="form-group">
+              <label for="shortname"><b>Shortname:</b></label>
+              <p class="form-control-static">{{shortname}}</p>
+            </div>
+            <div class="form-group">
+              <label for="tags"><b>Tags <i class="fas fa-tag"></i>:</b></label>
+              <p class="form-control-static">{{tags}}</p>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal">Close</button>
-            <button type="button" class="btn btn-primary" @click="saveChanges">Show Changes</button>
+            <button type="button" class="btn btn-primary" @click="saveChanges">Save Changes</button>
           </div>
         </div>
       </div>
