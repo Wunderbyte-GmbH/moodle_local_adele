@@ -128,13 +128,10 @@ $string['node_courseshortname'] = 'Short Coursename:';
 // Conditions description.
 $string['course_description_condition_manually'] = 'Course will be completed manually';
 $string['course_name_condition_manually'] = 'Course completion checkbox';
-$string['course_label_condition_manually'] = 'manually';
 $string['course_description_condition_timed'] = 'Course has to be completed due to a given date ';
 $string['course_name_condition_timed'] = 'Course determination date';
-$string['course_label_condition_timed'] = 'timed';
 $string['course_description_condition_course_completed'] = 'Course has been completed by student';
 $string['course_name_condition_course_completed'] = 'Course completed';
-$string['course_label_condition_course_completed'] = 'info_text';
 $string['course_description_condition_catquiz'] = 'Accroding to catquiz results/attempts';
 $string['course_name_condition_catquiz'] = 'Catquiz Quiz';
 

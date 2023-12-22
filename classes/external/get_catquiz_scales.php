@@ -59,7 +59,7 @@ class get_catquiz_scales extends external_api {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
-            'test_id'  => new external_value(PARAM_INT, 'test_id', VALUE_REQUIRED),
+            'testid'  => new external_value(PARAM_INT, 'testid', VALUE_REQUIRED),
             ]
         );
     }
@@ -76,7 +76,7 @@ class get_catquiz_scales extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learninggoalid' => $learninggoalid,
-            'test_id' => $testid,
+            'testid' => $testid,
         ]);
 
         require_login();

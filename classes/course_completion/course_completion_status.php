@@ -58,9 +58,7 @@ class course_completion_status {
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_completion/conditions/*.php';
         $filelist = glob($path);
-
         $completionstatus = [];
-
         // We just want filenames, as they are also the classnames.
         foreach ($filelist as $filepath) {
             $path = pathinfo($filepath);
@@ -68,7 +66,7 @@ class course_completion_status {
             // We instantiate all the classes, because we need some information.
             if (class_exists($filename)) {
                 $conditionclass = new $filename();
-                $completionstatus[] = $conditionclass->get_completion_status($node, $userid);
+                $completionstatus[$path['filename']] = $conditionclass->get_completion_status($node, $userid);
             }
         }
         return $completionstatus;

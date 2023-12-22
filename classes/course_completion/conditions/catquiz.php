@@ -17,7 +17,7 @@
 /**
  * Base class for a single booking option availability condition.
  *
- * All bo condition types must extend this class.
+ * All bo condition labels must extend this class.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -28,7 +28,8 @@
 namespace local_adele\course_completion\conditions;
 
 use local_adele\course_completion\course_completion;
-
+use local_catquiz\catquiz as Local_catquizCatquiz;
+use local_catquiz\catscale;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,8 +47,8 @@ class catquiz implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
-    /** @var string $type of the redered condition in frontend. */
-    public $type = 'catquiz';
+    /** @var string $label of the redered condition in frontend. */
+    public $label = 'catquiz';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -64,14 +65,13 @@ class catquiz implements course_completion {
     public function get_description():array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
-        $label = $this->type;
+        $label = $this->label;
 
         return [
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
             'label' => $label,
-            'type' => $this->type,
         ];
     }
 
@@ -97,6 +97,7 @@ class catquiz implements course_completion {
 
     /**
      * Helper function to return localized description strings.
+     * TODO check if get_strategy_selectcontext suits.
      * @param array $node
      * @param int $userid
      * @return boolean
@@ -105,30 +106,31 @@ class catquiz implements course_completion {
         global $DB;
         $catquizzes = [];
         foreach ($node['completion']['nodes'] as $complitionnode) {
-            if ($complitionnode['data']['type'] == 'catquiz') {
-                $validcatquiz = false;
-                $testid = $complitionnode['data']['value']['test_id'];
+            if ($complitionnode['data']['label'] == 'catquiz') {
+                $testid = $complitionnode['data']['value']['testid'];
                 $scales = $complitionnode['data']['value']['scales'];
                 foreach ($scales as $scale) {
+                    $validcatquiz = false;
                     if (isset($scale['scale']) && $scale['scale'] != '') {
                         // Check if scale matches.
-                        $params = [
-                            'userid' => $userid,
-                            'scaleid' => $scale['id'],
-                        ];
-                        $record = $DB->get_record('local_catquiz_attempts', $params, 'personability_after_attempt');
-                        if ($record && $record->personability_after_attempt >= $scale['scale']) {
-                            $validcatquiz = true;
+                        $contextid = catscale::get_context_id($scale['id']);
+                        $personabilities = Local_catquizCatquiz::get_person_abilities( $contextid, [$scale['id']], $userid);
+                        if ($personabilities) {
+                            foreach ($personabilities as $personability) {
+                                if ($personability->ability >= $scale['scale']) {
+                                    $validcatquiz = true;
+                                }
+                            }
                         }
                     }
-                    if (isset($scale['attempts']) && (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == '') )) {
+                    if (isset($scale['attempts']) && (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
                         // Check if attempts matches.
-                        $params = [
-                            'userid' => $userid,
-                            'scaleid' => $scale['id'],
-                        ];
-                        $records = $DB->get_records('local_catquiz_attempts', $params);
-                        if (count($records) >= $scale['attempts']) {
+                        $records = Local_catquizCatquiz::return_attempt_and_contextid_from_attemptstable(
+                            $scale['attempts'],
+                            $scale['id'],
+                            $node['data']['course_node_id'],
+                            $userid);
+                        if (count($records) >= $scale['attempts'] || count($records) >= 1) {
                             $validcatquiz = true;
                         }
                     }
@@ -136,6 +138,26 @@ class catquiz implements course_completion {
                 }
             }
         }
-        return [$this->type => $catquizzes];
+        $catquizzes = self::conditionsummary($catquizzes);
+        return $catquizzes;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     * @param array $quizzesconditions
+     * @return array
+     */
+    private function conditionsummary($quizzesconditions) {
+        $quizsummary = [];
+        foreach ($quizzesconditions as $id => $quizzes) {
+            $valid = false;
+            foreach ($quizzes as $quiz) {
+                if ($quiz) {
+                    $valid = true;
+                }
+            }
+            $quizsummary[$id] = $valid;
+        }
+        return $quizsummary;
     }
 }
