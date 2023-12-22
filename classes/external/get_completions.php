@@ -91,7 +91,6 @@ class get_completions extends external_api {
                     'name' => new external_value(PARAM_TEXT, 'Condition description'),
                     'description' => new external_value(PARAM_TEXT, 'Condition description'),
                     'label' => new external_value(PARAM_TEXT, 'Condition label'),
-                    'type' => new external_value(PARAM_TEXT, 'Condition type'),
                 ]
             )
         );

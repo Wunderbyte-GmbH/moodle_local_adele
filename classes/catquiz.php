@@ -25,6 +25,10 @@
 
 namespace local_adele;
 
+use local_catquiz\catquiz_handler;
+use local_catquiz\data\dataapi;
+use local_catquiz\testenvironment;
+
 /**
  * Class learning_paths
  *
@@ -48,11 +52,7 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_tests() {
-        global $DB;
-        $records = $DB->get_records('local_catquiz_tests',
-            ['visible' => 1],
-            null,
-            'id, componentid, courseid, json');
+        $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2);
         $records = array_map(function ($record) {
             $record = (array)$record;
             $record['json'] = json_decode($record['json']);
@@ -60,7 +60,6 @@ class catquiz {
             unset($record['json']);
             return $record;
         }, $records);
-
         return $records;
     }
 
@@ -70,16 +69,19 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_scales($params) {
-        global $DB;
-        $records = $DB->get_records('local_catquiz_catscales',
-            ['parentid' => $params['test_id']],
-            null,
-            'id, name');
-        $records = array_map(function ($record) {
-            $record = (array)$record;
-            return $record;
-        }, $records);
-
+        $records = testenvironment::get_environments('mod_adaptivequiz', $params['testid']);
+        if ($records) {
+            $record = reset($records);
+            $testdata = json_decode($record->json);
+            $selectedsubscales = catquiz_handler::get_selected_subscales($testdata);
+            $records = dataapi::get_catscale_and_children($params['testid'], true);
+            $records = array_filter($records, function ($record) use ($selectedsubscales) {
+                return in_array($record->id, $selectedsubscales);
+            });
+            $records = array_map(function ($record) {
+                return (array)$record;
+            }, $records);
+        }
         return $records;
     }
 }
