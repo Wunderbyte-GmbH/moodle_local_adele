@@ -11,7 +11,7 @@ import catquiz from './conditions/catquiz.vue'
 const props = defineProps(['completion']);
 
 const dynamicComponent = computed(() => {
-  switch (getInputType()) {
+  switch (getInputLabel()) {
     case 'course_completed':
       return course_completed;
     case 'manual':
@@ -23,16 +23,16 @@ const dynamicComponent = computed(() => {
   }
 });
 
-const getInputType = () => {
-  // Map completion types to input components
-  const typeToComponent = {
+const getInputLabel = () => {
+  // Map completion labels to input components
+  const labelToComponent = {
     course_completed: 'course_completed',
     catquiz: 'catquiz',
   };
   if(props.completion.manual){
     return 'manual';
   }
-  return typeToComponent[props.completion.type] || 'manual';
+  return labelToComponent[props.completion.label] || 'manual';
 };
 
 </script>

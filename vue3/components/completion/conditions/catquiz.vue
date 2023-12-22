@@ -65,15 +65,20 @@ const attempts = ref('');
 onMounted(async () => {
   // Get all tests
   tests.value = await store.dispatch('fetchCatquizTests')
-  data.value = props.completion.value
-  selectedTest.value = props.completion.value.test_id
-  scales.value = props.completion.value.scales
-
+  if (props.completion.value !== undefined) {
+    data.value = props.completion.value;
+    if (props.completion.value.testid !== undefined) {
+      selectedTest.value = props.completion.value.testid;
+    }
+    if (props.completion.value.scales !== undefined) {
+      scales.value = props.completion.value.scales;
+    }
+  }
   // watch values from selected node
   watch(() => selectedTest.value, async (newValue, oldValue) => {
-    scales.value = await store.dispatch('fetchCatquizScales', {test_id: selectedTest.value})
+    scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
     data.value = {
-      test_id: selectedTest.value,
+      testid: selectedTest.value,
       scales: scales.value,
     }
   }, { deep: true } );
