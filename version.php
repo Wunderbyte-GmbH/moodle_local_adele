@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_adele';
-$plugin->release = '0.1.1';
-$plugin->version = 2024010300;
+$plugin->release = '0.1.2';
+$plugin->version = 2024010301;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = [
-    'local_catquiz' => 2023110603,
+    'local_catquiz' => 2024010300,
 ];
