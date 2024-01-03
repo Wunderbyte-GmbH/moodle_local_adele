@@ -27,7 +27,7 @@
 import { Handle, Position } from '@vue-flow/core'
 import { defineProps, computed, ref  } from 'vue';
 import { useStore } from 'vuex';
-import CompletionItem from '../completion/CompletionItem.vue'
+import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 
 // Load Store 
 const store = useStore();
@@ -63,13 +63,13 @@ const toggleTable = () => {
     <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
     <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
     <div v-if="data.manual">
-      <CompletionItem :completion="data" />
+      <CompletionOutPutItem :completion="data" />
     </div>
     <div v-if="data.completion.singlecompletionnode">
       <button class="btn btn-link" @click="toggleTable" aria-expanded="false" aria-controls="collapseTable">
-        Show Completion Criteria
+        {{ isTableVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
       </button>
-      <div v-show="isTableVisible">
+      <div v-show="isTableVisible" class="table-container">
         <table class="table table-bordered table-hover fancy-table">
           <thead class="thead-light">
             <tr>
@@ -81,6 +81,7 @@ const toggleTable = () => {
             <tr v-for="(value, key) in data.completion.singlecompletionnode" :key="key">
               <td>{{ key }}</td>
               <td>
+                {{ value }}
                 <span v-if="value" class="text-success">&#10004;</span>
               </td>
             </tr>
@@ -102,6 +103,12 @@ const toggleTable = () => {
 }
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;
+}
+.table-container {
+  left: 50%;
+  transform: translate(-50%, 0);
+  position: absolute;
+  z-index: 100;
 }
 
 /* Fancy table styles */
