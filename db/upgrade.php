@@ -38,7 +38,7 @@ function xmldb_local_adele_upgrade($oldversion) {
     //
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
-    if ($oldversion < 2023010303) {
+    if ($oldversion < 2024010304) {
 
         // Define table local_adele_path_user to be created.
         $table = new xmldb_table('local_adele_path_user');
@@ -65,7 +65,7 @@ function xmldb_local_adele_upgrade($oldversion) {
         }
 
         // Adele savepoint reached.
-        upgrade_plugin_savepoint(true, 2023010303, 'local', 'adele');
+        upgrade_plugin_savepoint(true, 2024010304, 'local', 'adele');
     }
 
     return true;
