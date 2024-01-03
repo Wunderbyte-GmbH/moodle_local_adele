@@ -48,7 +48,7 @@
               <p class="form-control-static">{{shortname}}</p>
             </div>
             <div class="form-group">
-              <label for="tags"><b>Tags <i class="fas fa-tag"></i>:</b></label>
+              <label for="tags"><b>Tags <i class="fa fa-tag"></i>:</b></label>
               <p class="form-control-static">{{tags}}</p>
             </div>
           </div>

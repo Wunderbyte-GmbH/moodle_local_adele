@@ -5,14 +5,14 @@
 
     <div class="card-body">
       <h5 class="card-title">
-          <i class="fas fa-check-circle"></i> Completion Criteria for:
+          <i class="fa fa-check-circle"></i> Completion Criteria for:
       </h5>
       <ul class="list-group list-group-flush">
           <li class="list-group-item">
-              <i class="fas fa-header"></i> Course Title: {{ store.state.node.fullname }}
+              <i class="fa fa-header"></i> Course Title: {{ store.state.node.fullname }}
           </li>
           <li class="list-group-item">
-              <i class="fas fa-tag"></i> Tags: {{ store.state.node.tags }}
+              <i class="fa fa-tag"></i> Tags: {{ store.state.node.tags }}
           </li>
       </ul>
     </div>
@@ -20,7 +20,7 @@
     <div v-if="completions !== null">
       <div class="card-body">
         <h5 class="card-title">
-            <i class="fas fa-arrow-circle-up"></i> Parent Nodes:
+            <i class="fa fa-arrow-circle-up"></i> Parent Nodes:
         </h5>
         <ul class="list-group list-group-flush">
           <template v-if="parentNodes.length > 0">
@@ -65,7 +65,7 @@
 
         <div class="card-body">
           <h5 class="card-title">
-              <i class="fas fa-arrow-circle-down"></i> Child Nodes:
+              <i class="fa fa-arrow-circle-down"></i> Child Nodes:
           </h5>
           <ul class="list-group list-group-flush">
             <template v-if="childNodes.length > 0">

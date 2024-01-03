@@ -26,24 +26,24 @@
   <notifications width="100%" />
     <div>
       <button @click="goBack" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left"></i> Go Back to Overview
+        <i class="fa fa-arrow-left"></i> Go Back to Overview
       </button>
       <h2 class="mt-3">User path for:</h2>
       <div class="card">
     <div v-if="store.state.lpuserpathrelation">
       <div class="card-body">
           <h5 class="card-title">
-              <i class="fas fa-user-circle"></i> {{ store.state.lpuserpathrelation.username }}
+              <i class="fa fa-user-circle"></i> {{ store.state.lpuserpathrelation.username }}
           </h5>
           <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                  <i class="fas fa-user"></i> Firstname: {{ store.state.lpuserpathrelation.firstname }}
+                  <i class="fa fa-user"></i> Firstname: {{ store.state.lpuserpathrelation.firstname }}
               </li>
               <li class="list-group-item">
-                  <i class="fas fa-user"></i> Lastname: {{ store.state.lpuserpathrelation.lastname }}
+                  <i class="fa fa-user"></i> Lastname: {{ store.state.lpuserpathrelation.lastname }}
               </li>
               <li class="list-group-item">
-                  <i class="fas fa-envelope"></i> Email: {{ store.state.lpuserpathrelation.email }}
+                  <i class="fa fa-envelope"></i> Email: {{ store.state.lpuserpathrelation.email }}
               </li>
           </ul>
         </div>

@@ -57,11 +57,10 @@ class learning_path_courses {
         $select = "SELECT s1.*
         FROM (
             SELECT ti.itemid AS course_node_id, c.fullname, c.shortname, c.category, " . $selectagg . "
-            FROM {tag_instance} ti
+            FROM {course} c
+            LEFT JOIN {tag_instance} ti ON ti.itemid = c.id AND ti.itemtype = 'course'
             LEFT JOIN {tag} tag ON ti.tagid = tag.id
-            LEFT JOIN {course} c ON ti.itemid = c.id
             %USERQUERY%
-            WHERE ti.itemtype = 'course'
             GROUP BY ti.itemid, c.id
         ) AS s1 %WHEREQUERY%
         ";
@@ -77,9 +76,9 @@ class learning_path_courses {
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            $userquery = "JOIN (SELECT DISTINCT e.courseid
+            $userquery = "LEFT JOIN (SELECT DISTINCT e.courseid
                 FROM {enrol} e
-                JOIN {user_enrolments} ue ON
+                LEFT JOIN {user_enrolments} ue ON
                 (ue.enrolid = e.id AND ue.userid = :userid)
                 ) en ON (en.courseid = c.id) ";
 

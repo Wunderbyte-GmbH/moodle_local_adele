@@ -110,13 +110,13 @@ const applyFormatting = () => {
     </p>
     <div class="formatting-toolbar">
       <button @click="toggleFormatting('italic')" :class="{ active: isFormattingActive('italic') }">
-        <i class="fas fa-italic"></i>
+        <i class="fa fa-italic"></i>
       </button>
       <button @click="toggleFormatting('bold')" :class="{ active: isFormattingActive('bold') }">
-        <i class="fas fa-bold"></i>
+        <i class="fa fa-bold"></i>
       </button>
       <button @click="toggleFormatting('code')" :class="{ active: isFormattingActive('code') }">
-        <i class="fas fa-code"></i>
+        <i class="fa fa-code"></i>
       </button>
     </div>
     <textarea
