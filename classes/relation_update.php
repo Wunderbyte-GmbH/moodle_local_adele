@@ -64,17 +64,17 @@ class relation_update {
                             $currentcondition = $completionnode;
                             $validationcondition = false;
                             while ( $currentcondition ) {
-                                if ($currentcondition['data']['type'] == 'catquiz') {
+                                if ($currentcondition['data']['label'] == 'catquiz') {
                                     $validationcondition =
-                                        $completioncriteria[$currentcondition['data']['type']][$currentcondition['id']];
-                                    $singlecompletionnode[$currentcondition['data']['type']
+                                        $completioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
+                                    $singlecompletionnode[$currentcondition['data']['label']
                                         . '_' . $currentcondition['id']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['type']
+                                    $validationconditionstring[] = $currentcondition['data']['label']
                                         . '_' . $currentcondition['id'];
                                 } else {
-                                    $validationcondition = $completioncriteria[$currentcondition['data']['type']];
-                                    $singlecompletionnode[$currentcondition['data']['type']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['type'];
+                                    $validationcondition = $completioncriteria[$currentcondition['data']['label']];
+                                    $singlecompletionnode[$currentcondition['data']['label']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label'];
                                 }
                                 // Check if the conditon is true and break if one condition is not met.
                                 if (!$validationcondition) {
