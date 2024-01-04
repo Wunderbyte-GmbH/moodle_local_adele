@@ -239,10 +239,6 @@ function onDrop(event) {
     }
     addNodes([newNode])
 
-    if(intersectedNode.value.closestnode.id == 'starting_node'){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value)
-    }
-
     // align node position after drop, so it's centered to the mouse
     nextTick(() => {
     const node = findNode(newNode.id)
@@ -273,6 +269,9 @@ function onDrop(event) {
     store.state.learninggoal[0].json = {
       tree: tree,
     }
+    if(intersectedNode.value.closestnode.id == 'starting_node'){
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600)
+    }
   } else{
     notify({
       title: 'Node drop refused',
@@ -296,7 +295,7 @@ watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
     if(oldNodes > newNodes){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, true)
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, true)
     }
   },
 );

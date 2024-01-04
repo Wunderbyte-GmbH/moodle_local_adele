@@ -63,7 +63,7 @@ watch(() => store.state.learninggoal[0], (newValue, oldValue) => {
     setNodes([])
     setEdges([])
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800)
 });
 
 

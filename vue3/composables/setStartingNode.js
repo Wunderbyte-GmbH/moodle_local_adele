@@ -16,7 +16,7 @@ let startingNode = {
     parentCourse: '',
   }
 
-const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, backwards = false) => {
+const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, backwards = false) => {
     removeNodes(['starting_node'])
     nextTick(() => {
         let rightStartingNode = 0
@@ -25,6 +25,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, backwards = fa
         nodes.forEach((node) => {
         if(node.parentCourse == 'starting_node'  && 
             node.position.x >= rightStartingNode){
+                console.log(node.position.x)
                 rightStartingNode = node.position.x
                 if(backwards){
                     rightStartingNode += node.dimensions.width/2
@@ -33,7 +34,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, backwards = fa
             }
         })
         if(shifted) {
-            startingNode.position.x = rightStartingNode + 600
+            startingNode.position.x = rightStartingNode + skip
         }
         addNodes([startingNode])
     })
