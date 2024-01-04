@@ -111,10 +111,10 @@ class modquiz implements course_completion {
                 $validcatquiz = false;
                 // Get grade and check if valid.
                 $data = $DB->get_records('quiz_grades',
-                    array(
+                    [
                         'quiz' => $completion['data']['value']['quizid'],
                         'userid' => $userid,
-                    ),
+                    ],
                     'timemodified DESC',
                     'grade',
                     0,
