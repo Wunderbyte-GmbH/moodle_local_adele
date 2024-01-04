@@ -64,7 +64,8 @@ class relation_update {
                             $currentcondition = $completionnode;
                             $validationcondition = false;
                             while ( $currentcondition ) {
-                                if ($currentcondition['data']['label'] == 'catquiz') {
+                                if ($currentcondition['data']['label'] == 'catquiz' ||
+                                    $currentcondition['data']['label'] == 'modquiz') {
                                     $validationcondition =
                                         $completioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
                                     $singlecompletionnode[$currentcondition['data']['label']

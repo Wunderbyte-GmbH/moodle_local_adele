@@ -196,6 +196,10 @@ const store = createStore({
             const result = await ajax('local_adele_get_catquiz_scales', payload);
             return result;
         },
+        async fetchModQuizzes() {
+            const result = await ajax('local_adele_get_mod_quizzes');
+            return result;
+        },
     }
 });
 

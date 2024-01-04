@@ -41,7 +41,7 @@ const toggleVisibility = () => {
 </script>
 
 <template>
-  <div class="custom-node text-center rounded p-3" style="height: 150px; width: 350px;">
+  <div class="custom-node text-center rounded p-3" style="height: 250px; width: 350px;">
     {{ data.name }}
     <button @click="toggleVisibility" 
       style="position: absolute; top: 5px; right: 5px; background: none; border: none;">

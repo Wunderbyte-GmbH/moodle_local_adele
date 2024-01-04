@@ -35,6 +35,7 @@ const prevClosestNode = ref(null);
 // Ref to store intersecting node
 const emit = defineEmits();
 const intersectingNode = ref(null);
+const nodeHeight = '250px';
 
 const availableEdges = ['target_and', 'target_or', 'source_and', 'source_or']
 
@@ -96,7 +97,7 @@ function checkIntersetcion(event, closestNode) {
           opacity: '0.75',
           bgcolor: 'chartreuse',
           infotext: 'Drop to connect here',
-          height: '150px',
+          height: nodeHeight,
           width: '350px',
         }
       }else{
@@ -104,7 +105,7 @@ function checkIntersetcion(event, closestNode) {
           opacity: '0.6',
           bgcolor: 'grey',
           infotext: 'Drop zone',
-          height: '150px',
+          height: nodeHeight,
           width: '350px',
         }
       }
@@ -132,9 +133,9 @@ function drawDropZones(freeEdges, closestNode) {
     }
     //draw some drop zones
     if(freeEdge == 'target_and'){
-      position.y -= 250;
+      position.y -= 350;
     }else if(freeEdge == 'source_and'){
-      position.y += 250;
+      position.y += 350;
     }else if(freeEdge == 'source_or'){
       position.x += 450;
     }else if(freeEdge == 'target_or'){
@@ -146,7 +147,7 @@ function drawDropZones(freeEdges, closestNode) {
         opacity: '0.6',
         bgcolor: 'grey',
         infotext: 'Drop zone',
-        height: '150px',
+        height: nodeHeight,
         width: '350px',
       }
       const newNode = {

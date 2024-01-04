@@ -119,4 +119,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_mod_quizzes' => [
+        'classname' => 'local_adele\external\get_mod_quizzes',
+        'classpath' => '',
+        'description' => 'Get mod quizzes',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
 ];
