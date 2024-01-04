@@ -40,7 +40,6 @@ class learning_path_courses {
      * @return array
      */
     public static function get_availablecourses() {
-        global $DB;
         $list = self::buildsqlquery();
         return array_map(fn($a) => (array)$a, $list);
     }
@@ -54,16 +53,6 @@ class learning_path_courses {
         global $DB, $USER;
         $selectagg = $DB->sql_group_concat('tag.name') . ' as tags';
         $userquery = '';
-        $select = "SELECT s1.*
-        FROM (
-            SELECT ti.itemid AS course_node_id, c.fullname, c.shortname, c.category, " . $selectagg . "
-            FROM {course} c
-            LEFT JOIN {tag_instance} ti ON ti.itemid = c.id AND ti.itemtype = 'course'
-            LEFT JOIN {tag} tag ON ti.tagid = tag.id
-            %USERQUERY%
-            GROUP BY ti.itemid, c.id
-        ) AS s1 %WHEREQUERY%
-        ";
 
         $configadele = get_config('local_adele');
 
@@ -84,8 +73,16 @@ class learning_path_courses {
 
             $whereparamsquery['params']["userid"] = $USER->id;
         }
-
-        $select = str_replace( ['%USERQUERY%', '%WHEREQUERY%'], [$userquery, $whereparamsquery['wherequery']], $select);
+        $select = "SELECT s1.*
+        FROM (
+            SELECT DISTINCT c.id AS course_node_id, c.fullname, c.shortname, c.category, " . $selectagg . "
+            FROM {course} c
+            LEFT JOIN {tag_instance} ti ON ti.itemid = c.id AND ti.itemtype = 'course'
+            LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
+            $userquery .
+            " WHERE c.visible=1
+            GROUP BY ti.itemid, c.id
+        ) AS s1 " . $whereparamsquery['wherequery'];
         return $DB->get_records_sql($select, $whereparamsquery['params']);
     }
 
@@ -117,55 +114,71 @@ class learning_path_courses {
      * @return array
      */
     protected static function build_where_query($configfilters) {
+
+        global $DB;
+
         $params = [];
-        $wherequery = '';
+        $categoryparams = [];
+        $tagqueries = [
+            "(s1.tags OPERATOR :TAG OPERATION ",
+            "s1.tags OPERATOR :TAG OPERATION ",
+            "s1.tags OPERATOR :TAG OPERATION ",
+            "s1.tags OPERATOR :TAG)",
+        ];
+
+        $where = [];
         foreach ($configfilters as $index => $configfilter) {
-            $tagqueries = [
-                "(s1.tags OPERATOR :TAG OR ",
-                "s1.tags OPERATOR :TAG OR ",
-                "s1.tags OPERATOR :TAG OR ",
-                "s1.tags OPERATOR :TAG)",
-            ];
             if (!empty($configfilter[0])) {
                 $indexfilter = 0;
                 $filtercount = count($configfilter);
                 if ($index == 'category') {
-                    $wherequery .= '(';
-                    foreach ($configfilter as $filter) {
-                        $wherequery .= 's1.category = :' . $index . $indexfilter;
-                        $params[$index . $indexfilter] = $filter;
-                        if ($indexfilter + 1 < $filtercount) {
-                            $wherequery .= ' OR ';
-                        }
-                        $indexfilter += 1;
+                    if ($filtercount > 0) {
+                        list($inorequal, $categoryparams) = $DB->get_in_or_equal($configfilter, SQL_PARAMS_NAMED);
+                        $where[] = " s1.category $inorequal  ";
                     }
-                    $wherequery .= ")";
+                    // Because we always get an array with key 0 and empty string from settings.php.
                 } else {
+                    $wheretags = [];
                     $operator = $index == 'include' ? 'LIKE' : 'NOT LIKE';
+                    $operation = $index == 'include' ? 'OR' : 'AND';
                     foreach ($configfilter as $filter) {
+                        $wherequery = '';
                         $tagwildcards = [
                             $filter,
                             $filter . ",%",
-                            "%," . $filter,
-                            "%," . $filter .",%",
+                            "%, " . $filter,
+                            "%, " . $filter .",%",
                         ];
                         foreach ($tagqueries as $indexquery => $tagquery) {
-                            $wherequery .= str_replace(['OPERATOR', 'TAG'], [$operator, $index . $indexfilter], $tagquery);
+                            $wherequery .= str_replace(
+                                ['OPERATOR', 'TAG', 'OPERATION'],
+                                [$operator, $index . $indexfilter, $operation],
+                                $tagquery);
 
                             $params[$index . $indexfilter] = $tagwildcards[$indexquery];
                             $indexfilter += 1;
                         }
+                        if (!empty($wherequery)) {
+                            $wheretags[] = $wherequery;
+                        }
+                    }
+                    if (!empty($wheretags)) {
+                        $where[] = "(" . implode(' OR ', $wheretags) . ")";
                     }
                 }
             }
         }
-        if ($wherequery != '') {
-            $wherequery = 'WHERE ' . str_replace(')(', ') AND (', $wherequery);
+        if (!empty($where)) {
+            $wherequery = " WHERE " . implode(' AND ', $where);
         }
+
+        foreach ($categoryparams as $key => $value) {
+            $params[$key] = $value;
+        }
+
         return [
             'wherequery' => $wherequery,
             'params' => $params,
         ];
-
     }
 }
