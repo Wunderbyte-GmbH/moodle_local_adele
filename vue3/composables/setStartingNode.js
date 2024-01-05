@@ -25,7 +25,6 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, backward
         nodes.forEach((node) => {
         if(node.parentCourse == 'starting_node'  && 
             node.position.x >= rightStartingNode){
-                console.log(node.position.x)
                 rightStartingNode = node.position.x
                 if(backwards){
                     rightStartingNode += node.dimensions.width/2

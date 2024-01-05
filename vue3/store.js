@@ -39,21 +39,22 @@ const store = createStore({
             learninggoals: null,
             learningpaths: null,
             learningpath: null,
-            // availablecourses: null,
-            availablecourses: [ 
-                { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
-                { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
-            ],
-            // learninggoal: null,
-            learninggoal: [ 
-                { "id": 22, "name": "", "description": "", "json": "" } 
-            ],
+            availablecourses: null,
+            // availablecourses: [ 
+            //     { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
+            //     { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
+            // ],
+            learninggoal: null,
+            // learninggoal: [ 
+            //     { "id": 22, "name": "", "description": "", "json": "" } 
+            // ],
             editingadding: false,
             node: null,
             startnode: null,
             editingpretest: false,
             lpuserpathrelations: [],
             lpuserpathrelation: null,
+            feedback: null,
         };
     },
     mutations: {
@@ -199,6 +200,12 @@ const store = createStore({
         async fetchModQuizzes() {
             const result = await ajax('local_adele_get_mod_quizzes');
             return result;
+        },
+        async saveFeedback(context, payload) {
+            // console.log(payload)
+            // console.log(store.state.feedback)
+            // console.log(store.state.learninggoal)
+            return payload;
         },
     }
 });

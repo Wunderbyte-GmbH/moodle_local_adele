@@ -23,9 +23,13 @@
  */ -->
  
  <script setup>
-import { onMounted, ref, watch } from 'vue'
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
+import { computed, watch } from 'vue';
+import { useStore } from 'vuex';
+
+// Load Store 
+const store = useStore();
 
 const props = defineProps({
   data: {
@@ -34,128 +38,61 @@ const props = defineProps({
   },
 });
 
-const minTextareaHeight = 3 // Minimum number of lines
-const lineHeight = 20 // Height of one line in pixels (adjust as needed)
+// Set node data for the modal
+const setFeedbackModal = () => {
+  store.state.feedback = props.data
+};
 
-const calculateExpandedHeight = () => {
-    // Calculate the number of lines in the textarea content
-    let numberOfLines = props.data.feedback.split('\n').length
+const processedFeedback = computed(() => {
+  const maxTextLength = 150; // Set your desired maximum text length
+  const feedback = props.data.feedback;
 
-    // Calculate the number of lines based on the total number of characters
-    const numberOfCharacters = props.data.feedback.length
-    const charactersPerLine = 25 // Adjust as needed based on your content
-    if(numberOfLines < Math.ceil(numberOfCharacters / charactersPerLine)){
-        numberOfLines = Math.ceil(numberOfCharacters / charactersPerLine)
-    }
-  // Set the height based on the content, with a minimum of 3 lines
-  textareaHeight.value = `${Math.max(minTextareaHeight, numberOfLines) * lineHeight}px`
-}
-
-const handleFocus = () => {
-  // Set the expanded height when focused
-  calculateExpandedHeight()
-}
-
-const handleBlur = () => {
-  // Collapse the textarea to the minimum height when focus is lost
-  textareaHeight.value = `${minTextareaHeight * lineHeight}px`
-}
-
-// Set the initial height to the minimum height
-const textareaHeight = ref(`${minTextareaHeight * lineHeight}px`)
-
-// Watch for changes in feedbackText and trigger calculateExpandedHeight
-watch(() => props.data.feedback, calculateExpandedHeight)
-
-const formattingState = ref({
-  italic: false,
-  bold: false,
-  code: false,
+  if (feedback && feedback.length > maxTextLength) {
+    // If the feedback exceeds the maximum length, truncate it and add ellipsis
+    return feedback.slice(0, maxTextLength) + '...';
+  } else {
+    return feedback;
+  }
 });
-
-const toggleFormatting = (format) => {
-  formattingState.value[format] = !formattingState.value[format];
-  applyFormatting();
-};
-
-const isFormattingActive = (format) => formattingState.value[format];
-
-const applyFormatting = () => {
-  let formattedText = props.data.feedback;
-
-  if (formattingState.value.italic) {
-    formattedText = `*${formattedText}*`;
-  }
-
-  if (formattingState.value.bold) {
-    formattedText = `**${formattedText}**`;
-  }
-
-  if (formattingState.value.code) {
-    formattedText = `\`${formattedText}\``;
-  }
-  props.data.feedback = formattedText;
-  calculateExpandedHeight();
-};
 
 </script>
 
 <template>
-  <div :class="{ 'custom-node': true, 'has-text': props.data.feedback }" 
-    class="custom-node text-center rounded p-3" 
-    style="width: 350px; height: 150px;"
-    >
-    <p style="margin-bottom: 0px;">
-        Feedback
-    </p>
-    <div class="formatting-toolbar">
-      <button @click="toggleFormatting('italic')" :class="{ active: isFormattingActive('italic') }">
-        <i class="fa fa-italic"></i>
-      </button>
-      <button @click="toggleFormatting('bold')" :class="{ active: isFormattingActive('bold') }">
-        <i class="fa fa-bold"></i>
-      </button>
-      <button @click="toggleFormatting('code')" :class="{ active: isFormattingActive('code') }">
-        <i class="fa fa-code"></i>
-      </button>
+  <div
+    :class="{ 'custom-node': true, 'has-text': props.data.feedback }"
+    class="custom-node rounded p-3"
+    style="width: 350px; height: 200px;"
+  >
+    <div class="text-center">
+      <h5 class="mb-1">Feedback</h5>
+
+      <div v-if="processedFeedback" class="feedback-section">
+        <div v-html="processedFeedback"></div>
+      </div>
+
+      <div v-else class="no-feedback-section">
+        <p class="text-muted">No feedback set...</p>
+      </div>
+
+      <div>
+        <button
+          type="button"
+          class="btn btn-secondary m-2"
+          @click="setFeedbackModal"
+          data-toggle="modal"
+          data-target="#feedbackModal"
+          style="opacity: 1 !important;"
+        >
+          Edit Feedback
+        </button>
+      </div>
     </div>
-    <textarea
-      v-model="props.data.feedback"
-      @focus="handleFocus"
-      @blur="handleBlur"
-      :style="{ height: textareaHeight }"
-      class="custom-textarea"
-      placeholder="<b>Type your feedback here...</b>"
-    ></textarea>
+
+    <Handle id="source_feedback" type="source" :position="Position.Bottom" />
   </div>
-  <Handle id="source_feedback" type="source" :position="Position.Bottom" />
 </template>
 
 <style scoped>
-
-.formatting-toolbar {
-  margin-bottom: 3px;
-  display: flex;
-  justify-content: center;
-}
-
-.formatting-toolbar button {
-  background-color: #4CAF50;
-  border: 1px solid #45a049;
-  color: white;
-  margin: 2px;
-  padding: 3px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.formatting-toolbar button:hover {
-  background-color: #45a049;
-}
-
-.formatting-toolbar button.active {
-  background-color: #3498db;
-}
 .custom-node {
   background-color: #6495ED;
   padding: 10px;
@@ -167,10 +104,18 @@ const applyFormatting = () => {
   opacity: 1;
 }
 
-.custom-textarea {
-  width: 100%;
-  box-sizing: border-box;
-  resize: none; /* Disable textarea resizing */
-  overflow: hidden; 
+.feedback-section {
+  background-color: #f8f9fa; /* Set your desired background color */
+  padding: 3px;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
+
+.no-feedback-section {
+  background-color: #f8f9fa; /* Set your desired background color */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 </style>

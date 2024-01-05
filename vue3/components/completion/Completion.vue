@@ -39,6 +39,8 @@
       </div>
 
         <div class="dndflowcompletion" @drop="onDrop" >
+          <FeedbackModal >
+          </FeedbackModal>
             <VueFlow @dragover="onDragOver"
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
                 <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
@@ -106,6 +108,7 @@ import CompletionLine from '../edges/CompletionLine.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import FeedbackNode from '../nodes/feedbackNode.vue'
+import FeedbackModal from '../modals/FeedbackModal.vue'
 
 const { nodes, edges, addNodes, project, vueFlowRef, onConnect, addEdges, findNode } = useVueFlow({
   nodes: [],})
