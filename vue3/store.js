@@ -49,6 +49,7 @@ const store = createStore({
             //     { "id": 22, "name": "", "description": "", "json": "" } 
             // ],
             editingadding: false,
+            editingrestriction: false,
             node: null,
             startnode: null,
             editingpretest: false,

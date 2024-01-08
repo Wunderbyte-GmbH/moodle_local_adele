@@ -38,16 +38,16 @@
               <div class="btn-toolbar" role="toolbar" aria-label="Formatting Buttons">
                 <div class="btn-group me-2" role="group" aria-label="Bold, Italic, Underline, and Code Buttons">
                   <button type="button" class="btn btn-secondary btn-bold border" @click="toggleFormatting('bold')">
-                    <i class="fas fa-bold"></i>
+                    <i class="fa fa-bold"></i>
                   </button>
                   <button type="button" class="btn btn-secondary btn-italic border" @click="toggleFormatting('italic')">
-                    <i class="fas fa-italic"></i>
+                    <i class="fa fa-italic"></i>
                   </button>
                   <button type="button" class="btn btn-secondary btn-underline border" @click="toggleFormatting('underline')">
-                    <i class="fas fa-underline"></i>
+                    <i class="fa fa-underline"></i>
                   </button>
                   <button type="button" class="btn btn-secondary btn-code border" @click="toggleFormatting('code')">
-                    <i class="fas fa-code"></i>
+                    <i class="fa fa-code"></i>
                   </button>
                 </div>
               </div>

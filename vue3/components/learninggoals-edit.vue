@@ -45,11 +45,12 @@
 <template>
     <div>
       <notifications width="100%" />
-        <div v-if="$store.state.editingadding == false && $store.state.editingpretest == false" class="fade-in">
+        <div v-if="$store.state.editingadding == false &&
+          $store.state.editingpretest == false &&
+          $store.state.editingrestriction == false" class="fade-in">
             <LearningPathList />
         </div>
-        <div v-if="$store.state.editingadding == true" class="fade-in">
-
+        <div v-else-if="$store.state.editingadding == true" class="fade-in">
           <div class="card p-4">
             <h2 class="mt-3">{{ store.state.strings.learninggoal_form_title_edit }}</h2>
             <div class="card-body">
@@ -99,8 +100,11 @@
           </div>
 
         </div>
-        <div v-if="$store.state.editingpretest == true" class="fade-in">
+        <div v-else-if="$store.state.editingpretest == true" class="fade-in">
           <Completion />
+        </div>
+        <div v-else-if="$store.state.editingrestriction == true" class="fade-in">
+          <Restriction />
         </div>
     </div>
 </template>
@@ -112,6 +116,7 @@ import { onBeforeRouteUpdate } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Completion from './completion/Completion.vue'
+import Restriction from './restriction/Restriction.vue'
 import LearingPath from './flowchart/LearningPath.vue'
 import LearningPathList from './LearningPathList.vue'
 

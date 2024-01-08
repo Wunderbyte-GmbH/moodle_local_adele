@@ -49,6 +49,14 @@ const setPretestView = () => {
   store.state.editingadding = false
 };
 
+// Set node data for the modal
+const setRestrictionView = () => {
+  store.state.node = props.data
+  store.state.editingpretest = false
+  store.state.editingadding = false
+  store.state.editingrestriction = true
+};
+
 // Set the node that handle has been clicked
 const setStartNode = (node_id) => {
   store.commit('setstartNode', {
@@ -63,21 +71,24 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
 </script>
 
 <template>
-  <div class="custom-node text-center rounded p-3"
-    style="height: 200px; width: 400px;">
-    <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
-    <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
+  <div class="custom-node text-center rounded p-3" style="height: 200px; width: 400px;">
+    <div>
+      <button type="button" class="btn btn-secondary" @click="setRestrictionView">
+        <i class="fa fa-cogs"></i> Edit Restrictions
+      </button>
+    </div>
+    <div class="mb-2"><strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}</div>
     <div>
       <button type="button" class="btn btn-primary m-2" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
-        {{ store.state.strings.edit_course_node }}
+        <i class="fa fa-edit"></i> {{ store.state.strings.edit_course_node }}
       </button>
       <button type="button" class="btn btn-secondary" @click="setPretestView">
-        {{ store.state.strings.edit_node_pretest }}
+        <i class="fa fa-tasks"></i> {{ store.state.strings.edit_node_pretest }}
       </button>
     </div>
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
-  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
+  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
+  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
 </template>
 
 <style scoped>
