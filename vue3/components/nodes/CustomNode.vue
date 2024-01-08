@@ -27,6 +27,7 @@
 import { Handle, Position } from '@vue-flow/core'
 import { defineProps, computed  } from 'vue';
 import { useStore } from 'vuex';
+import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 
 // Load Store 
 const store = useStore();
@@ -79,13 +80,14 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
     </div>
     <div class="mb-2"><strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}</div>
     <div>
-      <button type="button" class="btn btn-primary m-2" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
+      <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
         <i class="fa fa-edit"></i> {{ store.state.strings.edit_course_node }}
       </button>
       <button type="button" class="btn btn-secondary" @click="setPretestView">
         <i class="fa fa-tasks"></i> {{ store.state.strings.edit_node_pretest }}
       </button>
     </div>
+    <OverviewRestrictionCompletion :node=data />
   </div>
   <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
   <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
