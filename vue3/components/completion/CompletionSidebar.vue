@@ -180,7 +180,7 @@ function drawDropZones(freeEdges, closestNode) {
       sourceHandle: freeEdge,
       target: newNode.id,
       targetHandle: targetHandle,
-      type: 'completion',
+      type: 'condition',
       data: edgeData,
     };
     // Add the new edge
@@ -228,16 +228,16 @@ function onDragEnd(){
 
 // Defined props from the parent component
 const props = defineProps({
-  completions: Array,
+  conditions: Array,
   strings: Object,
   nodes: Array,
   edges: Array,
 });
 
 // Calculate searched courses
-const filteredCompletions = computed(() => {
-  return props.completions.filter(completion =>
-  completion.description.toLowerCase().includes(searchTerm.value.toLowerCase().slice(1))
+const filteredConditions = computed(() => {
+  return props.conditions.filter(condition =>
+  condition.description.toLowerCase().includes(searchTerm.value.toLowerCase().slice(1))
   );
 });
 
@@ -250,13 +250,13 @@ const filteredCompletions = computed(() => {
     <input class="form-control" v-model="searchTerm" :placeholder="strings.placeholder_search" />
     <div class="learning-path-nodes-container">
       <div class="nodes">
-        <template v-for="completion in filteredCompletions" :key="completion.description">
+        <template v-for="condition in filteredConditions" :key="condition.description">
           <div class="vue-flow__node-input mt-1" :draggable="true" 
-            @dragstart="onDragStart($event, completion, this)" 
-            @drag="onDrag($event, completion)"
+            @dragstart="onDragStart($event, condition, this)" 
+            @drag="onDrag($event, condition)"
             @dragend="onDragEnd()"
-            :data="completion" style="width: 100%;">
-            {{ completion.description }}
+            :data="condition" style="width: 100%;">
+            {{ condition.description }}
           </div>
         </template>
       </div>

@@ -25,8 +25,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_adele\restriction\conditions;
+namespace local_adele\course_restriction\conditions;
 
+use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,13 +41,12 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timed {
+class manual implements course_restriction {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_TIMED;
-    /** @var string $type of the redered condition in frontend. */
-    public $type = 'date';
-
+    public $id = COURSES_COND_MANUALLY;
+    /** @var string $label of the redered condition in frontend. */
+    public $label = 'manual';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -63,14 +63,13 @@ class timed {
     public function get_description():array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
-        $label = $this->get_label_string();
+        $label = $this->label;
 
         return [
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
             'label' => $label,
-            'type' => $this->type,
         ];
     }
 
@@ -80,7 +79,7 @@ class timed {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_timed', 'local_adele');
+        $description = get_string('course_description_condition_manually', 'local_adele');
         return $description;
     }
 
@@ -90,17 +89,21 @@ class timed {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_timed', 'local_adele');
+        $description = get_string('course_name_condition_manually', 'local_adele');
         return $description;
     }
 
     /**
      * Helper function to return localized description strings.
-     *
-     * @return string
+     * @param array $node
+     * @param int $userid
+     * @return boolean
      */
-    private function get_label_string() {
-        $label = get_string('course_label_condition_timed', 'local_adele');
-        return $label;
+    public function get_restriction_status($node, $userid) {
+        if (isset($node['data']['manual'] ) && $node['data']['manual']
+            && $node['data']['value']) {
+            return true;
+        }
+        return false;
     }
 }

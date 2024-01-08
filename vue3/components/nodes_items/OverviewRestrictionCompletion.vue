@@ -4,7 +4,7 @@
     import { useStore } from 'vuex';
 
     // Colors for restriction and completion
-    const restrictionColor = ref("#0f78e9");
+    const restrictionColor = ref("#539be7");
     const completionColor = ref("#f1b00c");
 
     // Load Store 
@@ -57,7 +57,6 @@ function getConditions(completion_nodes) {
 }
 
 const toggleCards = () => {
-    console.log('inside')
   showCard.value = !showCard.value;
 };
 

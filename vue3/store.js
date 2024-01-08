@@ -190,6 +190,10 @@ const store = createStore({
             const result = await ajax('local_adele_get_completions');
             return result;
         },
+        async fetchRestrictions() {
+            const result = await ajax('local_adele_get_restrictions');
+            return result;
+        },
         async fetchCatquizTests() {
             const result = await ajax('local_adele_get_catquiz_tests');
             return result;
@@ -201,12 +205,6 @@ const store = createStore({
         async fetchModQuizzes() {
             const result = await ajax('local_adele_get_mod_quizzes');
             return result;
-        },
-        async saveFeedback(context, payload) {
-            // console.log(payload)
-            // console.log(store.state.feedback)
-            // console.log(store.state.learninggoal)
-            return payload;
         },
     }
 });

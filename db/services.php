@@ -79,6 +79,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_restrictions' => [
+        'classname' => 'local_adele\external\get_restrictions',
+        'classpath' => '',
+        'description' => 'Get all restrictions.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
     'local_adele_get_user_path_relations' => [
         'classname' => 'local_adele\external\get_lp_user_path_relations',
         'classpath' => '',

@@ -25,28 +25,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_adele\restriction\conditions;
-
-
+namespace local_adele\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/adele/lib.php');
 
 /**
- * Class for a single learning path course condition.
+ * Interface for a learning path course conditions.
  *
  * @package     local_adele
  * @author      Jacob Viertel
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manually {
 
-    /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_MANUALLY;
-    /** @var string $type of the redered condition in frontend. */
-    public $type = 'checkbox';
+interface course_restriction {
+
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -57,50 +52,26 @@ class manually {
      * (when displaying all information about the activity) and 'student' cases
      * (when displaying only conditions they don't meet).
      *
-     * @return array availability and Information string (for admin) about all restrictions on
+     * @return array Information string (for admin) about all restrictions on
      *   this item
      */
-    public function get_description():array {
-        $description = $this->get_description_string();
-        $name = $this->get_name_string();
-        $label = $this->get_label_string();
-
-        return [
-            'id' => $this->id,
-            'name' => $name,
-            'description' => $description,
-            'label' => $label,
-            'type' => $this->type,
-        ];
-    }
+    public function get_description();
 
     /**
-     * Helper function to return localized description strings.
+     * Obtains a string describing this restriction (whether or not
+     * it actually applies). Used to obtain information that is displayed to
+     * students if the activity is not available to them, and for staff to see
+     * what conditions are.
      *
-     * @return string
+     * The $full parameter can be used to distinguish between 'staff' cases
+     * (when displaying all information about the activity) and 'student' cases
+     * (when displaying only conditions they don't meet).
+     *
+     * @param array $node
+     * @param int $userid
+     * @return array Information string (for admin) about all restrictions on
+     *   this item
      */
-    private function get_description_string() {
-        $description = get_string('course_description_condition_manually', 'local_adele');
-        return $description;
-    }
+    public function get_restriction_status($node, $userid);
 
-    /**
-     * Helper function to return localized description strings.
-     *
-     * @return string
-     */
-    private function get_name_string() {
-        $description = get_string('course_name_condition_manually', 'local_adele');
-        return $description;
-    }
-
-    /**
-     * Helper function to return localized description strings.
-     *
-     * @return string
-     */
-    private function get_label_string() {
-        $label = get_string('course_label_condition_manually', 'local_adele');
-        return $label;
-    }
 }

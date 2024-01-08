@@ -35,12 +35,6 @@ import recalculateParentChild from '../../composables/recalculateParentChild';
 
 // Load Store and Router
 const store = useStore();
-
-// Defined props from the parent component
-const props = defineProps({
-  condition: String,
-});
-
 const { onPaneReady, toObject } = useVueFlow()
 
 // Emit to parent component
@@ -52,17 +46,17 @@ function toggleClass() {
 
 // Watch for changes of the learning path
 if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
-    let condition = store.state.learninggoal[0].json.tree.nodes.filter(node => {
+    let restriction = store.state.learninggoal[0].json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
-    loadFlowChart(condition[0][props.condition])
+    loadFlowChart(restriction[0].restriction)
 }
 
 // Prepare and save learning path
 const onSave = () => {
-  let condition = toObject();
-  condition = removeDropzones(condition)
-  const singleNodes = standaloneNodeCheck(condition)
+  let restriction = toObject();
+  restriction = removeDropzones(restriction)
+  const singleNodes = standaloneNodeCheck(restriction)
   if (singleNodes) {
     notify({
         title: 'Invalid Path',
@@ -70,11 +64,11 @@ const onSave = () => {
         type: 'error'
       });
   } else{
-    condition = recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
+    restriction = recalculateParentChild(restriction, 'parentCondition', 'childCondition', 'starting_condition')
     //save learning path
     store.state.learninggoal[0].json.tree.nodes = store.state.learninggoal[0].json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
-          return { ...element_node, [props.condition]: condition };
+          return { ...element_node, restriction: restriction };
         }
         return element_node;
     });
@@ -82,6 +76,8 @@ const onSave = () => {
     store.dispatch('saveLearningpath', store.state.learninggoal[0]);
     store.dispatch('fetchLearningpaths');
     store.state.learninggoal[0].json = JSON.parse(store.state.learninggoal[0].json); 
+  
+  
     onCancel()
     notify({
       title: store.state.strings.title_save,
@@ -102,7 +98,6 @@ const onCancel = () => {
 onPaneReady(({ fitView,}) => {
   fitView({ padding: 0.2 })
 })
-
 </script>
 
 <template>

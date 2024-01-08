@@ -48,6 +48,8 @@ const setPretestView = () => {
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
+  store.state.editingrestriction = false
+
 };
 
 // Set node data for the modal

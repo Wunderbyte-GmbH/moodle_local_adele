@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import CompletionItem from '../completion/CompletionItem.vue'
+import RestrictionItem from '../restriction/RestrictionItem.vue'
 
 const props = defineProps({
   data: {
@@ -51,7 +51,7 @@ const toggleVisibility = () => {
           'strikethrough': !props.data.visibility }">
       </i>
     </button>
-    <CompletionItem :completion="data" />
+    <RestrictionItem :restriction="data" />
   </div>
   <Handle id="target_and" type="target" :position="Position.Top"/>
   <Handle id="source_and" type="source" :position="Position.Bottom"/>

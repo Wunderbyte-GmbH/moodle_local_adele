@@ -18,25 +18,7 @@
     </div>
 
     <div v-if="completions !== null">
-      <div class="card-body">
-        <h5 class="card-title">
-            <i class="fa fa-arrow-circle-up"></i> Parent Nodes:
-        </h5>
-        <ul class="list-group list-group-flush">
-          <template v-if="parentNodes.length > 0">
-            <div v-for="parent in parentNodes">
-              <li class="list-group-item">
-                {{ parent.data.fullname }}
-              </li>
-            </div>
-          </template>
-          <template v-else>
-            <li class="list-group-item">
-              No parent nodes found.
-            </li>
-          </template>
-        </ul>
-      </div>
+      <ParentNodes :parentNodes="parentNodes" />
 
         <div class="dndflowcompletion" @drop="onDrop" >
           <FeedbackModal >
@@ -53,39 +35,21 @@
                 <template #node-feedback="{ data }">
                     <FeedbackNode :data="data" />
                 </template>
-                <template #edge-completion="props" >
+                <template #edge-condition="props" >
                   <CompletionLine v-bind="props"/>
                 </template>
                 <MiniMap nodeColor="grey" />
             </VueFlow>
-            <Sidebar :completions="completions" 
+            <Sidebar :conditions="completions" 
               :strings="store.state.strings" 
               :nodes = nodes
               :edges = edges
               @nodesIntersected="handleNodesIntersected" />
         </div>
 
-        <div class="card-body">
-          <h5 class="card-title">
-              <i class="fa fa-arrow-circle-down"></i> Child Nodes:
-          </h5>
-          <ul class="list-group list-group-flush">
-            <template v-if="childNodes.length > 0">
-              <div v-for="child in childNodes">
-                <li class="list-group-item">
-                  {{ child.data.fullname }}
-                </li>
-              </div>
-            </template>
-            <template v-else>
-              <li class="list-group-item">
-                No child nodes found.
-              </li>
-            </template>
-          </ul>
-        </div>
+        <ChildNodes :childNodes="childNodes" />
           <div class="d-flex justify-content-center">
-            <Controls @change-class="toggleClass" />
+            <Controls @change-class="toggleClass" :condition='"completion"'/>
           </div>
     </div>
     <div v-else>
@@ -104,11 +68,13 @@ import Controls from './CompletionControls.vue'
 import CompletionNode from '../nodes/CompletionNode.vue'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
-import CompletionLine from '../edges/CompletionLine.vue'
+import CompletionLine from '../edges/ConditionLine.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import FeedbackNode from '../nodes/feedbackNode.vue'
 import FeedbackModal from '../modals/FeedbackModal.vue'
+import ChildNodes from '../charthelper/childNodes.vue'
+import ParentNodes from '../charthelper/parentNodes.vue'
 
 const { nodes, edges, addNodes, project, vueFlowRef, onConnect, addEdges, findNode } = useVueFlow({
   nodes: [],})
@@ -232,7 +198,7 @@ function onDrop(event) {
         sourceHandle: intersectedNode.value.dropzone.id,
         target: newNode.id,
         targetHandle: targetHandle,
-        type: 'completion',
+        type: 'condition',
         data: edgeData,
       };
       // Add the new edge
