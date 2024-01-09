@@ -149,7 +149,7 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param array $completionnodepaths
+     * @param array $conditionnodepaths
      * @return array
      */
     public static function getconditionnode($conditionnodepaths) {
