@@ -101,7 +101,6 @@ class timed implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-
         return true;
     }
 }

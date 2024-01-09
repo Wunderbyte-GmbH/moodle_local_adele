@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_adele\course_completion;
+namespace local_adele\course_restriction;
 
 /**
  *
@@ -32,7 +32,7 @@ namespace local_adele\course_completion;
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_completion_status {
+class course_restriction_status {
 
     /** @var int userid for a given user */
     protected $userid;
