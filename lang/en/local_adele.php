@@ -126,8 +126,10 @@ $string['node_coursefullname'] = 'Full Coursename:';
 $string['node_courseshortname'] = 'Short Coursename:';
 
 // Conditions description.
-$string['course_description_condition_manually'] = 'Course will be completed manually';
-$string['course_name_condition_manually'] = 'Course completion checkbox';
+$string['course_description_condition_completion_manual'] = 'Course will be completed manually';
+$string['course_name_condition_completion_manual'] = 'Course completion checkbox';
+$string['course_description_condition_restriction_manual'] = 'Access will be granted manually';
+$string['course_name_condition_restriction_manual'] = 'Course restriction checkbox';
 $string['course_description_condition_timed'] = 'Course has to be completed due to a given date ';
 $string['course_name_condition_timed'] = 'Course determination date';
 $string['course_description_condition_course_completed'] = 'Course has been completed by student';

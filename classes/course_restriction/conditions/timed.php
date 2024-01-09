@@ -101,6 +101,18 @@ class timed implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-        return true;
+        $timed = [];
+        foreach ($node['restriction']['nodes'] as $restrictionnode) {
+            if ($restrictionnode['data']['label'] == 'timed') {
+                $validtime = false;
+                $datetimestamp = strtotime($restrictionnode['data']['value']);
+                $currenttimestamp = strtotime(date('Y-m-d'));
+                if ($datetimestamp <= $currenttimestamp) {
+                    $validtime = true;
+                }
+                $timed[$restrictionnode['id']] = $validtime;
+            }
+        }
+        return $timed;
     }
 }
