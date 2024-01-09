@@ -1,6 +1,6 @@
 <template>
   <div v-for="output_item in output_items">
-    <component :is="getOutputLabel(output_item)" v-model="data.manualcompletionvalue" :data="data"/>
+    <component :is="getOutputLabel(output_item)" v-model="data.manualrestrictionvalue" :data="data"/>
   </div>
 </template>
 

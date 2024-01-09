@@ -5,6 +5,7 @@
 <script setup>
 import { computed } from 'vue';
 import manual from '../restriction/conditions/manual.vue'
+import manual_output from '../restriction/conditions_output/manual_output.vue'
 import timed from '../restriction/conditions/timed.vue'
 
 const props = defineProps(['restriction']);
@@ -15,6 +16,8 @@ const dynamicComponent = computed(() => {
       return manual;
     case 'timed':
       return timed;
+    case 'manual_output':
+      return manual_output;
     default:
       return null;
   }

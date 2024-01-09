@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace local_adele;
 
 use local_adele\course_completion\course_completion_status;
+use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
 
 defined('MOODLE_INTERNAL') || die();
@@ -54,8 +55,11 @@ class relation_update {
         if ($userpath) {
             foreach ($userpath->json['tree']['nodes'] as $node) {
                 $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
+                $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath->user_id);
                 $completionnodepaths = [];
+                $restrictionnodepaths = [];
                 $singlecompletionnode = [];
+                $singlerestrictionnode = [];
                 if (isset($node['completion'])) {
                     foreach ($node['completion']['nodes'] as $completionnode) {
                         $failedcompletion = false;
@@ -91,11 +95,49 @@ class relation_update {
                         }
                     }
                 }
-                $completionnode = self::getcompletionnode($completionnodepaths);
+                if (isset($node['restriction'])) {
+                    foreach ($node['restriction']['nodes'] as $restrictionnnode) {
+                        $failedrestriction = false;
+                        $validationconditionstring = [];
+                        if ($restrictionnnode['parentCondition'][0] == 'starting_condition') {
+                            $currentcondition = $restrictionnnode;
+                            $validationcondition = false;
+                            while ( $currentcondition ) {
+                                if ($currentcondition['data']['label'] == 'timed' ) {
+                                    $validationcondition =
+                                        $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
+                                    $singlerestrictionnode[$currentcondition['data']['label']
+                                        . '_' . $currentcondition['id']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label']
+                                        . '_' . $currentcondition['id'];
+                                } else {
+                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']];
+                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label'];
+                                }
+                                // Check if the conditon is true and break if one condition is not met.
+                                if (!$validationcondition) {
+                                    $failedrestriction = true;
+                                }
+                                // Get next Condition and return null if no child node exsists.
+                                $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
+                                    $currentcondition['childCondition'], 'id');
+                            }
+                            if ($validationcondition && !$failedrestriction) {
+                                $restrictionnodepaths[] = $validationconditionstring;
+                            }
+                        }
+                    }
+                }
+                $completionnode = self::getconditionnode($completionnodepaths);
+                $restrictionnode = self::getconditionnode($restrictionnodepaths);
                 $userpath->json['user_path_relation'][$node['id']] = [
                     'completioncriteria' => $completioncriteria,
                     'completionnode' => $completionnode,
                     'singlecompletionnode' => $singlecompletionnode,
+                    'restrictioncriteria' => $restrictioncriteria,
+                    'restrictionnode' => $restrictionnode,
+                    'singlerestrictionnode' => $singlerestrictionnode,
                 ];
                 // Match completions.
             }
@@ -107,15 +149,15 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param array $completionnodepaths
+     * @param array $conditionnodepaths
      * @return array
      */
-    public static function getcompletionnode($completionnodepaths) {
+    public static function getconditionnode($conditionnodepaths) {
         // TODO sort the valid completion paths.
-        $valid = count($completionnodepaths) ? true : false;
+        $valid = count($conditionnodepaths) ? true : false;
         return [
             'valid' => $valid,
-            'conditions' => $completionnodepaths,
+            'conditions' => $conditionnodepaths,
         ];
     }
 

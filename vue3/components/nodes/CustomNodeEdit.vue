@@ -28,6 +28,7 @@ import { Handle, Position } from '@vue-flow/core'
 import { defineProps, computed, ref  } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
+import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 
 // Load Store 
 const store = useStore();
@@ -49,10 +50,15 @@ const nodeBackgroundColor = computed(() => {
 const sourceHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
-const isTableVisible = ref(false);
+const isCompletionVisible = ref(false);
+const isRestrictionVisible = ref(false);
 
-const toggleTable = () => {
-  isTableVisible.value = !isTableVisible.value;
+const toggleTable = (condition) => {
+  const otherCondition = condition == 'Completion' ? 'Restriction' : 'Completion';
+  const conditionRef = eval(`is${condition}Visible`);
+  conditionRef.value = !conditionRef.value;
+  const otherconditionRef = eval(`is${otherCondition}Visible`);
+  otherconditionRef.value = false;
 };
 
 </script>
@@ -61,15 +67,17 @@ const toggleTable = () => {
   <div class="custom-node text-center rounded p-3"
     :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]">
     <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
-    <div class="mb-2"><b>{{ store.state.strings.node_courseshortname }}</b> {{ data.shortname }}</div>
-    <div v-if="data.manual">
-      <CompletionOutPutItem :completion="data" />
+    <div v-if="data.manualrestriction">
+      <RestrictionOutPutItem :data="data" />
+    </div>
+    <div v-if="data.manualcompletion">
+      <CompletionOutPutItem :data="data" />
     </div>
     <div v-if="data.completion.singlecompletionnode">
-      <button class="btn btn-link" @click="toggleTable" aria-expanded="false" aria-controls="collapseTable">
-        {{ isTableVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
+      <button class="btn btn-link" @click="toggleTable('Completion')" aria-expanded="false" aria-controls="collapseTable">
+        {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
       </button>
-      <div v-show="isTableVisible" class="table-container">
+      <div v-show="isCompletionVisible" class="table-container">
         <table class="table table-bordered table-hover fancy-table">
           <thead class="thead-light">
             <tr>
@@ -79,6 +87,30 @@ const toggleTable = () => {
           </thead>
           <tbody>
             <tr v-for="(value, key) in data.completion.singlecompletionnode" :key="key">
+              <td>{{ key }}</td>
+              <td>
+                {{ value }}
+                <span v-if="value" class="text-success">&#10004;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div v-if="data.completion.singlerestrictionnode">
+      <button class="btn btn-link" @click="toggleTable('Restriction')" aria-expanded="false" aria-controls="collapseTable">
+        {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
+      </button>
+      <div v-show="isRestrictionVisible" class="table-container">
+        <table class="table table-bordered table-hover fancy-table">
+          <thead class="thead-light">
+            <tr>
+              <th>Key</th>
+              <th>Checkmark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(value, key) in data.completion.singlerestrictionnode" :key="key">
               <td>{{ key }}</td>
               <td>
                 {{ value }}

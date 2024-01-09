@@ -80,7 +80,7 @@ class manual implements course_completion {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_manually', 'local_adele');
+        $description = get_string('course_description_condition_completion_manual', 'local_adele');
         return $description;
     }
 
@@ -90,7 +90,7 @@ class manual implements course_completion {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_manually', 'local_adele');
+        $description = get_string('course_name_condition_completion_manual', 'local_adele');
         return $description;
     }
 
@@ -101,8 +101,8 @@ class manual implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        if (isset($node['data']['manual'] ) && $node['data']['manual']
-            && $node['data']['value']) {
+        if (isset($node['data']['manualcompletion'] ) && $node['data']['manualcompletion']
+            && $node['data']['manualcompletionvalue']) {
             return true;
         }
         return false;

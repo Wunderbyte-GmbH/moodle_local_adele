@@ -378,15 +378,32 @@ class learning_paths {
             $node->deletable = false;
             $node->data->completion = $json->user_path_relation->{$node->id} ?? false;
             $node->data->manual = false;
-            if ($node->completion && $node->completion->nodes) {
-                foreach ($node->completion->nodes as $completionnode) {
-                    if ($completionnode->data->label == 'manual') {
-                        $node->data->manual = true;
+            $node = self::checkmanualcondition($node);
+        }
+        return json_encode($json);
+    }
+
+    /**
+     * Get user path relation.
+     *
+     * @param object $node
+     * @return array
+     */
+    public static function checkmanualcondition($node) {
+        $conditions = [
+            'completion',
+            'restriction',
+        ];
+        foreach ($conditions as $condition) {
+            if ($node->{$condition} && $node->{$condition}->nodes) {
+                foreach ($node->{$condition}->nodes as $conditionnode) {
+                    if ($conditionnode->data->label == 'manual') {
+                        $node->data->{ 'manual' . $condition} = true;
                     }
                 }
             }
         }
-        return json_encode($json);
+        return $node;
     }
 
 

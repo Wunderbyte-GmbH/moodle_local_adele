@@ -79,7 +79,7 @@ class manual implements course_restriction {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_manually', 'local_adele');
+        $description = get_string('course_description_condition_restriction_manual', 'local_adele');
         return $description;
     }
 
@@ -89,7 +89,7 @@ class manual implements course_restriction {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_manually', 'local_adele');
+        $description = get_string('course_name_condition_restriction_manual', 'local_adele');
         return $description;
     }
 
@@ -100,8 +100,8 @@ class manual implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-        if (isset($node['data']['manual'] ) && $node['data']['manual']
-            && $node['data']['value']) {
+        if (isset($node['data']['manualrestriction'] ) && $node['data']['manualrestriction']
+            && $node['data']['manualrestrictionvalue']) {
             return true;
         }
         return false;
