@@ -172,7 +172,7 @@ class relation_update {
     public static function searchnestedarray($haystack, $needle, $key) {
         foreach ($haystack as $item) {
             foreach ($needle as $need) {
-                if ( !str_contains($need, '_feedback' )) {
+                if ( !strpos($need, '_feedback' )) {
                     if (isset($item[$key]) && $item[$key] === $need) {
                         return $item;
                     }
