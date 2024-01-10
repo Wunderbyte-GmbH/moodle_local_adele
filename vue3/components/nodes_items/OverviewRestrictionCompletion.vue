@@ -1,6 +1,6 @@
 <script setup>
     // Import needed libraries
-    import { defineProps, onMounted, ref } from 'vue';
+    import { defineProps, onMounted, ref, watch } from 'vue';
     import { useStore } from 'vuex';
 
     // Colors for restriction and completion
@@ -29,18 +29,25 @@
             conditions: null,
         },
         };
-        store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
-            if (node.id == props.node.node_id) {
-                if (node.completion != undefined) {
-                    conditions.value.completion = getConditions(node.completion.nodes) 
-                }
-                if (node.restriction != undefined) {
-                    conditions.value.restriction = getConditions(node.restriction.nodes) 
-                }
+        triggerGetConditions()
+    // watch values from selected node
+    watch(() => store.state.learninggoal[0], async (newValue, oldValue) => {
+        triggerGetConditions()
+    }, { deep: true } );
+
+});
+function triggerGetConditions() {
+    store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
+        if (node.id == props.node.node_id) {
+            if (node.completion != undefined) {
+                conditions.value.completion = getConditions(node.completion.nodes) 
+            }
+            if (node.restriction != undefined) {
+                conditions.value.restriction = getConditions(node.restriction.nodes) 
             }
         }
-    )
-});
+    })
+}
 function getConditions(completion_nodes) {
     let count = 0
     let conditions = []

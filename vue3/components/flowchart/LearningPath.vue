@@ -88,6 +88,7 @@ import UserList from '../user_view/UserList.vue'
 import addCustomEdge from '../../composables/addCustomEdge';
 import removeDropzones from '../../composables/removeDropzones';
 import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
+import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 
 // Load Store and Router
 const store = useStore()
@@ -239,8 +240,6 @@ function onDrop(event) {
       childCourse: childCourse,
     }
     newNode = addAutoCompletions(newNode)
-    addNodes([newNode])
-
     // align node position after drop, so it's centered to the mouse
     nextTick(() => {
     const node = findNode(newNode.id)
@@ -255,16 +254,25 @@ function onDrop(event) {
       { deep: true, flush: 'post' },
     )
     })
+
     if(intersectedNode.value.dropzone.id.includes('dropzone_')){
       let source = intersectedNode.value.closestnode.id  
       let target = newNode.id
-
       if(intersectedNode.value.dropzone.id.includes('child')){
         source = newNode.id 
-        target = intersectedNode.value.closestnode.id 
+        target = intersectedNode.value.closestnode.id
+        newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child')
+        addNodes([newNode])
+      }else{
+        let oldNode = findNode(intersectedNode.value.closestnode.id)
+        oldNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
+        addNodes([newNode])
       }
       // Add the new edge
       addEdges(addCustomEdge(source, target));
+      store.state.learninggoal[0].json.tree.testing = 'test'
+    } else {
+      addNodes([newNode])
     }
     let tree = toObject()
     tree = removeDropzones(tree)
