@@ -41,7 +41,6 @@ onMounted(async () => {
 
 // Watch for changes in selectedCourse
 watch(() => selectedCourse.value, async () => {
-  console.log(selectedCourse.value)
   data.value = {
     courseid: selectedCourse.value,
   }
