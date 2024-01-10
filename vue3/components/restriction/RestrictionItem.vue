@@ -7,6 +7,7 @@ import { computed } from 'vue';
 import manual from '../restriction/conditions/manual.vue'
 import manual_output from '../restriction/conditions_output/manual_output.vue'
 import timed from '../restriction/conditions/timed.vue'
+import specific_course from '../restriction/conditions/specific_course.vue'
 
 const props = defineProps(['restriction']);
 
@@ -18,6 +19,8 @@ const dynamicComponent = computed(() => {
       return timed;
     case 'manual_output':
       return manual_output;
+    case 'specific_course':
+      return specific_course;
     default:
       return null;
   }
@@ -28,6 +31,7 @@ const getInputLabel = () => {
   const labelToComponent = {
     manual: 'manual',
     timed: 'timed',
+    specific_course: 'specific_course',
   };
   return labelToComponent[props.restriction.label] || 'manual';
 };
