@@ -161,7 +161,7 @@ function onDrop(event) {
       }
     }
 
-    const newNode = {
+    let newNode = {
       id: id,
       type,
       position: { x: position.x , y: position.y },
