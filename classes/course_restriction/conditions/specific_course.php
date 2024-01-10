@@ -27,6 +27,7 @@
 
 namespace local_adele\course_restriction\conditions;
 
+use completion_info;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -101,6 +102,26 @@ class specific_course implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-        return true;
+        $restrictions = $node['restriction']['nodes'];
+        $specificcourses = [];
+        foreach ($restrictions as $restriction) {
+            if ( $restriction['data']['label'] == 'specific_course') {
+                $coursecompleted = false;
+                // Get grade and check if valid.
+                $course = get_course($restriction['data']['value']['courseid']);
+                // Check if the course completion is enabled.
+                if ($course->enablecompletion) {
+                    // Get the course completion instance.
+                    $completion = new completion_info($course);
+                    // Check if the user has completed the course.
+                    $coursecompleted = $completion->is_course_complete($userid);
+                    if ($coursecompleted) {
+                        $coursecompleted = true;
+                    }
+                }
+                $specificcourses[$restriction['id']] = $coursecompleted;
+            }
+        }
+        return $specificcourses;
     }
 }

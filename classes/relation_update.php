@@ -103,7 +103,8 @@ class relation_update {
                             $currentcondition = $restrictionnnode;
                             $validationcondition = false;
                             while ( $currentcondition ) {
-                                if ($currentcondition['data']['label'] == 'timed' ) {
+                                if ($currentcondition['data']['label'] == 'timed' ||
+                                    $currentcondition['data']['label'] == 'specific_course') {
                                     $validationcondition =
                                         $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
                                     $singlerestrictionnode[$currentcondition['data']['label']
