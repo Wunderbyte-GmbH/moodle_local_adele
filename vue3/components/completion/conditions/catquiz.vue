@@ -77,6 +77,8 @@ onMounted(async () => {
   // watch values from selected node
   watch(() => selectedTest.value, async (newValue, oldValue) => {
     scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
+    // let main_scale = findKeyValue(tests.value, selectedTest.value)
+    // scales.value.push(main_scale)
     data.value = {
       testid: selectedTest.value,
       scales: scales.value,
@@ -89,6 +91,20 @@ watch(() => data.value, (newValue, oldValue) => {
   emit('update:modelValue', data.value);
 }, { deep: true } );
 
+const findKeyValue = (obj, targetValue) => {
+  for (const test of obj) {
+    if (test.hasOwnProperty('id') && test['id'] == targetValue) {
+      // If the key and value match, return a new object with the desired pair
+      return { 
+        id: 'id', 
+        name: test['name'],
+        type: 'test' 
+      };
+    }
+  }
+  // Return null if the pair is not found
+  return null;
+}
 
 const toggleTable = () => {
   showTable.value = !showTable.value;
