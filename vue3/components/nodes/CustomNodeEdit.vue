@@ -102,10 +102,11 @@ const toggleTable = (condition) => {
         {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
       </button>
       <div v-show="isRestrictionVisible" class="table-container">
-        <table class="table table-bordered table-hover fancy-table">
-          <thead class="thead-light">
-            <tr>
-              <th>Key</th>
+        <div v-if="!data.completion.singlerestrictionnode">
+          <table class="table table-bordered table-hover fancy-table">
+            <thead class="thead-light">
+              <tr>
+                <th>Key</th>
               <th>Checkmark</th>
             </tr>
           </thead>
@@ -118,10 +119,16 @@ const toggleTable = (condition) => {
               </td>
             </tr>
           </tbody>
-        </table>
-      </div>
+          </table>
+        </div>
+        <div v-else>
+          <div class="card">
+            <div class="card-body">
+              No conditions are defined
+            </div>
+          </div>
+        </div>
     </div>
-    <div>
     </div>
   </div>
   <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" />

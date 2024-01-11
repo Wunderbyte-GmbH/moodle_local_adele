@@ -51,11 +51,16 @@ class learning_path_update {
      */
     public static function updated_learning_path($event) {
         // Get the user path relations.
+        $manualconditions = [
+            'manualcompletion',
+            'manualcompletionvalue',
+            'manualrestriction',
+            'manualrestrictionvalue',
+        ];
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_user_path_relations($event->other['learningpathid']);
         foreach ($records as $userpath) {
-            $userpath->json = json_decode($userpath->json, true);
-            $userpath->json = json_decode($event->other['json'], true);
+            $userpath->json = self::passnodevalues($event->other['json'], $userpath->json);
             $eventsingle = user_path_updated::create([
                 'objectid' => $userpath->id,
                 'context' => context_system::instance(),
@@ -65,5 +70,33 @@ class learning_path_update {
             ]);
             $eventsingle->trigger();
         }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param string $newtree
+     * @param string $oldtree
+     * @return array
+     */
+    public static function passnodevalues($newtree, $oldtree) {
+        $oldpath = json_decode($oldtree, true);
+        $userpathjson = json_decode($newtree, true);
+        // Check if new path has manual.
+        $oldvalues = [];
+        foreach ($oldpath['tree']['nodes'] as $node) {
+            $oldvalues[$node['id']] = array(
+                'manualcompletion' => $node['data']['manualcompletion'],
+                'manualcompletionvalue' => $node['data']['manualcompletionvalue'],
+                'manualrestriction' => $node['data']['manualrestriction'],
+                'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
+            );
+        }
+        foreach ($userpathjson['tree']['nodes'] as &$node) {
+            if ($oldvalues[$node['id']]) {
+                $node['data'] = array_merge($node['data'], $oldvalues[$node['id']]);
+            }
+        }
+        return $userpathjson;
     }
 }

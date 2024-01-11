@@ -172,7 +172,7 @@ function onDrop(event) {
       childCondition: '',
     };
 
-    addNodes([newNode]);
+    addNodes([newNode])
     if(nodes.value.length == 1){
       addFeedbackNode(newNode)
     }

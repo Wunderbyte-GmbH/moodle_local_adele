@@ -37,7 +37,6 @@ const props = defineProps({
 const toggleVisibility = () => {
   props.data.visibility = !props.data.visibility;
 };
-
 </script>
 
 <template>

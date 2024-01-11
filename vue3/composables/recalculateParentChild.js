@@ -5,13 +5,15 @@ const  recalculateParentChild = (tree, parentNode, childNode, startNode) => {
             node[parentNode] = []
             node[childNode] = []
             tree.edges.forEach((edge) => {
-                if (edge.source == node.id && 
-                    !node[childNode].includes(node.id)) {
-                    node[childNode].push(edge.target);
-                }
-                if (edge.target == node.id && 
-                    !node[parentNode].includes(node.id)) {
-                    node[parentNode].push(edge.source);
+                if (!edge.sourceHandle.includes('or')) {
+                    if (edge.source == node.id && 
+                        !node[childNode].includes(node.id)) {
+                        node[childNode].push(edge.target);
+                    }
+                    if (edge.target == node.id && 
+                        !node[parentNode].includes(node.id)) {
+                        node[parentNode].push(edge.source);
+                    }
                 }
             })
             if(node[parentNode].length == 0){

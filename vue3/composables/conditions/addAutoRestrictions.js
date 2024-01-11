@@ -34,7 +34,7 @@ function createRestriction (node_id, course_id) {
         },
         "draggable": false,
         "events": {},
-        "id": 'dndnode_1',
+        "id": 'condition_1',
         "label": "custom node",
         "parentCondition": [
           "starting_condition"
@@ -73,7 +73,7 @@ function expandRestriction (newNode, oldNode) {
       y = node.position.y
     }
 
-    let tmp_id = parseInt(node.id.replace('dndnode_', '')); 
+    let tmp_id = parseInt(node.id.replace('condition_', '')); 
     if (id == 0 || id < tmp_id) {
       id = tmp_id
     }

@@ -28,7 +28,7 @@
 import { Panel, useVueFlow, isNode } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { nextTick, watch } from 'vue';
+import { nextTick, onMounted, watch } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart';
 import setStartingNode from '../../composables/setStartingNode';
@@ -63,6 +63,11 @@ watch(() => store.state.learninggoal[0], (newValue, oldValue) => {
     setNodes([])
     setEdges([])
   }
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800)
+});
+
+// Trigger web services on mount
+onMounted(() => {
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800)
 });
 

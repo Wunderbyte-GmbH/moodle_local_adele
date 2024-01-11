@@ -152,14 +152,11 @@ function getOffsetX(closestNode, relation){
   if(relation == 'parent'){
     relationHandle = closestNode.parentCourse
   }
-
   if(relationHandle.length == 0 ||
   relationHandle.indexOf('starting_node') != -1){
     return closestNode.position.x
   }
-
   return closestNode.position.x + 500
-
 }
 
 function checkIntersetcion(event, closestNode) {

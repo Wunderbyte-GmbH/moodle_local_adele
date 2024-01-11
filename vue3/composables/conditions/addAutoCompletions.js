@@ -5,12 +5,12 @@ const  addAutoCompletions = (node) => {
           {
             "data": {},
             "events": {},
-            "id": node.id +"-" + node.id + "_feedback",
-            "source": node.id,
+            "id": "condition_1-condition_feedback",
+            "source": "condition_1",
             "sourceHandle": "target_and",
             "sourceX": 858,
             "sourceY": 241,
-            "target": node.id + "_feedback",
+            "target": "condition_1_feedback",
             "targetHandle": "source_feedback",
             "targetX": 858,
             "targetY": 199,
@@ -20,19 +20,19 @@ const  addAutoCompletions = (node) => {
         "nodes": [
           {
             "childCondition": [
-              node.id + "_feedback"
+              "condition_1_feedback"
             ],
             "data": {
               "description": "Course has been completed by student",
               "id": 150,
               "label": "course_completed",
               "name": "Course completed",
-              "node_id": node.id,
+              "node_id": 'condition_1',
               "visibility": true
             },
             "draggable": false,
             "events": {},
-            "id": node.id,
+            "id": "condition_1",
             "label": "custom node",
             "parentCondition": [
               "starting_condition"
@@ -45,12 +45,12 @@ const  addAutoCompletions = (node) => {
           },
           {
             "data": {
-              "childCondition": node.id,
+              "childCondition": 'condition_1',
               "feedback": ""
             },
             "draggable": false,
             "events": {},
-            "id": node.id + "_feedback",
+            "id": "condition_1_feedback",
             "label": "Feedback node",
             "position": {
               "x": 683,
