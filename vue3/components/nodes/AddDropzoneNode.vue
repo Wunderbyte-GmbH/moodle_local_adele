@@ -37,12 +37,10 @@
 <template>
   <div class="custom-node text-center rounded p-3"
     :style="{ 'background-color': data.bgcolor, 'opacity' : data.opacity,
-      'height': data.height, 'width': '400px'
+      'height': data.height, 'width': '300px'
     }">
     {{ data.infotext}}
   </div>
-  <Handle id="target_and" type="target" :position="Position.Top"/>
-  <Handle id="source_and" type="source" :position="Position.Bottom"/>
   <Handle id="target_or" type="target" :position="Position.Left"/>
   <Handle id="source_or" type="source" :position="Position.Right"/>
 </template>

@@ -2,7 +2,7 @@
 const  removeDropzones = (tree) => {
     let only_custom_nodes = [];
     tree.nodes.forEach((node) => {
-        if ( node.type != 'dropzone') {
+        if (node.type.indexOf('dropzone') == -1) {
             only_custom_nodes.push(node);
         }
     })

@@ -47,6 +47,9 @@
       <template #node-dropzone="{ data }">
           <DropzoneNode :data="data"/>
       </template>
+      <template #node-adddropzone="{ data }">
+          <AddDropzoneNode :data="data"/>
+      </template>
       <MiniMap nodeColor="grey"/>
     </VueFlow>
     <Sidebar 
@@ -81,6 +84,7 @@ import Modal from '../modals/Modal.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
+import AddDropzoneNode from '../nodes/AddDropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
 import shiftNodesDown from '../../composables/shiftNodesDown'
 import setStartingNode from '../../composables/setStartingNode';
@@ -89,6 +93,7 @@ import addCustomEdge from '../../composables/addCustomEdge';
 import removeDropzones from '../../composables/removeDropzones';
 import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
+import addAndConditions from '../../composables/conditions/addAndConditions'
 
 // Load Store and Router
 const store = useStore()
@@ -107,7 +112,7 @@ function toggleClass() {
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
     addNodes, removeNodes,
-    toObject, fitView } = useVueFlow({
+    toObject, fitView, getEdges } = useVueFlow({
 nodes: [],
 })
 
@@ -203,6 +208,13 @@ function onDrop(event) {
     //if is starting node dz
     let parentCourse = []
     let childCourse = []
+
+    let newNode = {
+      id: id,
+      type,
+      label: `${type} node`,
+      draggable: true,
+    }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       parentCourse.push('starting_node')
     }
@@ -222,24 +234,32 @@ function onDrop(event) {
       parentCourse.push(intersectedNode.value.closestnode.id)
       intersectedNode.value.closestnode.childCourse.push(data.node_id)
       position.y += 300
+    }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
+      const addConditions = addAndConditions(intersectedNode.value, getEdges, id)
+      parentCourse = addConditions.parentNodes
+      childCourse = addConditions.childNodes
+      newNode.restriction = addConditions.newRestrictions
+      newNode.completion = addConditions.newCompletions
+      newNode.data = data
+      addEdges(addConditions.newEdges)
+      nodes.value.forEach((node) => {
+        if (addConditions.newOtherRestrictions.includes(node.id)){
+          node = addAutoRestrictions(newNode, node, 'and')
+        }
+      })
     }
-
     if (intersectedNode.value.closestnode.position.x < intersectedNode.value.dropzone.position.x) {
       position.x += intersectedNode.value.closestnode.dimensions.width
     }
 
-
-    let newNode = {
-      id: id,
-      type,
-      position,
-      label: `${type} node`,
-      data: data,
-      draggable: true,
-      parentCourse: parentCourse,
-      childCourse: childCourse,
+    newNode = { ...newNode, ...{
+        data: data,
+        parentCourse: parentCourse,
+        childCourse: childCourse,
+        position,
+      }
     }
-    newNode = addAutoCompletions(newNode)
+
     // align node position after drop, so it's centered to the mouse
     nextTick(() => {
     const node = findNode(newNode.id)
@@ -255,7 +275,9 @@ function onDrop(event) {
     )
     })
 
-    if(intersectedNode.value.dropzone.id.includes('dropzone_')){
+    if((intersectedNode.value.dropzone.id.includes('dropzone_') &&
+      !intersectedNode.value.dropzone.id.includes('and'))){
+      newNode = addAutoCompletions(newNode)
       let source = intersectedNode.value.closestnode.id  
       let target = newNode.id
       if(intersectedNode.value.dropzone.id.includes('child')){
@@ -264,14 +286,13 @@ function onDrop(event) {
         newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child')
         addNodes([newNode])
       }else{
-        let oldNode = findNode(intersectedNode.value.closestnode.id)
-        oldNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
+        let oldNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
         addNodes([newNode])
       }
       // Add the new edge
       addEdges(addCustomEdge(source, target));
-      store.state.learninggoal[0].json.tree.testing = 'test'
     } else {
+      newNode = addAutoCompletions(newNode)
       addNodes([newNode])
     }
     let tree = toObject()

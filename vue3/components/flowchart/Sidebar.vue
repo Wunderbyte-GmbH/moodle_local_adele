@@ -26,6 +26,8 @@
 // Import needed libraries
 import { defineProps, ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
+import drawDropzone from '../../composables/nodesHelper/drawDropzone'
+import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
 const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } = useVueFlow()
 
 // Reference on searchTerm
@@ -75,126 +77,38 @@ function onDrag(event) {
   //add drop zones to this node 
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
   if(closestNode && startingNodeIntersecting){
-    drawDropZones(closestNode)
+    const newDrop = drawDropzone(closestNode)
+    addNodes(newDrop.nodes);
+    addEdges(newDrop.edges);
     checkIntersetcion(event, closestNode)
   }else{
-    removeNodes(['dropzone'])
+    removeNodes(['dropzone', 'dropzone_and'])
   }
 
   // Check if the closest node has changed
   if (closestNode !== prevClosestNode.value) {
-    removeNodes(['dropzone_parent', 'dropzone_child'])
+    removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and'])
     prevClosestNode.value = closestNode;
   }
-}
-
-function drawDropZones(closestNode) {
-  const dropZoneCourseNodes = {
-    parent: {
-      name: ' Parent',
-      positionY: -250,
-      positionX: 0,
-    },
-    child: {
-      name: ' Child',
-      positionY: 250,
-      positionX: 0,
-    },
-  }
-  let data = {
-    opacity: '0.6',
-    bgcolor: 'grey',
-    infotext: 'Drop zone',
-    height: '200px',
-    width: '400px',
-  }
-
-  //check if closest node has childerns TODO   
-  for (const key in dropZoneCourseNodes){
-    data.infotext += dropZoneCourseNodes[key].name 
-
-    let position = {
-      x: getOffsetX(closestNode, key), 
-      y: closestNode.position.y + dropZoneCourseNodes[key].positionY
-    }
-    const newNode = {
-      id: 'dropzone_' + key,
-      type: 'dropzone',
-      position: position,
-      label: `default node`,
-      data: data
-    }
-    addNodes([newNode]);
-
-    let targetHandle = 'source_and'
-    let sourceHandle =  'target'
-
-    if(key == 'child'){
-      targetHandle = 'target_and'
-      sourceHandle =  'source'
-    }
-
-    const newEdge = {
-      id: `${closestNode.id}-${key}`,
-      source: closestNode.id,
-      sourceHandle: sourceHandle,
-      target: newNode.id,
-      targetHandle: targetHandle,
-      type: 'default',
-    };
-    // Add the new edge
-    addEdges([newEdge]);
-  }
-}
-
-function getOffsetX(closestNode, relation){
-  let relationHandle = closestNode.childCourse
-  if(relation == 'parent'){
-    relationHandle = closestNode.parentCourse
-  }
-  if(relationHandle.length == 0 ||
-  relationHandle.indexOf('starting_node') != -1){
-    return closestNode.position.x
-  }
-  return closestNode.position.x + 500
 }
 
 function checkIntersetcion(event, closestNode) {
   let insideStartingNode = false;
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
-    if(node.type == 'dropzone'){
+    if(node.type == 'dropzone' || node.type == 'adddropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,
         y: event.clientY - top,
       });
       const nodesIntersecting = areNodesIntersecting(position, node)
-      if(nodesIntersecting){
-        intersectingNode.value = { closestnode: closestNode, dropzone: node};
-        node.data = {
-          opacity: '0.75',
-          bgcolor: 'chartreuse',
-          infotext: 'Drop to connect here',
-          height: '200px',
-          width: '400px',
-        }
-      }else{
-        node.data = {
-          opacity: '0.6',
-          bgcolor: 'grey',
-          infotext: 'New Staring node',
-          height: '200px',
-          width: '400px',
-        }
-        if(node.id == 'dropzone_parent'){
-          node.data.infotext = 'Drop zone Parent'
-        }else if(node.id == 'dropzone_child'){
-          node.data.infotext = 'Drop zone Child'
-        }else {
-          insideStartingNode = true;
-        }
-      }
+      const nodeFormat = formatIntersetingNodes(nodesIntersecting, node, intersectingNode.value,
+        closestNode, insideStartingNode)
+      node = nodeFormat.node
+      intersectingNode.value = nodeFormat.intersectingNode
+      insideStartingNode = nodeFormat.insideStartingNode
+
     }
   });
   emit('nodesIntersected', { intersecting: intersectingNode.value });
@@ -224,8 +138,7 @@ function findClosestNode(event) {
 
 
   nodes.value.forEach((node) => {
-    if(node.type != 'dropzone'){
-
+    if(node.type != 'dropzone' && node.type != 'adddropzone'){
       const distance = Math.sqrt(
         Math.pow(position.x - node.position.x, 2) +
         Math.pow(position.y - node.position.y, 2)
@@ -240,7 +153,7 @@ function findClosestNode(event) {
 }
 
 function onDragEnd(){
-  removeNodes(['dropzone_parent', 'dropzone_child'])
+  removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and'])
 }
 
 </script>
