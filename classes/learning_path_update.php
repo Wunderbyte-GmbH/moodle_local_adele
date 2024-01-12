@@ -85,12 +85,12 @@ class learning_path_update {
         // Check if new path has manual.
         $oldvalues = [];
         foreach ($oldpath['tree']['nodes'] as $node) {
-            $oldvalues[$node['id']] = array(
+            $oldvalues[$node['id']] = [
                 'manualcompletion' => $node['data']['manualcompletion'],
                 'manualcompletionvalue' => $node['data']['manualcompletionvalue'],
                 'manualrestriction' => $node['data']['manualrestriction'],
                 'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
-            );
+            ];
         }
         foreach ($userpathjson['tree']['nodes'] as &$node) {
             if ($oldvalues[$node['id']]) {
