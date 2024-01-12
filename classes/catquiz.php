@@ -71,13 +71,7 @@ class catquiz {
     public static function get_catquiz_scales($params) {
         $records = testenvironment::get_environments('mod_adaptivequiz', $params['testid']);
         if ($records) {
-            $record = reset($records);
-            $testdata = json_decode($record->json);
-            //$selectedsubscales = catquiz_handler::get_selected_subscales($testdata);
             $records = dataapi::get_catscale_and_children($params['testid'], true);
-            // $records = array_filter($records, function ($record) use ($selectedsubscales) {
-            //     return in_array($record->id, $selectedsubscales);
-            // });
             $records = array_map(function ($record) {
                 return (array)$record;
             }, $records);
