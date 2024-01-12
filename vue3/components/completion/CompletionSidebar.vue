@@ -84,7 +84,7 @@ function onDrag(event, data ) {
 function checkIntersetcion(event, closestNode) {
   intersectingNode.value = null;
   props.nodes.forEach((node) => {
-    if(node.type == 'dropzone'){
+    if(node.type.indexOf('dropzone') != -1){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,

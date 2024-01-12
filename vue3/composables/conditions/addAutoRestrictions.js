@@ -7,11 +7,15 @@ const  addAutoRestrictions = (newNode, oldNode, relation) => {
   } else if (relation == 'parent') {
     // Add restriction to already exsisting node.
     if (oldNode.restriction != undefined) {
-      oldNode = expandRestriction(newNode, oldNode)
+      oldNode = expandRestriction(newNode, oldNode, relation)
     } else {
+      
       oldNode.restriction = createRestriction(oldNode.id, newNode.data.course_node_id)
     }
     return oldNode
+  } else if (relation == 'and') {
+    // Add restriction to already exsisting node.
+    return expandRestriction(newNode, oldNode, relation)
   }
 }
 
@@ -59,7 +63,7 @@ function createRestriction (node_id, course_id) {
   }
 }
 
-function expandRestriction (newNode, oldNode) {
+function expandRestriction (newNode, oldNode, relation) {
   let x = null
   let y = null
   let id = 0
@@ -105,19 +109,21 @@ function expandRestriction (newNode, oldNode) {
     },
     "type": "custom"
   })
-  oldNode.restriction.edges.push({
-    "data": {
-      "text": "OR",
-      "type": "disjunctional"
-    },
-    "events": {},
-    "id": rightesNodeId + "-condition_" + id,
-    "source": rightesNodeId,
-    "sourceHandle": "source_or",
-    "target": "condition_" + id,
-    "targetHandle": "target_or",
-    "type": "condition"
-  })
+  if ( relation == 'parent'){
+    oldNode.restriction.edges.push({
+      "data": {
+        "text": "OR",
+        "type": "disjunctional"
+      },
+      "events": {},
+      "id": rightesNodeId + "-condition_" + id,
+      "source": rightesNodeId,
+      "sourceHandle": "source_or",
+      "target": "condition_" + id,
+      "targetHandle": "target_or",
+      "type": "condition"
+    })
+  }
   // Add edge:
   return oldNode;
 }

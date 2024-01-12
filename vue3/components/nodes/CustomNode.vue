@@ -93,6 +93,8 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
   </div>
   <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
   <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
+  <Handle id="source_and" type="source_and" :position="Position.Right" :style="targetHandleStyle" />
+  <Handle id="source_or" type="source_or" :position="Position.Left" :style="sourceHandleStyle" />
 </template>
 
 <style scoped>
