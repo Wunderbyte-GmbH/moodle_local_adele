@@ -103,17 +103,22 @@ class course_completed implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        $course = get_course($node['data']['course_node_id']);
-        // Check if the course completion is enabled.
-        if ($course->enablecompletion) {
-            // Get the course completion instance.
-            $completion = new completion_info($course);
-            // Check if the user has completed the course.
-            $coursecompleted = $completion->is_course_complete($userid);
-            if ($coursecompleted) {
-                return true;
+        $courses = $node['data']['course_node_id'];
+        $coursecompletion = [];
+        foreach ($courses as $courseid) {
+            $course = get_course($courseid);
+            $completed = false;
+            if ($course->enablecompletion) {
+                // Get the course completion instance.
+                $completion = new completion_info($course);
+                // Check if the user has completed the course.
+                $coursecompleted = $completion->is_course_complete($userid);
+                if ($coursecompleted) {
+                    $completed = true;
+                }
             }
+            $coursecompletion[$courseid] = $completed;
         }
-        return false;
+        return $coursecompletion;
     }
 }

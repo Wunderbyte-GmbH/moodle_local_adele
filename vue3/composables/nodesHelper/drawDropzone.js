@@ -7,13 +7,13 @@ const  drawDropzone = (closestNode) => {
     const dropZoneCourseNodes = {
         parent: {
             name: 'Drop zone Parent',
-            positionY: -350,
+            positionY: -250,
             positionX: 0,
             type: 'dropzone',
         },
         child: {
             name: 'Drop zone Child',
-            positionY: 350,
+            positionY: 50 + closestNode.dimensions.height,
             positionX: 0,
             type: 'dropzone',
         },
@@ -21,14 +21,20 @@ const  drawDropzone = (closestNode) => {
             name: 'And drop zone',
             positionY: 200,
             positionX: 450,
-            type: 'adddropzone',
+            type: 'anddropzone',
+        },
+        or: {
+            name: 'Or drop zone',
+            positionY: 300,
+            positionX: -350,
+            type: 'ordropzone',
         }
-        }
-        let data = {
-            opacity: '0.6',
-            bgcolor: 'grey',
-            height: '200px',
-        }
+    }
+    let data = {
+        opacity: '0.6',
+        bgcolor: 'grey',
+        height: '200px',
+    }
 
     //check if closest node has childerns TODO   
     for (const key in dropZoneCourseNodes){
@@ -38,7 +44,7 @@ const  drawDropzone = (closestNode) => {
             x: 0, 
             y: 0
         }
-        if (key != 'and') {
+        if (key != 'and' && key != 'or') {
             position = {
                 x: getOffsetX(closestNode, key), 
                 y: closestNode.position.y + dropZoneCourseNodes[key].positionY
@@ -66,7 +72,7 @@ const  drawDropzone = (closestNode) => {
             sourceHandle =  'source'
         } 
 
-        if (key != 'and') {
+        if (key != 'and' && key != 'or') {
             const newEdge = {
                 id: `${closestNode.id}-${key}`,
                 source: closestNode.id,
@@ -95,7 +101,7 @@ function getOffsetX(closestNode, relation){
 }
 
 function getOffsetY(closestNode){
-    return closestNode.position.y
+    return closestNode.computedPosition.y + closestNode.dimensions.height/2 - 100
 }
 
 export default drawDropzone;

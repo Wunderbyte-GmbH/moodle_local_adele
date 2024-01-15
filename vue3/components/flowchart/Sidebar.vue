@@ -82,12 +82,12 @@ function onDrag(event) {
     addEdges(newDrop.edges);
     checkIntersetcion(event, closestNode)
   }else{
-    removeNodes(['dropzone', 'dropzone_and'])
+    removeNodes(['dropzone', 'dropzone_and', 'dropzone_or'])
   }
 
   // Check if the closest node has changed
   if (closestNode !== prevClosestNode.value) {
-    removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and'])
+    removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
     prevClosestNode.value = closestNode;
   }
 }
@@ -96,7 +96,8 @@ function checkIntersetcion(event, closestNode) {
   let insideStartingNode = false;
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
-    if(node.type == 'dropzone' || node.type == 'adddropzone'){
+    if(node.type == 'dropzone' || node.type == 'anddropzone' ||
+      node.type == 'ordropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,
@@ -138,7 +139,8 @@ function findClosestNode(event) {
 
 
   nodes.value.forEach((node) => {
-    if(node.type != 'dropzone' && node.type != 'adddropzone'){
+    if(node.type != 'dropzone' && node.type != 'anddropzone' &&
+      node.type != 'ordropzone'){
       const distance = Math.sqrt(
         Math.pow(position.x - node.position.x, 2) +
         Math.pow(position.y - node.position.y, 2)
@@ -153,7 +155,7 @@ function findClosestNode(event) {
 }
 
 function onDragEnd(){
-  removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and'])
+  removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
 }
 
 </script>

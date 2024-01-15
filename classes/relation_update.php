@@ -68,18 +68,27 @@ class relation_update {
                             $currentcondition = $completionnode;
                             $validationcondition = false;
                             while ( $currentcondition ) {
-                                if ($currentcondition['data']['label'] == 'catquiz' ||
-                                    $currentcondition['data']['label'] == 'modquiz') {
+                                $label = $currentcondition['data']['label'];
+                                if ($label == 'catquiz' ||
+                                $label == 'modquiz') {
                                     $validationcondition =
-                                        $completioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
-                                    $singlecompletionnode[$currentcondition['data']['label']
+                                        $completioncriteria[$label][$currentcondition['id']];
+                                    $singlecompletionnode[$label
                                         . '_' . $currentcondition['id']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label']
+                                    $validationconditionstring[] = $label
                                         . '_' . $currentcondition['id'];
+                                } else if ($label == 'course_completed') {
+                                    foreach ($completioncriteria[$label] as $coursecompleted) {
+                                        if ($coursecompleted) {
+                                            $validationcondition = true;
+                                            $validationconditionstring[] = $label;
+                                        }
+                                    }
+                                    $singlecompletionnode[$label] = $validationcondition;
                                 } else {
-                                    $validationcondition = $completioncriteria[$currentcondition['data']['label']];
-                                    $singlecompletionnode[$currentcondition['data']['label']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label'];
+                                    $validationcondition = $completioncriteria[$label];
+                                    $singlecompletionnode[$label] = $validationcondition;
+                                    $validationconditionstring[] = $$label;
                                 }
                                 // Check if the conditon is true and break if one condition is not met.
                                 if (!$validationcondition) {

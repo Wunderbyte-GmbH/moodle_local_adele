@@ -94,7 +94,9 @@ class get_availablecourses extends external_api {
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
             new external_single_structure([
-                    'course_node_id' => new external_value(PARAM_INT, 'Item id'),
+                    'course_node_id' => new external_single_structure([
+                            '0' => new external_value(PARAM_TEXT, 'id'),
+                    ]),
                     'fullname' => new external_value(PARAM_TEXT, 'Historyid id'),
                     'shortname' => new external_value(PARAM_TEXT, 'Item name'),
                     'category' => new external_value(PARAM_TEXT, 'Category level'),

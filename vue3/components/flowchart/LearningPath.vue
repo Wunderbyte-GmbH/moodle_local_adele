@@ -47,8 +47,14 @@
       <template #node-dropzone="{ data }">
           <DropzoneNode :data="data"/>
       </template>
-      <template #node-adddropzone="{ data }">
-          <AddDropzoneNode :data="data"/>
+      <template #node-anddropzone="{ data }">
+          <AndDropzoneNode :data="data"/>
+      </template>
+      <template #node-ordropzone="{ data }">
+          <OrDropzoneNode :data="data"/>
+      </template>
+      <template #node-orcourses="{ data }">
+          <OrCourses :data="data" @typeChange="typeChanged"/>
       </template>
       <MiniMap nodeColor="grey"/>
     </VueFlow>
@@ -84,7 +90,9 @@ import Modal from '../modals/Modal.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
-import AddDropzoneNode from '../nodes/AddDropzoneNode.vue'
+import AndDropzoneNode from '../nodes/AndDropzoneNode.vue'
+import OrDropzoneNode from '../nodes/OrDropzoneNode.vue'
+import OrCourses from '../nodes/OrCourses.vue'
 import { notify } from "@kyvg/vue3-notification"
 import shiftNodesDown from '../../composables/shiftNodesDown'
 import setStartingNode from '../../composables/setStartingNode';
@@ -100,13 +108,20 @@ const store = useStore()
 
 // Define constants that will be referenced
 const dark = ref(false)
-const edgeId = ref('')
 // Intersected node
 const intersectedNode = ref(null);
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
+}
+
+const typeChanged = (changedNode) => {
+  nodes.value.forEach((node) => {
+    if ( node.id == changedNode.id) {
+      node.type = 'custom'
+    }
+  })
 }
 
 // load useVueFlow properties / functions
@@ -121,29 +136,6 @@ function handleNodesIntersected({ intersecting }) {
   intersectedNode.value = intersecting
 }
 
-// Automatically connect to node if node is close enough
-// function onNodeDrag(event) {
-//   const connectionRadius = 500;
-//   const { left, top } = vueFlowRef.value.getBoundingClientRect();
-//   const position = project({
-//   x: event.event.clientX - left,
-//   y: event.event.clientY - top,
-//   });
-//   const clostestNode = findClosestNode(position, connectionRadius, event.node.id); 
-//   if(clostestNode){
-//   let source = clostestNode;
-//   let target = event.node;
-//   if(source.position.y < target.position.y){
-//     target = clostestNode;
-//     source = event.node;
-//   }
-//   edgeId.value = source.id + target.id
-//   showPreviewConnection(source, target)
-//   }else{
-//   removeEdges(edgeId.value)
-//   }
-// }
-
 // Prevent default event if node has been dropped
 function onDragOver(event) {
   event.preventDefault()
@@ -152,35 +144,11 @@ function onDragOver(event) {
   }
 }
 
-// Show a preview node if nodes are close enough
-// function showPreviewConnection(source, target ) {
-//   removeEdges(target.id + source.id)
-//   addEdges(addCustomEdge(source.id, target.id));
-// }
-
-// Find the closest node within a set boundary
-function findClosestNode(position, connectionRadius, draggedId) {
-let closestNode = null;
-let closestDistance = Infinity;
-
-nodes.value.forEach((node) => {
- const distance = Math.sqrt(
-   Math.pow(position.x - node.position.x, 2) +
-   Math.pow(position.y - node.position.y, 2)
- );
-
- if (node.id != draggedId && distance < closestDistance && distance < connectionRadius) {
-   closestDistance = distance;
-   closestNode = node;
- }
-});
-
-return closestNode;
-}
-
 // Adjust and add edges if connection was made
 function handleConnect(params) {
 if (params.source !== store.state.startnode) {
+  console.log(params)
+  console.log(store.state.startnode)
  // Swap source and target positions
  params.target = params.source;
  params.source = store.state.startnode;
@@ -248,6 +216,25 @@ function onDrop(event) {
         }
       })
     }
+    else if(intersectedNode.value.dropzone.id == 'dropzone_or'){
+      // get the clostestnode and change type and data 
+      let dropzoneNode = intersectedNode.value.closestnode
+      dropzoneNode.type = 'orcourses'
+      if ( !dropzoneNode.data.course_node_id.includes(data.course_node_id[0])) {
+        dropzoneNode.data.course_node_id.push(data.course_node_id[0])
+        nodes.value.forEach((node) => {
+          if (node.id == dropzoneNode.id){
+            node = dropzoneNode
+          }
+        })
+      } else {
+        notify({
+          title: 'Course already inside',
+          text: 'The course is already inside the node included',
+          type: 'warn'
+        });
+      }
+    }
     if (intersectedNode.value.closestnode.position.x < intersectedNode.value.dropzone.position.x) {
       position.x += intersectedNode.value.closestnode.dimensions.width
     }
@@ -260,23 +247,26 @@ function onDrop(event) {
       }
     }
 
-    // align node position after drop, so it's centered to the mouse
     nextTick(() => {
     const node = findNode(newNode.id)
-    const stop = watch(
-      () => node.dimensions,
-      (dimensions) => {
-        if (dimensions.width > 0 && dimensions.height > 0) {
-          node.position = { x: Math.round((node.position.x - node.dimensions.width / 2) * 10)/10, y:  Math.round((node.position.y - node.dimensions.height / 2) * 10)/10 }
-          stop()
-        }
-      },
-      { deep: true, flush: 'post' },
-    )
+    if (node != undefined) {
+      const stop = watch(
+        () => node.dimensions,
+        (dimensions) => {
+          if (dimensions.width > 0 && dimensions.height > 0) {
+            node.position = { x: Math.round((node.position.x - node.dimensions.width / 2) * 10)/10, y:  Math.round((node.position.y - node.dimensions.height / 2) * 10)/10 }
+            stop()
+          }
+        },
+        { deep: true, flush: 'post' },
+      )
+    }
     })
-
     if((intersectedNode.value.dropzone.id.includes('dropzone_') &&
-      !intersectedNode.value.dropzone.id.includes('and'))){
+      !intersectedNode.value.dropzone.id.includes('_and')) &&
+      !intersectedNode.value.dropzone.id.includes('_or')){
+      
+
       newNode = addAutoCompletions(newNode)
       let source = intersectedNode.value.closestnode.id  
       let target = newNode.id
@@ -291,7 +281,8 @@ function onDrop(event) {
       }
       // Add the new edge
       addEdges(addCustomEdge(source, target));
-    } else {
+    } else if (!intersectedNode.value.dropzone.id.includes('_or')) {
+      // Add Completion addAutoAndCompletions.
       newNode = addAutoCompletions(newNode)
       addNodes([newNode])
     }
