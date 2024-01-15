@@ -55,6 +55,9 @@
           <template #node-custom="{ data }">
             <CustomNodeEdit :data="data"/>
           </template>
+          <template #node-orcourses="{ data }">
+            <CustomNodeEdit :data="data"/>
+          </template>
         </VueFlow>
       </div>
       <div class="d-flex justify-content-center">

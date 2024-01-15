@@ -41,6 +41,9 @@ class learning_path_courses {
      */
     public static function get_availablecourses() {
         $list = self::buildsqlquery();
+        foreach ($list as &$element) {
+            $element->course_node_id = [$element->course_node_id];
+        }
         return array_map(fn($a) => (array)$a, $list);
     }
 

@@ -49,7 +49,6 @@ const setPretestView = () => {
   store.state.editingpretest = true
   store.state.editingadding = false
   store.state.editingrestriction = false
-
 };
 
 // Set node data for the modal
@@ -93,15 +92,17 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
   </div>
   <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
   <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
-  <Handle id="source_and" type="source_and" :position="Position.Right" :style="targetHandleStyle" />
-  <Handle id="source_or" type="source_or" :position="Position.Left" :style="sourceHandleStyle" />
 </template>
 
 <style scoped>
 .custom-node {
+  position: relative;
   background-color: white;
   padding: 10px;
   border: 1px solid #ccc;
+}
+.card-text {
+  padding: 5px;
 }
 
 </style>

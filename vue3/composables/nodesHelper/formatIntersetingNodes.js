@@ -23,6 +23,8 @@ const  formatIntersetingNodes = (nodesIntersecting, node, intersectingNode,
             node.data.infotext = 'Drop zone Child'
         }else if(node.id == 'dropzone_and'){
             node.data.infotext = 'And drop zone'
+        }else if(node.id == 'dropzone_or'){
+            node.data.infotext = 'Or drop zone'
         }else {
             insideStartingNode = true;
         }

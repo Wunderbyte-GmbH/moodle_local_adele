@@ -70,9 +70,7 @@ const toggleCards = () => {
 </script>
 
 <template>
-    <div v-if="conditions.restriction" class="card-container mt-2">
-
-        <div @click="toggleCards" class="card-container">
+        <div v-if="conditions.restriction" @click="toggleCards" class="card-container mt-2">
             <div class="card">
                 <div class="restriction" :style="{ color: restrictionColor }">
                     <i class="fa-solid fa-key"></i>
@@ -130,8 +128,6 @@ const toggleCards = () => {
                 </ul>
             </div>
         </div>
-
-    </div>
 </template>
 
 <style scoped>
@@ -139,8 +135,11 @@ const toggleCards = () => {
   display: flex;
   flex-direction: column; /* Stack children vertically */
   justify-content: flex-end; /* Align items at the bottom */
-  height: 35%; /* Occupy full height of the parent */
   cursor: pointer;
+  position: absolute;
+  width: 92%;
+  bottom: 0;
+  margin-bottom: 1rem;
 }
 
 .card {
