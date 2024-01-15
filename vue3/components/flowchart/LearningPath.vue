@@ -47,11 +47,8 @@
       <template #node-dropzone="{ data }">
           <DropzoneNode :data="data"/>
       </template>
-      <template #node-anddropzone="{ data }">
-          <AndDropzoneNode :data="data"/>
-      </template>
-      <template #node-ordropzone="{ data }">
-          <OrDropzoneNode :data="data"/>
+      <template #node-conditionaldropzone="{ data }">
+          <ConditionalDropzoneNode :data="data"/>
       </template>
       <template #node-orcourses="{ data }">
           <OrCourses :data="data" @typeChange="typeChanged"/>
@@ -90,8 +87,7 @@ import Modal from '../modals/Modal.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
-import AndDropzoneNode from '../nodes/AndDropzoneNode.vue'
-import OrDropzoneNode from '../nodes/OrDropzoneNode.vue'
+import ConditionalDropzoneNode from '../nodes/ConditionalDropzoneNode.vue'
 import OrCourses from '../nodes/OrCourses.vue'
 import { notify } from "@kyvg/vue3-notification"
 import shiftNodesDown from '../../composables/shiftNodesDown'

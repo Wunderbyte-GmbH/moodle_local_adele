@@ -47,8 +47,7 @@ const nodeBackgroundColor = computed(() => {
 });
 
 // Connection handles
-const sourceHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
-const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 const isCompletionVisible = ref(false);
 const isRestrictionVisible = ref(false);
@@ -131,8 +130,8 @@ const toggleTable = (condition) => {
     </div>
     </div>
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" />
-  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" />
+  <Handle id="target" type="target" :position="Position.Top" :style="handleStyle" />
+  <Handle id="source" type="source" :position="Position.Bottom" :style="handleStyle" />
 </template>
 
 <style scoped>

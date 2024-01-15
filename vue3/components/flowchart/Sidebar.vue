@@ -96,8 +96,7 @@ function checkIntersetcion(event, closestNode) {
   let insideStartingNode = false;
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
-    if(node.type == 'dropzone' || node.type == 'anddropzone' ||
-      node.type == 'ordropzone'){
+    if(node.type == 'dropzone' || node.type == 'conditionaldropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,
@@ -139,8 +138,7 @@ function findClosestNode(event) {
 
 
   nodes.value.forEach((node) => {
-    if(node.type != 'dropzone' && node.type != 'anddropzone' &&
-      node.type != 'ordropzone'){
+    if(node.type != 'dropzone' && node.type != 'conditionaldropzone'){
       const distance = Math.sqrt(
         Math.pow(position.x - node.position.x, 2) +
         Math.pow(position.y - node.position.y, 2)

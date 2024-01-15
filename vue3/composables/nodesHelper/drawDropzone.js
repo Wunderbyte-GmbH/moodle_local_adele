@@ -21,13 +21,13 @@ const  drawDropzone = (closestNode) => {
             name: 'And drop zone',
             positionY: 200,
             positionX: 450,
-            type: 'anddropzone',
+            type: 'conditionaldropzone',
         },
         or: {
             name: 'Or drop zone',
             positionY: 300,
             positionX: -350,
-            type: 'ordropzone',
+            type: 'conditionaldropzone',
         }
     }
     let data = {

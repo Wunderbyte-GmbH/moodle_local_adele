@@ -67,8 +67,7 @@ const setStartNode = (node_id) => {
 };
 
 // Connection handles
-const sourceHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
-const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 </script>
 
@@ -90,8 +89,8 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
     </div>
     <OverviewRestrictionCompletion :node=data />
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
-  <Handle id="source" type="source" :position="Position.Bottom" :style="sourceHandleStyle" @mousedown="() => setStartNode(data.node_id)" />
+  <Handle id="target" type="target" :position="Position.Top" :style="handleStyle" @mousedown="() => setStartNode(data.node_id)" />
+  <Handle id="source" type="source" :position="Position.Bottom" :style="handleStyle" @mousedown="() => setStartNode(data.node_id)" />
 </template>
 
 <style scoped>

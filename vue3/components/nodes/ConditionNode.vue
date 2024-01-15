@@ -26,12 +26,20 @@
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
 import RestrictionItem from '../restriction/RestrictionItem.vue'
+import CompletionItem from '../completion/CompletionItem.vue'
+import { computed } from 'vue';
+
+// Connection handles
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 const props = defineProps({
   data: {
     type: Object,
     required: true,
   },
+  type: {
+    type: String,
+  }
 });
 
 const toggleVisibility = () => {
@@ -51,12 +59,17 @@ const toggleVisibility = () => {
           'strikethrough': !props.data.visibility }">
       </i>
     </button>
-    <RestrictionItem :restriction="data" />
+    <div v-if="props.type == 'restriction'">
+      <RestrictionItem :restriction="data" />
+    </div>
+    <div v-else-if="props.type == 'completion'">
+      <CompletionItem :completion="data" />
+    </div>
   </div>
-  <Handle id="target_and" type="target" :position="Position.Top"/>
-  <Handle id="source_and" type="source" :position="Position.Bottom"/>
-  <Handle id="target_or" type="target" :position="Position.Left"/>
-  <Handle id="source_or" type="source" :position="Position.Right"/>
+  <Handle id="target_and" type="target" :position="Position.Top" :style="handleStyle"/>
+  <Handle id="source_and" type="source" :position="Position.Bottom" :style="handleStyle"/>
+  <Handle id="target_or" type="target" :position="Position.Left" :style="handleStyle"/>
+  <Handle id="source_or" type="source" :position="Position.Right" :style="handleStyle"/>
 </template>
 
 <style scoped>

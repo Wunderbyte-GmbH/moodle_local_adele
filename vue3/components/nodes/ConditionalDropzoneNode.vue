@@ -23,9 +23,6 @@
  */ -->
  
  <script setup>
- // Import needed libraries
- import { Handle, Position } from '@vue-flow/core'
-
  const props = defineProps({
   data: {
     type: Object,
@@ -41,7 +38,5 @@
     }">
     {{ data.infotext}}
   </div>
-  <Handle id="target_or" type="target" :position="Position.Left"/>
-  <Handle id="source_or" type="source" :position="Position.Right"/>
 </template>
 

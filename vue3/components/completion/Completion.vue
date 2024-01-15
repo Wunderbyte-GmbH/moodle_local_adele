@@ -1,4 +1,8 @@
 <template>
+  <button @click="goBack" class="btn btn-outline-primary">
+    <i class="fa fa-arrow-left"></i> Go Back to Learningpath
+  </button>
+  
     <h3>Edit Completion criteria of course node</h3>
     <div class="card">
     <h4></h4>
@@ -19,7 +23,6 @@
 
     <div v-if="completions !== null">
       <ParentNodes :parentNodes="parentNodes" />
-
         <div class="dndflowcompletion" @drop="onDrop" >
           <FeedbackModal >
           </FeedbackModal>
@@ -27,7 +30,7 @@
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
                 <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
                 <template #node-custom="{ data }" >
-                    <CompletionNode :data="data"/>
+                    <ConditionNode :data="data"/>
                 </template>
                 <template #node-dropzone="{ data }">
                     <DropzoneNode :data="data"/>
@@ -65,7 +68,7 @@ import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
 import { Background } from '@vue-flow/background'
 import Controls from './CompletionControls.vue'
-import CompletionNode from '../nodes/CompletionNode.vue'
+import ConditionNode from '../nodes/ConditionNode.vue'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
 import { notify } from "@kyvg/vue3-notification"
 import CompletionLine from '../edges/ConditionLine.vue'
@@ -87,6 +90,12 @@ const dark = ref(false)
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
+}
+
+// Function to go back
+const goBack = () => {
+  store.state.editingadding = !store.state.editingadding
+  store.state.editingrestriction = !store.state.editingrestriction
 }
 
 // Get all available completions

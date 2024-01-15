@@ -57,42 +57,7 @@
               <div>
                 <div v-for="goal in store.state.learninggoal">
                   <h4 class="font-weight-bold">{{ store.state.strings.fromlearningtitel }}</h4>
-                  <div>
-                    <input
-                      v-if="$store.state.learningGoalID == 0"
-                      class="form-control fancy-input"
-                      :placeholder="store.state.strings.goalnameplaceholder"
-                      autofocus
-                      type="text"
-                      v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                      v-model="goalname"
-                    />
-                    <input
-                      v-else
-                      class="form-control fancy-input"
-                      type="text"
-                      v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                      v-model="goal.name"
-                    />
-                  </div>
-                  <div class="mb-4">
-                    <h4 class="font-weight-bold">{{ store.state.strings.fromlearningdescription }}</h4>
-                    <div>
-                      <textarea
-                        v-if="$store.state.learningGoalID == 0"
-                        class="form-control fancy-input"
-                        :placeholder="store.state.strings.goalsubjectplaceholder"
-                        v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                        v-model="goaldescription"
-                      ></textarea>
-                      <textarea
-                        v-else
-                        class="form-control fancy-input"
-                        v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                        v-model="goal.description"
-                      ></textarea>
-                    </div>
-                  </div>
+                  <TextInputs :goal=goal @change-GoalName="changeGoalName" @change-GoalDescription="changeGoalDescription"/>
                   <LearingPath />
                 </div>
               </div>
@@ -111,7 +76,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
@@ -119,14 +84,7 @@ import Completion from './completion/Completion.vue'
 import Restriction from './restriction/Restriction.vue'
 import LearingPath from './flowchart/LearningPath.vue'
 import LearningPathList from './LearningPathList.vue'
-
-const beforeEnter = (el) => {
-  el.style.opacity = 0;
-};
-
-const afterLeave = (el) => {
-  el.style.opacity = 1;
-};
+import TextInputs from './charthelper/textInputs.vue'
 
 // Load Store and Router
 const store = useStore()
@@ -136,6 +94,13 @@ const router = useRouter()
 const goalname = ref('')
 const goaldescription = ref('')
 
+const changeGoalName = (newGoalName) => {
+  store.state.learninggoal[0].name = newGoalName;
+}
+
+const changeGoalDescription = (newGoalDescription) => {
+  store.state.learninggoal[0].description = newGoalDescription;
+}
 
 // Checking routes 
 const checkRoute = (currentRoute) => {
@@ -177,16 +142,6 @@ const showForm = async (learninggoalId = null) => {
   window.scrollTo(0, 0)
   // This has to happen after the save button is hit.
 };
-
-// Watch changes on goalname
-watch(goalname, (newGoalName) => {
-  store.state.learninggoal[0].name = newGoalName;
-});
-
-// Watch changes on goaldescription
-watch(goaldescription, (newGoalDescription) => {
-  store.state.learninggoal[0].description = newGoalDescription;
-});
 
 // Trigger the checking route function
 onBeforeRouteUpdate((to, from, next) => {

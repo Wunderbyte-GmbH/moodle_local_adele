@@ -27,7 +27,7 @@
           :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
             <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
             <template #node-custom="{ data }" >
-                <RestrictionNode :data="data"/>
+                <ConditionNode :data="data" :type="'restriction'"/>
             </template>
             <template #node-dropzone="{ data }">
                 <DropzoneNode :data="data"/>
@@ -68,7 +68,7 @@ import DropzoneNode from '../nodes/DropzoneNode.vue'
 import ConditionLine from '../edges/ConditionLine.vue'
 import Sidebar from '../completion/CompletionSidebar.vue'
 import Controls from '../completion/CompletionControls.vue'
-import RestrictionNode from '../nodes/RestrictionNode.vue'
+import ConditionNode from '../nodes/ConditionNode.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 

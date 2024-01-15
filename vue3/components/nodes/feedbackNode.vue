@@ -25,7 +25,7 @@
  <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 // Load Store 
@@ -42,6 +42,9 @@ const props = defineProps({
 const setFeedbackModal = () => {
   store.state.feedback = props.data
 };
+
+// Connection handles
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 const processedFeedback = computed(() => {
   const maxTextLength = 150; // Set your desired maximum text length
@@ -88,7 +91,7 @@ const processedFeedback = computed(() => {
       </div>
     </div>
 
-    <Handle id="source_feedback" type="source" :position="Position.Bottom" />
+    <Handle id="source_feedback" type="source" :position="Position.Bottom" :style="handleStyle"/>
   </div>
 </template>
 
