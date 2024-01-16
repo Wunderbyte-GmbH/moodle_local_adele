@@ -44,11 +44,11 @@
               />
             </div>
             <div class="form-group">
-              <label for="shortname"><b>Shortname:</b></label>
+              <b>Shortname:</b>
               <p class="form-control-static">{{shortname}}</p>
             </div>
             <div class="form-group">
-              <label for="tags"><b>Tags <i class="fa fa-tag"></i>:</b></label>
+              <b>Tags <i class="fa fa-tag"></i>:</b>
               <p class="form-control-static">{{tags}}</p>
             </div>
           </div>

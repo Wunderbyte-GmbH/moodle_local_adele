@@ -40,6 +40,7 @@ watch(goaldescription, (newGoalDescription) => {
                 class="form-control fancy-input"
                 :placeholder="store.state.strings.goalnameplaceholder"
                 autofocus
+                id="goalnameplaceholder"
                 type="text"
                 v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
                 v-model="goalname"
@@ -48,6 +49,7 @@ watch(goaldescription, (newGoalDescription) => {
                 v-else
                 class="form-control fancy-input"
                 type="text"
+                id="goalnameplaceholder"
                 v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
                 v-model="props.goal.name"
             />
@@ -58,6 +60,7 @@ watch(goaldescription, (newGoalDescription) => {
                 <textarea
                 v-if="$store.state.learningGoalID == 0"
                 class="form-control fancy-input"
+                id="goalsubjectplaceholder"
                 :placeholder="store.state.strings.goalsubjectplaceholder"
                 v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
                 v-model="goaldescription"
@@ -65,6 +68,7 @@ watch(goaldescription, (newGoalDescription) => {
                 <textarea
                 v-else
                 class="form-control fancy-input"
+                id="goalsubjectplaceholder"
                 v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
                 v-model="props.goal.description"
                 ></textarea>
