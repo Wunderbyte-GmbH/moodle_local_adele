@@ -56,7 +56,6 @@
             <div class="card-body">
               <div>
                 <div v-for="goal in store.state.learninggoal">
-                  <h4 class="font-weight-bold">{{ store.state.strings.fromlearningtitel }}</h4>
                   <TextInputs :goal=goal @change-GoalName="changeGoalName" @change-GoalDescription="changeGoalDescription"/>
                   <LearingPath />
                 </div>

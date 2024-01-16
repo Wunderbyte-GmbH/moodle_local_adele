@@ -30,7 +30,7 @@
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" class="completions" :class="{ dark }" >
                 <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
                 <template #node-custom="{ data }" >
-                    <ConditionNode :data="data"/>
+                    <ConditionNode :data="data" :type="'completion'"/>
                 </template>
                 <template #node-dropzone="{ data }">
                     <DropzoneNode :data="data"/>

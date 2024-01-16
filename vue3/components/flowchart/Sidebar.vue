@@ -162,7 +162,7 @@ function onDragEnd(){
   <aside class="col-md-2" style="min-width: 10% !important;"> <!-- Adjust the width as needed -->
     <div type="text">{{ strings.fromavailablecourses }}</div>
     <div type="text">{{ strings.tagsearch_description }}</div>
-    <input class="form-control" v-model="searchTerm" :placeholder="strings.placeholder_search" />
+    <input class="form-control" id="searchTerm" v-model="searchTerm" :placeholder="strings.placeholder_search" />
     <div class="learning-path-nodes-container">
       <div class="nodes">
         <template v-for="course in filteredCourses" :key="course.id">
@@ -172,6 +172,9 @@ function onDragEnd(){
             @dragend="onDragEnd()"
             :data="course" style="width: 100%;">
             {{ course.fullname }}
+            <a :href="'/course/view.php?id=' + course.course_node_id[0]" target="_blank">
+              <i class="fa fa-link"></i>
+            </a>
           </div>
         </template>
       </div>

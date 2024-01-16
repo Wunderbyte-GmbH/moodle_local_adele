@@ -247,7 +247,7 @@ const filteredConditions = computed(() => {
   <aside class="col-md-2">
     <div type="text">{{ strings.fromavailablecourses }}</div>
     <div type="text">{{ strings.tagsearch_description }}</div>
-    <input class="form-control" v-model="searchTerm" :placeholder="strings.placeholder_search" />
+    <input class="form-control" id="searchTerm" v-model="searchTerm" :placeholder="strings.placeholder_search" />
     <div class="learning-path-nodes-container">
       <div class="nodes">
         <template v-for="condition in filteredConditions" :key="condition.description">

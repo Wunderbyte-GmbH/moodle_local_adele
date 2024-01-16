@@ -1,7 +1,7 @@
 <template>
   <div class="form-check">
     {{ restriction.description }}
-    <input type="date" :value="data" @input="updateSelectedDate" />
+    <input type="date" :value="data" @input="updateSelectedDate"/>
   </div>
 </template>
 
