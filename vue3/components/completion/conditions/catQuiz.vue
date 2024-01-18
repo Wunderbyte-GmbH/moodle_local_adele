@@ -1,6 +1,12 @@
 <template>
   <div class="form-check">
     {{ completion.description }}
+    <input
+      v-model="testSearch"
+      type="text"
+      class="form-control mb-3"
+      placeholder="Search tests"
+    >
     <select 
       v-model="selectedTest" 
       class="form-select mb-3" 
@@ -12,7 +18,7 @@
         Select a Test
       </option>
       <option 
-        v-for="test in tests" 
+        v-for="test in filteredTests" 
         :key="test.id" 
         :value="test.id"
       >
@@ -89,7 +95,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 // Load Store 
@@ -111,6 +117,7 @@ const emit = defineEmits(['update:modelValue'])
 const showTable = ref(false)
 const scalevalue = ref('');
 const attempts = ref('');
+const testSearch = ref('');
 
 onMounted(async () => {
   // Get all tests
@@ -127,6 +134,8 @@ onMounted(async () => {
   // watch values from selected node
   watch(() => selectedTest.value, async () => {
     scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
+    console.log('scales.value')
+    console.log(scales.value)
     data.value = {
       testid: selectedTest.value,
       scales: scales.value,
@@ -177,6 +186,13 @@ const setValues = (id) => {
     data.value.scales[indexToUpdate].attempts = attempts.value;
   }
 }
+const filteredTests = computed(() => {
+  const searchTerm = testSearch.value.toLowerCase();
+  return tests.value.filter((test) =>
+    test.name.toLowerCase().includes(searchTerm)
+  );
+});
+
 </script>
 
 <style scoped>
