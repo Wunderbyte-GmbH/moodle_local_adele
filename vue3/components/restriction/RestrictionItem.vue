@@ -10,7 +10,7 @@
 import { computed } from 'vue';
 import manual from '../restriction/conditions/manual_check.vue'
 import manual_output from '../restriction/conditions_output/manual_output.vue'
-import timed from '../restriction/conditions/timed_end.vue'
+import timed from '../restriction/conditions/timed_dates.vue'
 import specific_course from '../restriction/conditions/specific_course.vue'
 import parent_courses from '../restriction/conditions/parent_courses.vue'
 
