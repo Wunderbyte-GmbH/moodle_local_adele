@@ -1,16 +1,31 @@
 <template>
-  <div class="form-check">
+  <div 
+    class="form-check"
+  >
     {{ restriction.description }}
-    <input type="date" :value="data" @input="updateSelectedDate"/>
+    <input 
+      type="date" 
+      :value="data" 
+      @input="updateSelectedDate" 
+    >
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 
-const props = defineProps(['modelValue', 'restriction']);
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: null,
+  }, 
+  restriction: {
+    type: Object,
+    required: true,
+  },
+  });
 const data = ref(null);
-const emit = defineEmits()
+const emit = defineEmits(['update:modelValue'])
 
 const updateSelectedDate = (event) => {
   data.value = event.target.value;

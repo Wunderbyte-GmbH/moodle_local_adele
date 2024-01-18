@@ -29,7 +29,6 @@ import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { notify } from "@kyvg/vue3-notification";
 import { useRoute, useRouter } from 'vue-router';
-import { nextTick } from 'vue';
  
  // Load Store and Router
  const store = useStore();
@@ -64,10 +63,20 @@ import { nextTick } from 'vue';
  
  </script>
  
- <template>
-   <Panel class="save-restore-controls">
-     <button class="btn btn-primary m-2" @click="onSave">{{store.state.strings.save}}</button>
-     <button class="btn btn-secondary m-2" @click="onCancel">{{store.state.strings.btncancel}}</button>
-   </Panel>
- </template>
+<template>
+  <Panel class="save-restore-controls">
+    <button 
+      class="btn btn-primary m-2" 
+      @click="onSave"
+    >
+      {{ store.state.strings.save }}
+    </button>
+    <button 
+      class="btn btn-secondary m-2" 
+      @click="onCancel"
+    >
+      {{ store.state.strings.btncancel }}
+    </button>
+  </Panel>
+</template>
  

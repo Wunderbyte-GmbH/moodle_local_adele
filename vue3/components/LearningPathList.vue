@@ -23,47 +23,95 @@
  */ -->
 
 <template>
-    <h3>{{store.state.strings.pluginname}}</h3>
-    <div >
-        <router-link :to="{ name: 'learninggoal-new' }" tag="button" class="btn btn-primary">{{store.state.strings.learninggoal_form_title_add}}</router-link>
+  <div>
+    <h3>{{ store.state.strings.pluginname }}</h3>
+    <div>
+      <router-link 
+        :to="{ name: 'learninggoal-new' }" 
+        tag="button" 
+        class="btn btn-primary"
+      >
+        {{ store.state.strings.learninggoal_form_title_add }}
+      </router-link>
     </div>
-    <h2>{{store.state.strings.overviewlearningpaths}}</h2>
+    <h2>{{ store.state.strings.overviewlearningpaths }}</h2>
 
-    <div >{{store.state.strings.learninggoals_edit_site_description}}</div>
+    <div>{{ store.state.strings.learninggoals_edit_site_description }}</div>
     <span v-if="store.state.learningpaths == ''">
-        {{store.state.strings.learninggoals_edit_site_no_learningpaths}}
+      {{ store.state.strings.learninggoals_edit_site_no_learningpaths }}
     </span>
     <span v-else>
-      <div v-for="singlelearninggoal in store.state.learningpaths" style="margin-bottom: 10px">
-          <div v-if="singlelearninggoal.name !== 'not found'">
-              <div>
-                <div class="card" style="width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ singlelearninggoal.name }}</h5>
-                    <p class="card-text">{{ singlelearninggoal.description }}</p>
-                    <router-link :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" :title="store.state.strings.edit">
-                      <i class="icon fa fa-pencil fa-fw iconsmall m-r-0" :title="store.state.strings.edit"></i>
-                    </router-link>
-                    <a href="" v-on:click.prevent="duplicateLearningpath(singlelearninggoal.id)" :title="store.state.strings.duplicate">
-                        <i class="icon fa fa-copy fa-fw iconsmall m-r-0" :title="store.state.strings.duplicate"></i>
-                    </a>
-                    <a href="" v-on:click.prevent="showDeleteConfirm(singlelearninggoal.id)" :title="store.state.strings.delete">
-                        <i class="icon fa fa-trash fa-fw iconsmall" :title="store.state.strings.delete"></i>
-                    </a>
-                    </div>
-                </div>
+      <div 
+        v-for="singlelearninggoal in store.state.learningpaths" 
+        :key="singlelearninggoal.id" 
+        style="margin-bottom: 10px"
+      >
+        <div v-if="singlelearninggoal.name !== 'not found'">
+          <div>
+            <div 
+              class="card" 
+              style="width: 18rem;"
+            >
+              <div class="card-body">
+                <h5 class="card-title">{{ singlelearninggoal.name }}</h5>
+                <p class="card-text">{{ singlelearninggoal.description }}</p>
+                <router-link 
+                  :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" 
+                  :title="store.state.strings.edit"
+                >
+                  <i 
+                    class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
+                    :title="store.state.strings.edit" 
+                  />
+                </router-link>
+                <a 
+                  :title="store.state.strings.duplicate"
+                  href="" 
+                  @click.prevent="duplicateLearningpath(singlelearninggoal.id)" 
+                >
+                  <i 
+                    class="icon fa fa-copy fa-fw iconsmall m-r-0" 
+                    :title="store.state.strings.duplicate" 
+                  />
+                </a>
+                <a 
+                  :title="store.state.strings.delete"
+                  href="" 
+                  @click.prevent="showDeleteConfirm(singlelearninggoal.id)" 
+                >
+                  <i 
+                    class="icon fa fa-trash fa-fw iconsmall" 
+                    :title="store.state.strings.delete"
+                  />
+                </a>
               </div>
-              <div class="alert-danger p-3 m-t-1 m-b-1" v-show="clicked[singlelearninggoal.id]">
-                  <div>{{store.state.strings.deletepromptpre}}{{singlelearninggoal.name}}{{store.state.strings.deletepromptpost}}</div>
-                  <div class="m-t-1">
-                      <button class="btn btn-danger m-r-0" @click="deleteLearningpathConfirm(singlelearninggoal.id)" :title="store.state.strings.btnconfirmdelete">
-                      {{ store.state.strings.btnconfirmdelete }}</button>
-                      <button type=button @click="cancelDeleteConfirm(singlelearninggoal.id)" class="btn btn-secondary">{{store.state.strings.cancel}}</button>
-                  </div>
-              </div>
+            </div>
+          </div>
+          <div 
+            v-show="clicked[singlelearninggoal.id]"
+            class="alert-danger p-3 m-t-1 m-b-1" 
+          >
+            <div>{{ store.state.strings.deletepromptpre }}{{ singlelearninggoal.name }}{{ store.state.strings.deletepromptpost }}</div>
+            <div class="m-t-1">
+              <button 
+                class="btn btn-danger m-r-0" 
+                :title="store.state.strings.btnconfirmdelete"
+                @click="deleteLearningpathConfirm(singlelearninggoal.id)" 
+              >
+                {{ store.state.strings.btnconfirmdelete }}</button>
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                @click="cancelDeleteConfirm(singlelearninggoal.id)" 
+              >
+                {{ store.state.strings.cancel }}
+              </button>
+            </div>
           </div>
         </div>
+      </div>
     </span>
+  </div>
 </template>
 
 <script setup>
@@ -86,7 +134,7 @@ const showDeleteConfirm = (index) => {
 
 // Cancel learning path deletion
 const cancelDeleteConfirm = (index) => {
-  if (clicked.value.hasOwnProperty(index)) clicked.value[index] = !clicked.value[index];
+  if (clicked.value in index) clicked.value[index] = !clicked.value[index];
 };
 
 // Deleting learning path

@@ -35,7 +35,9 @@ window.__VUE_PROD_DEVTOOLS__ = false;
 
 function init() {
     // We need to overwrite the variable for lazy loading.
+    /* eslint-disable no-undef */
     __webpack_public_path__ = M.cfg.wwwroot + '/local/adele/amd/build/';
+    /* eslint-enable no-undef */
     const app = createApp({});
     
     app.use(VueInputAutowidth);

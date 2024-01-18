@@ -26,7 +26,7 @@
  // Import needed libraries
  import { Handle, Position } from '@vue-flow/core'
 
- const props = defineProps({
+defineProps({
   data: {
     type: Object,
     required: true,
@@ -35,15 +35,38 @@
  
  </script>
 <template>
-  <div class="custom-node text-center rounded p-3"
-    :style="{ 'background-color': data.bgcolor, 'opacity' : data.opacity,
-      'height': data.height, 'width': '400px'
-    }">
-    {{ data.infotext}}
+  <div>
+    <div 
+      class="custom-node text-center rounded p-3"
+      :style="{ 
+        'background-color': data.bgcolor, 
+        'opacity' : data.opacity,
+        'height': data.height, 
+        'width': '400px'
+      }"
+    >
+      {{ data.infotext }}
+    </div>
+    <Handle 
+      id="target_and" 
+      type="target" 
+      :position="Position.Top"
+    />
+    <Handle 
+      id="source_and" 
+      type="source" 
+      :position="Position.Bottom"
+    />
+    <Handle 
+      id="target_or" 
+      type="target" 
+      :position="Position.Left"
+    />
+    <Handle 
+      id="source_or" 
+      type="source" 
+      :position="Position.Right"
+    />
   </div>
-  <Handle id="target_and" type="target" :position="Position.Top"/>
-  <Handle id="source_and" type="source" :position="Position.Bottom"/>
-  <Handle id="target_or" type="target" :position="Position.Left"/>
-  <Handle id="source_or" type="source" :position="Position.Right"/>
 </template>
 

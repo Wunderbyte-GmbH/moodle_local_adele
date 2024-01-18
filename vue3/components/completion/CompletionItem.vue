@@ -1,15 +1,24 @@
 <template>
-  <component :is="dynamicComponent" v-model="completion.value" :completion="completion"/>
+  <component 
+    :is="dynamicComponent" 
+    v-model="completion.value" 
+    :completion="completion"
+  />
 </template>
 
 <script setup>
 import { computed } from 'vue';
 import course_completed from './conditions/course_completed.vue'
-import manual from '../completion/conditions/manual.vue'
-import catquiz from './conditions/catquiz.vue'
-import modquiz from './conditions/modquiz.vue'
+import manual from '../completion/conditions/manual_check.vue'
+import catquiz from './conditions/catQuiz.vue'
+import modquiz from './conditions/modQuiz.vue'
 
-const props = defineProps(['completion']);
+const props = defineProps({
+  completion: {
+    type: Object,
+    default: null,
+  },
+});
 
 const dynamicComponent = computed(() => {
   switch (getInputLabel()) {

@@ -22,14 +22,35 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
- <template>
+<template>
   <div>
-    <div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
+    <div 
+      id="nodeModal" 
+      tabindex="-1" 
+      role="dialog" 
+      class="modal fade" 
+      aria-labelledby="exampleModalLabel" 
+      aria-hidden="true"
+    >
+      <div 
+        class="modal-dialog modal-lg" 
+        role="document"
+      >
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="exampleModalLabel">Edit {{fullname}}</h5>
-            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" @click="closeModal">
+            <h5 
+              id="exampleModalLabel"
+              class="modal-title" 
+            >
+              Edit {{ fullname }}
+            </h5>
+            <button 
+              type="button" 
+              class="close text-white" 
+              data-dismiss="modal" 
+              aria-label="Close" 
+              @click="closeModal"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -37,24 +58,41 @@
             <div class="form-group">
               <label for="fullname"><b>Longname:</b></label>
               <input
-                type="text"
-                class="form-control"
                 id="fullname"
                 v-model="fullname"
-              />
+                class="form-control"
+                type="text"
+              >
             </div>
             <div class="form-group">
               <b>Shortname:</b>
-              <p class="form-control-static">{{shortname}}</p>
+              <p class="form-control-static">
+                {{ shortname }}
+              </p>
             </div>
             <div class="form-group">
-              <b>Tags <i class="fa fa-tag"></i>:</b>
-              <p class="form-control-static">{{tags}}</p>
+              <b>Tags <i class="fa fa-tag" />:</b>
+              <p class="form-control-static">
+                {{ tags }}
+              </p>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal">Close</button>
-            <button type="button" class="btn btn-primary" @click="saveChanges">Save Changes</button>
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              data-dismiss="modal" 
+              @click="closeModal"
+            >
+              Close
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="saveChanges"
+            >
+              Save Changes
+            </button>
           </div>
         </div>
       </div>
@@ -66,6 +104,7 @@
 // import dependancies
 import { useStore } from 'vuex'
 import { ref, watch } from 'vue';
+import $ from 'jquery';
 
 // define constants
 const store = useStore();
@@ -90,7 +129,7 @@ const saveChanges = () => {
 };
 
 // watch values from selected node
-watch(() => store.state.node, (newValue, oldValue) => {
+watch(() => store.state.node, (newValue) => {
   fullname.value = newValue.fullname;
   shortname.value = newValue.shortname;
   tags.value = newValue.tags;

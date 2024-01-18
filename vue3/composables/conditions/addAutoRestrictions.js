@@ -69,16 +69,16 @@ function expandRestriction (newNode, oldNode, relation) {
   let id = 0
   let rightesNodeId = null
   oldNode.restriction.nodes.forEach((node) => {
-    if (x == null || x < node.position.x) {
-       x = node.position.x
+    if (x == null ||x < node.position.x) {
+      x = node.position.x
       rightesNodeId = node.id
     }
-    if (y == null || y > node.position.y) {
+    if (y == null ||y > node.position.y) {
       y = node.position.y
     }
 
     let tmp_id = parseInt(node.id.replace('condition_', '')); 
-    if (id == 0 || id < tmp_id) {
+    if (id == 0 ||id < tmp_id) {
       id = tmp_id
     }
   })

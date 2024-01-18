@@ -1,13 +1,27 @@
 <template>
-  <div v-for="output_item in output_items">
-    <component :is="getOutputLabel(output_item)" v-model="data.manualcompletionvalue" :data="data"/>
+  <div>
+    <div 
+      v-for="output_item in output_items" 
+      :key="output_item"
+    >
+      <component 
+        :is="getOutputLabel(output_item)" 
+        v-model="data.manualcompletionvalue" 
+        :data="data"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
 import manual_output from './conditions_output/manual_output.vue'
 
-const props = defineProps(['data']);
+const props = defineProps({
+  data: {
+    type: Object,
+    default: null,
+  },
+});
 const output_items = ['manual'];
 
 const dynamicComponent = (output_item) => {

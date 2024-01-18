@@ -22,56 +22,59 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
- <style scoped>
- @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
- @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';
- @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
- @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
- @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
-
-.dndflow{flex-direction:column;display:flex;height:600px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
-.learning-path-flow.dark{background:#4e574f;}
-</style>
 <template>
-
-<div class="dndflow" @drop="onDrop">
-    <Modal >
-    </Modal>
-    <VueFlow @dragover="onDragOver" :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
-      :class="{ dark }" :fit-view-on-init="true" :max-zoom="3" :min-zoom="0.3"
-      class="learning-path-flow">
-      <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8"/>
-      <template #node-custom="{ data }">
-          <CustomNode :data="data"/>
-      </template>
-      <template #node-dropzone="{ data }">
-          <DropzoneNode :data="data"/>
-      </template>
-      <template #node-conditionaldropzone="{ data }">
-          <ConditionalDropzoneNode :data="data"/>
-      </template>
-      <template #node-orcourses="{ data }">
-          <OrCourses :data="data" @typeChange="typeChanged"/>
-      </template>
-      <MiniMap nodeColor="grey"/>
-    </VueFlow>
-    <Sidebar 
-      @nodesIntersected="handleNodesIntersected"
-      :courses="store.state.availablecourses" 
-      :strings="store.state.strings" />
-</div>
-<p>
-<div class="d-flex justify-content-center">
-<Controls :learninggoal="store.state.learninggoal[0]"
-    @change-class="toggleClass"
-/>
-</div>
-</p>
-
-<p>
-  <UserList :learningPathId = "store.state.learninggoal[0]"/>
-</p>
-
+  <div>
+    <div 
+      class="dndflow" 
+      @drop="onDrop"
+    >
+      <Modal />
+      <VueFlow 
+        :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
+        :class="{ dark }" 
+        :fit-view-on-init="true" 
+        :max-zoom="3" 
+        :min-zoom="0.3"
+        class="learning-path-flow"
+        @dragover="onDragOver"
+      >
+        <Background 
+          :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
+          gap="8"
+        />
+        <template #node-custom="{ data }">
+          <CustomNode :data="data" />
+        </template>
+        <template #node-dropzone="{ data }">
+          <DropzoneNode :data="data" />
+        </template>
+        <template #node-conditionaldropzone="{ data }">
+          <ConditionalDropzoneNode :data="data" />
+        </template>
+        <template #node-orcourses="{ data }">
+          <OrCourses 
+            :data="data" 
+            @typeChange="typeChanged"
+          />
+        </template>
+        <MiniMap node-color="grey" />
+      </VueFlow>
+      <Sidebar 
+        :courses="store.state.availablecourses" 
+        :strings="store.state.strings" 
+        @nodesIntersected="handleNodesIntersected"
+      />
+    </div>
+    <p />
+    <div class="d-flex justify-content-center">
+      <Controls 
+        :learninggoal="store.state.learninggoal[0]"
+        @change-class="toggleClass"
+      />
+    </div>
+    <p />
+    <UserList :learning-path-id="store.state.learninggoal[0]" />
+  </div>
 </template>
 
 <script setup>
@@ -79,11 +82,11 @@
 import { ref, watch, nextTick } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
-import Sidebar from './Sidebar.vue'
-import Controls from './Controls.vue'
+import Sidebar from './SidebarPath.vue'
+import Controls from './ControlsPath.vue'
 import CustomNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
-import Modal from '../modals/Modal.vue'
+import Modal from '../modals/ModalNode.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
@@ -272,7 +275,7 @@ function onDrop(event) {
         newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child')
         addNodes([newNode])
       }else{
-        let oldNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
+        addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
         addNodes([newNode])
       }
       // Add the new edge
@@ -319,3 +322,14 @@ watch(
 );
 
 </script>
+
+<style scoped>
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
+
+.dndflow{flex-direction:column;display:flex;height:600px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
+.learning-path-flow.dark{background:#4e574f;}
+</style>

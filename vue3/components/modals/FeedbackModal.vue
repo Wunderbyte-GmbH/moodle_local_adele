@@ -22,32 +22,76 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
- <template>
+<template>
   <div>
-  <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div 
+      id="feedbackModal" 
+      class="modal fade" 
+      tabindex="-1" 
+      aria-labelledby="feedbackModalLabel" 
+      aria-hidden="true"
+    >
+      <div 
+        class="modal-dialog modal-lg" 
+        role="document"
+      >
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="exampleModalLabel">Edit Feedback</h5>
-            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" @click="closeModal">
+            <h5 
+              id="exampleModalLabel"
+              class="modal-title" 
+            >
+              Edit Feedback
+            </h5>
+            <button 
+              type="button" 
+              class="close text-white" 
+              data-dismiss="modal" 
+              aria-label="Close" 
+              @click="closeModal"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <div class="btn-toolbar" role="toolbar" aria-label="Formatting Buttons">
-                <div class="btn-group me-2" role="group" aria-label="Bold, Italic, Underline, and Code Buttons">
-                  <button type="button" class="btn btn-secondary btn-bold border" @click="toggleFormatting('bold')">
-                    <i class="fa fa-bold"></i>
+              <div 
+                class="btn-toolbar" 
+                role="toolbar" 
+                aria-label="Formatting Buttons"
+              >
+                <div 
+                  class="btn-group me-2" 
+                  role="group" 
+                  aria-label="Bold, Italic, Underline, and Code Buttons"
+                >
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary btn-bold border" 
+                    @click="toggleFormatting('bold')"
+                  >
+                    <i class="fa fa-bold" />
                   </button>
-                  <button type="button" class="btn btn-secondary btn-italic border" @click="toggleFormatting('italic')">
-                    <i class="fa fa-italic"></i>
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary btn-italic border" 
+                    @click="toggleFormatting('italic')"
+                  >
+                    <i class="fa fa-italic" />
                   </button>
-                  <button type="button" class="btn btn-secondary btn-underline border" @click="toggleFormatting('underline')">
-                    <i class="fa fa-underline"></i>
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary btn-underline border" 
+                    @click="toggleFormatting('underline')"
+                  >
+                    <i class="fa fa-underline" />
                   </button>
-                  <button type="button" class="btn btn-secondary btn-code border" @click="toggleFormatting('code')">
-                    <i class="fa fa-code"></i>
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary btn-code border" 
+                    @click="toggleFormatting('code')"
+                  >
+                    <i class="fa fa-code" />
                   </button>
                 </div>
               </div>
@@ -59,31 +103,42 @@
                 @input="handleInput"
                 @keyup="adjustContenteditableHeight"
                 v-html="initialFeedback"
-              >
-              </div>
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal">Close</button>
-            <button type="button" class="btn btn-primary" @click="saveChanges">Save Changes</button>
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              data-dismiss="modal" 
+              @click="closeModal"
+            >
+              Close
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="saveChanges"
+            >
+              Save Changes
+            </button>
           </div>
         </div>
       </div>
-  </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import $ from 'jquery';
 
 // Load Store 
 const store = useStore();
 
 const initialFeedback = ref(null);
 const feedbackContent = ref(null);
-
-const props = defineProps(['initialFeedback']);
 
 const toggleFormatting = (format) => {
   const selection = window.getSelection();
@@ -147,7 +202,7 @@ onMounted(() => {
   });
 });
 
-watch(() => store.state.feedback, (newValue) => {
+watch(() => store.state.feedback, () => {
   initialFeedback.value = store.state.feedback.feedback;
 });
 

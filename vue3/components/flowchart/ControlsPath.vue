@@ -45,17 +45,22 @@ const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
   addNodes, nodes } = useVueFlow()
 
 // Define props in the setup block
-const props = defineProps(['learninggoal']); 
+const props = defineProps({
+  learninggoal: {
+    type: Object,
+    default: null,
+  }
+}); 
 
 // Emit to parent component
-const emit = defineEmits();
+const emit = defineEmits(['change-class']);
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
   emit('change-class');
 }
 
 // Watch for changes of the learning path
-watch(() => store.state.learninggoal[0], (newValue, oldValue) => {
+watch(() => store.state.learninggoal[0], (newValue) => {
   if (newValue.json.tree != undefined) {
     setNodes(newValue.json.tree.nodes)
     setEdges(newValue.json.tree.edges)
@@ -119,6 +124,7 @@ const onSave = () => {
 const onCancel = () => {
     store.state.learningGoalID = 0;
     store.state.editingadding = false;
+    store.state.editingrestriction = false;
     router.push({name: 'learninggoals-edit-overview'});
 };
 
@@ -130,6 +136,7 @@ onPaneReady(({ fitView,}) => {
 // Update the position of the nodes
 function updatePos() {
   let elements = toObject();
+  let loop = true
   //get all ids
   let nodeids = [];
   elements.nodes.forEach((el) => {
@@ -173,7 +180,7 @@ function updatePos() {
 
   }
 
-  while (true) {
+  while (loop) {
     let new_targets = [];
     //get target nodes position and targets node sources
     targets.forEach((taregt) => {
@@ -203,6 +210,7 @@ function updatePos() {
     })
     targets = new_targets;
     if (new_targets.length === 0) {
+      loop = false
       break;
     }
   }
@@ -218,12 +226,41 @@ function onlyUnique(value, index, array) {
 
 <template>
   <Panel class="save-restore-controls">
-    <button class="btn btn-primary m-2" @click="onSave">{{store.state.strings.save}}</button>
-    <button class="btn btn-secondary m-2" @click="onCancel">{{store.state.strings.btncancel}}</button>
-    <button class="btn btn-info m-2" @click="updatePos">{{store.state.strings.btnupdate_positions}}</button>
-    <button class="btn btn-warning m-2" @click="toggleClass">{{store.state.strings.btntoggle}}</button>
-    <a href="/backup/restorefile.php?contextid=1" target="_blank" rel="noreferrer noopener">
-      <button class="btn btn-link" :title="store.state.strings.btncreatecourse">{{ store.state.strings.btncreatecourse }}</button>
+    <button 
+      class="btn btn-primary m-2" 
+      @click="onSave"
+    >
+      {{ store.state.strings.save }}
+    </button>
+    <button 
+      class="btn btn-secondary m-2" 
+      @click="onCancel"
+    >
+      {{ store.state.strings.btncancel }}
+    </button>
+    <button 
+      class="btn btn-info m-2" 
+      @click="updatePos"
+    >
+      {{ store.state.strings.btnupdate_positions }}
+    </button>
+    <button 
+      class="btn btn-warning m-2" 
+      @click="toggleClass"
+    >
+      {{ store.state.strings.btntoggle }}
+    </button>
+    <a 
+      href="/backup/restorefile.php?contextid=1" 
+      target="_blank" 
+      rel="noreferrer noopener"
+    >
+      <button 
+        class="btn btn-link" 
+        :title="store.state.strings.btncreatecourse"
+      >
+        {{ store.state.strings.btncreatecourse }}
+      </button>
     </a>
   </Panel>
 </template>

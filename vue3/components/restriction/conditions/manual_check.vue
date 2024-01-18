@@ -1,21 +1,19 @@
 <template>
   <div class="form-check">
-    {{ completion.description }}
+    {{ restriction.description }}
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 
 defineProps({
   modelValue: {
     type: Object,
     default: null,
   },
-  completion: {
+  restriction: {
     type: Object,
-    default: null,
-  },
-});
+    required: true,
+  }});
 
 </script>

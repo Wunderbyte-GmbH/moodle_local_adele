@@ -6,13 +6,22 @@
       type="checkbox"
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
-    />
+    >
     <label :for="data.node_id">Grant access to course manually</label>
   </div>
 </template>
 
 <script setup>
 
-const props = defineProps(['modelValue', 'data']);
+defineProps({
+  modelValue: {
+    type: Boolean,
+    default: null,
+  }, 
+  data: {
+    type: Object,
+    required: true,
+  }
+});
 
 </script>

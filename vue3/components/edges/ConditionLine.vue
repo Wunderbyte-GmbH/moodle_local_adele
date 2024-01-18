@@ -60,13 +60,9 @@
      type: String,
      required: true,
    },
-   data: {
-     type: Object,
-     required: false,
-   },
    markerEnd: {
      type: String,
-     required: false,
+     required: true,
    },
    style: {
      type: Object,
@@ -82,25 +78,31 @@
  }
  </script>
  
- <template>
-   <!-- You can use the `BaseEdge` component to create your own custom edge more easily -->
-   <BaseEdge :id="id" :style="style" :path="path[0]" :marker-end="markerEnd" />
- 
-   <!-- Use the `EdgeLabelRenderer` to escape the SVG world of edges and render your own custom label in a `<div>` ctx -->
-   <EdgeLabelRenderer>
-     <div
-       :style="{
+<template>
+  <!-- You can use the `BaseEdge` component to create your own custom edge more easily -->
+  <BaseEdge 
+    :id="id" 
+    :style="style" 
+    :path="path[0]" 
+    :marker-end="markerEnd" 
+  />
+
+  <!-- Use the `EdgeLabelRenderer` to escape the SVG world of edges and render your own custom label in a `<div>` ctx -->
+  <EdgeLabelRenderer>
+    <div
+      :style="{
         pointerEvents: 'all',
         position: 'absolute',
         transform: `translate(-50%, -50%) translate(${path[1]}px,${path[2]}px)`,
         borderRadius: '50%',
         padding: '5px 10px', 
-        backgroundColor: '#007BFF',  // Bootstrap primary color
-        color: '#fff',  // Text color 
-       }"
-       class="nodrag nopan"
-     >{{ data.text }}
-     </div>
-   </EdgeLabelRenderer>
- </template>
+        backgroundColor: '#007BFF',// Bootstrap primary color
+        color: '#fff',// Text color 
+      }"
+      class="nodrag nopan"
+    >
+      {{ data.text }}
+    </div>
+  </EdgeLabelRenderer>
+</template>
  

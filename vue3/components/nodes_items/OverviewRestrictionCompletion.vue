@@ -10,7 +10,10 @@
     // Load Store 
     const store = useStore();
     const props = defineProps({
-        node: Object,
+        node: {
+          type: Object,
+          required: true,
+        }
     });
     // Calculate searched courses
 
@@ -31,7 +34,7 @@
         };
         triggerGetConditions()
     // watch values from selected node
-    watch(() => store.state.learninggoal[0], async (newValue, oldValue) => {
+    watch(() => store.state.learninggoal[0], async () => {
         triggerGetConditions()
     }, { deep: true } );
 
@@ -70,64 +73,96 @@ const toggleCards = () => {
 </script>
 
 <template>
-        <div v-if="conditions.restriction" @click="toggleCards" class="card-container mt-2">
-            <div class="card">
-                <div class="restriction" :style="{ color: restrictionColor }">
-                    <i class="fa-solid fa-key"></i>
-                    <span class="count" >{{ conditions.restriction.count }}</span>
-                </div>
-                <div class="completion" :style="{ color: completionColor }">
-                    <i class="fa-solid fa-check-to-slot"></i>
-                    <span class="count">{{ conditions.completion.count }}</span>
-                </div>
-            </div>
+  <div>
+    <div 
+      v-if="conditions.restriction" 
+      class="card-container mt-2"
+      @click="toggleCards"
+    >
+      <div class="card">
+        <div 
+          class="restriction" 
+          :style="{ color: restrictionColor }"
+        >
+          <i class="fa-solid fa-key" />
+          <span class="count">
+            {{ conditions.restriction.count }}
+          </span>
         </div>
+        <div 
+          class="completion" 
+          :style="{ color: completionColor }"
+        >
+          <i class="fa-solid fa-check-to-slot" />
+          <span class="count">
+            {{ conditions.completion.count }}
+          </span>
+        </div>
+      </div>
+    </div>
 
-        <!-- Left Card -->
-        <div v-if="showCard" class="additional-card left" :style="{ backgroundColor: restrictionColor }">
-            <!-- Content for the left card -->
-            <i class="fa-solid fa-key"></i>
-            <b>
-                Restriction
-            </b>
-            <div v-if="conditions.restriction.count > 0 ">
-                <ul class="list-group mt-3">
-                    <li class="list-group-item" v-for="(condition, index) in conditions.restriction.conditions" :key="index">
-                        {{ condition }}
-                    </li>
-                </ul>
-            </div>
-            <div v-else>
-                <ul class="list-group mt-3">
-                    <li class="list-group-item" >
-                        No restrictions are defined
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <!-- Left Card -->
+    <div 
+      v-if="showCard" 
+      class="additional-card left" 
+      :style="{ backgroundColor: restrictionColor }"
+    >
+      <!-- Content for the left card -->
+      <i class="fa-solid fa-key" />
+      <b>
+        Restriction
+      </b>
+      <div v-if="conditions.restriction.count > 0 ">
+        <ul class="list-group mt-3">
+          <li 
+            v-for="(condition, index) in conditions.restriction.conditions" 
+            :key="index"
+            class="list-group-item"
+          >
+            {{ condition }}
+          </li>
+        </ul>
+      </div>
+      <div v-else>
+        <ul class="list-group mt-3">
+          <li class="list-group-item">
+            No restrictions are defined
+          </li>
+        </ul>
+      </div>
+    </div>
 
-        <!-- Right Card -->
-        <div v-if="showCard" class="additional-card right" :style="{ backgroundColor: completionColor }">
-            <!-- Content for the left card -->
-            <i class="fa-solid fa-key"></i>
-            <b>
-                Completion
-            </b>
-            <div v-if="conditions.completion.count > 0 ">
-                <ul class="list-group mt-3">
-                    <li class="list-group-item" v-for="(condition, index) in conditions.completion.conditions" :key="index">
-                        {{ condition }}
-                    </li>
-                </ul>
-            </div>
-            <div v-else>
-                <ul class="list-group mt-3">
-                    <li class="list-group-item" >
-                        No restrictions are defined
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <!-- Right Card -->
+    <div 
+      v-if="showCard" 
+      class="additional-card right" 
+      :style="{ backgroundColor: completionColor }"
+    >
+      <!-- Content for the left card -->
+      <i class="fa-solid fa-key" />
+      <b>
+        Completion
+      </b>
+      <div v-if="conditions.completion.count > 0 ">
+        <ul class="list-group mt-3">
+          <li 
+            v-for="(condition, index) in conditions.completion.conditions" 
+            :key="index"
+            class="list-group-item"
+          >
+            {{ condition }}
+          </li>
+        </ul>
+      </div>
+      <div v-else>
+        <ul class="list-group mt-3">
+          <li class="list-group-item">
+            No restrictions are defined
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>

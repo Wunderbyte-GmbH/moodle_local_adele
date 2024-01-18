@@ -67,31 +67,46 @@ const processedFeedback = computed(() => {
     style="width: 350px; height: 200px;"
   >
     <div class="text-center">
-      <h5 class="mb-1">Feedback</h5>
+      <h5 class="mb-1">
+        Feedback
+      </h5>
 
-      <div v-if="processedFeedback" class="feedback-section">
-        <div v-html="processedFeedback"></div>
+      <div 
+        v-if="processedFeedback" 
+        class="feedback-section"
+      >
+        <div v-html="processedFeedback" />
       </div>
 
-      <div v-else class="no-feedback-section">
-        <p class="text-muted">No feedback set...</p>
+      <div 
+        v-else 
+        class="no-feedback-section"
+      >
+        <p class="text-muted">
+          No feedback set...
+        </p>
       </div>
 
       <div>
         <button
           type="button"
           class="btn btn-secondary m-2"
-          @click="setFeedbackModal"
           data-toggle="modal"
           data-target="#feedbackModal"
           style="opacity: 1 !important;"
+          @click="setFeedbackModal"
         >
           Edit Feedback
         </button>
       </div>
     </div>
 
-    <Handle id="source_feedback" type="source" :position="Position.Bottom" :style="handleStyle"/>
+    <Handle 
+      id="source_feedback" 
+      type="source" 
+      :position="Position.Bottom" 
+      :style="handleStyle"
+    />
   </div>
 </template>
 
