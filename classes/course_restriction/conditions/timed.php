@@ -27,6 +27,7 @@
 
  namespace local_adele\course_restriction\conditions;
 
+use DateTime;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -104,15 +105,39 @@ class timed implements course_restriction {
         $timed = [];
         foreach ($node['restriction']['nodes'] as $restrictionnode) {
             if ($restrictionnode['data']['label'] == 'timed') {
+                $validstart = true;
                 $validtime = false;
-                $datetimestamp = strtotime($restrictionnode['data']['value']);
-                $currenttimestamp = strtotime(date('Y-m-d'));
-                if ($datetimestamp <= $currenttimestamp) {
-                    $validtime = true;
+                if (self::isvaliddate($restrictionnode['data']['value']['start'])) {
+                    $datetimestamp = strtotime($restrictionnode['data']['value']['start']);
+                    $currenttimestamp = strtotime(date('Y-m-d'));
+                    if ($datetimestamp <= $currenttimestamp) {
+                        $validtime = true;
+                    } else {
+                        $validstart = false;
+                    }
+                }
+                if (self::isvaliddate($restrictionnode['data']['value']['end'])) {
+                    $datetimestamp = strtotime($restrictionnode['data']['value']['end']);
+                    $currenttimestamp = strtotime(date('Y-m-d'));
+                    if ($datetimestamp >= $currenttimestamp &&
+                        $validstart) {
+                        $validtime = true;
+                    }
                 }
                 $timed[$restrictionnode['id']] = $validtime;
             }
         }
         return $timed;
     }
+
+    /**
+     * Helper function to return localized description strings.
+     * @param string $datestring
+     * @param string $format
+     * @return boolean
+     */
+    public function isvaliddate($datestring, $format = 'Y-m-d') {
+        $datetime = DateTime::createFromFormat($format, $datestring);
+        return $datetime && $datetime->format($format) === $datestring;
+  }
 }
