@@ -1,9 +1,12 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const props = defineProps({
-    goal: Object,
+  goal: {
+      type: Object,
+      default: null,
+    },
 });
  
 // Load Store and Router
@@ -17,6 +20,11 @@ const emit = defineEmits([
 // Define constants that will be referenced
 const goalname = ref('')
 const goaldescription = ref('')
+
+onMounted(() => {
+  goalname.value = props.goal.name
+  goaldescription.value = props.goal.description
+})
 
 // Watch changes on goalname
 watch(goalname, (newGoalName) => {
@@ -32,47 +40,34 @@ watch(goaldescription, (newGoalDescription) => {
 </script>
 
 <template>
+  <div>
+    <h4 class="font-weight-bold">
+      {{ store.state.strings.fromlearningtitel }}
+    </h4>
     <div>
-        <h4 class="font-weight-bold">{{ store.state.strings.fromlearningtitel }}</h4>
-        <div>
-            <input
-                v-if="$store.state.learningGoalID == 0"
-                class="form-control fancy-input"
-                :placeholder="store.state.strings.goalnameplaceholder"
-                autofocus
-                id="goalnameplaceholder"
-                type="text"
-                v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                v-model="goalname"
-            />
-            <input
-                v-else
-                class="form-control fancy-input"
-                type="text"
-                id="goalnameplaceholder"
-                v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-                v-model="props.goal.name"
-            />
-            </div>
-            <div class="mb-4">
-            <h4 class="font-weight-bold">{{ store.state.strings.fromlearningdescription }}</h4>
-            <div>
-                <textarea
-                v-if="$store.state.learningGoalID == 0"
-                class="form-control fancy-input"
-                id="goalsubjectplaceholder"
-                :placeholder="store.state.strings.goalsubjectplaceholder"
-                v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                v-model="goaldescription"
-                ></textarea>
-                <textarea
-                v-else
-                class="form-control fancy-input"
-                id="goalsubjectplaceholder"
-                v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-                v-model="props.goal.description"
-                ></textarea>
-            </div>
-        </div>
+      <input
+        id="goalnameplaceholder"
+        v-model="goalname"
+        v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
+        class="form-control fancy-input"
+        :placeholder="store.state.strings.goalnameplaceholder"
+        type="text"
+        autofocus
+      >
     </div>
+    <div class="mb-4">
+      <h4 class="font-weight-bold">
+        {{ store.state.strings.fromlearningdescription }}
+      </h4>
+      <div>
+        <textarea
+          id="goalsubjectplaceholder"
+          v-model="goaldescription"
+          v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
+          class="form-control fancy-input"
+          :placeholder="store.state.strings.goalsubjectplaceholder"
+        />
+      </div>
+    </div>
+  </div>
 </template>

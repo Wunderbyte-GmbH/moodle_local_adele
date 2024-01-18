@@ -22,55 +22,55 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
-<style scoped>
-    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
-    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';
-    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
-    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
-    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
-
-.dndflow{flex-direction:column;display:flex;height:500px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
-.learning-path-flow.dark{background:#4e574f;}
-
-.fade-in {
-  animation: fadeIn 2s cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-</style>
 <template>
-    <div>
-      <notifications width="100%" />
-        <div v-if="$store.state.editingadding == false &&
-          $store.state.editingpretest == false &&
-          $store.state.editingrestriction == false" class="fade-in">
-            <LearningPathList />
-        </div>
-        <div v-else-if="$store.state.editingadding == true" class="fade-in">
-          <div class="card p-4">
-            <h2 class="mt-3">{{ store.state.strings.learninggoal_form_title_edit }}</h2>
-            <div class="card-body">
-              <div>
-                <div v-for="goal in store.state.learninggoal">
-                  <TextInputs :goal=goal @change-GoalName="changeGoalName" @change-GoalDescription="changeGoalDescription"/>
-                  <LearingPath />
-                </div>
-              </div>
+  <div>
+    <notifications width="100%" />
+    <div 
+      v-if="$store.state.editingadding == false &&
+        $store.state.editingpretest == false &&
+        $store.state.editingrestriction == false" 
+      class="fade-in"
+    >
+      <LearningPathList />
+    </div>
+    <div 
+      v-else-if="$store.state.editingadding == true" 
+      class="fade-in"
+    >
+      <div class="card p-4">
+        <h2 class="mt-3">
+          {{ store.state.strings.learninggoal_form_title_edit }}
+        </h2>
+        <div class="card-body">
+          <div>
+            <div 
+              v-for="goal in store.state.learninggoal" 
+              :key="goal.id"
+            >
+              <TextInputs 
+                :goal="goal" 
+                @change-GoalName="changeGoalName" 
+                @change-GoalDescription="changeGoalDescription"
+              />
+              <LearingPath />
             </div>
           </div>
-
         </div>
-        <div v-else-if="$store.state.editingpretest == true" class="fade-in">
-          <Completion />
-        </div>
-        <div v-else-if="$store.state.editingrestriction == true" class="fade-in">
-          <Restriction />
-        </div>
+      </div>
     </div>
+    <div 
+      v-else-if="$store.state.editingpretest == true" 
+      class="fade-in"
+    >
+      <Completion />
+    </div>
+    <div 
+      v-else-if="$store.state.editingrestriction == true" 
+      class="fade-in"
+    >
+      <Restriction />
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -79,8 +79,8 @@ import { ref, onMounted, nextTick } from 'vue'
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import Completion from './completion/Completion.vue'
-import Restriction from './restriction/Restriction.vue'
+import Completion from './completion/CompletionFlow.vue'
+import Restriction from './restriction/RestrictionFlow.vue'
 import LearingPath from './flowchart/LearningPath.vue'
 import LearningPathList from './LearningPathList.vue'
 import TextInputs from './charthelper/textInputs.vue'
@@ -148,3 +148,24 @@ onBeforeRouteUpdate((to, from, next) => {
   next();
 });
 </script>
+
+<style scoped>
+    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
+    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';
+    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
+    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
+    @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
+
+.dndflow{flex-direction:column;display:flex;height:500px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
+.learning-path-flow.dark{background:#4e574f;}
+
+.fade-in {
+  animation: fadeIn 2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+</style>

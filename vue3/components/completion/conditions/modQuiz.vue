@@ -1,35 +1,71 @@
 <template>
   <div class="form-check">
     {{ completion.description }}
-
     <div class="form-group">
-      <label class="form-label" for="quizSelect">Select a Quiz:</label>
-      <select id="quizSelect" class="form-select" v-model="selectedQuiz">
-        <option :value="null" disabled>Select a Quiz</option>
-        <option v-for="quiz in quizzes" :key="quiz.id" :value="quiz.id">{{ quiz.name }}</option>
+      <label 
+        class="form-label" 
+        for="quizSelect"
+      >
+        Select a Quiz:
+      </label>
+      <select 
+        id="quizSelect" 
+        v-model="selectedQuiz"
+        class="form-select" 
+      >
+        <option 
+          :value="null" 
+          disabled
+        >
+          Select a Quiz
+        </option>
+        <option 
+          v-for="quiz in quizzes" 
+          :key="quiz.id" 
+          :value="quiz.id"
+        >
+          {{ quiz.name }}
+        </option>
       </select>
     </div>
     <div v-if="selectedQuiz">
       <div class="form-group">
-        <label class="form-label" for="grade">Min. Grade:</label>
-        <input id="grade" v-model="grade" class="form-control" />
+        <label 
+          class="form-label" 
+          for="grade"
+        >
+          Min. Grade:
+        </label>
+        <input 
+          id="grade" 
+          v-model="grade" 
+          class="form-control" 
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, defineEmits } from 'vue';
 import { useStore } from 'vuex';
 
 // Load Store 
 const store = useStore();
-const props = defineProps(['modelValue', 'completion'])
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default: null,
+  }, 
+  completion: {
+    type: Object,
+    default: null,
+  }})
 const data = ref([])
 const quizzes = ref([])
 const selectedQuiz = ref(null)
 const grade = ref(null)
-const emit = defineEmits()
+const emit = defineEmits(['update:modelValue'])
 
 onMounted(async () => {
   // Get all tests

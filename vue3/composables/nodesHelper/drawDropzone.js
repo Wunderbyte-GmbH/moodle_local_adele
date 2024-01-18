@@ -44,7 +44,7 @@ const  drawDropzone = (closestNode) => {
             x: 0, 
             y: 0
         }
-        if (key != 'and' && key != 'or') {
+        if (key != 'and' &&key != 'or') {
             position = {
                 x: getOffsetX(closestNode, key), 
                 y: closestNode.position.y + dropZoneCourseNodes[key].positionY
@@ -72,7 +72,7 @@ const  drawDropzone = (closestNode) => {
             sourceHandle =  'source'
         } 
 
-        if (key != 'and' && key != 'or') {
+        if (key != 'and' &&key != 'or') {
             const newEdge = {
                 id: `${closestNode.id}-${key}`,
                 source: closestNode.id,

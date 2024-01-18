@@ -6,13 +6,21 @@
       type="checkbox"
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
-    />
+    >
     <label :for="data.node_id">Finish course manually</label>
   </div>
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
 
-const props = defineProps(['modelValue', 'data']);
-
+defineProps({
+  modelValue: {
+    type: Array,
+    default: null,
+  }, 
+  data: {
+    type: Object,
+    default: null,
+  }});
 </script>

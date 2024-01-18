@@ -23,10 +23,12 @@
 
 // Import needed libraries
 import { createRouter, createWebHashHistory } from 'vue-router';
-import notFound from '../components/not-found';
+import notFound from '../components/NotFound';
 import learninggoalsEdit from '../components/learninggoals-edit';
 import userPath from '../components/user_view/UserPath';
+import { useStore } from 'vuex'
 
+const store = useStore()
 // All available routes
 const routes = [
     {

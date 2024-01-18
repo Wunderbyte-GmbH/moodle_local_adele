@@ -72,25 +72,58 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
 </script>
 
 <template>
-  <div class="custom-node text-center rounded p-3" style="height: 200px; width: 400px;">
-    <div>
-      <button type="button" class="btn btn-secondary" @click="setRestrictionView">
-        <i class="fa fa-cogs"></i> Edit Restrictions
-      </button>
+  <div>
+    <div 
+      class="custom-node text-center rounded p-3" 
+      style="height: 200px; width: 400px;"
+    >
+      <div>
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          @click="setRestrictionView"
+        >
+          <i class="fa fa-cogs" /> Edit Restrictions
+        </button>
+      </div>
+      <div class="mb-2">
+        <strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}
+      </div>
+      <div>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          data-toggle="modal" 
+          data-target="#nodeModal"
+          @click="setNodeModal"
+        >
+          <i class="fa fa-edit" /> {{ store.state.strings.edit_course_node }}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          @click="setPretestView"
+        >
+          <i class="fa fa-tasks" /> {{ store.state.strings.edit_node_pretest }}
+        </button>
+      </div>
+      <OverviewRestrictionCompletion :node="data" />
     </div>
-    <div class="mb-2"><strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}</div>
-    <div>
-      <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
-        <i class="fa fa-edit"></i> {{ store.state.strings.edit_course_node }}
-      </button>
-      <button type="button" class="btn btn-secondary" @click="setPretestView">
-        <i class="fa fa-tasks"></i> {{ store.state.strings.edit_node_pretest }}
-      </button>
-    </div>
-    <OverviewRestrictionCompletion :node=data />
+    <Handle 
+      id="target" 
+      type="target" 
+      :position="Position.Top" 
+      :style="handleStyle" 
+      @mousedown="() => setStartNode(data.node_id)" 
+    />
+    <Handle 
+      id="source" 
+      type="source" 
+      :position="Position.Bottom" 
+      :style="handleStyle" 
+      @mousedown="() => setStartNode(data.node_id)" 
+    />
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="handleStyle" @mousedown="() => setStartNode(data.node_id)" />
-  <Handle id="source" type="source" :position="Position.Bottom" :style="handleStyle" @mousedown="() => setStartNode(data.node_id)" />
 </template>
 
 <style scoped>

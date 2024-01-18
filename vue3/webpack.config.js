@@ -3,7 +3,7 @@ var webpack = require('webpack');
 const { VueLoaderPlugin } = require('vue-loader');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const isDevServer = process.argv.find(v => v.includes('webpack-dev-server'));
+process.argv.find(v => v.includes('webpack-dev-server'));
 
 module.exports = (env, options) => {
 
@@ -51,7 +51,7 @@ module.exports = (env, options) => {
             noInfo: true,
             overlay: true,
             headers: {
-                'Access-Control-Allow-Origin': '\*'
+                'Access-Control-Allow-Origin': '*'
             },
             disableHostCheck: true,
             https: true,

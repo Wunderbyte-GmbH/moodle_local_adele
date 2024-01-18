@@ -38,13 +38,16 @@ const store = useStore();
 
 // Defined props from the parent component
 const props = defineProps({
-  condition: String,
+  condition: {
+    type: String,
+    default: null,
+  },
 });
 
 const { onPaneReady, toObject } = useVueFlow()
 
 // Emit to parent component
-const emit = defineEmits();
+const emit = defineEmits(['change-class']);
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
   emit('change-class');
@@ -107,8 +110,23 @@ onPaneReady(({ fitView,}) => {
 
 <template>
   <Panel class="save-restore-controls">
-    <button class="btn btn-primary m-2" @click="onSave">{{store.state.strings.save}}</button>
-    <button class="btn btn-secondary m-2" @click="onCancel">{{store.state.strings.btncancel}}</button>
-    <button class="btn btn-warning m-2" @click="toggleClass">{{store.state.strings.btntoggle}}</button>
+    <button 
+      class="btn btn-primary m-2" 
+      @click="onSave"
+    >
+      {{ store.state.strings.save }}
+    </button>
+    <button 
+      class="btn btn-secondary m-2" 
+      @click="onCancel"
+    >
+      {{ store.state.strings.btncancel }}
+    </button>
+    <button 
+      class="btn btn-warning m-2" 
+      @click="toggleClass"
+    >
+      {{ store.state.strings.btntoggle }}
+    </button>
   </Panel>
 </template>

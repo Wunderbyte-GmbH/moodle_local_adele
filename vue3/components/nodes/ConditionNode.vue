@@ -39,6 +39,7 @@ const props = defineProps({
   },
   type: {
     type: String,
+    default: null
   }
 });
 
@@ -49,27 +50,59 @@ const toggleVisibility = () => {
 </script>
 
 <template>
-  <div class="custom-node text-center rounded p-3" style="height: 250px; width: 350px;">
-    {{ data.name }}
-    <button @click="toggleVisibility" 
-      style="position: absolute; top: 5px; right: 5px; background: none; border: none;">
-      <i class="fa" 
-        :class="{ 'fa-eye': props.data.visibility, 
-          'fa-eye-slash': !props.data.visibility, 
-          'strikethrough': !props.data.visibility }">
-      </i>
-    </button>
-    <div v-if="props.type == 'restriction'">
-      <RestrictionItem :restriction="data" />
+  <div>
+    <div 
+      class="custom-node text-center rounded p-3" 
+      style="height: 250px; width: 350px;"
+    >
+      <b>
+        {{ data.name }}
+      </b>
+      <button 
+        style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
+        @click="toggleVisibility" 
+      >
+        <i 
+          class="fa" 
+          :class="{ 
+            'fa-eye': props.data.visibility, 
+            'fa-eye-slash': !props.data.visibility, 
+            'strikethrough': !props.data.visibility 
+          }"
+        />
+      </button>
+      <div v-if="props.type == 'restriction'">
+        <RestrictionItem :restriction="data" />
+      </div>
+      <div v-else-if="props.type == 'completion'">
+        <CompletionItem :completion="data" />
+      </div>
     </div>
-    <div v-else-if="props.type == 'completion'">
-      <CompletionItem :completion="data" />
-    </div>
+    <Handle 
+      id="target_and" 
+      type="target" 
+      :position="Position.Top" 
+      :style="handleStyle"
+    />
+    <Handle 
+      id="source_and" 
+      type="source" 
+      :position="Position.Bottom" 
+      :style="handleStyle"
+    />
+    <Handle 
+      id="target_or" 
+      type="target" 
+      :position="Position.Left" 
+      :style="handleStyle"
+    />
+    <Handle 
+      id="source_or" 
+      type="source" 
+      :position="Position.Right" 
+      :style="handleStyle"
+    />
   </div>
-  <Handle id="target_and" type="target" :position="Position.Top" :style="handleStyle"/>
-  <Handle id="source_and" type="source" :position="Position.Bottom" :style="handleStyle"/>
-  <Handle id="target_or" type="target" :position="Position.Left" :style="handleStyle"/>
-  <Handle id="source_or" type="source" :position="Position.Right" :style="handleStyle"/>
 </template>
 
 <style scoped>

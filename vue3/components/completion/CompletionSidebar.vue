@@ -33,14 +33,14 @@ const searchTerm = ref('');
 // Prev closest node
 const prevClosestNode = ref(null);
 // Ref to store intersecting node
-const emit = defineEmits();
+const emit = defineEmits(['nodesIntersected']);
 const intersectingNode = ref(null);
 const nodeHeight = '250px';
 
 const availableEdges = ['target_and', 'target_or', 'source_and', 'source_or']
 
 // Function sets up data for nodes
-function onDragStart(event, data, el) {
+function onDragStart(event, data) {
   if (event.dataTransfer) {
     event.dataTransfer.setData('application/vueflow', 'custom');
     event.dataTransfer.setData('application/data', JSON.stringify(data));
@@ -49,7 +49,7 @@ function onDragStart(event, data, el) {
 }
 
 // Function sets up data for nodes
-function onDrag(event, data ) {
+function onDrag(event ) {
   //find closestNode node
   const closestNode = findClosestNode(event); 
   //add drop zones to this node 
@@ -142,7 +142,7 @@ function drawDropZones(freeEdges, closestNode) {
       position.x -= 450;
     }
 
-    if(freeEdge == 'source_and' || (freeEdge == 'source_or' && freeEdges.includes('target_and'))){
+    if(freeEdge == 'source_and' ||(freeEdge == 'source_or' && freeEdges.includes('target_and'))){
       const data = {
         opacity: '0.6',
         bgcolor: 'grey',
@@ -228,10 +228,22 @@ function onDragEnd(){
 
 // Defined props from the parent component
 const props = defineProps({
-  conditions: Array,
-  strings: Object,
-  nodes: Array,
-  edges: Array,
+  conditions: {
+    type: Array,
+    default: null,
+  },
+  strings: {
+    type: Object,
+    default: null,
+  },
+  nodes: {
+    type: Array,
+    default: null,
+  },
+  edges: {
+    type: Array,
+    default: null,
+  },
 });
 
 // Calculate searched courses
@@ -245,23 +257,36 @@ const filteredConditions = computed(() => {
 
 <template>
   <aside class="col-md-2">
-    <div type="text">{{ strings.fromavailablecourses }}</div>
-    <div type="text">{{ strings.tagsearch_description }}</div>
-    <input class="form-control" id="searchTerm" v-model="searchTerm" :placeholder="strings.placeholder_search" />
+    <div type="text">
+      {{ strings.fromavailablecourses }}
+    </div>
+    <div type="text">
+      {{ strings.tagsearch_description }}
+    </div>
+    <input 
+      id="searchTerm" 
+      v-model="searchTerm" 
+      class="form-control" 
+      :placeholder="strings.placeholder_search" 
+    >
     <div class="learning-path-nodes-container">
       <div class="nodes">
-        <template v-for="condition in filteredConditions" :key="condition.description">
-          <div class="vue-flow__node-input mt-1" :draggable="true" 
-            @dragstart="onDragStart($event, condition, this)" 
-            @drag="onDrag($event, condition)"
-            @dragend="onDragEnd()"
-            :data="condition" style="width: 100%;">
-            {{ condition.description }}
-          </div>
-        </template>
+        <div 
+          v-for="condition in filteredConditions" 
+          :key="condition.description"
+          class="vue-flow__node-input mt-1" 
+          :draggable="true" 
+          :data="condition" 
+          style="width: 100%;"
+          @dragstart="onDragStart($event, condition, this)" 
+          @drag="onDrag($event, condition)"
+          @dragend="onDragEnd()"
+        >
+          {{ condition.name }}
+        </div>
       </div>
     </div>
-</aside>
+  </aside>
 </template>
 
 <style scoped>

@@ -23,45 +23,48 @@
  */ -->
 
 <template>
-    <table class="table table-margin-top">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Firstname</th>
-          <th>Lastname</th>
-          <th>Progress</th>
-          <th>Nodes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="relation in store.state.lpuserpathrelations" :key="relation.id">
-          <td>
-            <router-link :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}">
-              {{ relation.id }}
-            </router-link>
-          </td>
-          <td>{{ relation.username }}</td>
-          <td>{{ relation.firstname }}</td>
-          <td>{{ relation.lastname }}</td>
-          <td>
-            <div class="progress">
-              <div
-                class="progress-bar"
-                role="progressbar"
-                :style="{ width: relation.progress.progress + '%' }"
-                aria-valuenow="{{ relation.progress.progress }}"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                {{ relation.progress.progress }}%
-              </div>
+  <table class="table table-margin-top">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Progress</th>
+        <th>Nodes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr 
+        v-for="relation in store.state.lpuserpathrelations" 
+        :key="relation.id"
+      >
+        <td>
+          <router-link :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}">
+            {{ relation.id }}
+          </router-link>
+        </td>
+        <td>{{ relation.username }}</td>
+        <td>{{ relation.firstname }}</td>
+        <td>{{ relation.lastname }}</td>
+        <td>
+          <div class="progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              :style="{ width: relation.progress.progress + '%' }"
+              aria-valuenow="{{ relation.progress.progress }}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              {{ relation.progress.progress }}%
             </div>
-          </td>
-          <td>{{ relation.progress.completed_nodes }}</td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </td>
+        <td>{{ relation.progress.completed_nodes }}</td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <script setup>

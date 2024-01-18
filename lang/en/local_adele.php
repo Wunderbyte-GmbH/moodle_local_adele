@@ -128,6 +128,8 @@ $string['node_courseshortname'] = 'Short Coursename:';
 // Conditions description.
 $string['course_description_condition_completion_manual'] = 'Course will be completed manually';
 $string['course_name_condition_completion_manual'] = 'Course completion checkbox';
+$string['course_description_condition_parent_courses'] = 'Course will be accessible if a certain amount of parent courses are completed';
+$string['course_name_condition_parent_courses'] = 'According to parent nodes';
 $string['course_description_condition_restriction_manual'] = 'Access will be granted manually';
 $string['course_name_condition_restriction_manual'] = 'Course restriction checkbox';
 $string['course_description_condition_restriction_specific_course'] = 'Only if a certain course of this learning path is completed';

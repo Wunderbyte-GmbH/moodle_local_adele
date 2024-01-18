@@ -34,7 +34,7 @@ const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } 
 const searchTerm = ref('');
 
 // Ref to store intersecting node
-const emit = defineEmits();
+const emit = defineEmits(['nodesIntersected']);
 const intersectingNode = ref(null);
 
 // Prev closest node
@@ -42,9 +42,14 @@ const prevClosestNode = ref(null);
 
 // Defined props from the parent component
 const props = defineProps({
-  courses: Array,
-  strings: Object,
-  require: true,
+  courses: {
+    type: Array,
+    required: true,
+  },
+  strings: {
+    type: Object,
+    required: true,
+  }
 });
 
 // Function sets up data for nodes
@@ -96,7 +101,7 @@ function checkIntersetcion(event, closestNode) {
   let insideStartingNode = false;
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
-    if(node.type == 'dropzone' || node.type == 'conditionaldropzone'){
+    if(node.type == 'dropzone' ||node.type == 'conditionaldropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
         x: event.clientX - left,
@@ -159,27 +164,46 @@ function onDragEnd(){
 </script>
 
 <template>
-  <aside class="col-md-2" style="min-width: 10% !important;"> <!-- Adjust the width as needed -->
-    <div type="text">{{ strings.fromavailablecourses }}</div>
-    <div type="text">{{ strings.tagsearch_description }}</div>
-    <input class="form-control" id="searchTerm" v-model="searchTerm" :placeholder="strings.placeholder_search" />
+  <aside 
+    class="col-md-2" 
+    style="min-width: 10% !important;"
+  >
+    <div type="text">
+      {{ strings.fromavailablecourses }}
+    </div>
+    <div type="text">
+      {{ strings.tagsearch_description }}
+    </div>
+    <input 
+      id="searchTerm" 
+      v-model="searchTerm" 
+      class="form-control" 
+      :placeholder="strings.placeholder_search" 
+    >
     <div class="learning-path-nodes-container">
       <div class="nodes">
-        <template v-for="course in filteredCourses" :key="course.id">
-          <div class="vue-flow__node-input mt-1" :draggable="true" 
-            @dragstart="onDragStart($event, course)" 
-            @drag="onDrag($event)"
-            @dragend="onDragEnd()"
-            :data="course" style="width: 100%;">
-            {{ course.fullname }}
-            <a :href="'/course/view.php?id=' + course.course_node_id[0]" target="_blank">
-              <i class="fa fa-link"></i>
-            </a>
-          </div>
-        </template>
+        <div 
+          v-for="course in filteredCourses" 
+          :key="course.id"
+          class="vue-flow__node-input mt-1" 
+          :draggable="true" 
+          :data="course" 
+          style="width: 100%;"
+          @dragstart="onDragStart($event, course)" 
+          @drag="onDrag($event)"
+          @dragend="onDragEnd()"
+        >
+          {{ course.fullname }}
+          <a 
+            :href="'/course/view.php?id=' + course.course_node_id[0]" 
+            target="_blank"
+          >
+            <i class="fa fa-link" />
+          </a>
+        </div>
       </div>
     </div>
-</aside>
+  </aside>
 </template>
 
 <style scoped>

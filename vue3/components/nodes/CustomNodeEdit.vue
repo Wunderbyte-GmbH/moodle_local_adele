@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed, ref  } from 'vue';
+import { defineProps, computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
@@ -60,78 +60,133 @@ const toggleTable = (condition) => {
   otherconditionRef.value = false;
 };
 
+
+watch(() => props.data, async () => {
+  console.log(props.data.manualrestrictionvalue)
+  }, { deep: true } );
+
 </script>
 
 <template>
-  <div class="custom-node text-center rounded p-3"
-    :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]">
-    <div class="mb-2"><b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}</div>
-    <div v-if="data.manualrestriction">
-      <RestrictionOutPutItem :data="data" />
-    </div>
-    <div v-if="data.manualcompletion">
-      <CompletionOutPutItem :data="data" />
-    </div>
-    <div v-if="data.completion.singlecompletionnode">
-      <button class="btn btn-link" @click="toggleTable('Completion')" aria-expanded="false" aria-controls="collapseTable">
-        {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
-      </button>
-      <div v-show="isCompletionVisible" class="table-container">
-        <table class="table table-bordered table-hover fancy-table">
-          <thead class="thead-light">
-            <tr>
-              <th>Key</th>
-              <th>Checkmark</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(value, key) in data.completion.singlecompletionnode" :key="key">
-              <td>{{ key }}</td>
-              <td>
-                {{ value }}
-                <span v-if="value" class="text-success">&#10004;</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <div>
+    <div 
+      class="custom-node text-center rounded p-3"
+      :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]"
+    >
+      <div class="mb-2">
+        <b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}
       </div>
-    </div>
-    <div v-if="data.completion.singlerestrictionnode">
-      <button class="btn btn-link" @click="toggleTable('Restriction')" aria-expanded="false" aria-controls="collapseTable">
-        {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
-      </button>
-      <div v-show="isRestrictionVisible" class="table-container">
-        <div v-if="!data.completion.singlerestrictionnode">
+      <div v-if="data.manualrestriction">
+        <RestrictionOutPutItem 
+          :data="data"
+        />
+      </div>
+      <div v-if="data.manualcompletion">
+        <CompletionOutPutItem :data="data" />
+      </div>
+      <div v-if="data.completion.singlecompletionnode">
+        <button 
+          class="btn btn-link" 
+          aria-expanded="false" 
+          aria-controls="collapseTable"
+          @click="toggleTable('Completion')"
+        >
+          {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
+        </button>
+        <div
+          v-show="isCompletionVisible" 
+          class="table-container"
+        >
           <table class="table table-bordered table-hover fancy-table">
             <thead class="thead-light">
               <tr>
                 <th>Key</th>
-              <th>Checkmark</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(value, key) in data.completion.singlerestrictionnode" :key="key">
-              <td>{{ key }}</td>
-              <td>
-                {{ value }}
-                <span v-if="value" class="text-success">&#10004;</span>
-              </td>
-            </tr>
-          </tbody>
+                <th>Checkmark</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                v-for="(value, key) in data.completion.singlecompletionnode" 
+                :key="key"
+              >
+                <td>{{ key }}</td>
+                <td>
+                  {{ value }}
+                  <span 
+                    v-if="value" 
+                    class="text-success"
+                  >
+                    &#10004;
+                  </span>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
-        <div v-else>
-          <div class="card">
-            <div class="card-body">
-              No conditions are defined
+      </div>
+      <div v-if="data.completion.singlerestrictionnode">
+        <button 
+          class="btn btn-link" 
+          aria-expanded="false" 
+          aria-controls="collapseTable"
+          @click="toggleTable('Restriction')"
+        >
+          {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
+        </button>
+        <div 
+          v-show="isRestrictionVisible" 
+          class="table-container"
+        >
+          <div v-if="!data.completion.singlerestrictionnode">
+            <table class="table table-bordered table-hover fancy-table">
+              <thead class="thead-light">
+                <tr>
+                  <th>Key</th>
+                  <th>Checkmark</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="(value, key) in data.completion.singlerestrictionnode" 
+                  :key="key"
+                >
+                  <td>{{ key }}</td>
+                  <td>
+                    {{ value }}
+                    <span 
+                      v-if="value" 
+                      class="text-success"
+                    >
+                      &#10004;
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else>
+            <div class="card">
+              <div class="card-body">
+                No conditions are defined
+              </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
-    </div>
+    <Handle 
+      id="target" 
+      type="target" 
+      :position="Position.Top" 
+      :style="handleStyle" 
+    />
+    <Handle 
+      id="source" 
+      type="source" 
+      :position="Position.Bottom" 
+      :style="handleStyle" 
+    />
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="handleStyle" />
-  <Handle id="source" type="source" :position="Position.Bottom" :style="handleStyle" />
 </template>
 
 <style scoped>

@@ -22,51 +22,62 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
 
- <template>
-  <notifications width="100%" />
+<template>
+  <div>
+    <notifications width="100%" />
     <div>
-      <button @click="goBack" class="btn btn-outline-primary">
-        <i class="fa fa-arrow-left"></i> Go Back to Overview
+      <button 
+        class="btn btn-outline-primary"
+        @click="goBack" 
+      >
+        <i class="fa fa-arrow-left" /> Go Back to Overview
       </button>
-      <h2 class="mt-3">User path for:</h2>
+      <h2 class="mt-3">
+        User path for:
+      </h2>
       <div class="card">
-    <div v-if="store.state.lpuserpathrelation">
-      <div class="card-body">
-          <h5 class="card-title">
-              <i class="fa fa-user-circle"></i> {{ store.state.lpuserpathrelation.username }}
-          </h5>
-          <ul class="list-group list-group-flush">
+        <div v-if="store.state.lpuserpathrelation">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fa fa-user-circle" /> {{ store.state.lpuserpathrelation.username }}
+            </h5>
+            <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                  <i class="fa fa-user"></i> Firstname: {{ store.state.lpuserpathrelation.firstname }}
+                <i class="fa fa-user" /> Firstname: {{ store.state.lpuserpathrelation.firstname }}
               </li>
               <li class="list-group-item">
-                  <i class="fa fa-user"></i> Lastname: {{ store.state.lpuserpathrelation.lastname }}
+                <i class="fa fa-user" /> Lastname: {{ store.state.lpuserpathrelation.lastname }}
               </li>
               <li class="list-group-item">
-                  <i class="fa fa-envelope"></i> Email: {{ store.state.lpuserpathrelation.email }}
+                <i class="fa fa-envelope" /> Email: {{ store.state.lpuserpathrelation.email }}
               </li>
-          </ul>
+            </ul>
+          </div>
+        </div>
+      
+        <div style="width: 100%; height: 600px;">
+          <VueFlow 
+            :nodes="nodes" 
+            :edges="edges" 
+            :viewport="viewport" 
+            :default-viewport="viewport" 
+            class="learning-path-flow"
+          >
+            <template #node-custom="{ data }">
+              <CustomNodeEdit :data="data" />
+            </template>
+            <template #node-orcourses="{ data }">
+              <CustomNodeEdit :data="data" />
+            </template>
+          </VueFlow>
+        </div>
+        <div class="d-flex justify-content-center">
+          <Controls />
         </div>
       </div>
-      
-      <div style="width: 100%; height: 600px;">
-        <VueFlow :nodes="nodes" :edges="edges" :viewport="viewport" 
-          :default-viewport="viewport" class="learning-path-flow">
-          <template #node-custom="{ data }">
-            <CustomNodeEdit :data="data"/>
-          </template>
-          <template #node-orcourses="{ data }">
-            <CustomNodeEdit :data="data"/>
-          </template>
-        </VueFlow>
-      </div>
-      <div class="d-flex justify-content-center">
-        <Controls />
-      </div>
     </div>
-      <!-- Your content goes here -->
-    </div>
-  </template>
+  </div>
+</template>
   
   <script setup>
   // Import needed libraries

@@ -31,6 +31,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 const courses = ref([])
 const cardHeight = ref(200);
+const dataValue = ref('')
 
  const props = defineProps({
   data: {
@@ -67,12 +68,13 @@ const setRestrictionView = () => {
 onMounted(() => {
   getCourseNamesIds() 
   calculateHeight(courses.value.length)
+  dataValue.value = props.data
 })
 
 const getCourseNamesIds = () => {
   courses.value = []
   store.state.availablecourses.forEach(course => {
-    if (props.data.course_node_id.includes(course.course_node_id[0])) { 
+    if (props.data.course_node_id.includes(course.course_node_id[0])) {
       courses.value.push({
         fullname : course.fullname,
         id : [course.course_node_id[0]]
@@ -92,7 +94,7 @@ const removeCourse = (id) => {
   courses.value = courses.value.filter(course => course.id !== id);
   store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
     if (node.id == props.data.node_id) {
-      props.data.course_node_id = removeElement(node.data.course_node_id, id[0]);
+      dataValue.value.course_node_id = removeElement(node.data.course_node_id, id[0]);
       if (courses.value.length == 1) {
         emit('typeChange', node)
       }
@@ -109,13 +111,13 @@ const removeElement = (array, elementToRemove) => {
 };
 
 // watch values from selected node
-watch(() => props.data, (newValue, oldValue) => {
+watch(() => props.data, () => {
   getCourseNamesIds()
 
 }, { deep: true } );
 
 // watch values from selected node
-watch(() => courses.value, (newValue, oldValue) => {
+watch(() => courses.value, () => {
   calculateHeight(courses.value.length)
 }, { deep: true } );
 
@@ -130,36 +132,79 @@ const setStartNode = (node_id) => {
  
 </script>
 <template>
-  <div class="custom-node text-center rounded p-3" :style="{ height: cardHeight + 'px', width: '400px' }">
-    <div>
-      <button type="button" class="btn btn-secondary" @click="setRestrictionView">
-        <i class="fa fa-cogs"></i> Edit Restrictions
-      </button>
-    </div>
-    <div class="mb-2"><strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}</div>
-    <div class="card-body">
-      <h5 class="card-title">Included Courses</h5>
-      <div v-for="(value, key) in courses" :key="key" class="card-text">
-        <div class="fullname-container">
-          {{ value.fullname }}
-          <button type="button" class="btn btn-danger btn-sm trash-button" @click="removeCourse(value.id)">
-            <i class="fa fa-trash"></i>
-          </button>
+  <div>
+    <div 
+      class="custom-node text-center rounded p-3" 
+      :style="{ height: cardHeight + 'px', width: '400px' }"
+    >
+      <div>
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          @click="setRestrictionView"
+        >
+          <i class="fa fa-cogs" /> Edit Restrictions
+        </button>
+      </div>
+      <div class="mb-2">
+        <strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">
+          Included Courses
+        </h5>
+        <div 
+          v-for="(value, key) in courses" 
+          :key="key" 
+          class="card-text"
+        >
+          <div class="fullname-container">
+            {{ value.fullname }}
+            <button 
+              type="button" 
+              class="btn btn-danger btn-sm trash-button" 
+              @click="removeCourse(value.id)"
+            >
+              <i class="fa fa-trash" />
+            </button>
+          </div>
         </div>
       </div>
+      <div>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          data-toggle="modal" 
+          data-target="#nodeModal"
+          @click="setNodeModal"
+        >
+          <i class="fa fa-edit" /> {{ store.state.strings.edit_course_node }}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          @click="setPretestView"
+        >
+          <i class="fa fa-tasks" /> {{ store.state.strings.edit_node_pretest }}
+        </button>
+      </div>
+      <OverviewRestrictionCompletion :node="data" />
     </div>
-    <div>
-      <button type="button" class="btn btn-primary" @click="setNodeModal" data-toggle="modal" data-target="#nodeModal">
-        <i class="fa fa-edit"></i> {{ store.state.strings.edit_course_node }}
-      </button>
-      <button type="button" class="btn btn-secondary" @click="setPretestView">
-        <i class="fa fa-tasks"></i> {{ store.state.strings.edit_node_pretest }}
-      </button>
-    </div>
-    <OverviewRestrictionCompletion :node=data />
+    <Handle 
+      id="target" 
+      type="target" 
+      :position="Position.Top" 
+      :style="targetHandleStyle" 
+      @mousedown="() => setStartNode(data.node_id)"
+    />
+    <Handle 
+      id="source" 
+      type="source" 
+      :position="Position.Bottom" 
+      :style="targetHandleStyle" 
+      @mousedown="() => setStartNode(data.node_id)"
+    />
   </div>
-  <Handle id="target" type="target" :position="Position.Top" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
-  <Handle id="source" type="source" :position="Position.Bottom" :style="targetHandleStyle" @mousedown="() => setStartNode(data.node_id)"/>
 </template>
 <style scoped>
 .custom-node {

@@ -23,20 +23,25 @@
  */ -->
  
  <script setup>
- const props = defineProps({
+ defineProps({
   data: {
     type: Object,
     required: true,
   },
 });
  
- </script>
+</script>
 <template>
-  <div class="custom-node text-center rounded p-3"
-    :style="{ 'background-color': data.bgcolor, 'opacity' : data.opacity,
-      'height': data.height, 'width': '300px'
-    }">
-    {{ data.infotext}}
+  <div 
+    class="custom-node text-center rounded p-3"
+    :style="{ 
+      'background-color': data.bgcolor, 
+      'opacity' : data.opacity,
+      'height': data.height, 
+      'width': '300px'
+    }"
+  >
+    {{ data.infotext }}
   </div>
 </template>
 

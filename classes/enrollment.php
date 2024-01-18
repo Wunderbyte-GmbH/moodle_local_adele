@@ -98,7 +98,7 @@ class enrollment {
         WHERE {$likecourseid}";
 
         // Providing the named parameter in the $params array.
-        $params = ['courseidpattern' => '%course_node_id__' . $courseid . ',%'];
+        $params = ['courseidpattern' => '%course_node_id____' . $courseid . '__,%'];
 
         // Using get_records_sql function to execute the query with parameters.
         $records = $DB->get_records_sql($sql, $params);
