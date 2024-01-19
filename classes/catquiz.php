@@ -51,7 +51,7 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_tests() {
-        $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2);
+        $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2, true);
         $records = array_map(function ($record) {
             $record = (array)$record;
             $record['json'] = json_decode($record['json']);
