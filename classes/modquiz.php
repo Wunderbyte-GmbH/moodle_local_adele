@@ -53,7 +53,10 @@ class modquiz {
      */
     public static function get_mod_quizzes() {
         global $DB;
-        $records = $DB->get_records('quiz', null, null, 'id, course, name');
+        $sql = "SELECT q.id, q.course, q.name, c.fullname as coursename
+                FROM {quiz} q
+                LEFT JOIN {course} c ON c.id = q.course";
+        $records = $DB->get_records_sql($sql);
         return array_map(fn($a) => (array)$a, $records);
     }
 }

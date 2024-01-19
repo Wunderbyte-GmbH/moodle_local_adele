@@ -95,7 +95,7 @@ class get_catquiz_tests extends external_api {
             new external_single_structure([
                     'id' => new external_value(PARAM_TEXT, 'id'),
                     'componentid' => new external_value(PARAM_TEXT, 'componentid'),
-                    'courseid' => new external_value(PARAM_TEXT, 'courseid'),
+                    'coursename' => new external_value(PARAM_TEXT, 'coursename'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
                 ]
             )

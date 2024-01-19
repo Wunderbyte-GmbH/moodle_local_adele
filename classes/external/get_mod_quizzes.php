@@ -96,6 +96,7 @@ class get_mod_quizzes extends external_api {
                     'id' => new external_value(PARAM_TEXT, 'id'),
                     'course' => new external_value(PARAM_TEXT, 'courseid'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
+                    'coursename' => new external_value(PARAM_TEXT, 'coursename'),
                 ]
             )
         );
