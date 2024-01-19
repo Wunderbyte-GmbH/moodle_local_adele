@@ -2,31 +2,11 @@
   <div class="form-check">
     {{ completion.description }}
     <div class="form-group">
-      <label 
-        class="form-label" 
-        for="quizSelect"
-      >
-        Select a Quiz:
-      </label>
-      <select 
-        id="quizSelect" 
-        v-model="selectedQuiz"
-        class="form-select" 
-      >
-        <option 
-          :value="null" 
-          disabled
-        >
-          Select a Quiz
-        </option>
-        <option 
-          v-for="quiz in quizzes" 
-          :key="quiz.id" 
-          :value="quiz.id"
-        >
-          {{ quiz.name }}
-        </option>
-      </select>
+      <DropdownInput 
+        :selected-test-id="selectedQuiz"
+        :tests="quizzes" 
+        @update:value="updatedTest"
+      />
     </div>
     <div v-if="selectedQuiz">
       <div class="form-group">
@@ -49,6 +29,7 @@
 <script setup>
 import { onMounted, ref, watch, defineEmits } from 'vue';
 import { useStore } from 'vuex';
+import DropdownInput from '../../nodes_items/DropdownInput.vue'
 
 // Load Store 
 const store = useStore();
@@ -100,6 +81,10 @@ watch(() => data.value, () => {
   emit('update:modelValue', data.value);
 }, { deep: true } );
 
+const updatedTest = (test) => {
+  selectedQuiz.value = test.id;
+}
+
 </script>
 
 <style scoped>
@@ -118,7 +103,6 @@ watch(() => data.value, () => {
   font-weight: bold;
 }
 
-.form-select,
 .form-control {
   width: 100%; /* Make the inputs fill their container */
   padding: 8px;
@@ -127,9 +111,4 @@ watch(() => data.value, () => {
   border-radius: 4px;
 }
 
-.form-select {
-  max-width: 100%; /* Set a maximum width for the select */
-}
-
-/* Add any additional styling as needed */
 </style>

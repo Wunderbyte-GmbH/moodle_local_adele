@@ -60,11 +60,6 @@ const toggleTable = (condition) => {
   otherconditionRef.value = false;
 };
 
-
-watch(() => props.data, async () => {
-  console.log(props.data.manualrestrictionvalue)
-  }, { deep: true } );
-
 </script>
 
 <template>

@@ -146,8 +146,6 @@ function onDragOver(event) {
 // Adjust and add edges if connection was made
 function handleConnect(params) {
 if (params.source !== store.state.startnode) {
-  console.log(params)
-  console.log(store.state.startnode)
  // Swap source and target positions
  params.target = params.source;
  params.source = store.state.startnode;

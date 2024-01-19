@@ -25,7 +25,6 @@
 
 namespace local_adele;
 
-use local_catquiz\catquiz_handler;
 use local_catquiz\data\dataapi;
 use local_catquiz\testenvironment;
 
@@ -57,6 +56,7 @@ class catquiz {
             $record = (array)$record;
             $record['json'] = json_decode($record['json']);
             $record['name'] = $record['json']->name;
+            $record['coursename'] = $record['fullname'];
             unset($record['json']);
             return $record;
         }, $records);

@@ -97,6 +97,7 @@ const onSave = () => {
 // Cancel learning path edition and return to overview
 const onCancel = () => {
   store.state.editingpretest = false
+  store.state.editingrestriction = false
   store.state.editingadding = true
   store.state.node = null
 };
