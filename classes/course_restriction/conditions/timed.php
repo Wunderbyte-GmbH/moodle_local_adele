@@ -139,5 +139,5 @@ class timed implements course_restriction {
     public function isvaliddate($datestring, $format = 'Y-m-d') {
         $datetime = DateTime::createFromFormat($format, $datestring);
         return $datetime && $datetime->format($format) === $datestring;
-  }
+    }
 }
