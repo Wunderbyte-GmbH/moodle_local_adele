@@ -28,7 +28,7 @@
       class="dndflow" 
       @drop="onDrop"
     >
-      <Modal />
+      <Modal v-if="store.state.view != 'teacher'" />
       <VueFlow 
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
         :class="{ dark }" 
@@ -60,20 +60,23 @@
         <MiniMap node-color="grey" />
       </VueFlow>
       <Sidebar 
+        v-if="store.state.view != 'teacher'"
         :courses="store.state.availablecourses" 
         :strings="store.state.strings" 
         @nodesIntersected="handleNodesIntersected"
       />
     </div>
     <p />
-    <div class="d-flex justify-content-center">
+    <div 
+      class="d-flex justify-content-center"
+    >
       <Controls 
         :learninggoal="store.state.learninggoal[0]"
         @change-class="toggleClass"
       />
     </div>
     <p />
-    <UserList :learning-path-id="store.state.learninggoal[0]" />
+    <UserList :learning-path-id="store.state.learninggoal[0]" /> 
   </div>
 </template>
 
@@ -301,15 +304,15 @@ function onDrop(event) {
 }
 
 // Watch for changes in the nodes
-watch(
-  () => nodes.value,
-  () => {
-    setTimeout(() => {
-      fitView({ duration: 1000, padding: 0.5 });
-    }, 100);
-  },
-  { deep: true } // Enable deep watching to capture changes in nested properties
-);
+// watch(
+//   () => nodes.value,
+//   () => {
+//     setTimeout(() => {
+//       fitView({ duration: 1000, padding: 0.5 });
+//     }, 100);
+//   },
+//   { deep: true } // Enable deep watching to capture changes in nested properties
+// );
 watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {

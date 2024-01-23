@@ -24,51 +24,59 @@
 
 <template>
   <div>
-    <notifications width="100%" />
-    <div 
-      v-if="$store.state.editingadding == false &&
-        $store.state.editingpretest == false &&
-        $store.state.editingrestriction == false" 
-      class="fade-in"
-    >
-      <LearningPathList />
+    <div v-if="store.state.view=='teacher'">
+      <TeacherView />
     </div>
-    <div 
-      v-else-if="$store.state.editingadding == true" 
-      class="fade-in"
-    >
-      <div class="card p-4">
-        <h2 class="mt-3">
-          {{ store.state.strings.learninggoal_form_title_edit }}
-        </h2>
-        <div class="card-body">
-          <div>
-            <div 
-              v-for="goal in store.state.learninggoal" 
-              :key="goal.id"
-            >
-              <TextInputs 
-                :goal="goal" 
-                @change-GoalName="changeGoalName" 
-                @change-GoalDescription="changeGoalDescription"
-              />
-              <LearingPath />
+    <div v-if="store.state.view=='student'">
+      <StudentView />
+    </div>
+    <div v-else>
+      <notifications width="100%" />
+      <div 
+        v-if="$store.state.editingadding == false &&
+          $store.state.editingpretest == false &&
+          $store.state.editingrestriction == false" 
+        class="fade-in"
+      >
+        <LearningPathList />
+      </div>
+      <div 
+        v-else-if="$store.state.editingadding == true" 
+        class="fade-in"
+      >
+        <div class="card p-4">
+          <h2 class="mt-3">
+            {{ store.state.strings.learninggoal_form_title_edit }}
+          </h2>
+          <div class="card-body">
+            <div>
+              <div 
+                v-for="goal in store.state.learninggoal" 
+                :key="goal.id"
+              >
+                <TextInputs 
+                  :goal="goal" 
+                  @change-GoalName="changeGoalName" 
+                  @change-GoalDescription="changeGoalDescription"
+                />
+                <LearingPath />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div 
-      v-else-if="$store.state.editingpretest == true" 
-      class="fade-in"
-    >
-      <Completion />
-    </div>
-    <div 
-      v-else-if="$store.state.editingrestriction == true" 
-      class="fade-in"
-    >
-      <Restriction />
+      <div 
+        v-else-if="$store.state.editingpretest == true" 
+        class="fade-in"
+      >
+        <Completion />
+      </div>
+      <div 
+        v-else-if="$store.state.editingrestriction == true" 
+        class="fade-in"
+      >
+        <Restriction />
+      </div>
     </div>
   </div>
 </template>
@@ -84,6 +92,8 @@ import Restriction from './restriction/RestrictionFlow.vue'
 import LearingPath from './flowchart/LearningPath.vue'
 import LearningPathList from './LearningPathList.vue'
 import TextInputs from './charthelper/textInputs.vue'
+import TeacherView from './teacher_view/TeacherView.vue';
+import StudentView from './student_view/StudentView.vue';
 
 // Load Store and Router
 const store = useStore()
@@ -117,8 +127,10 @@ const checkRoute = (currentRoute) => {
 
 // Trigger web services on mount
 onMounted(() => {
-  store.dispatch('fetchLearningpaths');
-  store.dispatch('fetchAvailablecourses');
+  if(store.state.view!='student'){
+    store.dispatch('fetchLearningpaths');
+    store.dispatch('fetchAvailablecourses');
+  }
   checkRoute(router.value);
 });
 

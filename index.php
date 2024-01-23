@@ -50,11 +50,10 @@ $PAGE->navbar->ignore_active(true);
 $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/local/adele/index.php'));
 $PAGE->set_pagelayout('admin');
 
-$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
-
 $output = $PAGE->get_renderer('local_adele');
 
 echo $OUTPUT->header();
+$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
 echo <<<'EOT'
 <div id="local-adele-app">

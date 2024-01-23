@@ -79,7 +79,8 @@ class get_lp_user_path_relations extends external_api {
         require_login();
 
         $context = context_system::instance();
-        if (!has_capability('local/adele:canmanage', $context)) {
+        if (!has_capability('local/adele:canmanage', $context) &&
+            !has_capability('local/adele:view', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 

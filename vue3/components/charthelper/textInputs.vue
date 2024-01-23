@@ -53,6 +53,7 @@ watch(goaldescription, (newGoalDescription) => {
         :placeholder="store.state.strings.goalnameplaceholder"
         type="text"
         autofocus
+        :disabled="store.state.view=='teacher'"
       >
     </div>
     <div class="mb-4">
@@ -66,6 +67,7 @@ watch(goaldescription, (newGoalDescription) => {
           v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
           class="form-control fancy-input"
           :placeholder="store.state.strings.goalsubjectplaceholder"
+          :disabled="store.state.view=='teacher'"
         />
       </div>
     </div>

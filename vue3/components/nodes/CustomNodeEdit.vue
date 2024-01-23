@@ -29,6 +29,7 @@ import { defineProps, computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
+import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 
 // Load Store 
 const store = useStore();
@@ -76,63 +77,26 @@ const toggleTable = (condition) => {
           :data="data"
         />
       </div>
-      <div v-if="data.manualcompletion">
-        <CompletionOutPutItem :data="data" />
+      <div v-if="store.state.learninggoal && store.state.view=='student'">
+        <OverviewRestrictionCompletion :node="data" />
       </div>
-      <div v-if="data.completion.singlecompletionnode">
-        <button 
-          class="btn btn-link" 
-          aria-expanded="false" 
-          aria-controls="collapseTable"
-          @click="toggleTable('Completion')"
-        >
-          {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
-        </button>
-        <div
-          v-show="isCompletionVisible" 
-          class="table-container"
-        >
-          <table class="table table-bordered table-hover fancy-table">
-            <thead class="thead-light">
-              <tr>
-                <th>Key</th>
-                <th>Checkmark</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
-                v-for="(value, key) in data.completion.singlecompletionnode" 
-                :key="key"
-              >
-                <td>{{ key }}</td>
-                <td>
-                  {{ value }}
-                  <span 
-                    v-if="value" 
-                    class="text-success"
-                  >
-                    &#10004;
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <div v-else>
+        <div v-if="data.manualcompletion">
+          <CompletionOutPutItem :data="data" />
         </div>
-      </div>
-      <div v-if="data.completion.singlerestrictionnode">
-        <button 
-          class="btn btn-link" 
-          aria-expanded="false" 
-          aria-controls="collapseTable"
-          @click="toggleTable('Restriction')"
-        >
-          {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
-        </button>
-        <div 
-          v-show="isRestrictionVisible" 
-          class="table-container"
-        >
-          <div v-if="!data.completion.singlerestrictionnode">
+        <div v-if="data.completion.singlecompletionnode">
+          <button 
+            class="btn btn-link" 
+            aria-expanded="false" 
+            aria-controls="collapseTable"
+            @click="toggleTable('Completion')"
+          >
+            {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
+          </button>
+          <div
+            v-show="isCompletionVisible" 
+            class="table-container"
+          >
             <table class="table table-bordered table-hover fancy-table">
               <thead class="thead-light">
                 <tr>
@@ -142,7 +106,7 @@ const toggleTable = (condition) => {
               </thead>
               <tbody>
                 <tr 
-                  v-for="(value, key) in data.completion.singlerestrictionnode" 
+                  v-for="(value, key) in data.completion.singlecompletionnode" 
                   :key="key"
                 >
                   <td>{{ key }}</td>
@@ -159,10 +123,52 @@ const toggleTable = (condition) => {
               </tbody>
             </table>
           </div>
-          <div v-else>
-            <div class="card">
-              <div class="card-body">
-                No conditions are defined
+        </div>
+        <div v-if="data.completion.singlerestrictionnode">
+          <button 
+            class="btn btn-link" 
+            aria-expanded="false" 
+            aria-controls="collapseTable"
+            @click="toggleTable('Restriction')"
+          >
+            {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
+          </button>
+          <div 
+            v-show="isRestrictionVisible" 
+            class="table-container"
+          >
+            <div v-if="!data.completion.singlerestrictionnode">
+              <table class="table table-bordered table-hover fancy-table">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Key</th>
+                    <th>Checkmark</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr 
+                    v-for="(value, key) in data.completion.singlerestrictionnode" 
+                    :key="key"
+                  >
+                    <td>{{ key }}</td>
+                    <td>
+                      {{ value }}
+                      <span 
+                        v-if="value" 
+                        class="text-success"
+                      >
+                        &#10004;
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-else>
+              <div class="card">
+                <div class="card-body">
+                  No conditions are defined
+                </div>
               </div>
             </div>
           </div>

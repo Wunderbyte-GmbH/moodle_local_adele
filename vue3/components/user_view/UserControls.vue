@@ -43,12 +43,6 @@ import { useRoute, useRouter } from 'vue-router';
     store.dispatch('saveUserPathRelation', { 
         nodes: completion.nodes, 
         route: route_params});
-
-    setTimeout(() => {
-      //store.dispatch('fetchUserPathRelation', route.params);
-
-    }, 100);
-
     notify({
         title: store.state.strings.title_save,
         text: store.state.strings.description_save,

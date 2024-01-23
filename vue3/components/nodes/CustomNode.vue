@@ -77,7 +77,7 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
       class="custom-node text-center rounded p-3" 
       style="height: 200px; width: 400px;"
     >
-      <div>
+      <div v-if="store.state.view!='teacher'">
         <button 
           type="button" 
           class="btn btn-secondary" 
@@ -89,7 +89,7 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
       <div class="mb-2">
         <strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}
       </div>
-      <div>
+      <div v-if="store.state.view!='teacher'">
         <button 
           type="button" 
           class="btn btn-primary" 

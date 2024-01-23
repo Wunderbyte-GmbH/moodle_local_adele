@@ -33,6 +33,8 @@ import $ from 'jquery';
 const store = createStore({
     state() {
         return {
+            view: 'defaultView',
+            user: null,
             learningGoalID: 0,
             contextID: 0,
             strings: {},

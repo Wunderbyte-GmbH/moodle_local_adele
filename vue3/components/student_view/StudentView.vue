@@ -1,5 +1,4 @@
-<?php
-// This file is part of Moodle - http://moodle.org/
+<!-- // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,31 +14,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page is the entry page into the mod.
+ * Validate if the string does excist.
  *
  * @package     local_adele
  * @author      Jacob Viertel
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ */ -->
 
-require('../../config.php');
-require_login();
+<template>
+  <div>
+    <div>
+      <UserPath />
+      <UserList />
+    </div>
+  </div>
+</template>
+  
+<script setup>
+// Import needed libraries
+import { onMounted } from 'vue';
+import UserList from '../user_view/UserList.vue';
+import UserPath from '../user_view/UserPath.vue';
+import { useStore } from 'vuex'
 
-$coursemoduleid = optional_param('id', 0, PARAM_INT);
-if ($coursemoduleid > 0) {
-    $path = '/local/adele/view.php/' . $coursemoduleid . '/';
-    redirect(new \moodle_url($path));
-}
+const store = useStore()
 
-$title = get_string('modulename', 'local_adele');
+onMounted(() => {
+  store.dispatch('fetchLearningpath')
+  store.dispatch('fetchUserPathRelations')
+})
 
-$PAGE->set_context($coursemodule->context ?? null);
-$PAGE->set_title($title);
-$PAGE->set_heading($title);
-$PAGE->set_pagelayout('standard');
-
-$url = new moodle_url('/local/adele/view.php', ['id' => $coursemoduleid]);
-$PAGE->set_url($url);
-
-echo $OUTPUT->footer();
+</script>

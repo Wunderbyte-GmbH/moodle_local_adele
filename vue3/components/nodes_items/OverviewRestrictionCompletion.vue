@@ -55,7 +55,9 @@ function getConditions(completion_nodes) {
     let count = 0
     let conditions = []
     completion_nodes.forEach((node_completion) => {
-        if (node_completion.type != 'feedback') {
+        if (node_completion.type != 'feedback' && !(
+          store.state.view=='student' && !node_completion.data.visibility
+        )) {
             count ++
             conditions.push(node_completion.data.description)
         }
