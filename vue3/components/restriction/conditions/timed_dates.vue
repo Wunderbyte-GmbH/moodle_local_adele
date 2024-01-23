@@ -3,19 +3,19 @@
     <div class="input-group mb-3">
       <span class="input-group-text rounded-end-0">{{ descriptions.start }}</span>
       <input
-        type="date"
+        type="datetime-local"
         class="form-control"
         :value="data.start"
-        @input="updateSelectedDate('start', $event)"
+        @input="updateSelectedDateTime('start', $event)"
       >
     </div>
     <div class="input-group mb-3">
       <span class="input-group-text rounded-end-0">{{ descriptions.end }}</span>
       <input
-        type="date"
+        type="datetime-local"
         class="form-control"
         :value="data.end"
-        @input="updateSelectedDate('end', $event)"
+        @input="updateSelectedDateTime('end', $event)"
       >
     </div>
   </div>
@@ -44,7 +44,7 @@ const descriptions = ref({
 });
 const emit = defineEmits(['update:modelValue'])
 
-const updateSelectedDate = (type, event) => {
+const updateSelectedDateTime = (type, event) => {
   data.value[type] = event.target.value;
   emit('update:modelValue', data.value);
 };
