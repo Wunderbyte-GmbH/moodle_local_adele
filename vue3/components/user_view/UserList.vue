@@ -40,9 +40,15 @@
         :key="relation.id"
       >
         <td>
-          <router-link :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}">
+          <router-link 
+            v-if="store.state.view!='student'"
+            :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}"
+          >
             {{ relation.id }}
           </router-link>
+          <div v-else>
+            {{ relation.id }}
+          </div>
         </td>
         <td>{{ relation.username }}</td>
         <td>{{ relation.firstname }}</td>

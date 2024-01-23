@@ -225,7 +225,10 @@ function onlyUnique(value, index, array) {
 </script>
 
 <template>
-  <Panel class="save-restore-controls">
+  <Panel 
+    v-if="store.state.view != 'teacher'"
+    class="save-restore-controls"
+  >
     <button 
       class="btn btn-primary m-2" 
       @click="onSave"

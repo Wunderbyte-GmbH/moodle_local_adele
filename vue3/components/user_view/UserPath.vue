@@ -71,7 +71,10 @@
             </template>
           </VueFlow>
         </div>
-        <div class="d-flex justify-content-center">
+        <div 
+          v-if="store.state.view != 'student'"
+          class="d-flex justify-content-center"
+        >
           <Controls />
         </div>
       </div>
@@ -107,7 +110,16 @@ const edges = ref([]);
 const viewport = ref({});
 
 onMounted(() => {
-  store.dispatch('fetchUserPathRelation', route.params)
+  let params = []
+  if (store.state.view == 'student') {
+    params = {
+      learninggoalId: store.state.learningGoalID,
+      userId: store.state.user,
+    }
+  }else {
+    params = route.params
+  }
+  store.dispatch('fetchUserPathRelation', params)
 })
 // Watch for changes in the nodes
 watch(
@@ -116,6 +128,11 @@ watch(
     const flowchart = JSON.parse(store.state.lpuserpathrelation.json)
     nodes.value = flowchart.tree.nodes;
     edges.value = flowchart.tree.edges;
+    if (store.state.view == 'student') {
+      edges.value.forEach((edge) => {
+        edge.deletable = false
+      })
+    }
     viewport.value = flowchart.tree.viewport;
     setTimeout(() => {
       fitView({ duration: 1000, padding: 0.5 });
