@@ -1,7 +1,5 @@
 // generate a new id
 
-import { useStore } from 'vuex';
-
 let startingNode = {
     id: 'starting_node',
     type: 'dropzone',
@@ -18,10 +16,9 @@ let startingNode = {
     parentCourse: '',
   }
 
-const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, backwards = false) => {
-  const store = useStore()  
+const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, view, backwards = false) => {
   removeNodes(['starting_node'])
-    if (store.state.view != 'teacher') {
+  if (view != 'teacher') {
       nextTick(() => {
           let rightStartingNode = 0
           let shifted = false

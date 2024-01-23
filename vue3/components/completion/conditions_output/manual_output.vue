@@ -16,7 +16,7 @@ import { defineProps } from 'vue';
 
 defineProps({
   modelValue: {
-    type: Array,
+    type: Boolean,
     default: null,
   }, 
   data: {

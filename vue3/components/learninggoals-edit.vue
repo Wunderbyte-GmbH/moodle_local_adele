@@ -27,7 +27,7 @@
     <div v-if="store.state.view=='teacher'">
       <TeacherView />
     </div>
-    <div v-if="store.state.view=='student'">
+    <div v-else-if="store.state.view=='student'">
       <StudentView />
     </div>
     <div v-else>
@@ -44,7 +44,7 @@
         v-else-if="$store.state.editingadding == true" 
         class="fade-in"
       >
-        <div class="card p-4">
+        <div class="card p-4" style="padding: 2.5rem !important;">
           <h2 class="mt-3">
             {{ store.state.strings.learninggoal_form_title_edit }}
           </h2>

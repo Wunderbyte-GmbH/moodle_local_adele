@@ -58,7 +58,7 @@ if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
     let condition = store.state.learninggoal[0].json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
-    loadFlowChart(condition[0][props.condition])
+    loadFlowChart(condition[0][props.condition], store.state.view)
 }
 
 // Prepare and save learning path

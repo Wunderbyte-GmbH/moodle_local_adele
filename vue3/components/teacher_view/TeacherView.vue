@@ -30,6 +30,7 @@
           :goal="store.state.learninggoal[0]"
         />
         <LearningPath />
+        <UserList :learning-path-id="store.state.learninggoal[0]" /> 
       </div>
     </div>
   </div>
@@ -41,6 +42,7 @@ import { onMounted } from 'vue';
 import { useStore } from 'vuex';
 import LearningPath from '../flowchart/LearningPath.vue';
 import TextInputs from '../charthelper/textInputs.vue';
+import UserList from '../user_view/UserList.vue';
 
 const store = useStore()
 

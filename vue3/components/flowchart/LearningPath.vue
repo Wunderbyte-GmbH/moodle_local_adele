@@ -76,7 +76,6 @@
       />
     </div>
     <p />
-    <UserList :learning-path-id="store.state.learninggoal[0]" /> 
   </div>
 </template>
 
@@ -292,7 +291,7 @@ function onDrop(event) {
       tree: tree,
     }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600)
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view)
     }
   } else{
     notify({
@@ -317,7 +316,7 @@ watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
     if(oldNodes > newNodes){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, true)
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
     }
   },
 );
