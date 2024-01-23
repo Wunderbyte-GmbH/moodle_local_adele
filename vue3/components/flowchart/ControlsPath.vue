@@ -63,9 +63,6 @@ function toggleClass() {
 watch(() => store.state.learninggoal[0], (newValue) => {
   if (newValue.json.tree != undefined) {
     loadFlowChart(newValue.json.tree, store.state.view)
-
-    //setNodes(newValue.json.tree.nodes)
-    //setEdges(newValue.json.tree.edges)
   }else{
     setNodes([])
     setEdges([])
