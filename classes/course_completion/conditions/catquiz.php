@@ -49,6 +49,8 @@ class catquiz implements course_completion {
     public $id = COURSES_COND_MANUALLY;
     /** @var string $label of the redered condition in frontend. */
     public $label = 'catquiz';
+    /** @var int $id Standard Conditions have hardcoded ids. */
+    public $priority = 1;
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -161,5 +163,13 @@ class catquiz implements course_completion {
             $quizsummary[$id] = $valid;
         }
         return $quizsummary;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     * @return int
+     */
+    public function get_completion_priority() {
+        return $this->priority;
     }
 }

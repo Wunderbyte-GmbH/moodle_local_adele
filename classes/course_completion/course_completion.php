@@ -74,4 +74,12 @@ interface course_completion {
      */
     public function get_completion_status($node, $userid);
 
+    /**
+     * It returns a indicator of how important the criteria is in
+     * order to visualize it for the user.
+     *
+     * @return int Information array of importancy.
+     */
+    public function get_completion_priority();
+
 }
