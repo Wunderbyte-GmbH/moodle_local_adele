@@ -1,15 +1,16 @@
 // Build flow-chart with edges and nodes
-
 import { useVueFlow } from '@vue-flow/core';
-import { useStore } from 'vuex';
 
-const  loadFlowChart = (flow) => {
+const  loadFlowChart = (flow, view) => {
     if (flow) {
-        const store = useStore();
         const { setNodes, setEdges } = useVueFlow();
-        if (store.state.view == 'teacher') {
+        if (view == 'teacher') {
           flow.nodes.forEach((nodes) => {
             nodes.draggable = false
+            nodes.deletable = false
+          })
+          flow.edges.forEach((edge) => {
+            edge.deletable = false
           })
         }
         setNodes(flow.nodes)

@@ -128,11 +128,9 @@ watch(
     const flowchart = JSON.parse(store.state.lpuserpathrelation.json)
     nodes.value = flowchart.tree.nodes;
     edges.value = flowchart.tree.edges;
-    if (store.state.view == 'student') {
-      edges.value.forEach((edge) => {
-        edge.deletable = false
-      })
-    }
+    edges.value.forEach((edge) => {
+      edge.deletable = false
+    })
     viewport.value = flowchart.tree.viewport;
     setTimeout(() => {
       fitView({ duration: 1000, padding: 0.5 });

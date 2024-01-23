@@ -62,25 +62,25 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => store.state.learninggoal[0], (newValue) => {
   if (newValue.json.tree != undefined) {
-    setNodes(newValue.json.tree.nodes)
-    setEdges(newValue.json.tree.edges)
+    loadFlowChart(newValue.json.tree, store.state.view)
+
+    //setNodes(newValue.json.tree.nodes)
+    //setEdges(newValue.json.tree.edges)
   }else{
     setNodes([])
     setEdges([])
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
 
 // Trigger web services on mount
 onMounted(() => {
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
-
-
 
 // Watch for changes of the learning path
 if (store.state.learninggoal[0].json.tree != undefined) {
-  loadFlowChart(store.state.learninggoal[0].json.tree)
+  loadFlowChart(store.state.learninggoal[0].json.tree, store.state.view)
 }
 
 // Prepare and save learning path
@@ -214,7 +214,7 @@ function updatePos() {
       break;
     }
   }
-  loadFlowChart(elements)
+  loadFlowChart(elements, store.state.view)
 }
 
 // Get all nodes id

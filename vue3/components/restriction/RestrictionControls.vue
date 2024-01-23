@@ -49,7 +49,7 @@ if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
     let restriction = store.state.learninggoal[0].json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
-    loadFlowChart(restriction[0].restriction)
+    loadFlowChart(restriction[0].restriction, store.state.view)
 }
 
 // Prepare and save learning path
