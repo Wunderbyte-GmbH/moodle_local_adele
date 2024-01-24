@@ -74,10 +74,21 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
 import { useStore } from 'vuex'
 
 // Load Store 
 const store = useStore()
+
+const stop = watch(
+  () => store.state.lpuserpathrelations,
+  () => {
+    if(store.state.view == 'student' && store.state.userlist == 2){
+      store.state.lpuserpathrelations = store.state.lpuserpathrelations.filter(obj =>obj['id'] == store.state.user)
+      stop()
+    }
+  },
+);
 
 </script>
 

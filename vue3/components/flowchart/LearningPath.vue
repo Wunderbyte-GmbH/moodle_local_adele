@@ -97,7 +97,6 @@ import OrCourses from '../nodes/OrCourses.vue'
 import { notify } from "@kyvg/vue3-notification"
 import shiftNodesDown from '../../composables/shiftNodesDown'
 import setStartingNode from '../../composables/setStartingNode';
-import UserList from '../user_view/UserList.vue'
 import addCustomEdge from '../../composables/addCustomEdge';
 import removeDropzones from '../../composables/removeDropzones';
 import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
@@ -128,7 +127,7 @@ const typeChanged = (changedNode) => {
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
     addNodes, removeNodes,
-    toObject, fitView, getEdges } = useVueFlow({
+    toObject, getEdges } = useVueFlow({
 nodes: [],
 })
 

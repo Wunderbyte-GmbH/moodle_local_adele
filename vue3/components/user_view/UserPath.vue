@@ -27,6 +27,7 @@
     <notifications width="100%" />
     <div>
       <button 
+        v-if="store.state.view!='student'"
         class="btn btn-outline-primary"
         @click="goBack" 
       >

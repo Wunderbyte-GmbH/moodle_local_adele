@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed, ref, watch } from 'vue';
+import { defineProps, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
@@ -42,8 +42,13 @@ const props = defineProps({
 
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
+  if (props.data.completion.completionnode) {
+    return {
+      backgroundColor: props.data.completion.completionnode.valid ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+    };
+  }
   return {
-    backgroundColor: props.data.completion.completionnode.valid ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+    backgroundColor: props.data.completion ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
   };
 });
 
@@ -72,7 +77,7 @@ const toggleTable = (condition) => {
       <div class="mb-2">
         <b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}
       </div>
-      <div v-if="data.manualrestriction">
+      <div v-if="data.manualrestriction && store.state.view!='student'">
         <RestrictionOutPutItem 
           :data="data"
         />

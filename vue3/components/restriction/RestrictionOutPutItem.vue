@@ -8,7 +8,6 @@
         :is="getOutputLabel(output_item)" 
         v-model="data.manualrestrictionvalue" 
         :data="data"
-        @update:modelValue="updatedData"
       />
     </div>
   </div>
