@@ -196,8 +196,9 @@ const toggleCards = () => {
 }
 
 .additional-card {
-  width: 300px;
-  padding: 10px;
+  width: 300px !important;
+  padding: 10px !important;
+  text-align: center !important;
   border-radius: 8px;
   margin-top: 10px;
   position: absolute;

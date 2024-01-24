@@ -72,15 +72,17 @@ onMounted(() => {
 })
 
 const getCourseNamesIds = () => {
-  courses.value = []
-  store.state.availablecourses.forEach(course => {
-    if (props.data.course_node_id.includes(course.course_node_id[0])) {
-      courses.value.push({
-        fullname : course.fullname,
-        id : [course.course_node_id[0]]
-      })
-    }
-  });
+  if (store.state.availablecourses) {
+    courses.value = []
+    store.state.availablecourses.forEach(course => {
+      if (props.data.course_node_id.includes(course.course_node_id[0])) {
+        courses.value.push({
+          fullname : course.fullname,
+          id : [course.course_node_id[0]]
+        })
+      }
+    });
+  }
 }
 
 const calculateHeight = (length) => {
@@ -119,6 +121,11 @@ watch(() => props.data, () => {
 // watch values from selected node
 watch(() => courses.value, () => {
   calculateHeight(courses.value.length)
+}, { deep: true } );
+
+// watch values from selected node
+watch(() => store.state.availablecourses, () => {
+  getCourseNamesIds()
 }, { deep: true } );
 
 const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))

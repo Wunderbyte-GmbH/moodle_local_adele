@@ -35,6 +35,7 @@ const store = createStore({
         return {
             view: 'defaultView',
             user: null,
+            userlist: null,
             learningGoalID: 0,
             contextID: 0,
             strings: {},

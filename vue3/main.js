@@ -28,6 +28,7 @@ import { store } from './store';
 import Notifications from '@kyvg/vue3-notification'
 import router from './router/router'
 
+
 // Enables the Composition API
 window.__VUE_OPTIONS_API__ = true; 
 // Disable devtools in production
@@ -53,6 +54,8 @@ function init() {
       store.state.learningGoalID = pathAttributeValue;
       const userAttributeValue = localAdeleAppElement.getAttribute('user');
       store.state.user = userAttributeValue;
+      const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
+      store.state.userlist = userListAttributeValue;
   
       app.use(router);
       app.mount('#local-adele-app');
