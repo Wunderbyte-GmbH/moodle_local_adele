@@ -80,6 +80,7 @@ $string['btnsave'] = 'save';
 $string['btncancel'] = 'cancel';
 $string['btnupdate_positions'] = 'update positions';
 $string['btntoggle'] = 'change view';
+$string['btnreload'] = 'Reload Page';
 
 // From Strings.
 $string['fromlearningtitel'] = 'Learning Path Titel';

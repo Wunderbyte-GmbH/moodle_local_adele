@@ -46,15 +46,17 @@ function init() {
     
     app.use(store);
     const localAdeleAppElement = document.getElementById('local-adele-app');
-    const viewAttributeValue = localAdeleAppElement.getAttribute('view');
-    store.state.view = viewAttributeValue;
-    const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
-    store.state.learningGoalID = pathAttributeValue;
-    const userAttributeValue = localAdeleAppElement.getAttribute('user');
-    store.state.user = userAttributeValue;
-
-    app.use(router);
-    app.mount('#local-adele-app');
+    if (localAdeleAppElement) {
+      const viewAttributeValue = localAdeleAppElement.getAttribute('view');
+      store.state.view = viewAttributeValue;
+      const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
+      store.state.learningGoalID = pathAttributeValue;
+      const userAttributeValue = localAdeleAppElement.getAttribute('user');
+      store.state.user = userAttributeValue;
+  
+      app.use(router);
+      app.mount('#local-adele-app');
+    }
 }
 
 export { init };
