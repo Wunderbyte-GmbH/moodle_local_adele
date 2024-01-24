@@ -56,7 +56,7 @@ echo $OUTPUT->header();
 $PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
 echo <<<'EOT'
-<div id="local-adele-app">
+<div id="local-adele-app" name="local-adele-app">
   <router-view></router-view>
 </div>
 EOT;

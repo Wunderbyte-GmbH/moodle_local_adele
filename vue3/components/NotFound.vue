@@ -24,8 +24,8 @@
 
 <template>
   <div class="NotFound">
-    <h2>{{ strings.route_not_found_site_name }}</h2>
-    <h3>{{ strings.route_not_found }}</h3>
+    <h2>{{ store.state.strings.route_not_found_site_name }}</h2>
+    <h3>{{ store.state.strings.route_not_found }}</h3>
 
     <div class="learninggoals-edit-add">
       <router-link 
@@ -33,19 +33,25 @@
         tag="button" 
         class="btn btn-primary"
       >
-        {{ strings.learninggoal_form_title_add }}
+        {{ store.state.strings.btnreload }}
       </router-link>
     </div>
   </div>
 </template>
 
-<script>
-    import { mapState } from 'vuex';
+<script setup>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex'
+const store = useStore()
+const router = useRouter()
 
-    export default {
-        name: "NotFound",
-        computed: mapState(['strings']),
-        created: function() {
-        }
+onMounted(() => {
+  if(router.value == undefined && store.state.view){
+        router.push({ name: 'learninggoals-edit-overview' });
     }
+});
+
+
+
 </script>
