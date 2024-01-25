@@ -60,6 +60,42 @@ class relation_update {
                 $restrictionnodepaths = [];
                 $singlecompletionnode = [];
                 $singlerestrictionnode = [];
+                if (isset($node['restriction'])) {
+                    foreach ($node['restriction']['nodes'] as $restrictionnnode) {
+                        $failedrestriction = false;
+                        $validationconditionstring = [];
+                        if ($restrictionnnode['parentCondition'][0] == 'starting_condition') {
+                            $currentcondition = $restrictionnnode;
+                            $validationcondition = false;
+                            while ( $currentcondition ) {
+                                if ($currentcondition['data']['label'] == 'timed' ||
+                                    $currentcondition['data']['label'] == 'specific_course' ||
+                                    $currentcondition['data']['label'] == 'parent_courses') {
+                                    $validationcondition =
+                                        $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
+                                    $singlerestrictionnode[$currentcondition['data']['label']
+                                        . '_' . $currentcondition['id']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label']
+                                        . '_' . $currentcondition['id'];
+                                } else {
+                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']];
+                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label'];
+                                }
+                                // Check if the conditon is true and break if one condition is not met.
+                                if (!$validationcondition) {
+                                    $failedrestriction = true;
+                                }
+                                // Get next Condition and return null if no child node exsists.
+                                $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
+                                    $currentcondition['childCondition'], 'id');
+                            }
+                            if ($validationcondition && !$failedrestriction) {
+                                $restrictionnodepaths[] = $validationconditionstring;
+                            }
+                        }
+                    }
+                }
                 if (isset($node['completion'])) {
                     foreach ($node['completion']['nodes'] as $completionnode) {
                         $failedcompletion = false;
@@ -98,44 +134,9 @@ class relation_update {
                                 $currentcondition = self::searchnestedarray($node['completion']['nodes'],
                                     $currentcondition['childCondition'], 'id');
                             }
-                            if ($validationcondition && !$failedcompletion) {
+                            if ($validationcondition && !$failedcompletion &&
+                                (count($restrictionnodepaths) || !count($node['restriction']['nodes']))) {
                                 $completionnodepaths[] = $validationconditionstring;
-                            }
-                        }
-                    }
-                }
-                if (isset($node['restriction'])) {
-                    foreach ($node['restriction']['nodes'] as $restrictionnnode) {
-                        $failedrestriction = false;
-                        $validationconditionstring = [];
-                        if ($restrictionnnode['parentCondition'][0] == 'starting_condition') {
-                            $currentcondition = $restrictionnnode;
-                            $validationcondition = false;
-                            while ( $currentcondition ) {
-                                if ($currentcondition['data']['label'] == 'timed' ||
-                                    $currentcondition['data']['label'] == 'specific_course' ||
-                                    $currentcondition['data']['label'] == 'parent_courses') {
-                                    $validationcondition =
-                                        $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
-                                    $singlerestrictionnode[$currentcondition['data']['label']
-                                        . '_' . $currentcondition['id']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label']
-                                        . '_' . $currentcondition['id'];
-                                } else {
-                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']];
-                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label'];
-                                }
-                                // Check if the conditon is true and break if one condition is not met.
-                                if (!$validationcondition) {
-                                    $failedrestriction = true;
-                                }
-                                // Get next Condition and return null if no child node exsists.
-                                $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
-                                    $currentcondition['childCondition'], 'id');
-                            }
-                            if ($validationcondition && !$failedrestriction) {
-                                $restrictionnodepaths[] = $validationconditionstring;
                             }
                         }
                     }
