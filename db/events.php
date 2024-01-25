@@ -42,4 +42,8 @@
         'eventname' => '\local_adele\event\user_path_updated',
         'callback' => 'local_adele_observer::user_path_updated',
     ],
+    [
+      'eventname' => '\local_adele\event\node_finished',
+      'callback' => 'local_adele_observer::node_finished',
+    ],
  ];

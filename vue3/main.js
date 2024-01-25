@@ -24,7 +24,7 @@
 // Import needed libraries
 import { createApp } from 'vue';
 import VueInputAutowidth from 'vue-input-autowidth';
-import { store } from './store';
+import { createAppStore } from './store';
 import Notifications from '@kyvg/vue3-notification'
 import router from './router/router'
 
@@ -39,27 +39,32 @@ function init() {
     /* eslint-disable no-undef */
     __webpack_public_path__ = M.cfg.wwwroot + '/local/adele/amd/build/';
     /* eslint-enable no-undef */
-    const app = createApp({});
-    
-    app.use(VueInputAutowidth);
-    app.use(Notifications);
-    store.dispatch('loadComponentStrings');
-    
-    app.use(store);
-    const localAdeleAppElement = document.getElementById('local-adele-app');
-    if (localAdeleAppElement) {
-      const viewAttributeValue = localAdeleAppElement.getAttribute('view');
-      store.state.view = viewAttributeValue;
-      const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
-      store.state.learningGoalID = pathAttributeValue;
-      const userAttributeValue = localAdeleAppElement.getAttribute('user');
-      store.state.user = userAttributeValue;
-      const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
-      store.state.userlist = userListAttributeValue;
-  
-      app.use(router);
-      app.mount('#local-adele-app');
-    }
+
+    const localAdeleAppElements = document.getElementsByName('local-adele-app');
+    localAdeleAppElements.forEach((localAdeleAppElement) => {
+        if (!localAdeleAppElement.__vue_app__) {
+            const app = createApp({});
+
+            app.use(VueInputAutowidth);
+            app.use(Notifications);
+
+            const store = createAppStore();
+            store.dispatch('loadComponentStrings');
+        
+            app.use(store);
+            app.use(router);
+            const viewAttributeValue = localAdeleAppElement.getAttribute('view');
+            store.state.view = viewAttributeValue;
+            const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
+            store.state.learningGoalID = pathAttributeValue;
+            const userAttributeValue = localAdeleAppElement.getAttribute('user');
+            store.state.user = userAttributeValue;
+            const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
+            store.state.userlist = userListAttributeValue;
+        
+            app.mount(localAdeleAppElement);
+        }
+    });
 }
 
 export { init };

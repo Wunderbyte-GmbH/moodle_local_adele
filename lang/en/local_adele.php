@@ -155,3 +155,5 @@ $string['event_completion_criteria_updated'] = 'Completion criteria updated';
 $string['event_completion_criteria_updated_description'] = 'The completion criteria {$a} was updated';
 $string['event_user_path_updated'] = 'User path relation was updated';
 $string['event_user_path_updated_description'] = 'The user path path relation for user {$a->user} and learning path {$a->path} was updated';
+$string['event_node_finished'] = 'Node weas finished';
+$string['event_node_finished_description'] = 'The user {$a->user} has finished the node {$a->node}';

@@ -30,6 +30,8 @@ namespace local_adele;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
+use local_adele\event\node_finished;
+use context_system;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -51,6 +53,7 @@ class relation_update {
      */
     public static function updated_single($event) {
         // Get the user path relation.
+        global $USER;
         $userpath = $event->other['userpath'];
         if ($userpath) {
             foreach ($userpath->json['tree']['nodes'] as $node) {
@@ -137,6 +140,15 @@ class relation_update {
                             if ($validationcondition && !$failedcompletion &&
                                 (count($restrictionnodepaths) || !count($node['restriction']['nodes']))) {
                                 $completionnodepaths[] = $validationconditionstring;
+                                $nodefinished = node_finished::create([
+                                    'objectid' => $userpath->id,
+                                    'context' => context_system::instance(),
+                                    'other' => [
+                                        'node' => $node,
+                                        'userpath' => $userpath,
+                                    ],
+                                ]);
+                                $nodefinished->trigger();
                             }
                         }
                     }
