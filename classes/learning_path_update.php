@@ -82,8 +82,8 @@ class learning_path_update {
     public static function passnodevalues($newtree, $oldtree) {
         $oldpath = json_decode($oldtree, true);
         $userpathjson = json_decode($newtree, true);
-        // Check if new path has manual.
         $oldvalues = [];
+
         foreach ($oldpath['tree']['nodes'] as $node) {
             $oldvalues[$node['id']] = [
                 'manualcompletion' => $node['data']['manualcompletion'],
@@ -92,9 +92,29 @@ class learning_path_update {
                 'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
             ];
         }
+
         foreach ($userpathjson['tree']['nodes'] as &$node) {
+            $manualrestriction = false;
+            foreach ($node['restriction']['nodes'] as $restrictionnode) {
+                if ( $restrictionnode['data']['label'] == 'manual' ) {
+                    $manualrestriction = true;
+                }
+            }
+            $manualcompletion = false;
+            foreach ($node['completion']['nodes'] as $completionnode) {
+                if ( $completionnode['data']['label'] == 'manual' ) {
+                    $manualcompletion = true;
+                }
+            }
             if ($oldvalues[$node['id']]) {
-                $node['data'] = array_merge($node['data'], $oldvalues[$node['id']]);
+                if ($manualrestriction) {
+                    $node['data']['manualrestriction'] = $oldvalues[$node['id']]['manualrestriction'];
+                    $node['data']['manualrestrictionvalue'] = $oldvalues[$node['id']]['manualrestrictionvalue'];
+                }
+                if ($manualcompletion) {
+                    $node['data']['manualcompletion'] = $oldvalues[$node['id']]['manualcompletion'];
+                    $node['data']['manualcompletionvalue'] = $oldvalues[$node['id']]['manualcompletionvalue'];
+                }
             }
         }
         return $userpathjson;

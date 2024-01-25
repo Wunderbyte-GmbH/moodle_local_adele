@@ -100,8 +100,14 @@ class manual implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
+        $containsmanual = false;
+        foreach ($node['restriction']['nodes'] as $restrictionnode) {
+            if ($restrictionnode['data']['label'] == 'manual') {
+                $containsmanual = true;
+            }
+        }
         if (isset($node['data']['manualrestriction'] ) && $node['data']['manualrestriction']
-            && $node['data']['manualrestrictionvalue']) {
+            && $node['data']['manualrestrictionvalue'] && $containsmanual) {
             return true;
         }
         return false;
