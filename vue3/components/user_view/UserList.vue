@@ -54,18 +54,7 @@
         <td>{{ relation.firstname }}</td>
         <td>{{ relation.lastname }}</td>
         <td>
-          <div class="progress">
-            <div
-              class="progress-bar"
-              role="progressbar"
-              :style="{ width: relation.progress.progress + '%' }"
-              aria-valuenow="{{ relation.progress.progress }}"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              {{ relation.progress.progress }}%
-            </div>
-          </div>
+          <ProgressBar :progress="relation.progress.progress" />
         </td>
         <td>{{ relation.progress.completed_nodes }}</td>
       </tr>
@@ -76,6 +65,7 @@
 <script setup>
 import { watch } from 'vue';
 import { useStore } from 'vuex'
+import ProgressBar from '../nodes_items/ProgressBar.vue';
 
 // Load Store 
 const store = useStore()

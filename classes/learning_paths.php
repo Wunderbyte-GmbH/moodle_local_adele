@@ -32,6 +32,7 @@ use context_system;
 use local_adele\event\learnpath_deleted;
 use local_adele\event\user_path_updated;
 use local_adele\helper\user_path_relation;
+use core_completion\progress;
 
 /**
  * Class learning_paths
@@ -352,7 +353,7 @@ class learning_paths {
 
         $record = $DB->get_record_sql($sql, $params);
         if ($record) {
-            $record->json = self::addnodemanualcondition($record->json);
+            $record->json = self::addnodemanualcondition($record->json, $record->user_id);
             return (array)$record;
         }
         return [
@@ -371,7 +372,7 @@ class learning_paths {
      * @param string $json
      * @return array
      */
-    public static function addnodemanualcondition($json) {
+    public static function addnodemanualcondition($json, $userid) {
         $json = json_decode($json);
         foreach ($json->tree->nodes as $node) {
             $node->draggable = false;
@@ -379,6 +380,7 @@ class learning_paths {
             $node->data->completion = $json->user_path_relation->{$node->id} ?? false;
             $node->data->manual = false;
             $node = self::checkmanualcondition($node);
+            $node = self::checknodeprogression($node, $userid);
         }
         return json_encode($json);
     }
@@ -433,5 +435,22 @@ class learning_paths {
         return ['success' => false];
     }
 
-
+    /**
+     * Get user path relation.
+     *
+     * @param object $node
+     * @return array
+     */
+    public static function checknodeprogression($node, $userid) {
+        $progress = 0;
+        foreach ($node->data->course_node_id as $coursenodeid) {
+            $course = get_course($coursenodeid);
+            $tmpprogress = (int) progress::get_course_progress_percentage($course, $userid);
+            if ($tmpprogress > $progress) {
+                $progress = $tmpprogress;
+            }
+        }
+        $node->data->progress = $progress;
+        return $node;
+    }
 }

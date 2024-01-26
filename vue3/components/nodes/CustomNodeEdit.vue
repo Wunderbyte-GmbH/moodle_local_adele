@@ -30,6 +30,7 @@ import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
+import ProgressBar from '../nodes_items/ProgressBar.vue';
 
 // Load Store 
 const store = useStore();
@@ -74,8 +75,21 @@ const toggleTable = (condition) => {
       class="custom-node text-center rounded p-3"
       :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]"
     >
-      <div class="mb-2">
-        <b>{{ store.state.strings.node_coursefullname }}</b> {{ data.fullname }}
+      <div class="row mb-2 ">
+        <div class="col-5 text-left">
+          <b>{{ store.state.strings.node_coursefullname }}</b> 
+        </div>
+        <div class="col-7">
+          {{ data.fullname }}
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-4 text-left">
+          <b>Node progress:</b>
+        </div>
+        <div class="col-8">
+          <ProgressBar :progress="data.progress" />
+        </div>
       </div>
       <div v-if="data.manualrestriction && store.state.view!='student'">
         <RestrictionOutPutItem 
