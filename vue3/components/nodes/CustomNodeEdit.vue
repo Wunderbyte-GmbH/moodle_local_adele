@@ -25,21 +25,38 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
+import DateInfo from '../nodes_items/DateInfo.vue';
 
 // Load Store 
 const store = useStore();
+const date = ref({})
 const props = defineProps({
   data: {
     type: Object,
     required: true,
   },
 });
+
+onMounted(() => {
+  const userpath = JSON.parse(store.state.lpuserpathrelation.json)
+  userpath.tree.nodes.forEach((node) => {
+    if (props.data.node_id == node.id) {
+      if (node.restriction.nodes) {
+        node.restriction.nodes.forEach((restrictionnode) => {
+          if(restrictionnode.data.label == 'timed'){
+            date.value = restrictionnode.data.value
+          }
+        })
+      }
+    }
+  })
+})
 
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
@@ -72,25 +89,33 @@ const toggleTable = (condition) => {
 <template>
   <div>
     <div 
-      class="custom-node text-center rounded p-3"
+      class="custom-node rounded p-3"
       :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]"
     >
       <div class="row mb-2 ">
         <div class="col-5 text-left">
           <b>{{ store.state.strings.node_coursefullname }}</b> 
         </div>
-        <div class="col-7">
+        <div class="col-7 text-right">
           {{ data.fullname }}
         </div>
       </div>
-      <div class="row mb-2">
-        <div class="col-4 text-left">
-          <b>Node progress:</b>
+
+      <div store.state.view="'student'">
+        <div v-if="date">
+          <DateInfo :date="date" />
         </div>
-        <div class="col-8">
-          <ProgressBar :progress="data.progress" />
+        <div class="row mb-2">
+          <div class="col-4 text-left">
+            <b>Node progress:</b>
+          </div>
+          <div class="col-8">
+            <ProgressBar :progress="data.progress" />
+          </div>
         </div>
       </div>
+
+
       <div v-if="data.manualrestriction && store.state.view!='student'">
         <RestrictionOutPutItem 
           :data="data"

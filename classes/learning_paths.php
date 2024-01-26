@@ -370,6 +370,7 @@ class learning_paths {
      * Get user path relation.
      *
      * @param string $json
+     * @param string $userid
      * @return array
      */
     public static function addnodemanualcondition($json, $userid) {
@@ -439,6 +440,7 @@ class learning_paths {
      * Get user path relation.
      *
      * @param object $node
+     * @param String $userid
      * @return array
      */
     public static function checknodeprogression($node, $userid) {

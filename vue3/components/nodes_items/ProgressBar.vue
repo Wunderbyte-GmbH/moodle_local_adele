@@ -2,7 +2,7 @@
   <div class="progress-container">
     <div
       class="progress-bar"
-      :class="{ 'bg-success': props.progress > 0, 'no-progress': props.progress === 0 }"
+      :class="{ 'bg-success': props.progress > 0 }"
       role="progressbar"
       :style="{ width: props.progress + '%' }"
       aria-valuenow="{{ props.progress }}"
@@ -42,19 +42,5 @@ const props = defineProps({
 /* Customize the background color when progress is zero */
 .progress-bar.bg-success {
   background-color: #28a745;
-}
-
-/* Style for 'No Progress' text when progress is zero */
-.no-progress {
-  color: #000000 !important; /* Use !important to ensure the color is applied */
-}
-
-.no-progress::before {
-  content: 'No Progress';
-  display: inline-block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 </style>
