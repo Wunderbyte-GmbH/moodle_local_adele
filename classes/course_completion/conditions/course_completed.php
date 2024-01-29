@@ -50,7 +50,7 @@ class course_completed implements course_completion {
     /** @var string $label of the redered condition in frontend. */
     public $label = 'course_completed';
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $priority = 1;
+    public $priority = COURSES_PRIORITY_BEST;
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to

@@ -71,4 +71,28 @@ class course_completion_status {
         }
         return $completionstatus;
     }
+
+    /**
+     * Returns conditions depending on the conditions param.
+     *
+     * @return array
+     */
+    public static function get_condition_priority(): array {
+        global $CFG;
+        // First, we get all the available conditions from our directory.
+        $path = $CFG->dirroot . '/local/adele/classes/course_completion/conditions/*.php';
+        $filelist = glob($path);
+        $completionpriorities = [];
+        // We just want filenames, as they are also the classnames.
+        foreach ($filelist as $filepath) {
+            $path = pathinfo($filepath);
+            $filename = 'local_adele\\course_completion\\conditions\\' . $path['filename'];
+            // We instantiate all the classes, because we need some information.
+            if (class_exists($filename)) {
+                $conditionclass = new $filename();
+                $completionpriorities[$path['filename']] = $conditionclass->get_completion_priority();
+            }
+        }
+        return $completionpriorities;
+    }
 }

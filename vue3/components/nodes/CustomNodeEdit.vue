@@ -101,7 +101,7 @@ const toggleTable = (condition) => {
         </div>
       </div>
 
-      <div store.state.view="'student'">
+      <div v-if="store.state.learninggoal && store.state.view=='student'">
         <div v-if="date">
           <DateInfo :date="date" />
         </div>
@@ -113,105 +113,107 @@ const toggleTable = (condition) => {
             <ProgressBar :progress="data.progress" />
           </div>
         </div>
-      </div>
-
-
-      <div v-if="data.manualrestriction && store.state.view!='student'">
-        <RestrictionOutPutItem 
-          :data="data"
-        />
-      </div>
-      <div v-if="store.state.learninggoal && store.state.view=='student'">
         <OverviewRestrictionCompletion :node="data" />
       </div>
       <div v-else>
+        <div v-if="data.manualrestriction">
+          <RestrictionOutPutItem 
+            :data="data"
+          />
+        </div>
         <div v-if="data.manualcompletion">
           <CompletionOutPutItem :data="data" />
         </div>
-        <div v-if="data.completion.singlecompletionnode">
-          <button 
-            class="btn btn-link" 
-            aria-expanded="false" 
-            aria-controls="collapseTable"
-            @click="toggleTable('Completion')"
-          >
-            {{ isCompletionVisible ? 'Hide Completion Criteria' : 'Show Completion Criteria' }}
-          </button>
-          <div
-            v-show="isCompletionVisible" 
-            class="table-container"
-          >
-            <table class="table table-bordered table-hover fancy-table">
-              <thead class="thead-light">
-                <tr>
-                  <th>Key</th>
-                  <th>Checkmark</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr 
-                  v-for="(value, key) in data.completion.singlecompletionnode" 
-                  :key="key"
-                >
-                  <td>{{ key }}</td>
-                  <td>
-                    {{ value }}
-                    <span 
-                      v-if="value" 
-                      class="text-success"
+        <div class="row">
+          <div class="col-md-6">
+            <div v-if="data.completion.singlecompletionnode">
+              <button 
+                class="btn btn-link" 
+                aria-expanded="false" 
+                aria-controls="collapseTable"
+                @click="toggleTable('Completion')"
+              >
+                {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
+              </button>
+              <div
+                v-show="isCompletionVisible" 
+                class="table-container table-container-left"
+              >
+                <table class="table table-bordered table-hover fancy-table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Key</th>
+                      <th>Checkmark</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr 
+                      v-for="(value, key) in data.completion.singlecompletionnode" 
+                      :key="key"
                     >
-                      &#10004;
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div v-if="data.completion.singlerestrictionnode">
-          <button 
-            class="btn btn-link" 
-            aria-expanded="false" 
-            aria-controls="collapseTable"
-            @click="toggleTable('Restriction')"
-          >
-            {{ isRestrictionVisible ? 'Hide Restriction Criteria' : 'Show Restriction Criteria' }}
-          </button>
-          <div 
-            v-show="isRestrictionVisible" 
-            class="table-container"
-          >
-            <div v-if="!data.completion.singlerestrictionnode">
-              <table class="table table-bordered table-hover fancy-table">
-                <thead class="thead-light">
-                  <tr>
-                    <th>Key</th>
-                    <th>Checkmark</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr 
-                    v-for="(value, key) in data.completion.singlerestrictionnode" 
-                    :key="key"
-                  >
-                    <td>{{ key }}</td>
-                    <td>
-                      {{ value }}
-                      <span 
-                        v-if="value" 
-                        class="text-success"
-                      >
-                        &#10004;
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      <td>{{ key }}</td>
+                      <td>
+                        {{ value }}
+                        <span 
+                          v-if="value" 
+                          class="text-success"
+                        >
+                          &#10004;
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div v-else>
-              <div class="card">
-                <div class="card-body">
-                  No conditions are defined
+          </div>
+          <div class="col-md-6">
+            <div v-if="data.completion.singlerestrictionnode">
+              <button 
+                class="btn btn-link" 
+                aria-expanded="false" 
+                aria-controls="collapseTable"
+                @click="toggleTable('Restriction')"
+              >
+                {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
+              </button>
+              <div 
+                v-show="isRestrictionVisible" 
+                class="table-container"
+              >
+                <div v-if="data.completion.singlerestrictionnode">
+                  <table class="table table-bordered table-hover fancy-table" style="right: -150%;">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>Key</th>
+                        <th>Checkmark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr 
+                        v-for="(value, key) in data.completion.singlerestrictionnode" 
+                        :key="key"
+                      >
+                        <td>{{ key }}</td>
+                        <td>
+                          {{ value }}
+                          <span 
+                            v-if="value" 
+                            class="text-success"
+                          >
+                            &#10004;
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div v-else>
+                  <div class="card">
+                    <div class="card-body">
+                      No conditions are defined
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -241,13 +243,17 @@ const toggleTable = (condition) => {
 }
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;
+  
 }
 .table-container {
-  left: 50%;
-  transform: translate(-50%, 0);
+  width: 300px;
   position: absolute;
   z-index: 100;
 }
+.table-container-left {
+  transform: translate(-50%, 0);
+}
+
 
 /* Fancy table styles */
 .fancy-table {

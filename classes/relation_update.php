@@ -127,7 +127,7 @@ class relation_update {
                                 } else {
                                     $validationcondition = $completioncriteria[$label];
                                     $singlecompletionnode[$label] = $validationcondition;
-                                    $validationconditionstring[] = $$label;
+                                    $validationconditionstring[] = $label;
                                 }
                                 // Check if the conditon is true and break if one condition is not met.
                                 if (!$validationcondition) {
@@ -179,8 +179,20 @@ class relation_update {
     public static function getconditionnode($conditionnodepaths) {
         // TODO sort the valid completion paths.
         $valid = count($conditionnodepaths) ? true : false;
+        $priority = 0;
+        if ($valid) {
+            $completionpriorities = course_completion_status::get_condition_priority();
+            foreach ($conditionnodepaths as $conditionnodepath) {
+                foreach ($conditionnodepath as $condition) {
+                    if ($priority == 0 || $completionpriorities[$condition] < $priority) {
+                        $priority = $completionpriorities[$condition];
+                    }
+                }
+            }
+        }
         return [
             'valid' => $valid,
+            'priority' => $priority,
             'conditions' => $conditionnodepaths,
         ];
     }

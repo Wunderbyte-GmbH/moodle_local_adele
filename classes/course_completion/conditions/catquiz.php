@@ -46,11 +46,11 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
 class catquiz implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_MANUALLY;
+    public $id = COURSES_COND_CATQUIZ;
     /** @var string $label of the redered condition in frontend. */
     public $label = 'catquiz';
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $priority = 1;
+    public $priority = COURSES_PRIORITY_SECOND;
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
