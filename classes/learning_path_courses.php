@@ -180,7 +180,7 @@ class learning_path_courses {
         }
 
         return [
-            'wherequery' => $wherequery,
+            'wherequery' => $wherequery ?? '',
             'params' => $params,
         ];
     }

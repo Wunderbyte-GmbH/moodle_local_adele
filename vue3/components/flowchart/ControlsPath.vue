@@ -25,7 +25,7 @@
 
 <script setup>
 // Import needed libraries
-import { Panel, useVueFlow, isNode } from '@vue-flow/core'
+import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { nextTick, onMounted, watch } from 'vue';
@@ -62,7 +62,9 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => store.state.learninggoal[0], (newValue) => {
   if (newValue.json.tree != undefined) {
-    loadFlowChart(newValue.json.tree, store.state.view)
+    //loadFlowChart(newValue.json.tree, store.state.view)
+    setNodes(newValue.json.tree.nodes)
+    setEdges(newValue.json.tree.edges)
   }else{
     setNodes([])
     setEdges([])
@@ -135,88 +137,31 @@ function updatePos() {
   let elements = toObject();
   let loop = true
   //get all ids
-  let nodeids = [];
-  elements.nodes.forEach((el) => {
-    if (isNode(el)) {
-      nodeids.push(el.id);
-    }
-  })
-  //get target
-  let sources = [];
-  elements.edges.forEach((el) => {
-    if (el.source) {
-      sources.push(el.source);
-    }
-  })
-  sources = sources.filter(onlyUnique);
-  let targets = nodeids.filter(x => !sources.includes(x));
-
-  //set all target to one x
-  if(targets.length > 1){
-    let targetEndY = null;
-    targets.forEach((taregt) => {
-      //get target
-      let target_node = elements.nodes.filter(search_target => {
-        return search_target.id === taregt
-      })
-      if(targetEndY){
-        elements.nodes = elements.nodes.map(element_node => {
-          if (element_node.id === taregt) {
-            let position = {
-              x: element_node.position.x,
-              y: targetEndY,
-            }
-            return { ...element_node, position: position };
-          }
-          return element_node;
-        });
-      }else{
-        targetEndY = target_node[0].position.y;
-      }
-    });
-
-  }
+  let nodelabels = ['starting_node'];
+  let yvalue = 0;
 
   while (loop) {
-    let new_targets = [];
-    //get target nodes position and targets node sources
-    targets.forEach((taregt) => {
-      //get target
-      let target_node = elements.nodes.filter(search_target => {
-        return search_target.id === taregt
+    let newlabels = []
+    let xvalue = 0;
+    elements.nodes.forEach((el) => {
+      nodelabels.forEach((label) => {
+          if(el.parentCourse.includes(label)){
+            el.position.y = yvalue
+            el.position.x = xvalue
+            xvalue -= 500;
+            newlabels.push(el.id)
+          }
       })
-      //get sources of target
-      let source_nodes = elements.edges.filter(search_sources => {
-        return search_sources.target === target_node[0].id;
-      })
-
-      //update position, construct new targets 
-      source_nodes.forEach((source_node) => {
-        elements.nodes = elements.nodes.map(element_node => {
-            if (element_node.id === source_node.source) {
-              let position = {
-                x: element_node.position.x,
-                y: target_node[0].position.y - 350,
-              }
-              new_targets.push(element_node.id);
-              return { ...element_node, position: position };
-            }
-            return element_node;
-        });
-      });
     })
-    targets = new_targets;
-    if (new_targets.length === 0) {
+    yvalue += 600;
+    newlabels == [...new Set(newlabels)]
+    nodelabels = newlabels
+    console.log(nodelabels)
+    if (nodelabels.length == 0 ) {
       loop = false
-      break;
     }
   }
-  loadFlowChart(elements, store.state.view)
-}
-
-// Get all nodes id
-function onlyUnique(value, index, array) {
-  return array.indexOf(value) === index;
+  setNodes(elements.nodes)
 }
 
 </script>
@@ -227,18 +172,21 @@ function onlyUnique(value, index, array) {
     class="save-restore-controls"
   >
     <button 
+      id="save-learning-path"
       class="btn btn-primary m-2" 
       @click="onSave"
     >
       {{ store.state.strings.save }}
     </button>
     <button 
+      id="cancel-learning-path"
       class="btn btn-secondary m-2" 
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
     <button 
+      id="update-learning-path-position"
       class="btn btn-info m-2" 
       @click="updatePos"
     >

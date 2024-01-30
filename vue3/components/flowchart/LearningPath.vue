@@ -81,7 +81,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -126,7 +126,7 @@ const typeChanged = (changedNode) => {
 
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
-    addNodes, removeNodes,
+    addNodes, removeNodes, fitView,
     toObject, getEdges } = useVueFlow({
 nodes: [],
 })
@@ -180,6 +180,11 @@ function onDrop(event) {
       type,
       label: `${type} node`,
       draggable: true,
+    }
+    if (intersectedNode.value.dropzone.id != 'dropzone_and' && intersectedNode.value.dropzone.id != 'dropzone_or') {
+      setTimeout(() => {
+        fitView({ duration: 1000, padding: 0.5 });
+      }, 100);
     }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       parentCourse.push('starting_node')
@@ -301,16 +306,6 @@ function onDrop(event) {
   }
 }
 
-// Watch for changes in the nodes
-// watch(
-//   () => nodes.value,
-//   () => {
-//     setTimeout(() => {
-//       fitView({ duration: 1000, padding: 0.5 });
-//     }, 100);
-//   },
-//   { deep: true } // Enable deep watching to capture changes in nested properties
-// );
 watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {

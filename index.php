@@ -27,7 +27,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once('lib.php');
 
-global $CFG, $DB;
+global $CFG, $DB, $USER;
 
 $learninggoalid = optional_param('id', 0, PARAM_INT);
 
@@ -55,10 +55,11 @@ $output = $PAGE->get_renderer('local_adele');
 echo $OUTPUT->header();
 $PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
-echo <<<'EOT'
-<div id="local-adele-app" name="local-adele-app">
-  <router-view></router-view>
-</div>
-EOT;
+echo <<<EOT
+    <div id="local-adele-app" name="local-adele-app"
+        user="{$USER->id}">
+      <router-view></router-view>
+    </div>
+    EOT;
 
 echo $OUTPUT->footer();

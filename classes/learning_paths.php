@@ -64,10 +64,11 @@ class learning_paths {
         $data->description = $params['description'];
         $data->timemodified = time();
         $data->json = $params['json'];
+        $id = 0;
 
         if ($params['learninggoalid'] == 0) {
             $data->timecreated = time();
-            $data->createdby = $params['userid'];
+            $data->createdby = $params['userid'] ?? 0;
             $id = $DB->insert_record('local_adele_learning_paths', (object)$data);
             // Trigger catscale created event.
             $event = learnpath_created::create([
@@ -76,11 +77,12 @@ class learning_paths {
                 'other' => [
                     'learningpathname' => $data->name,
                     'learningpathid' => $id,
-                    'userid' => $data->createdb,
+                    'userid' => $data->createdby,
                 ],
             ]);
         } else {
-            $data->id = $params['learninggoalid'];
+            $id = $params['learninggoalid'];
+            $data->id = $id;
             $DB->update_record('local_adele_learning_paths', $data);
             // Trigger catscale created event.
             $event = learnpath_updated::create([

@@ -190,12 +190,14 @@ export function createAppStore() {
                 return result.result;
             },
             async deleteLearningpath(context, payload) {
-                const result = await ajax('local_adele_delete_learningpath', payload);
+                const result = await ajax('local_adele_delete_learningpath', 
+                {userid: context.state.user, learninggoalid: payload.learninggoalid});
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
             async duplicateLearningpath(context, payload) {
-                const result = await ajax('local_adele_duplicate_learningpath', payload);
+                const result = await ajax('local_adele_duplicate_learningpath', 
+                {userid: context.state.user, learninggoalid: payload.learninggoalid});
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
@@ -215,7 +217,8 @@ export function createAppStore() {
                 return result;
             },
             async fetchCatquizScales(context, payload) {
-                const result = await ajax('local_adele_get_catquiz_scales', payload);
+                const result = await ajax('local_adele_get_catquiz_scales', 
+                { userid: context.state.user, learninggoalid: context.state.learningGoalID, payload});
                 return result;
             },
             async fetchModQuizzes(context) {
@@ -233,10 +236,7 @@ export function createAppStore() {
 export async function ajax(method, args) {
     const request = {
         methodname: method,
-        args: Object.assign({
-            userid: 0,
-            learninggoalid: 0,
-        }, args),
+        args: Object.assign( args ),
     };
 
     try {

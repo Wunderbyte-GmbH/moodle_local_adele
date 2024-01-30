@@ -55,15 +55,16 @@
               <div class="card-body">
                 <h5 class="card-title">{{ singlelearninggoal.name }}</h5>
                 <p class="card-text">{{ singlelearninggoal.description }}</p>
-                <router-link 
-                  :to="{ name: 'learninggoal-edit', params: { learninggoalId: singlelearninggoal.id }}" 
+                <a 
                   :title="store.state.strings.edit"
+                  href="" 
+                  @click.prevent="editLearningpath(singlelearninggoal.id)" 
                 >
                   <i 
                     class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
                     :title="store.state.strings.edit" 
                   />
-                </router-link>
+                </a>
                 <a 
                   :title="store.state.strings.duplicate"
                   href="" 
@@ -118,10 +119,12 @@
 // Import needed libraries
 import { ref } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router';
 import { notify } from "@kyvg/vue3-notification"
 
 // Load Store and Router
 const store = useStore()
+const router = useRouter()
 
 // Define constants that will be referenced
 const clicked = ref({})
@@ -132,9 +135,18 @@ const showDeleteConfirm = (index) => {
   clicked.value[index] = true;
 };
 
+// Edit learning path deletion
+const editLearningpath = (singlelearninggoalid) => {
+  store.state.learningGoalID = singlelearninggoalid
+  router.push({
+    name: 'learninggoal-edit',
+    params: { learninggoalId: singlelearninggoalid  }
+  })
+};
+
 // Cancel learning path deletion
 const cancelDeleteConfirm = (index) => {
-  if (clicked.value in index) clicked.value[index] = !clicked.value[index];
+  clicked.value[index] = false
 };
 
 // Deleting learning path
