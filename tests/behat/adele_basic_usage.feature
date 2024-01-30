@@ -52,13 +52,3 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     Then I should see "Confirm delete"
     And I click on "Confirm delete" "button"
     Then I wait "5" seconds
-
-
-
-
-    
-
-
-
-     
-
