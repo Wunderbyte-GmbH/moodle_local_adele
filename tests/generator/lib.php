@@ -14,12 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Class local_catquiz_generator for generation of dummy data
+ * Class local_adele_generator for generation of dummy data
  *
- * @package local_catquiz
+ * @package local_adele
  * @category test
  * @copyright 2023 Andrii Semenets
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

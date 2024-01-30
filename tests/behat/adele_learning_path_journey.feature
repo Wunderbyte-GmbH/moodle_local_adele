@@ -1,5 +1,5 @@
-@local @local_catquiz @javascript
-Feature: As an admin I perform import of catquiz alonf with questions to check Scales and Feedbacks.
+@local @local_adele @javascript
+Feature: As an admin I perform import of adele alonf with questions to check Scales and Feedbacks.
 
   Background:
     Given the following "users" exist:
@@ -29,6 +29,16 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
     Then I should see "Edit a learning path"
     And I click on "Edit completion criteria" "button"
     Then I should see "Edit Completion criteria of course node"
+    And I click on "change view" "button"
     And I click on "Go Back to Learningpath" "button"
     Then I should see "Edit a learning path"
-    Then I wait "5" seconds
+    And I click on "Edit Restriction" "button"
+    Then I should see "Edit Restrictions to enter course node"
+    And I click on "Save" "button"
+    Then I should see "Edit a learning path"
+    And I click on "update positions" "button"
+    And I click on "change view" "button"
+    And I click on "Go to page and create a course" "button"
+    Then I should see "Acceptance test site"
+    And I switch to the main window
+    Then I wait "4" seconds
