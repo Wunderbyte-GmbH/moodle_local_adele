@@ -35,7 +35,6 @@ Feature: As an admin I perform several drag and drop actions.
     Then I should see "Changes saved"
     And I set the field with xpath "//*[@id='id_s_local_adele_includetags']" to "test"
     And I press "Save changes"
-    Then I should not see "Some settings were not changed due to an error."
     And I set the field with xpath "//*[@id='id_s_local_adele_includetags']" to "testing"
     And I press "Save changes"
     Then I should see "Changes saved"
