@@ -57,8 +57,6 @@ class get_lp_user_path_relation extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'learningpathid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
             'userpathid'  => new external_value(PARAM_INT, 'userpathid', VALUE_REQUIRED),
             ]
         );
@@ -72,10 +70,8 @@ class get_lp_user_path_relation extends external_api {
      * @param int $userpathid
      * @return array
      */
-    public static function execute($learningpathid, $userid, $learninggoalid, $userpathid): array {
+    public static function execute($learningpathid, $userpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
-            'userid' => $userid,
-            'learninggoalid' => $learninggoalid,
             'learningpathid' => $learningpathid,
             'userpathid' => $userpathid,
         ]);
