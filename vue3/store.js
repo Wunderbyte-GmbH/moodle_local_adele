@@ -218,7 +218,7 @@ export function createAppStore() {
             },
             async fetchCatquizScales(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_scales', 
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID, payload});
+                { userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid});
                 return result;
             },
             async fetchModQuizzes(context) {
