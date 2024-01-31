@@ -150,5 +150,5 @@ $functions = [
       'type' => 'read',
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
-  ],
+    ],
 ];

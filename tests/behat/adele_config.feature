@@ -25,7 +25,6 @@ Feature: As an admin I perform several drag and drop actions.
   Scenario: Adele usage: admin defines config
     Given I log in as "admin"
     And I wait until the page is ready
-    And I follow "More"
     And I follow "Site administration"
     And I wait until the page is ready
     And I follow "Plugins"
