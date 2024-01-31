@@ -217,8 +217,19 @@ export function createAppStore() {
                 return result;
             },
             async fetchCatquizScales(context, payload) {
+                console.log({ userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid})
                 const result = await ajax('local_adele_get_catquiz_scales', 
                 { userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid});
+                return result;
+            },
+            async fetchCatquizParentScales(context) {
+                const result = await ajax('local_adele_get_catquiz_parent_scales',
+                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                return result;
+            },
+            async fetchCatquizParentScale(context, payload) {
+                const result = await ajax('local_adele_get_catquiz_parent_scale',
+                { userid: context.state.user, learninggoalid: context.state.learningGoalID, sacleid: payload.scaleid });
                 return result;
             },
             async fetchModQuizzes(context) {

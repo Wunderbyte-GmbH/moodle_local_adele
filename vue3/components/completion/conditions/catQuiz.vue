@@ -6,6 +6,19 @@
       :tests="tests" 
       @update:value="updatedTest"
     />
+    <div v-if="parentscales.length > 0">
+      <select 
+        v-model="selectedparentscale"
+      >
+        <option 
+          v-for="parentScale in parentscales" 
+          :key="parentScale.id" 
+          :value="parentScale.id"
+        >
+          {{ parentScale.name }}
+        </option>
+      </select>
+    </div>
     <div>
       <button 
         v-if="scales.length > 0" 
@@ -93,6 +106,8 @@ const props = defineProps({
   }})
 const data = ref([])
 const tests = ref([])
+const parentscales = ref([])
+const selectedparentscale = ref('')
 const scales = ref([])
 const selectedTest = ref(null)
 const emit = defineEmits(['update:modelValue'])
@@ -103,6 +118,12 @@ const attempts = ref('');
 onMounted(async () => {
   // Get all tests
   tests.value = await store.dispatch('fetchCatquizTests')
+  tests.value.push({
+    id: '0',
+    componentid: '0',
+    coursename: 'The Catquiz that is inside the same course as the Learning path',
+    name: 'Catquiz inside course'
+  })
   if (props.completion.value !== undefined) {
     data.value = props.completion.value;
     if (props.completion.value.testid !== undefined) {
@@ -111,13 +132,26 @@ onMounted(async () => {
     if (props.completion.value.scales !== undefined) {
       scales.value = props.completion.value.scales;
     }
+    if (props.completion.value.parentscales !== undefined) {
+      selectedparentscale.value = props.completion.value.parentscales;
+      parentscales.value = await store.dispatch('fetchCatquizParentScales')
+    }
   }
   // watch values from selected node
   watch(() => selectedTest.value, async () => {
-    scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
-    data.value = {
-      testid: selectedTest.value,
-      scales: scales.value,
+    if (selectedTest.value == 0) {
+      parentscales.value = await store.dispatch('fetchCatquizParentScales')
+      scales.value = []
+      data.value = {
+        testid: selectedTest.value,
+      }
+    }else{
+      scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
+      parentscales.value = []
+      data.value = {
+        testid: selectedTest.value,
+        scales: scales.value,
+      }
     }
   }, { deep: true } );
 });
@@ -125,6 +159,15 @@ onMounted(async () => {
 // watch values from selected node
 watch(() => data.value, () => {
   emit('update:modelValue', data.value);
+}, { deep: true } );
+
+// watch values from selected node
+watch(() => selectedparentscale.value, async ($old, $new) => {
+  if (selectedparentscale.value && $new) {
+    scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
+    data.value.scales = scales.value
+    data.value.parentscales = selectedparentscale.value
+  }
 }, { deep: true } );
 
 const toggleTable = () => {

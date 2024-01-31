@@ -39,7 +39,6 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, view, ba
           addNodes([startingNode])
       })
     }
-
 }
 
 export default setStartingNode;
