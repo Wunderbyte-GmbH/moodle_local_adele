@@ -122,7 +122,7 @@ $functions = [
     'local_adele_get_catquiz_scales' => [
         'classname' => 'local_adele\external\get_catquiz_scales',
         'classpath' => '',
-        'description' => 'Get catquiz tests',
+        'description' => 'Get catquiz scales',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
@@ -135,4 +135,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_catquiz_parent_scales' => [
+        'classname' => 'local_adele\external\get_catquiz_parent_scales',
+        'classpath' => '',
+        'description' => 'Get catquiz parent scales',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/adele:edit',
+    ],
+    'local_adele_get_catquiz_parent_scale' => [
+      'classname' => 'local_adele\external\get_catquiz_parent_scale',
+      'classpath' => '',
+      'description' => 'Get catquiz parent subscale',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+  ],
 ];

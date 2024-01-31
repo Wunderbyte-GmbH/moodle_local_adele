@@ -25,6 +25,7 @@
 
 namespace local_adele;
 
+use local_catquiz\catquiz as Local_catquizCatquiz;
 use local_catquiz\data\dataapi;
 use local_catquiz\testenvironment;
 
@@ -76,6 +77,16 @@ class catquiz {
                 return (array)$record;
             }, $records);
         }
+        return $records;
+    }
+
+
+    /**
+     * Get all parent scales.
+     * @return array
+     */
+    public static function get_catquiz_parent_scales() {
+        $records = Local_catquizCatquiz::get_all_parent_catscales();
         return $records;
     }
 }
