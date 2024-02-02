@@ -138,6 +138,17 @@ class learning_paths {
     }
 
     /**
+     * Get one specific learning path by id.
+     *
+     * @param string $id
+     * @return object
+     */
+    public static function get_learning_path_by_id($id) {
+        global $DB;
+        return $DB->get_record('local_adele_learning_paths', ['id' => $id]);
+    }
+
+    /**
      * Duplicate a learning path.
      *
      * @param array $params
