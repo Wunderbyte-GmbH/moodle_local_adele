@@ -26,6 +26,8 @@
 declare(strict_types=1);
 
 namespace local_adele;
+
+use block_accessreview\external\get_module_data;
 use context_system;
 
 use local_adele\event\user_path_updated;
@@ -49,37 +51,51 @@ class enrollment {
      * @param object $event
      */
     public static function enrolled($event) {
-        global $DB;
+        global $DB, $CFG;
         $params = $event;
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
-                $learningpath->json = json_decode($learningpath->json, true);
-                $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
-                if (!$userpath) {
-                    $id = $DB->insert_record('local_adele_path_user', [
-                        'user_id' => $params->relateduserid,
-                        'learning_path_id' => $learningpath->id,
-                        'status' => 'active',
-                        'timecreated' => time(),
-                        'timemodified' => time(),
-                        'createdby' => $params->userid,
-                        'json' => json_encode([
-                            'tree' => $learningpath->json['tree'],
-                        ]),
-                    ]);
-                    $userpath = $DB->get_record('local_adele_path_user', ['id' => $id]);
-                    $userpath->json = json_decode($userpath->json, true);
-                    $eventsingle = user_path_updated::create([
-                        'objectid' => $id,
-                        'context' => context_system::instance(),
-                        'other' => [
-                            'userpath' => $userpath,
-                        ],
-                    ]);
-                    $eventsingle->trigger();
-                }
+                self::subscribe_user_to_learning_path($learningpath, $params);
             }
+        }
+    }
+
+    /**
+     * Build sql query with config filters.
+     *
+     * @param object $learningpath
+     * @param object $params
+     * @return array
+     */
+    public static function subscribe_user_to_learning_path($learningpath, $params) {
+        global $DB;
+        if (is_string($learningpath->json)) {
+            $learningpath->json = json_decode($learningpath->json, true);
+        }
+        $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
+        if (!$userpath) {
+            $id = $DB->insert_record('local_adele_path_user', [
+                'user_id' => $params->relateduserid,
+                'learning_path_id' => $learningpath->id,
+                'status' => 'active',
+                'timecreated' => time(),
+                'timemodified' => time(),
+                'createdby' => $params->userid,
+                'json' => json_encode([
+                    'tree' => $learningpath->json['tree'],
+                ]),
+            ]);
+            $userpath = $DB->get_record('local_adele_path_user', ['id' => $id]);
+            $userpath->json = json_decode($userpath->json, true);
+            $eventsingle = user_path_updated::create([
+                'objectid' => $id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
         }
     }
 
