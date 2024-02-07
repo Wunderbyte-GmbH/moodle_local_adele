@@ -110,7 +110,7 @@ class save_learningpath extends external_api {
                     'createdby' => new external_value(PARAM_TEXT, 'Condition label'),
                     'json' => new external_value(PARAM_TEXT, 'Condition label'),
                 ]
-            )
+            ),
             ]
         );
     }
