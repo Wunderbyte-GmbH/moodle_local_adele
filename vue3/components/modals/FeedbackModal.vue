@@ -163,11 +163,11 @@ const closeModal = () => {
 // updating changes and closing modal
 const saveChanges = () => {
   // Loop over nodes and macht node
-  let learninggoal = store.state.learninggoal[0]
+  let learningpath = store.state.learningpath
 
   // Serialize the modified DOM back to a string
   const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML) 
-  learninggoal.json.tree.nodes.forEach((node) => {
+  learningpath.json.tree.nodes.forEach((node) => {
     if (node.id == store.state.node.node_id) {
       // Find the feedback node.
       node.completion.nodes.forEach((completionnode) => {
@@ -178,10 +178,10 @@ const saveChanges = () => {
       })
     }
   });
-  learninggoal.json = JSON.stringify(learninggoal.json); 
-  store.dispatch('saveLearningpath', learninggoal);
+  learningpath.json = JSON.stringify(learningpath.json); 
+  store.dispatch('saveLearningpath', learningpath);
   store.state.feedback.feedback = cleanedHtml
-  learninggoal.json = JSON.parse(learninggoal.json); 
+  learningpath.json = JSON.parse(learningpath.json); 
   $('#feedbackModal').modal('hide');
 };
 

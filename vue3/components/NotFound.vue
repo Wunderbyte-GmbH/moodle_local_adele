@@ -27,9 +27,9 @@
     <h2>{{ store.state.strings.route_not_found_site_name }}</h2>
     <h3>{{ store.state.strings.route_not_found }}</h3>
 
-    <div class="learninggoals-edit-add">
+    <div class="learningpaths-edit-add">
       <router-link 
-        :to="{ name: 'learninggoals-edit-overview' }" 
+        :to="{ name: 'learningpaths-edit-overview' }" 
         tag="button" 
         class="btn btn-primary"
       >
@@ -48,7 +48,7 @@ const router = useRouter()
 
 onMounted(() => {
   if(router.value == undefined && store.state.view){
-        router.push({ name: 'learninggoals-edit-overview' });
+        router.push({ name: 'learningpaths-edit-overview' });
     }
 });
 

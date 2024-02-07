@@ -50,8 +50,7 @@ const setNodeModal = () => {
 // Set node data for the modal
 const setPretestView = () => {
   let tree = toObject()
-  store.state.learninggoal[0].json.tree = tree
-  //store.state.learninggoal[0].json = tree
+  store.state.learningpath.json.tree = tree
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -61,7 +60,7 @@ const setPretestView = () => {
 // Set node data for the modal
 const setRestrictionView = () => {
   let tree = toObject()
-  store.state.learninggoal[0].json.tree = tree
+  store.state.learningpath.json.tree = tree
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false

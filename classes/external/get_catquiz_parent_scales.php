@@ -58,7 +58,7 @@ class get_catquiz_parent_scales extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
           'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-          'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+          'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
           ]
         );
     }

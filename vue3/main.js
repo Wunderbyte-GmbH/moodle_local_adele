@@ -56,7 +56,7 @@ function init() {
             const viewAttributeValue = localAdeleAppElement.getAttribute('view');
             store.state.view = viewAttributeValue;
             const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
-            store.state.learningGoalID = pathAttributeValue;
+            store.state.learningPathID = pathAttributeValue;
             const userAttributeValue = localAdeleAppElement.getAttribute('user');
             store.state.user = userAttributeValue;
             const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');

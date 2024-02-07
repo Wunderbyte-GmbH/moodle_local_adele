@@ -6,13 +6,13 @@
     text-align: left;
 }
 
-#page-local-differentiator-index #local-differentiator-app .learninggoals-edit-list {
+#page-local-differentiator-index #local-differentiator-app .learningpaths-edit-list {
     padding-top: 1rem;
 }
-#page-local-differentiator-index #local-differentiator-app .learninggoals-edit-add {
+#page-local-differentiator-index #local-differentiator-app .learningpaths-edit-add {
     padding-top: 20px;
 }
-#page-local-differentiator-index #local-differentiator-app .learninggoals-edit-add-form > div > p > input {
+#page-local-differentiator-index #local-differentiator-app .learningpaths-edit-add-form > div > p > input {
     margin-bottom: 5px;
     font-size: 1rem;
 }

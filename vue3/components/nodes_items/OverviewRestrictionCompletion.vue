@@ -34,13 +34,13 @@
         };
         triggerGetConditions()
     // watch values from selected node
-    watch(() => store.state.learninggoal[0], async () => {
+    watch(() => store.state.learningpath, async () => {
         triggerGetConditions()
     }, { deep: true } );
 
 });
 function triggerGetConditions() {
-    store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
+    store.state.learningpath.json.tree.nodes.forEach((node) => {
         if (node.id == props.node.node_id) {
             if (node.completion != undefined) {
                 conditions.value.completion = getConditions(node.completion.nodes) 

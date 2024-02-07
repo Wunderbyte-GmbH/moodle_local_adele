@@ -53,7 +53,7 @@ const selectedCourse = ref(null)
 const emit = defineEmits(['update:modelValue'])
 
 onMounted(async () => {
-  store.state.learninggoal[0].json.tree.nodes.forEach(node => {
+  store.state.learningpath.json.tree.nodes.forEach(node => {
     if (store.state.node.course_node_id != node.data.course_node_id) {
       courses.value.push({
         id: node.data.course_node_id,

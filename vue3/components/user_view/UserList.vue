@@ -42,7 +42,7 @@
         <td>
           <router-link 
             v-if="store.state.view!='student'"
-            :to="{ name: 'userDetails', params: { learninggoalId: store.state.learningGoalID, userId: relation.id }}"
+            :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
           >
             {{ relation.id }}
           </router-link>

@@ -29,10 +29,10 @@ require_once('lib.php');
 
 global $CFG, $DB, $USER;
 
-$learninggoalid = optional_param('id', 0, PARAM_INT);
+$learningpathid = optional_param('id', 0, PARAM_INT);
 
-if ($learninggoalid > 0) {
-    $path = '/local/adele/index.php/learninggoals/edit/' . $learninggoalid . '/';
+if ($learningpathid > 0) {
+    $path = '/local/adele/index.php/learningpaths/edit/' . $learningpathid . '/';
     redirect(new \moodle_url($path));
 }
 

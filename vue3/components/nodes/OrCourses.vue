@@ -94,7 +94,7 @@ const calculateHeight = (length) => {
 
 const removeCourse = (id) => {
   courses.value = courses.value.filter(course => course.id !== id);
-  store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
+  store.state.learningpath.json.tree.nodes.forEach((node) => {
     if (node.id == props.data.node_id) {
       dataValue.value.course_node_id = removeElement(node.data.course_node_id, id[0]);
       if (courses.value.length == 1) {

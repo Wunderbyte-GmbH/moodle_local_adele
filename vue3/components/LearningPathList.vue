@@ -27,38 +27,38 @@
     <h3>{{ store.state.strings.pluginname }}</h3>
     <div>
       <router-link 
-        :to="{ name: 'learninggoal-new' }" 
+        :to="{ name: 'learningpath-new' }" 
         tag="button" 
         class="btn btn-primary"
       >
-        {{ store.state.strings.learninggoal_form_title_add }}
+        {{ store.state.strings.learningpath_form_title_add }}
       </router-link>
     </div>
     <h2>{{ store.state.strings.overviewlearningpaths }}</h2>
 
-    <div>{{ store.state.strings.learninggoals_edit_site_description }}</div>
+    <div>{{ store.state.strings.learningpaths_edit_site_description }}</div>
     <span v-if="store.state.learningpaths == ''">
-      {{ store.state.strings.learninggoals_edit_site_no_learningpaths }}
+      {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
     </span>
     <span v-else>
       <div 
-        v-for="singlelearninggoal in store.state.learningpaths" 
-        :key="singlelearninggoal.id" 
+        v-for="singlelearningpath in store.state.learningpaths" 
+        :key="singlelearningpath.id" 
         style="margin-bottom: 10px"
       >
-        <div v-if="singlelearninggoal.name !== 'not found'">
+        <div v-if="singlelearningpath.name !== 'not found'">
           <div>
             <div 
               class="card" 
               style="width: 18rem;"
             >
               <div class="card-body">
-                <h5 class="card-title">{{ singlelearninggoal.name }}</h5>
-                <p class="card-text">{{ singlelearninggoal.description }}</p>
+                <h5 class="card-title">{{ singlelearningpath.name }}</h5>
+                <p class="card-text">{{ singlelearningpath.description }}</p>
                 <a 
                   :title="store.state.strings.edit"
                   href="" 
-                  @click.prevent="editLearningpath(singlelearninggoal.id)" 
+                  @click.prevent="editLearningpath(singlelearningpath.id)" 
                 >
                   <i 
                     class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
@@ -68,7 +68,7 @@
                 <a 
                   :title="store.state.strings.duplicate"
                   href="" 
-                  @click.prevent="duplicateLearningpath(singlelearninggoal.id)" 
+                  @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
                 >
                   <i 
                     class="icon fa fa-copy fa-fw iconsmall m-r-0" 
@@ -78,7 +78,7 @@
                 <a 
                   :title="store.state.strings.delete"
                   href="" 
-                  @click.prevent="showDeleteConfirm(singlelearninggoal.id)" 
+                  @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
                 >
                   <i 
                     class="icon fa fa-trash fa-fw iconsmall" 
@@ -89,21 +89,21 @@
             </div>
           </div>
           <div 
-            v-show="clicked[singlelearninggoal.id]"
+            v-show="clicked[singlelearningpath.id]"
             class="alert-danger p-3 m-t-1 m-b-1" 
           >
-            <div>{{ store.state.strings.deletepromptpre }}{{ singlelearninggoal.name }}{{ store.state.strings.deletepromptpost }}</div>
+            <div>{{ store.state.strings.deletepromptpre }}{{ singlelearningpath.name }}{{ store.state.strings.deletepromptpost }}</div>
             <div class="m-t-1">
               <button 
                 class="btn btn-danger m-r-0" 
                 :title="store.state.strings.btnconfirmdelete"
-                @click="deleteLearningpathConfirm(singlelearninggoal.id)" 
+                @click="deleteLearningpathConfirm(singlelearningpath.id)" 
               >
                 {{ store.state.strings.btnconfirmdelete }}</button>
               <button 
                 type="button" 
                 class="btn btn-secondary"
-                @click="cancelDeleteConfirm(singlelearninggoal.id)" 
+                @click="cancelDeleteConfirm(singlelearningpath.id)" 
               >
                 {{ store.state.strings.cancel }}
               </button>
@@ -136,11 +136,11 @@ const showDeleteConfirm = (index) => {
 };
 
 // Edit learning path deletion
-const editLearningpath = (singlelearninggoalid) => {
-  store.state.learningGoalID = singlelearninggoalid
+const editLearningpath = (singlelearningpathid) => {
+  store.state.learningPathID = singlelearningpathid
   router.push({
-    name: 'learninggoal-edit',
-    params: { learninggoalId: singlelearninggoalid  }
+    name: 'learningpath-edit',
+    params: { learningpathId: singlelearningpathid  }
   })
 };
 
@@ -150,9 +150,9 @@ const cancelDeleteConfirm = (index) => {
 };
 
 // Deleting learning path
-const deleteLearningpathConfirm = (learninggoalid) => {
+const deleteLearningpathConfirm = (learningpathid) => {
   const result = {
-    learninggoalid: learninggoalid,
+    learningpathid: learningpathid,
   };
   store.dispatch('deleteLearningpath', result);
   clicked.value = {};
@@ -164,9 +164,9 @@ const deleteLearningpathConfirm = (learninggoalid) => {
 };
 
 // Duplicate learning path
-const duplicateLearningpath = (learninggoalid) => {
+const duplicateLearningpath = (learningpathid) => {
   const result = {
-    learninggoalid: learninggoalid,
+    learningpathid: learningpathid,
   };
   store.dispatch('duplicateLearningpath', result);
   notify({

@@ -66,7 +66,7 @@ class learning_paths {
         $data->json = $params['json'];
         $id = 0;
 
-        if ($params['learninggoalid'] == 0) {
+        if ($params['learningpathid'] == 0) {
             $data->timecreated = time();
             $data->createdby = $params['userid'] ?? 0;
             $id = $DB->insert_record('local_adele_learning_paths', (object)$data);
@@ -81,7 +81,7 @@ class learning_paths {
                 ],
             ]);
         } else {
-            $id = $params['learninggoalid'];
+            $id = $params['learningpathid'];
             $data->id = $id;
             $DB->update_record('local_adele_learning_paths', $data);
             // Trigger catscale created event.
@@ -114,8 +114,8 @@ class learning_paths {
      */
     public static function get_learning_paths() {
         global $DB;
-        $learninggoals = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description');
-        return array_map(fn($a) => (array)$a, $learninggoals);
+        $learningpaths = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description');
+        return array_map(fn($a) => (array)$a, $learningpaths);
     }
 
     /**
@@ -125,19 +125,19 @@ class learning_paths {
      * @return array
      */
     public static function get_learning_path($params) {
-        if ($params['learninggoalid'] == 0) {
-            $learninggoal = [
+        if ($params['learningpathid'] == 0) {
+            $learningpath = [
                 'id' => 0,
                 'name' => '',
                 'description' => '',
                 'json' => '',
             ];
-            return [$learninggoal];
+            return $learningpath;
         }
         global $DB;
-        $learninggoal = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']],
+        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
             'id, name, description, json');
-        return [(array) $learninggoal];
+        return (array) $learningpath;
     }
 
     /**
@@ -149,7 +149,7 @@ class learning_paths {
     public static function duplicate_learning_path($params) {
         global $DB, $USER;
 
-        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learninggoalid']],
+        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
             'name, description, json');
 
         if (isset($learningpath)) {
@@ -183,15 +183,15 @@ class learning_paths {
     public static function delete_learning_path($params) {
         global $DB, $USER;
 
-        $result = $DB->delete_records('local_adele_learning_paths', ['id' => $params['learninggoalid']]);
+        $result = $DB->delete_records('local_adele_learning_paths', ['id' => $params['learningpathid']]);
         if ($result) {
             // Trigger catscale created event.
             $event = learnpath_deleted::create([
-                'objectid' => $params['learninggoalid'],
+                'objectid' => $params['learningpathid'],
                 'context' => context_system::instance(),
                 'other' => [
                     'learningpathname' => $params['name'] ?? 'TBD',
-                    'learningpathid' => $params['learninggoalid'],
+                    'learningpathid' => $params['learningpathid'],
                     'userid' => $USER->id,
                 ],
             ]);
@@ -216,7 +216,7 @@ class learning_paths {
         global $DB;
 
         $params = [
-            'learning_path_id' => (int)$data['learninggoalid'],
+            'learning_path_id' => (int)$data['learningpathid'],
         ];
 
         $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
@@ -424,7 +424,7 @@ class learning_paths {
     public static function save_learning_user_relation($params) {
         $userpathrelation = new user_path_relation();
         $params = json_decode($params['params']);
-        $userpath = $userpathrelation->get_user_path_relation($params->route->learninggoalId, $params->route->userId);
+        $userpath = $userpathrelation->get_user_path_relation($params->route->learningpathId, $params->route->userId);
         if ($userpath) {
             $userpath->json = json_decode($userpath->json, true);
             $userpath->json['tree']['nodes'] = json_decode(json_encode($params->nodes), true);

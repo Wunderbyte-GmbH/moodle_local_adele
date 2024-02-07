@@ -71,7 +71,7 @@
       class="d-flex justify-content-center"
     >
       <Controls 
-        :learninggoal="store.state.learninggoal[0]"
+        :learningpath="store.state.learningpath"
         @change-class="toggleClass"
       />
     </div>
@@ -269,7 +269,6 @@ function onDrop(event) {
       !intersectedNode.value.dropzone.id.includes('_and')) &&
       !intersectedNode.value.dropzone.id.includes('_or')){
       
-
       newNode = addAutoCompletions(newNode)
       let source = intersectedNode.value.closestnode.id  
       let target = newNode.id
@@ -291,7 +290,7 @@ function onDrop(event) {
     }
     let tree = toObject()
     tree = removeDropzones(tree)
-    store.state.learninggoal[0].json = {
+    store.state.learningpath.json = {
       tree: tree,
     }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
@@ -309,11 +308,13 @@ function onDrop(event) {
 watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
-    if(oldNodes > newNodes){
+    if(oldNodes != newNodes){
       setTimeout(() => {
         fitView({ duration: 1000, padding: 0.5 });
       }, 100);
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
+      if(oldNodes > newNodes){
+        setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
+      }
     }
   },
 );

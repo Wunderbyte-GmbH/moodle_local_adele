@@ -46,16 +46,13 @@
       >
         <div class="card p-4" style="padding: 2.5rem !important;">
           <h2 class="mt-3">
-            {{ store.state.strings.learninggoal_form_title_edit }}
+            {{ store.state.strings.learningpath_form_title_edit }}
           </h2>
           <div class="card-body">
             <div>
-              <div 
-                v-for="goal in store.state.learninggoal" 
-                :key="goal.id"
-              >
+              <div v-if="store.state.learningpath">
                 <TextInputs 
-                  :goal="goal" 
+                  :goal="store.state.learningpath" 
                   @change-GoalName="changeGoalName" 
                   @change-GoalDescription="changeGoalDescription"
                 />
@@ -95,8 +92,8 @@ import TextInputs from './charthelper/textInputs.vue'
 import TeacherView from './teacher_view/TeacherView.vue';
 import StudentView from './student_view/StudentView.vue';
 
-// Load Store and Router
 const store = useStore()
+// Load Store and Router
 const router = useRouter()
 
 // Define constants that will be referenced
@@ -104,22 +101,22 @@ const goalname = ref('')
 const goaldescription = ref('')
 
 const changeGoalName = (newGoalName) => {
-  store.state.learninggoal[0].name = newGoalName;
+  store.state.learningpath.name = newGoalName;
 }
 
 const changeGoalDescription = (newGoalDescription) => {
-  store.state.learninggoal[0].description = newGoalDescription;
+  store.state.learningpath.description = newGoalDescription;
 }
 
 // Checking routes 
 const checkRoute = (currentRoute) => {
     if(currentRoute == undefined){
-        router.push({ name: 'learninggoals-edit-overview' });
+        router.push({ name: 'learningpaths-edit-overview' });
     }
-  else if (currentRoute.name === 'learninggoal-edit') {
+  else if (currentRoute.name === 'learningpath-edit') {
     store.state.editingadding = true;
-    nextTick(() => showForm(currentRoute.params.learninggoalId));
-  } else if (currentRoute.name === 'learninggoal-new') {
+    nextTick(() => showForm(currentRoute.params.learningpathId));
+  } else if (currentRoute.name === 'learningpath-new') {
     store.state.editingadding = true;
     nextTick(() => showForm(null));
   }
@@ -135,11 +132,11 @@ onMounted(() => {
 });
 
 // Showing form to generate or edit learning path
-const showForm = async (learninggoalId = null) => {
+const showForm = async (learningpathId = null) => {
   goalname.value = ''
   goaldescription.value = ''
-  if (learninggoalId) {
-    store.state.learningGoalID = learninggoalId;
+  if (learningpathId) {
+    store.state.learningPathID = learningpathId;
     store.dispatch('fetchLearningpath')
     store.dispatch('fetchUserPathRelations')
 

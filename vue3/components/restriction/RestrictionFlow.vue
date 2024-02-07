@@ -123,7 +123,7 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching conditions:', error);
     }
-    const learningGoal = store.state.learninggoal[0];
+    const learningGoal = store.state.learningpath;
     if (learningGoal && learningGoal.json && learningGoal.json.tree &&
       learningGoal.json.tree.nodes &&
       store.state.node) {

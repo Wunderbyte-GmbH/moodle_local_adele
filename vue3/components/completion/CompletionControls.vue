@@ -56,8 +56,8 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-if (store.state.node != undefined && store.state.learninggoal[0].json != '') {
-    let condition = store.state.learninggoal[0].json.tree.nodes.filter(node => {
+if (store.state.node != undefined && store.state.learningpath.json != '') {
+    let condition = store.state.learningpath.json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
     loadFlowChart(condition[0][props.condition], store.state.view)
@@ -77,15 +77,15 @@ const onSave = () => {
   } else{
     condition = recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
     //save learning path
-    store.state.learninggoal[0].json.tree.nodes = store.state.learninggoal[0].json.tree.nodes.map(element_node => {
+    store.state.learningpath.json.tree.nodes = store.state.learningpath.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
           return { ...element_node, [props.condition]: condition };
         }
         return element_node;
     });
-    store.state.learninggoal[0].json = JSON.stringify(store.state.learninggoal[0].json); 
+    store.state.learningpath.json = JSON.stringify(store.state.learningpath.json); 
     const savePromise = new Promise((resolve, reject) => {
-      store.dispatch('saveLearningpath', store.state.learninggoal[0])
+      store.dispatch('saveLearningpath', store.state.learningpath)
         .then(() => {
           resolve();
         })
@@ -97,8 +97,8 @@ const onSave = () => {
     savePromise.then(() => {
       // Fetch learning paths after saving
       store.dispatch('fetchLearningpaths');
-      store.state.learninggoal[0].json = JSON.parse(store.state.learninggoal[0].json); 
-      router.push('/learninggoals/edit/' + store.state.learningpath.id);
+      store.state.learningpath.json = JSON.parse(store.state.learningpath.json); 
+      router.push('/learningpaths/edit/' + store.state.learningpath.id);
       onCancel();
 
       notify({

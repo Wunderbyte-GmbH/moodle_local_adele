@@ -58,7 +58,7 @@ onMounted(() => {
     data.value.min_courses = props.restriction.value.min_courses
   }
   let parentCoursesId = null;
-  store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
+  store.state.learningpath.json.tree.nodes.forEach((node) => {
     if (node.id == store.state.node.node_id) {
       if (node.parentCourse == undefined ||
         node.parentCourse.includes('starting_node')) {
@@ -71,7 +71,7 @@ onMounted(() => {
   })
   let CoursesId = [];
   if (parentCoursesId != null) {
-    store.state.learninggoal[0].json.tree.nodes.forEach((node) => {
+    store.state.learningpath.json.tree.nodes.forEach((node) => {
       if (parentCoursesId.includes(node.id)) {
         CoursesId.push(node.data.course_node_id[0])
       }

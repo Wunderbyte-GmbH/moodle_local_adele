@@ -45,10 +45,10 @@ $string['route_not_found_site_name'] = 'Error: Page (route) not found!';
 $string['route_not_found'] = 'Page was not found. Please consider going back and trying it again.';
 
 // Vue component learning goal edit.
-$string['learninggoals_edit_site_name'] = 'adele learning goals';
-$string['learninggoals_edit_site_description'] = 'You may add a new learning path or edit existing paths.';
-$string['learninggoals_edit_site_no_learningpaths'] = 'No learning paths to show yet.';
-$string['learninggoals_edit_no_learninggoals'] = 'There are no goals to show.';
+$string['learningpaths_edit_site_name'] = 'adele learning goals';
+$string['learningpaths_edit_site_description'] = 'You may add a new learning path or edit existing paths.';
+$string['learningpaths_edit_site_no_learningpaths'] = 'No learning paths to show yet.';
+$string['learningpaths_edit_no_learningpaths'] = 'There are no goals to show.';
 
 // Learning goals overview.
 $string['edit'] = 'Edit';
@@ -64,11 +64,11 @@ $string['toclipboarddone'] = 'Copied to clipboard';
 $string['subject'] = 'Subject';
 
 // Learning goal form.
-$string['learninggoal'] = 'Goal';
-$string['learninggoal_name'] = 'Goal name';
-$string['learninggoal_description'] = 'Goal description';
-$string['learninggoal_form_title_add'] = 'Add a new learning path';
-$string['learninggoal_form_title_edit'] = 'Edit a learning path';
+$string['learningpath'] = 'Goal';
+$string['learningpath_name'] = 'Goal name';
+$string['learningpath_description'] = 'Goal description';
+$string['learningpath_form_title_add'] = 'Add a new learning path';
+$string['learningpath_form_title_edit'] = 'Edit a learning path';
 $string['save'] = 'Save';
 $string['cancel'] = 'Cancel';
 
@@ -157,3 +157,19 @@ $string['event_user_path_updated'] = 'User path relation was updated';
 $string['event_user_path_updated_description'] = 'The user path path relation for user {$a->user} and learning path {$a->path} was updated';
 $string['event_node_finished'] = 'Node weas finished';
 $string['event_node_finished_description'] = 'The user {$a->user} has finished the node {$a->node}';
+
+// Color strings.
+$string['DARK_GREEN'] = '#063449';
+$string['DEEP_SKY_BLUE'] = '#0d5575';
+$string['LIGHT_SEA_GREEN'] = '#4d8da8';
+$string['LIGHT_STEEL_BLUE'] = '#87b8ce';
+$string['DARK_RED'] = '#750033';
+$string['CRIMSON'] = '#ad0050';
+$string['DARK_ORANGE'] = '#df843b';
+$string['RUSTY_RED'] = '#c76413';
+$string['PUMPKIN'] = '#e7a23b';
+$string['LIGHT_GRAY'] = '#d1d1d1';
+$string['GRAY'] = '#ababab';
+$string['DIM_GRAY'] = '#737373';
+$string['VERY_DARK_GRAY'] = '#373737';
+$string['BLACK'] = '#0c0c0c';

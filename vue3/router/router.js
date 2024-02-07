@@ -24,7 +24,7 @@
 // Import needed libraries
 import { createRouter, createWebHashHistory } from 'vue-router';
 import notFound from '../components/NotFound';
-import learninggoalsEdit from '../components/learninggoals-edit';
+import learningpathsEdit from '../components/LearningpathsEdit';
 import userPath from '../components/user_view/UserPath';
 import { useStore } from 'vuex'
 
@@ -34,26 +34,26 @@ const routes = [
     {
         path: '/',
         redirect: {
-            name: 'learninggoals-edit-overview'
+            name: 'learningpaths-edit-overview'
         }
     },
     {
-        path: '/learninggoals/edit',
-        component: learninggoalsEdit,
-        name: 'learninggoals-edit-overview',
+        path: '/learningpaths/edit',
+        component: learningpathsEdit,
+        name: 'learningpaths-edit-overview',
         children: [
             {
-                path: '/learninggoals/edit/:learninggoalId(\\d+)',
-                component: learninggoalsEdit,
-                name: 'learninggoal-edit',
+                path: '/learningpaths/edit/:learningpathId(\\d+)',
+                component: learningpathsEdit,
+                name: 'learningpath-edit',
             }, {
-                path: '/learninggoals/edit/new',
-                component: learninggoalsEdit,
-                name: 'learninggoal-new'
+                path: '/learningpaths/edit/new',
+                component: learningpathsEdit,
+                name: 'learningpath-new'
             },
         ],
     }, {
-            path: '/learninggoals/edit/:learninggoalId(\\d+)/:userId(\\d+)',
+            path: '/learningpaths/edit/:learningpathId(\\d+)/:userId(\\d+)',
             component: userPath,
             name: 'userDetails'
     },
