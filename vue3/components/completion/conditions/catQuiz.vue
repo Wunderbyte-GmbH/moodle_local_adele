@@ -135,6 +135,14 @@ onMounted(async () => {
     if (props.completion.value.parentscales !== undefined) {
       selectedparentscale.value = props.completion.value.parentscales;
       parentscales.value = await store.dispatch('fetchCatquizParentScales')
+      // watch values from selected node
+      watch(() => selectedparentscale.value, async ($new) => {
+        if (selectedparentscale.value && $new) {
+          scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
+          data.value.scales = scales.value
+          data.value.parentscales = selectedparentscale.value
+        }
+      }, { deep: true } );
     }
   }
   // watch values from selected node
@@ -159,15 +167,6 @@ onMounted(async () => {
 // watch values from selected node
 watch(() => data.value, () => {
   emit('update:modelValue', data.value);
-}, { deep: true } );
-
-// watch values from selected node
-watch(() => selectedparentscale.value, async ($old, $new) => {
-  if (selectedparentscale.value && $new) {
-    scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
-    data.value.scales = scales.value
-    data.value.parentscales = selectedparentscale.value
-  }
 }, { deep: true } );
 
 const toggleTable = () => {

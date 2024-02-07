@@ -46,15 +46,15 @@ const props = defineProps({
 onMounted(() => {
   const userpath = JSON.parse(store.state.lpuserpathrelation.json)
   userpath.tree.nodes.forEach((node) => {
-    if (props.data.node_id == node.id) {
-      if (node.restriction.nodes) {
+     if (props.data.node_id == node.id) {
+       if (node.restriction && node.restriction.nodes) {
         node.restriction.nodes.forEach((restrictionnode) => {
           if(restrictionnode.data.label == 'timed'){
             date.value = restrictionnode.data.value
           }
         })
-      }
-    }
+       }
+     }
   })
 })
 

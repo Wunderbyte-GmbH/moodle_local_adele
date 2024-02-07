@@ -28,6 +28,8 @@ import { Handle, Position } from '@vue-flow/core'
 import { defineProps, computed  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
+import { useVueFlow } from '@vue-flow/core'
+
 
 // Load Store 
 const store = useStore();
@@ -38,6 +40,8 @@ const props = defineProps({
   },
 });
 
+const { toObject } = useVueFlow()
+
 // Set node data for the modal
 const setNodeModal = () => {
   store.state.node = props.data
@@ -45,6 +49,9 @@ const setNodeModal = () => {
 
 // Set node data for the modal
 const setPretestView = () => {
+  let tree = toObject()
+  store.state.learninggoal[0].json.tree = tree
+  //store.state.learninggoal[0].json = tree
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -53,6 +60,8 @@ const setPretestView = () => {
 
 // Set node data for the modal
 const setRestrictionView = () => {
+  let tree = toObject()
+  store.state.learninggoal[0].json.tree = tree
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false

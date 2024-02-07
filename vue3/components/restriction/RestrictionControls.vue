@@ -32,9 +32,12 @@ import loadFlowChart from '../../composables/loadFlowChart'
 import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
+import { useRouter } from 'vue-router';
 
 // Load Store and Router
 const store = useStore();
+const router = useRouter();
+
 const { onPaneReady, toObject } = useVueFlow()
 
 // Emit to parent component
@@ -73,16 +76,36 @@ const onSave = () => {
         return element_node;
     });
     store.state.learninggoal[0].json = JSON.stringify(store.state.learninggoal[0].json); 
-    store.dispatch('saveLearningpath', store.state.learninggoal[0]);
-    store.dispatch('fetchLearningpaths');
-    store.state.learninggoal[0].json = JSON.parse(store.state.learninggoal[0].json); 
-  
-  
-    onCancel()
-    notify({
-      title: store.state.strings.title_save,
-      text: store.state.strings.description_save,
-      type: 'success'
+    const savePromise = new Promise((resolve, reject) => {
+      store.dispatch('saveLearningpath', store.state.learninggoal[0])
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+    
+    savePromise.then(() => {
+      // Fetch learning paths after saving
+      store.dispatch('fetchLearningpaths');
+      store.state.learninggoal[0].json = JSON.parse(store.state.learninggoal[0].json); 
+      router.push('/learninggoals/edit/' + store.state.learningpath.id);
+      onCancel();
+
+      notify({
+        title: store.state.strings.title_save,
+        text: store.state.strings.description_save,
+        type: 'success'
+      });
+    }).catch((error) => {
+      // Handle errors if necessary
+      console.error('Error saving learning path:', error);
+      notify({
+        title: 'Error',
+        text: 'Failed to save learning path.',
+        type: 'error'
+      });
     });
   }
 };

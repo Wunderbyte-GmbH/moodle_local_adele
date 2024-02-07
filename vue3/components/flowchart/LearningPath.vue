@@ -81,7 +81,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -310,6 +310,9 @@ watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
     if(oldNodes > newNodes){
+      setTimeout(() => {
+        fitView({ duration: 1000, padding: 0.5 });
+      }, 100);
       setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
     }
   },

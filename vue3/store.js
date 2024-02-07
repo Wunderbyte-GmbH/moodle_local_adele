@@ -80,7 +80,7 @@ export function createAppStore() {
                 state.learningpaths = ajaxdata;
             },
             setLearningpath(state, ajaxdata) {
-                state.learningpath = ajaxdata;
+              state.learningpath = ajaxdata;
             },
             setAvailablecourses(state, ajaxdata) {
                 state.availablecourses = ajaxdata;
@@ -187,7 +187,8 @@ export function createAppStore() {
                   description: payload.description, 
                   json: payload.json });
                 context.dispatch('fetchLearningpaths');
-                return result.result;
+                context.commit('setLearningpath', result.learningpath);
+                return result.learningpath.id;
             },
             async deleteLearningpath(context, payload) {
                 const result = await ajax('local_adele_delete_learningpath', 
@@ -217,7 +218,6 @@ export function createAppStore() {
                 return result;
             },
             async fetchCatquizScales(context, payload) {
-                console.log({ userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid})
                 const result = await ajax('local_adele_get_catquiz_scales', 
                 { userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid});
                 return result;

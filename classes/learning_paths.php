@@ -99,7 +99,10 @@ class learning_paths {
         $event->trigger();
 
         if ($id > 0) {
-            return 1;
+            return $DB->get_record(
+                'local_adele_learning_paths',
+                ['id' => $id]
+            );
         }
         return 0;
     }

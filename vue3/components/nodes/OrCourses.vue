@@ -146,6 +146,7 @@ const setStartNode = (node_id) => {
     >
       <div>
         <button 
+          v-if="store.state.view != 'teacher'"
           type="button" 
           class="btn btn-secondary" 
           @click="setRestrictionView"
@@ -168,6 +169,7 @@ const setStartNode = (node_id) => {
           <div class="fullname-container">
             {{ value.fullname }}
             <button 
+              v-if="store.state.view != 'teacher'"
               type="button" 
               class="btn btn-danger btn-sm trash-button" 
               @click="removeCourse(value.id)"
@@ -179,6 +181,7 @@ const setStartNode = (node_id) => {
       </div>
       <div>
         <button 
+          v-if="store.state.view != 'teacher'"
           type="button" 
           class="btn btn-primary" 
           data-toggle="modal" 
@@ -188,6 +191,7 @@ const setStartNode = (node_id) => {
           <i class="fa fa-edit" /> {{ store.state.strings.edit_course_node }}
         </button>
         <button 
+          v-if="store.state.view != 'teacher'"
           type="button" 
           class="btn btn-secondary" 
           @click="setPretestView"

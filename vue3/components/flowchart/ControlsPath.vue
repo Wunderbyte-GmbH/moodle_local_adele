@@ -62,6 +62,12 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => store.state.learninggoal[0], (newValue) => {
   if (newValue.json.tree != undefined) {
+    if(store.state.view == 'teacher'){
+      newValue.json.tree.nodes.forEach((node) => {
+        node.draggable = false
+      })
+    }
+
     //loadFlowChart(newValue.json.tree, store.state.view)
     setNodes(newValue.json.tree.nodes)
     setEdges(newValue.json.tree.edges)
@@ -156,12 +162,12 @@ function updatePos() {
     yvalue += 600;
     newlabels == [...new Set(newlabels)]
     nodelabels = newlabels
-    console.log(nodelabels)
     if (nodelabels.length == 0 ) {
       loop = false
     }
   }
   setNodes(elements.nodes)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 }
 
 </script>

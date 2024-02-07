@@ -33,7 +33,7 @@ defineProps({
   },
 });
  
- </script>
+</script>
 <template>
   <div>
     <div 
@@ -42,7 +42,7 @@ defineProps({
         'background-color': data.bgcolor, 
         'opacity' : data.opacity,
         'height': data.height, 
-        'width': '400px'
+        'width': data.width ? data.width : '400px'
       }"
     >
       {{ data.infotext }}

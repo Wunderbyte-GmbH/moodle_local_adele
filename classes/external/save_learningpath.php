@@ -91,7 +91,7 @@ class save_learningpath extends external_api {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
 
-        return ['success' => learning_paths::save_learning_path($params)];
+        return ['learningpath' => learning_paths::save_learning_path($params)];
     }
 
     /**
@@ -101,7 +101,16 @@ class save_learningpath extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'success' => new external_value(PARAM_INT, '1 for success', VALUE_REQUIRED),
+            'learningpath' => new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Condition description'),
+                    'name' => new external_value(PARAM_TEXT, 'Condition description'),
+                    'description' => new external_value(PARAM_TEXT, 'Condition description'),
+                    'timecreated' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'timemodified' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'createdby' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'json' => new external_value(PARAM_TEXT, 'Condition label'),
+                ]
+            )
             ]
         );
     }
