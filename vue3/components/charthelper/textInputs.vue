@@ -28,15 +28,21 @@ onMounted(() => {
 
 // Watch changes on goalname
 watch(goalname, (newGoalName) => {
-    store.state.learninggoal[0].name = newGoalName;
+    store.state.learningpath.name = newGoalName;
     emit('change-GoalName', newGoalName);
 });
 
 // Watch changes on goaldescription
 watch(goaldescription, (newGoalDescription) => {
-    store.state.learninggoal[0].description = newGoalDescription;
+    store.state.learningpath.description = newGoalDescription;
     emit('change-GoalDescription', newGoalDescription);
 });
+
+// Watch changes on goaldescription
+watch(() => store.state.learningpath, async () => {
+  goalname.value = store.state.learningpath.name
+  goaldescription.value = store.state.learningpath.description
+}, { deep: true } );
 </script>
 
 <template>

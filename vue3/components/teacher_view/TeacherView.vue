@@ -25,12 +25,12 @@
 <template>
   <div>
     <div>
-      <div v-if="store.state.learninggoal">
+      <div v-if="store.state.learningpath">
         <TextInputs 
-          :goal="store.state.learninggoal[0]"
+          :goal="store.state.learningpath"
         />
         <LearningPath />
-        <UserList :learning-path-id="store.state.learninggoal[0]" /> 
+        <UserList :learning-path-id="store.state.learningpath" /> 
       </div>
     </div>
   </div>

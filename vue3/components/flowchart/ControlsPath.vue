@@ -46,7 +46,7 @@ const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
 
 // Define props in the setup block
 const props = defineProps({
-  learninggoal: {
+  learningpath: {
     type: Object,
     default: null,
   }
@@ -60,7 +60,7 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-watch(() => store.state.learninggoal[0], (newValue) => {
+watch(() => store.state.learningpath, (newValue) => {
   if (newValue.json.tree != undefined) {
     if(store.state.view == 'teacher'){
       newValue.json.tree.nodes.forEach((node) => {
@@ -84,8 +84,8 @@ onMounted(() => {
 });
 
 // Watch for changes of the learning path
-if (store.state.learninggoal[0].json.tree != undefined) {
-  loadFlowChart(store.state.learninggoal[0].json.tree, store.state.view)
+if (store.state.learningpath.json.tree != undefined) {
+  loadFlowChart(store.state.learningpath.json.tree, store.state.view)
 }
 
 // Prepare and save learning path
@@ -105,16 +105,16 @@ const onSave = () => {
       obj['tree'] = recalculateParentChild(obj['tree'], 'parentCourse', 'childCourse', 'starting_node')
       obj = JSON.stringify(obj);
       let result = {
-          learninggoalid: props.learninggoal.id,
-          name: props.learninggoal.name,
-          description: props.learninggoal.description,
+          learningpathid: props.learningpath.id,
+          name: props.learningpath.name,
+          description: props.learningpath.description,
           json: obj,
       };
       store.dispatch('saveLearningpath', result);
       store.dispatch('fetchLearningpaths');
-      store.state.learningGoalID = 0;
+      store.state.learningPathID = 0;
       store.state.editingadding = false;
-      router.push({name: 'learninggoals-edit-overview'});
+      router.push({name: 'learningpaths-edit-overview'});
       window.scrollTo(0,0);
   
       notify({
@@ -127,10 +127,11 @@ const onSave = () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-    store.state.learningGoalID = 0;
+    store.state.learningPathID = 0;
     store.state.editingadding = false;
     store.state.editingrestriction = false;
-    router.push({name: 'learninggoals-edit-overview'});
+    store.state.editingpretest = false;
+    router.push({name: 'learningpaths-edit-overview'});
 };
 
 // Fit pane into view

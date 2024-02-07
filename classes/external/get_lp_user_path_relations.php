@@ -58,7 +58,7 @@ class get_lp_user_path_relations extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -67,13 +67,13 @@ class get_lp_user_path_relations extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $userid
-     * @param int $learninggoalid
+     * @param int $learningpathid
      * @return array
      */
-    public static function execute($userid, $learninggoalid): array {
+    public static function execute($userid, $learningpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
-            'learninggoalid' => $learninggoalid,
+            'learningpathid' => $learningpathid,
         ]);
 
         require_login();

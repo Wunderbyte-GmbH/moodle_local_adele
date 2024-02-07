@@ -58,7 +58,7 @@ class get_learningpath extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -67,13 +67,13 @@ class get_learningpath extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $userid
-     * @param int $learninggoalid
+     * @param int $learningpathid
      * @return array
      */
-    public static function execute($userid, $learninggoalid): array {
+    public static function execute($userid, $learningpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
-            'learninggoalid' => $learninggoalid,
+            'learningpathid' => $learningpathid,
         ]);
 
         require_login();
@@ -92,15 +92,13 @@ class get_learningpath extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
-                    'name' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'description' => new external_value(PARAM_TEXT, 'Item name'),
-                    'json' => new external_value(PARAM_RAW, 'Item name'),
-                ]
-            )
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'id' => new external_value(PARAM_INT, 'Item id'),
+            'name' => new external_value(PARAM_TEXT, 'Historyid id'),
+            'description' => new external_value(PARAM_TEXT, 'Item name'),
+            'json' => new external_value(PARAM_RAW, 'Item name'),
+        ]
         );
     }
 }

@@ -114,7 +114,7 @@ onMounted(() => {
   let params = []
   if (store.state.view == 'student') {
     params = {
-      learninggoalId: store.state.learningGoalID,
+      learningpathId: store.state.learningPathID,
       userId: store.state.user,
     }
   }else {

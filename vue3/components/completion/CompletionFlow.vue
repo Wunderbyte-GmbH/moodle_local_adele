@@ -133,7 +133,7 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching completions:', error);
     }
-    const learningGoal = store.state.learninggoal[0];
+    const learningGoal = store.state.learningpath;
     if (learningGoal && learningGoal.json && learningGoal.json.tree && learningGoal.json.tree.nodes) {
         learningGoal.json.tree.nodes.forEach((node) => {
             if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {

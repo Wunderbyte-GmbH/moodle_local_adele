@@ -58,7 +58,7 @@ class get_catquiz_scales extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathd', VALUE_REQUIRED),
             'testid'  => new external_value(PARAM_INT, 'testid', VALUE_REQUIRED),
             ]
         );
@@ -68,14 +68,14 @@ class get_catquiz_scales extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $userid
-     * @param int $learninggoalid
+     * @param int $learningpathid
      * @param int $testid
      * @return array
      */
-    public static function execute($userid, $learninggoalid, $testid): array {
+    public static function execute($userid, $learningpathid, $testid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
-            'learninggoalid' => $learninggoalid,
+            'learningpathid' => $learningpathid,
             'testid' => $testid,
         ]);
 

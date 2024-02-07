@@ -57,7 +57,7 @@ class duplicate_learningpath extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -72,7 +72,7 @@ class duplicate_learningpath extends external_api {
     public static function execute($userid, $learningpathid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
-            'learninggoalid' => $learningpathid,
+            'learningpathid' => $learningpathid,
         ]);
 
         require_login();

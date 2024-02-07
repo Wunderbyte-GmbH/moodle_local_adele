@@ -44,10 +44,10 @@ $string['route_not_found_site_name'] = 'Fehler: Seite (Route) nicht gefunden!';
 $string['route_not_found'] = 'Seite wurde nicht gefunden. Bitte gehen Sie zurück und versuchen Sie es erneut.';
 
 // Vue component learning goal edit.
-$string['learninggoals_edit_site_name'] = 'Adele Lernziele';
-$string['learninggoals_edit_site_description'] = 'Sie können einen neuen Lernpfad hinzufügen oder vorhandene Pfade bearbeiten.';
-$string['learninggoals_edit_site_no_learningpaths'] = 'Noch keine Lernpfade vorhanden.';
-$string['learninggoals_edit_no_learninggoals'] = 'Es gibt keine Ziele zu zeigen.';
+$string['learningpaths_edit_site_name'] = 'Adele Lernziele';
+$string['learningpaths_edit_site_description'] = 'Sie können einen neuen Lernpfad hinzufügen oder vorhandene Pfade bearbeiten.';
+$string['learningpaths_edit_site_no_learningpaths'] = 'Noch keine Lernpfade vorhanden.';
+$string['learningpaths_edit_no_learningpaths'] = 'Es gibt keine Ziele zu zeigen.';
 
 // Learning goals overview.
 $string['edit'] = 'Bearbeiten';
@@ -63,11 +63,11 @@ $string['toclipboarddone'] = 'In die Zwischenablage kopiert';
 $string['subject'] = 'Thema';
 
 // Learning goal form.
-$string['learninggoal'] = 'Ziel';
-$string['learninggoal_name'] = 'Zielname';
-$string['learninggoal_description'] = 'Zielbeschreibung';
-$string['learninggoal_form_title_add'] = 'Einen neuen Lernpfad hinzufügen';
-$string['learninggoal_form_title_edit'] = 'Einen Lernpfad bearbeiten';
+$string['learningpath'] = 'Ziel';
+$string['learningpath_name'] = 'Zielname';
+$string['learningpath_description'] = 'Zielbeschreibung';
+$string['learningpath_form_title_add'] = 'Einen neuen Lernpfad hinzufügen';
+$string['learningpath_form_title_edit'] = 'Einen Lernpfad bearbeiten';
 $string['save'] = 'Speichern';
 $string['cancel'] = 'Abbrechen';
 

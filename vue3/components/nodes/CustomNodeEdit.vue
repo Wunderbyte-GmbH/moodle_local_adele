@@ -101,7 +101,7 @@ const toggleTable = (condition) => {
         </div>
       </div>
 
-      <div v-if="store.state.learninggoal && store.state.view=='student'">
+      <div v-if="store.state.learningpath && store.state.view=='student'">
         <div v-if="date">
           <DateInfo :date="date" />
         </div>

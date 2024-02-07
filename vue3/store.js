@@ -37,26 +37,17 @@ export function createAppStore() {
                 view: 'defaultView',
                 user: null,
                 userlist: null,
-                learningGoalID: 0,
+                learningPathID: 0,
                 contextID: 0,
                 strings: {},
-                learninggoals: null,
                 learningpaths: null,
                 learningpath: null,
                 availablecourses: null,
-                // availablecourses: [ 
-                //     { "id": 17, "fullname": "BANALY", "shortname": "BANALY", "category": "5", "tags": "first" }, 
-                //     { "id": 927, "fullname": "adaptive", "shortname": "adaptive", "category": "6", "tags": "zwei" } 
-                // ],
-                learninggoal: null,
-                // learninggoal: [ 
-                //     { "id": 22, "name": "", "description": "", "json": "" } 
-                // ],
                 editingadding: false,
                 editingrestriction: false,
+                editingpretest: false,
                 node: null,
                 startnode: null,
-                editingpretest: false,
                 lpuserpathrelations: [],
                 lpuserpathrelation: null,
                 feedback: null,
@@ -64,17 +55,11 @@ export function createAppStore() {
         },
         mutations: {
             // Mutations are synchronous.
-            setLearningGoalID(state, id) {
-                state.learningGoalID = id;
-            },
-            setContextID(state, id) {
-                state.contextID = id;
+            setlearningPathID(state, id) {
+                state.learningPathID = id;
             },
             setStrings(state, strings) {
                 state.strings = strings;
-            },
-            setLearninggoals(state, ajaxdata) {
-                state.learninggoals = ajaxdata;
             },
             setLearningpaths(state, ajaxdata) {
                 state.learningpaths = ajaxdata;
@@ -84,9 +69,6 @@ export function createAppStore() {
             },
             setAvailablecourses(state, ajaxdata) {
                 state.availablecourses = ajaxdata;
-            },
-            setLearninggoal(state, ajaxdata) {
-                state.learninggoal = ajaxdata;
             },
             setNode(state, data) {
                 state.node = data;
@@ -98,7 +80,7 @@ export function createAppStore() {
                 //set node name
                 state.node.fullname = data.fullname;
                 //save learning path
-                state.learninggoal[0].json.tree.nodes = state.learninggoal[0].json.tree.nodes.map(element_node => {
+                state.learningpath.json.tree.nodes = state.learningpath.json.tree.nodes.map(element_node => {
                     if (element_node.id === data.node_id) {
                       return { ...element_node, fullname: data.fullname };
                     }
@@ -140,101 +122,101 @@ export function createAppStore() {
                     context.commit('setStrings', strings);
                     moodleStorage.set(cacheKey, JSON.stringify(strings));
                 }
+
             },
             async fetchLearningpath(context) {
                 const learningpath = await ajax('local_adele_get_learningpath',
-                    { userid: 0, learninggoalid: context.state.learningGoalID });
-    
-                if (learningpath[0].json != '') {
-                    learningpath[0].json = JSON.parse(learningpath[0].json); 
+                    { userid: 0, learningpathid: context.state.learningPathID });
+                if (learningpath.json != '') {
+                    learningpath.json = JSON.parse(learningpath.json); 
                 }
-                context.commit('setLearninggoal', learningpath);
+                context.commit('setLearningpath', learningpath);
             },
-    
             async fetchUserPathRelations(context) {
                 const lpUserPathRelations = await ajax('local_adele_get_user_path_relations',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 context.commit('setLpUserPathRelations', lpUserPathRelations);
             },
             async fetchUserPathRelation(context, route) {
                 const lpUserPathRelation = await ajax('local_adele_get_user_path_relation',
-                    { learningpathid: route.learninggoalId, userpathid: route.userId});
+                    { learningpathid: route.learningpathId, userpathid: route.userId});
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
             },
             async saveUserPathRelation(context, params) {
                 await ajax('local_adele_save_user_path_relation',
                     { userid: context.state.user,
-                      learninggoalid: context.state.learningGoalID,
+                      learningpathid: context.state.learningPathID,
                       params: JSON.stringify(params)});
                 context.dispatch('fetchUserPathRelation', params.route);
                 context.dispatch('fetchUserPathRelations');
             },
             async fetchLearningpaths(context) {
                 const learningpaths = await ajax('local_adele_get_learningpaths',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 context.commit('setLearningpaths', learningpaths);
             },
             async fetchAvailablecourses(context) {
                 const availablecourses = await ajax('local_adele_get_availablecourses',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 context.commit('setAvailablecourses', availablecourses);
             },
             async saveLearningpath(context, payload) {
                 const result = await ajax('local_adele_save_learningpath',
                 { userid: context.state.user, 
-                  learninggoalid: context.state.learningGoalID, 
+                  learningpathid: context.state.learningPathID, 
                   name: payload.name, 
                   description: payload.description, 
                   json: payload.json });
                 context.dispatch('fetchLearningpaths');
                 context.commit('setLearningpath', result.learningpath);
+                context.commit('setlearningPathID', result.learningpath.id);
                 return result.learningpath.id;
             },
             async deleteLearningpath(context, payload) {
                 const result = await ajax('local_adele_delete_learningpath', 
-                {userid: context.state.user, learninggoalid: payload.learninggoalid});
+                {userid: context.state.user, learningpathid: payload.learningpathid});
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
             async duplicateLearningpath(context, payload) {
                 const result = await ajax('local_adele_duplicate_learningpath', 
-                {userid: context.state.user, learninggoalid: payload.learninggoalid});
+                {userid: context.state.user, learningpathid: payload.learningpathid});
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
             async fetchCompletions(context) {
                 const result = await ajax('local_adele_get_completions',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
             async fetchRestrictions(context) {
                 const result = await ajax('local_adele_get_restrictions',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
             async fetchCatquizTests(context) {
                 const result = await ajax('local_adele_get_catquiz_tests',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
             async fetchCatquizScales(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_scales', 
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID, testid: payload.testid});
+                { userid: context.state.user, learningpathid: context.state.learningPathID, testid: payload.testid});
                 return result;
             },
             async fetchCatquizParentScales(context) {
                 const result = await ajax('local_adele_get_catquiz_parent_scales',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
             async fetchCatquizParentScale(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_parent_scale',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID, sacleid: payload.scaleid });
+                { userid: context.state.user, learningpathid: context.state.learningPathID, sacleid: payload.scaleid });
                 return result;
             },
             async fetchModQuizzes(context) {
                 const result = await ajax('local_adele_get_mod_quizzes',
-                { userid: context.state.user, learninggoalid: context.state.learningGoalID });
+                { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
         }

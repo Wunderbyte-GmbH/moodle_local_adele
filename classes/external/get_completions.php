@@ -58,7 +58,7 @@ class get_completions extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learninggoalid'  => new external_value(PARAM_INT, 'learninggoalid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             ]
         );
     }
@@ -67,10 +67,10 @@ class get_completions extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $userid
-     * @param int $learninggoalid
+     * @param int $learningpathid
      * @return array
      */
-    public static function execute($userid, $learninggoalid): array {
+    public static function execute($userid, $learningpathid): array {
         require_login();
         $context = context_system::instance();
         if (!has_capability('local/adele:canmanage', $context)) {
