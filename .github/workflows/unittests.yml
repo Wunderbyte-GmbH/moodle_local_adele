@@ -21,6 +21,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: vue3
 
       - name: Run Jest Unit-Testing
         run: npm run test:unit:ci
+        working-directory: vue3
