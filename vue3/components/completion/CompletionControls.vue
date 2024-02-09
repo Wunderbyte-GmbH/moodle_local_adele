@@ -57,6 +57,7 @@ function toggleClass() {
 
 // Watch for changes of the learning path
 if (store.state.node != undefined && store.state.learningpath.json != '') {
+    console.log(store.state.learningpath)
     let condition = store.state.learningpath.json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })

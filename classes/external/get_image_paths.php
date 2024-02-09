@@ -62,8 +62,6 @@ class get_image_paths extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $userid
-     * @param int $learningpathid
      * @return array
      */
     public static function execute(): array {

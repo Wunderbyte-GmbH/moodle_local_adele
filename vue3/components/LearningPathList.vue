@@ -186,8 +186,4 @@ const duplicateLearningpath = (learningpathid) => {
   });
 };
 
-const showHelpingSlides = () => {
-  console.log('hello')
-}
-
 </script>
