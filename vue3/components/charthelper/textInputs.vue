@@ -1,6 +1,6 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { useStore } from 'vuex';
+import { ref, watch, onMounted, inject } from 'vue';
+import VueInputAutowidth from 'vue-input-autowidth';
 
 const props = defineProps({
   goal: {
@@ -10,7 +10,7 @@ const props = defineProps({
 });
  
 // Load Store and Router
-const store = useStore()
+const store = inject('store');
 
 const emit = defineEmits([
     'change-GoalName',
@@ -83,7 +83,7 @@ watch(() => store.state.learningpath, async () => {
           </h5>
         </div>
         <div class="card-body">
-          <p class="card-text">{{ goalname || 'No name provided.' }}</p>
+          <p class="card-text">{{ goalname ? goalname : 'No name provided.' }}</p>
         </div>
       </div>
       <div class="card border-secondary">
@@ -93,7 +93,7 @@ watch(() => store.state.learningpath, async () => {
           </h5>
         </div>
         <div class="card-body">
-          <p class="card-text">{{ goaldescription || 'No description provided.' }}</p>
+          <p class="card-text">{{ goaldescription ? goaldescription : 'No description provided.' }}</p>
         </div>
       </div>
     </div>
