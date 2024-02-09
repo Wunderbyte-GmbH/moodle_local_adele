@@ -1,0 +1,26 @@
+name: Unit-Testing vue components
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }} 
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Jest Unit-Testing
+        run: npm run test:unit:ci
