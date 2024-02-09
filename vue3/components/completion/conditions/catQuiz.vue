@@ -9,6 +9,7 @@
     <div v-if="parentscales.length > 0">
       <select 
         v-model="selectedparentscale"
+        @change="updateScales"
       >
         <option 
           v-for="parentScale in parentscales" 
@@ -114,7 +115,6 @@ const emit = defineEmits(['update:modelValue'])
 const showTable = ref(false)
 const scalevalue = ref('');
 const attempts = ref('');
-
 onMounted(async () => {
   // Get all tests
   tests.value = await store.dispatch('fetchCatquizTests')
@@ -135,14 +135,6 @@ onMounted(async () => {
     if (props.completion.value.parentscales !== undefined) {
       selectedparentscale.value = props.completion.value.parentscales;
       parentscales.value = await store.dispatch('fetchCatquizParentScales')
-      // watch values from selected node
-      watch(() => selectedparentscale.value, async ($new) => {
-        if (selectedparentscale.value && $new) {
-          scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
-          data.value.scales = scales.value
-          data.value.parentscales = selectedparentscale.value
-        }
-      }, { deep: true } );
     }
   }
   // watch values from selected node
@@ -163,6 +155,12 @@ onMounted(async () => {
     }
   }, { deep: true } );
 });
+
+const updateScales = async () => {
+  scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
+  data.value.scales = scales.value
+  data.value.parentscales = selectedparentscale.value
+}
 
 // watch values from selected node
 watch(() => data.value, () => {

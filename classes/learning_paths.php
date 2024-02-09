@@ -273,7 +273,11 @@ class learning_paths {
 
         foreach ($pathnodes as $node) {
             $node = (array)$node;
-            if (isset($node['parentCourse']) && in_array($startingcondition, $node['parentCourse'])) {
+            if (
+                isset($node['parentCourse']) &&
+                is_array($node['parentCourse']) &&
+                in_array($startingcondition, $node['parentCourse'])
+              ) {
                 self::findpaths($node, [], $paths, $pathnodes);
             }
         }

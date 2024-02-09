@@ -1,19 +1,27 @@
 <template>
   <div class="form-check">
-    <div class="input-group mb-3">
+    <div class="input-group mb-3 d-flex flex-column align-items-center">
       <span class="input-group-text rounded-end-0">{{ descriptions.start }}</span>
       <input
         type="datetime-local"
         class="form-control"
+        style="
+          width: 80%;
+          border-radius: 0.5rem !important;
+        "
         :value="data.start"
         @input="updateSelectedDateTime('start', $event)"
       >
     </div>
-    <div class="input-group mb-3">
+    <div class="input-group mb-3 d-flex flex-column align-items-center">
       <span class="input-group-text rounded-end-0">{{ descriptions.end }}</span>
       <input
         type="datetime-local"
         class="form-control"
+        style="
+          width: 80%;
+          border-radius: 0.5rem !important;
+        "
         :value="data.end"
         @input="updateSelectedDateTime('end', $event)"
       >
@@ -64,10 +72,3 @@ watch(() => props.modelValue, (newValue) => {
   data.value = newValue;
 }, { deep: true } );
 </script>
-
-<style scoped>
-.rounded-end-0 {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-</style>
