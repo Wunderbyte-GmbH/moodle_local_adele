@@ -151,4 +151,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_image_paths' => [
+      'classname' => 'local_adele\external\get_image_paths',
+      'classpath' => '',
+      'description' => 'Get image paths',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

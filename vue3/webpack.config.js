@@ -37,6 +37,18 @@ module.exports = (env, options) => {
                     test: /\.js$/,
                     loader: 'babel-loader',
                     exclude: /node_modules/
+                },
+                {
+                  test: /\.(png|jpe?g|gif|svg)$/i,
+                  use: [
+                    {
+                      loader: 'file-loader',
+                      options: {
+                        name: '[name].[ext]',
+                        outputPath: 'images/',
+                      },
+                    },
+                  ],
                 }
             ]
         },

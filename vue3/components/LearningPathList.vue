@@ -24,15 +24,24 @@
 
 <template>
   <div>
+    <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
     <div>
       <router-link 
         :to="{ name: 'learningpath-new' }" 
         tag="button" 
-        class="btn btn-primary"
+        class="btn btn-primary mr-2"
       >
         {{ store.state.strings.learningpath_form_title_add }}
       </router-link>
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        data-toggle="modal" 
+        data-target="#helpingSlider"
+      >
+        Show helping slider
+      </button>
     </div>
     <h2>{{ store.state.strings.overviewlearningpaths }}</h2>
 
@@ -121,6 +130,7 @@ import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router';
 import { notify } from "@kyvg/vue3-notification"
+import HelpingSlider from '../components/modals/HelpingSlider.vue'
 
 // Load Store and Router
 const store = useStore()
@@ -175,5 +185,9 @@ const duplicateLearningpath = (learningpathid) => {
     type: 'success'
   });
 };
+
+const showHelpingSlides = () => {
+  console.log('hello')
+}
 
 </script>

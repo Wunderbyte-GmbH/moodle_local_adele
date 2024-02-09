@@ -219,6 +219,10 @@ export function createAppStore() {
                 { userid: context.state.user, learningpathid: context.state.learningPathID });
                 return result;
             },
+            async fetchImagePaths() {
+              const result = await ajax('local_adele_get_image_paths', {});
+              return result;
+          },
         }
     });
 }

@@ -47,22 +47,21 @@ watch(() => store.state.learningpath, async () => {
 
 <template>
   <div>
-    <h4 class="font-weight-bold">
-      {{ store.state.strings.fromlearningtitel }}
-    </h4>
-    <div>
-      <input
-        id="goalnameplaceholder"
-        v-model="goalname"
-        v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-        class="form-control fancy-input"
-        :placeholder="store.state.strings.goalnameplaceholder"
-        type="text"
-        autofocus
-        :disabled="store.state.view=='teacher'"
-      >
-    </div>
-    <div class="mb-4">
+    <div v-if="store.state.view!='teacher'">
+      <h4 class="font-weight-bold">
+        {{ store.state.strings.fromlearningtitel }}
+      </h4>
+      <div>
+        <input
+          id="goalnameplaceholder"
+          v-model="goalname"
+          v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
+          class="form-control fancy-input"
+          :placeholder="store.state.strings.goalnameplaceholder"
+          type="text"
+          autofocus
+        >
+      </div>
       <h4 class="font-weight-bold">
         {{ store.state.strings.fromlearningdescription }}
       </h4>
@@ -73,8 +72,29 @@ watch(() => store.state.learningpath, async () => {
           v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
           class="form-control fancy-input"
           :placeholder="store.state.strings.goalsubjectplaceholder"
-          :disabled="store.state.view=='teacher'"
         />
+      </div>
+    </div>
+    <div v-else>
+      <div class="card border-primary mb-3">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">
+            {{ store.state.strings.fromlearningtitel }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ goalname || 'No name provided.' }}</p>
+        </div>
+      </div>
+      <div class="card border-secondary">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="card-title mb-0">
+            {{ store.state.strings.fromlearningdescription }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ goaldescription || 'No description provided.' }}</p>
+        </div>
       </div>
     </div>
   </div>
