@@ -52,7 +52,7 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
     $output = '<div class="popover-region nav-link icon-no-margin dropdown">
         <a class="btn btn-secondary"
         id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
-            . $CFG->wwwroot . '/local/adele/index.php"
+            . $CFG->wwwroot . '/local/adele/index.php#/learningpaths"
         role="button">
         '. get_string('btnadele', 'local_adele') .'
         </a>

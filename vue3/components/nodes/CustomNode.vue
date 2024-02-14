@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed  } from 'vue';
+import { computed  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { useVueFlow } from '@vue-flow/core'

@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { defineProps, computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'

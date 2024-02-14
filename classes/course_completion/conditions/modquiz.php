@@ -106,29 +106,32 @@ class modquiz implements course_completion {
      */
     public function get_completion_status($node, $userid) {
         global $DB;
-        $completions = $node['completion']['nodes'];
         $modquizzes = [];
-        foreach ($completions as $completion) {
-            if ( $completion['data']['label'] == 'modquiz') {
-                $validcatquiz = false;
-                // Get grade and check if valid.
-                $data = $DB->get_records('quiz_grades',
-                    [
-                        'quiz' => $completion['data']['value']['quizid'],
-                        'userid' => $userid,
-                    ],
-                    'timemodified DESC',
-                    'grade',
-                    0,
-                    1);
-                if ( !empty($data)) {
-                    foreach ($data as $lastgrade) {
-                        if ((float)$lastgrade->grade >= (float)$completion['data']['value']['grade']) {
-                            $validcatquiz = true;
+        if (isset($node['completion']) && isset($node['completion']['nodes'])) {
+            $completions = $node['completion']['nodes'];
+            foreach ($completions as $completion) {
+                if ( isset($complitionnode['data']) && isset($complitionnode['data']['label'])
+                  && $completion['data']['label'] == 'modquiz') {
+                    $validcatquiz = false;
+                    // Get grade and check if valid.
+                    $data = $DB->get_records('quiz_grades',
+                        [
+                            'quiz' => $completion['data']['value']['quizid'],
+                            'userid' => $userid,
+                        ],
+                        'timemodified DESC',
+                        'grade',
+                        0,
+                        1);
+                    if ( !empty($data)) {
+                        foreach ($data as $lastgrade) {
+                            if ((float)$lastgrade->grade >= (float)$completion['data']['value']['grade']) {
+                                $validcatquiz = true;
+                            }
                         }
                     }
+                    $modquizzes[$completion['id']] = $validcatquiz;
                 }
-                $modquizzes[$completion['id']] = $validcatquiz;
             }
         }
         return $modquizzes;

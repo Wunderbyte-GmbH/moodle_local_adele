@@ -61,7 +61,6 @@ function init() {
             store.state.user = userAttributeValue;
             const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
             store.state.userlist = userListAttributeValue;
-        
             app.mount(localAdeleAppElement);
         }
     });

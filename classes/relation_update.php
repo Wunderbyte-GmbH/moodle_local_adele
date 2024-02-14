@@ -103,7 +103,8 @@ class relation_update {
                     foreach ($node['completion']['nodes'] as $completionnode) {
                         $failedcompletion = false;
                         $validationconditionstring = [];
-                        if ($completionnode['parentCondition'][0] == 'starting_condition') {
+                        if (isset($completionnode['parentCondition']) &&
+                          $completionnode['parentCondition'][0] == 'starting_condition') {
                             $currentcondition = $completionnode;
                             $validationcondition = false;
                             while ( $currentcondition ) {

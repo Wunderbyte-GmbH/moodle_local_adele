@@ -32,11 +32,17 @@ const store = useStore()
 // All available routes
 const routes = [
     {
-        path: '/',
+        path: '/learningpaths',
         redirect: {
             name: 'learningpaths-edit-overview'
         }
     },
+    {
+      path: '/',
+      redirect: {
+          name: 'learningpaths-edit-overview'
+      }
+  },
     {
         path: '/learningpaths/edit',
         component: learningpathsEdit,
@@ -58,7 +64,7 @@ const routes = [
             name: 'userDetails'
     },
     {
-        path: '/:catchAll(.*)',
+        path: '/learningpaths/:catchAll(.*)',
         component: notFound
     },
 ];

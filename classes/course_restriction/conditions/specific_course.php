@@ -102,26 +102,28 @@ class specific_course implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-        $restrictions = $node['restriction']['nodes'];
         $specificcourses = [];
-        foreach ($restrictions as $restriction) {
-            if ( $restriction['data']['label'] == 'specific_course') {
-                $coursecompleted = false;
-                // Get grade and check if valid.
-                if ($restriction['data']['value'] && $restriction['data']['value']['courseid']) {
-                    $course = get_course($restriction['data']['value']['courseid'][0]);
-                    // Check if the course completion is enabled.
-                    if ($course->enablecompletion) {
-                        // Get the course completion instance.
-                        $completion = new completion_info($course);
-                        // Check if the user has completed the course.
-                        $coursecompleted = $completion->is_course_complete($userid);
-                        if ($coursecompleted) {
-                            $coursecompleted = true;
+        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+            $restrictions = $node['restriction']['nodes'];
+            foreach ($restrictions as $restriction) {
+                if ( $restriction['data']['label'] == 'specific_course') {
+                    $coursecompleted = false;
+                    // Get grade and check if valid.
+                    if ($restriction['data']['value'] && $restriction['data']['value']['courseid']) {
+                        $course = get_course($restriction['data']['value']['courseid'][0]);
+                        // Check if the course completion is enabled.
+                        if ($course->enablecompletion) {
+                            // Get the course completion instance.
+                            $completion = new completion_info($course);
+                            // Check if the user has completed the course.
+                            $coursecompleted = $completion->is_course_complete($userid);
+                            if ($coursecompleted) {
+                                $coursecompleted = true;
+                            }
                         }
                     }
+                    $specificcourses[$restriction['id']] = $coursecompleted;
                 }
-                $specificcourses[$restriction['id']] = $coursecompleted;
             }
         }
         return $specificcourses;

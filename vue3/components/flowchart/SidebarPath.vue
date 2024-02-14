@@ -24,7 +24,7 @@
  
 <script setup>
 // Import needed libraries
-import { defineProps, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'

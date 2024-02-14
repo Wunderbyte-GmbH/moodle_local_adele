@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, defineEmits } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import DropdownInput from '../../nodes_items/DropdownInput.vue'
 

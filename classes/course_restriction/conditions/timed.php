@@ -103,28 +103,30 @@ class timed implements course_restriction {
      */
     public function get_restriction_status($node, $userid) {
         $timed = [];
-        foreach ($node['restriction']['nodes'] as $restrictionnode) {
-            if ($restrictionnode['data']['label'] == 'timed') {
-                $validstart = true;
-                $validtime = false;
-                if (self::isvaliddate($restrictionnode['data']['value']['start'])) {
-                    $datetimestamp = strtotime($restrictionnode['data']['value']['start']);
-                    $currenttimestamp = strtotime(date('Y-m-d'));
-                    if ($datetimestamp <= $currenttimestamp) {
-                        $validtime = true;
-                    } else {
-                        $validstart = false;
+        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+            foreach ($node['restriction']['nodes'] as $restrictionnode) {
+                if ($restrictionnode['data']['label'] == 'timed') {
+                    $validstart = true;
+                    $validtime = false;
+                    if (self::isvaliddate($restrictionnode['data']['value']['start'])) {
+                        $datetimestamp = strtotime($restrictionnode['data']['value']['start']);
+                        $currenttimestamp = strtotime(date('Y-m-d'));
+                        if ($datetimestamp <= $currenttimestamp) {
+                            $validtime = true;
+                        } else {
+                            $validstart = false;
+                        }
                     }
-                }
-                if (self::isvaliddate($restrictionnode['data']['value']['end'])) {
-                    $datetimestamp = strtotime($restrictionnode['data']['value']['end']);
-                    $currenttimestamp = strtotime(date('Y-m-d'));
-                    if ($datetimestamp >= $currenttimestamp &&
-                        $validstart) {
-                        $validtime = true;
+                    if (self::isvaliddate($restrictionnode['data']['value']['end'])) {
+                        $datetimestamp = strtotime($restrictionnode['data']['value']['end']);
+                        $currenttimestamp = strtotime(date('Y-m-d'));
+                        if ($datetimestamp >= $currenttimestamp &&
+                            $validstart) {
+                            $validtime = true;
+                        }
                     }
+                    $timed[$restrictionnode['id']] = $validtime;
                 }
-                $timed[$restrictionnode['id']] = $validtime;
             }
         }
         return $timed;
