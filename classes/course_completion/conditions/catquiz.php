@@ -107,38 +107,41 @@ class catquiz implements course_completion {
     public function get_completion_status($node, $userid) {
         global $DB;
         $catquizzes = [];
-        foreach ($node['completion']['nodes'] as $complitionnode) {
-            if ($complitionnode['data']['label'] == 'catquiz') {
-                $testid = $complitionnode['data']['value']['testid'];
-                $scales = $complitionnode['data']['value']['scales'];
-                foreach ($scales as $scale) {
-                    $validcatquiz = false;
-                    if (!isset($scale['type'])) {
-                        if (isset($scale['scale']) && $scale['scale'] != '') {
-                            // Check if scale matches.
-                            $contextid = catscale::get_context_id($scale['id']);
-                            $personabilities = Local_catquizCatquiz::get_person_abilities( $contextid, [$scale['id']], $userid);
-                            if ($personabilities) {
-                                foreach ($personabilities as $personability) {
-                                    if ($personability->ability >= $scale['scale']) {
-                                        $validcatquiz = true;
+        if (isset($node['completion']) && isset($node['completion']['nodes'])) {
+            foreach ($node['completion']['nodes'] as $complitionnode) {
+                if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
+                  && $complitionnode['data']['label'] == 'catquiz') {
+                    $testid = $complitionnode['data']['value']['testid'];
+                    $scales = $complitionnode['data']['value']['scales'];
+                    foreach ($scales as $scale) {
+                        $validcatquiz = false;
+                        if (!isset($scale['type'])) {
+                            if (isset($scale['scale']) && $scale['scale'] != '') {
+                                // Check if scale matches.
+                                $contextid = catscale::get_context_id($scale['id']);
+                                $personabilities = Local_catquizCatquiz::get_person_abilities( $contextid, [$scale['id']], $userid);
+                                if ($personabilities) {
+                                    foreach ($personabilities as $personability) {
+                                        if ($personability->ability >= $scale['scale']) {
+                                            $validcatquiz = true;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (isset($scale['attempts']) && (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
-                            // Check if attempts matches.
-                            $records = Local_catquizCatquiz::return_attempt_and_contextid_from_attemptstable(
-                                $scale['attempts'],
-                                $scale['id'],
-                                $node['data']['course_node_id'],
-                                $userid);
-                            if (count($records) >= $scale['attempts'] || count($records) >= 1) {
-                                $validcatquiz = true;
+                            if (isset($scale['attempts']) && (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
+                                // Check if attempts matches.
+                                $records = Local_catquizCatquiz::return_attempt_and_contextid_from_attemptstable(
+                                    $scale['attempts'],
+                                    $scale['id'],
+                                    $node['data']['course_node_id'],
+                                    $userid);
+                                if (count($records) >= $scale['attempts'] || count($records) >= 1) {
+                                    $validcatquiz = true;
+                                }
                             }
                         }
+                        $catquizzes[$complitionnode['id']][$scale['id']] = $validcatquiz;
                     }
-                    $catquizzes[$complitionnode['id']][$scale['id']] = $validcatquiz;
                 }
             }
         }

@@ -1,6 +1,6 @@
 <script setup>
     // Import needed libraries
-    import { defineProps, onMounted, ref, watch } from 'vue';
+    import { onMounted, ref, watch } from 'vue';
     import { useStore } from 'vuex';
 
     // Colors for restriction and completion

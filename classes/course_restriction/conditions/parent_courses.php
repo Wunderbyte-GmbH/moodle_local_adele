@@ -102,30 +102,32 @@ class parent_courses implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userid) {
-        $restrictions = $node['restriction']['nodes'];
         $parentcourses = [];
-        foreach ($restrictions as $restriction) {
-            if ( $restriction['data']['label'] == 'parent_courses') {
-                $coursescompleted = false;
-                $coursestable = [];
-                foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
-                    $coursecompleted = false;
-                    $course = get_course($coursesid);
-                    // Check if the course completion is enabled.
-                    if ($course->enablecompletion) {
-                        // Get the course completion instance.
-                        $completion = new completion_info($course);
-                        // Check if the user has completed the course.
-                        $coursecompleted = $completion->is_course_complete($userid);
-                        if ($coursecompleted) {
-                            $coursestable[] = $coursesid;
+        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+            $restrictions = $node['restriction']['nodes'];
+            foreach ($restrictions as $restriction) {
+                if ( $restriction['data']['label'] == 'parent_courses') {
+                    $coursescompleted = false;
+                    $coursestable = [];
+                    foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
+                        $coursecompleted = false;
+                        $course = get_course($coursesid);
+                        // Check if the course completion is enabled.
+                        if ($course->enablecompletion) {
+                            // Get the course completion instance.
+                            $completion = new completion_info($course);
+                            // Check if the user has completed the course.
+                            $coursecompleted = $completion->is_course_complete($userid);
+                            if ($coursecompleted) {
+                                $coursestable[] = $coursesid;
+                            }
                         }
                     }
+                    if ($restriction['data']['value']['min_courses'] <= count($coursestable)) {
+                        $coursescompleted = true;
+                    }
+                    $parentcourses[$restriction['id']] = $coursescompleted;
                 }
-                if ($restriction['data']['value']['min_courses'] <= count($coursestable)) {
-                    $coursescompleted = true;
-                }
-                $parentcourses[$restriction['id']] = $coursescompleted;
             }
         }
         return $parentcourses;

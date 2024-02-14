@@ -44,6 +44,12 @@
         v-else-if="$store.state.editingadding == true" 
         class="fade-in"
       >
+        <button 
+          class="btn btn-outline-primary mb-2"
+          @click="goBack" 
+        >
+          <i class="fa fa-arrow-left" /> Go Back to Overview
+        </button>
         <div class="card p-4" style="padding: 2.5rem !important;">
           <h2 class="mt-3">
             {{ store.state.strings.learningpath_form_title_edit }}
@@ -156,6 +162,14 @@ onBeforeRouteUpdate((to, from, next) => {
   checkRoute(to);
   next();
 });
+
+// Function to go back
+const goBack = () => {
+  store.state.editingadding = false
+  store.state.editingrestriction = false
+  store.state.editingpretest = false
+}
+
 </script>
 
 <style scoped>

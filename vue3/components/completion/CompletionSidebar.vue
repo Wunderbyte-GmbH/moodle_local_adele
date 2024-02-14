@@ -24,7 +24,7 @@
  
 <script setup>
 // Import needed libraries
-import { defineProps, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 const { project, vueFlowRef, addNodes, addEdges, removeNodes} = useVueFlow()
 

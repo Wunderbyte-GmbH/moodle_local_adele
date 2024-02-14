@@ -95,14 +95,14 @@ $string['edit_node_pretest'] = 'Edit completion criteria';
 
 
 // Overview String.
-$string['overviewlearningpaths'] = 'Overview of all Learningpaths';
+$string['overviewlearningpaths'] = 'Overview of all learning paths';
 $string['overviewaddingbtn'] = 'Create new learning path';
 
 // Adele Settings.
 $string['activefilter'] = 'Activate filter';
-$string['activefilter_desc'] = 'The filters will effect the available courses for the creation of learningpaths';
+$string['activefilter_desc'] = 'The filters will effect the available courses for the creation of learning paths';
 $string['courselevel'] = 'Choose course level';
-$string['courselevel_desc'] = 'Decide which course level is shown inside the creation of learningpaths';
+$string['courselevel_desc'] = 'Decide which course level is shown inside the creation of learning paths';
 $string['tagsinclude'] = 'Define included tags';
 $string['tagsinclude_desc'] = 'Define which courses according to their tags will be filtered. Courses with one of those tags will be filtered';
 $string['tagsexclude'] = 'Define excluded tags';
@@ -123,7 +123,7 @@ $string['title_save'] = 'Learning Path saved/updated';
 $string['description_save'] = 'You have saved/updated the Learning Path!';
 
 // Node Strings.
-$string['node_coursefullname'] = 'Full Coursename:';
+$string['node_coursefullname'] = 'Nodename:';
 $string['node_courseshortname'] = 'Short Coursename:';
 
 // Conditions description.

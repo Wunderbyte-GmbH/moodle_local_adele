@@ -1,6 +1,4 @@
 <script setup>
-    // Import needed libraries
-    import { defineProps } from 'vue';
 
     const props = defineProps({
         parentNodes: {
