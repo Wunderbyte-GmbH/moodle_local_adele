@@ -61,7 +61,8 @@ class completion {
                     if (is_array($node['data']['course_node_id']) && in_array($params->courseid, $node['data']['course_node_id'])) {
                         if ($node['completion'] && $node['completion']['nodes']) {
                             foreach ($node['completion']['nodes'] as $completionnode) {
-                                if (is_array($completionnode['parentCondition']) && in_array('starting_condition', $completionnode['parentCondition'])) {
+                                if (is_array($completionnode['parentCondition']) &&
+                                    in_array('starting_condition', $completionnode['parentCondition'])) {
                                     $currentcondition = $node;
                                     while ( $currentcondition ) {
                                         // Check if the conditon is true and break if one condition is not met.

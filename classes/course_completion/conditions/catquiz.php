@@ -64,7 +64,7 @@ class catquiz implements course_completion {
      * @return array availability and Information string (for admin) about all restrictions on
      *   this item
      */
-    public function get_description():array {
+    public function get_description() : array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
         $label = $this->label;
@@ -119,7 +119,10 @@ class catquiz implements course_completion {
                             if (isset($scale['scale']) && $scale['scale'] != '') {
                                 // Check if scale matches.
                                 $contextid = catscale::get_context_id($scale['id']);
-                                $personabilities = Local_catquizCatquiz::get_person_abilities( $contextid, [$scale['id']], $userid);
+                                $personabilities = Local_catquizCatquiz::get_person_abilities(
+                                    $contextid, [$scale['id']],
+                                    $userid
+                                );
                                 if ($personabilities) {
                                     foreach ($personabilities as $personability) {
                                         if ($personability->ability >= $scale['scale']) {
@@ -128,7 +131,8 @@ class catquiz implements course_completion {
                                     }
                                 }
                             }
-                            if (isset($scale['attempts']) && (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
+                            if (isset($scale['attempts']) &&
+                                (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
                                 // Check if attempts matches.
                                 $records = Local_catquizCatquiz::return_attempt_and_contextid_from_attemptstable(
                                     $scale['attempts'],
