@@ -42,17 +42,17 @@ class user_path_relation {
      * @return object
      *
      */
-    public function get_learning_paths($courseid) {
+    public function get_learning_paths($userid) {
         global $DB;
         // Using named parameter :courseid in the SQL query.
-        $likecourseid = $DB->sql_like('lp.json', ':courseidpattern');
-        $sql = "SELECT lp.id, lp.json
-        FROM {local_adele_learning_paths} lp
-        WHERE {$likecourseid}";
+        $sql = "SELECT *
+            FROM {local_adele_path_user} lpu
+            WHERE lpu.user_id = :user_id
+            AND lpu.status = 'active'";
 
-        // Providing the named parameter in the $params array.
-        $params = ['courseidpattern' => '%course_node_id__' . $courseid . ',%'];
-
+        $params = [
+            'user_id' => (int)$userid,
+        ];
         // Using get_records_sql function to execute the query with parameters.
         $records = $DB->get_records_sql($sql, $params);
 

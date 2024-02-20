@@ -33,11 +33,14 @@
       >
         <i class="fa fa-arrow-left" /> Go Back to Overview
       </button>
-      <h2 class="mt-3">
+      <h2 
+        v-if="store.state.view!='student'"
+        class="mt-3"
+      >
         User path for:
       </h2>
       <div class="card">
-        <div v-if="store.state.lpuserpathrelation">
+        <div v-if="store.state.lpuserpathrelation && store.state.view!='student'">
           <div class="card-body">
             <h5 class="card-title">
               <i class="fa fa-user-circle" /> {{ store.state.lpuserpathrelation.username }}

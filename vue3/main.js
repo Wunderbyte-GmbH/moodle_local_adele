@@ -62,6 +62,7 @@ function init() {
             const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
             store.state.userlist = userListAttributeValue;
             app.mount(localAdeleAppElement);
+            router.push({ name: 'learningpaths-edit-overview' });
         }
     });
 }

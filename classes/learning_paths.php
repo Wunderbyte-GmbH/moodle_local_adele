@@ -164,8 +164,24 @@ class learning_paths {
             'name, description, json');
 
         if (isset($learningpath)) {
+            $copyindex = 1;
+            $copiedname = $learningpath->name .= ' copy';
+            while (true) {
+                if ($copyindex > 1) {
+                    $existinglearningpath = $DB->get_record('local_adele_learning_paths', ['name' => $copiedname . ' ' . $copyindex], 'id');
+                } else {
+                    $existinglearningpath = $DB->get_record('local_adele_learning_paths', ['name' => $copiedname], 'id');
+                }
+                if (!$existinglearningpath) {
+                    break;
+                }
+                $copyindex++;
+            }
             $learningpath->id = null;
             $learningpath->createdby = $USER->id;
+            if ($copyindex > 1) {
+                $learningpath->name .= ' ' . $copyindex;
+            }
             $learningpath->timecreated = time();
             $learningpath->timemodified = time();
             $id = $DB->insert_record('local_adele_learning_paths', $learningpath);
