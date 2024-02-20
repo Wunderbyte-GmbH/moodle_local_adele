@@ -81,7 +81,10 @@ const toggleCards = () => {
       class="card-container mt-2"
       @click="toggleCards"
     >
-      <div class="card">
+      <div 
+        class="card" 
+        :class="{ 'card-hover': showCard }"
+      >
         <div 
           class="restriction" 
           :style="{ color: restrictionColor }"
@@ -100,6 +103,9 @@ const toggleCards = () => {
             {{ conditions.completion.count }}
           </span>
         </div>
+        <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
+          <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
+        </button>
       </div>
     </div>
 
@@ -211,5 +217,20 @@ const toggleCards = () => {
 
 .right {
   left: 105%;
+}
+
+.card:hover {
+  background-color: rgb(213, 207, 207); /* Change background color on hover */
+}
+
+
+.cancel-button {
+  float: inline-end;
+  margin-left: auto; /* Push the button to the right */
+  background-color: rgb(109, 107, 107);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
 }
 </style>

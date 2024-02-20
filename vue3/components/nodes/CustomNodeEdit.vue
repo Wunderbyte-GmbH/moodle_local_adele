@@ -255,12 +255,14 @@ const toggleTable = (condition) => {
       </div>
     </div>
     <Handle 
+      v-if="store.state.view!='teacher' && store.state.view!='student'"
       id="target" 
       type="target" 
       :position="Position.Top" 
       :style="handleStyle" 
     />
     <Handle 
+      v-if="store.state.view!='teacher' && store.state.view!='student'"
       id="source" 
       type="source" 
       :position="Position.Bottom" 
