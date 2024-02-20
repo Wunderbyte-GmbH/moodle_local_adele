@@ -10,7 +10,7 @@ const  shiftNodesDown = (newNodeId, nodes) => {
         node.parentCourse.includes(currentNodeId) &&
         !alreadyShifted.has(currentNodeId)
       ) {
-        node.position.y += 500 + node.dimensions.height / 4;
+        node.position.y += 300 + node.dimensions.height / 4;
         if (node.childCourse.length > 0) {
             shiftedNodes.push(node.id);
         }

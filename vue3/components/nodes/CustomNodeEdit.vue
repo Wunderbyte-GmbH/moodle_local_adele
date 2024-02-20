@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
@@ -36,6 +36,7 @@ import DateInfo from '../nodes_items/DateInfo.vue';
 // Load Store 
 const store = useStore();
 const date = ref({})
+const includedCourses = ref([])
 const props = defineProps({
   data: {
     type: Object,
@@ -56,6 +57,20 @@ onMounted(() => {
        }
      }
   })
+
+  watch(() => store.state.availablecourses, () => {
+    if (props.data.course_node_id && store.state.availablecourses) {
+      props.data.course_node_id.forEach((course_id) => {
+        const course = store.state.availablecourses.find(course => course.course_node_id[0] === course_id)
+        if (course) {
+          includedCourses.value.push({
+            id: course.course_node_id[0],
+            name: course.fullname,
+          })
+        }
+      })
+    }
+  });
 })
 
 // Dynamic background color based on data.completion
@@ -112,6 +127,24 @@ const toggleTable = (condition) => {
           <div class="col-8">
             <ProgressBar :progress="data.progress" />
           </div>
+        </div>
+        <div v-if="includedCourses" class="row mb-2">
+          <div class="col-5 text-left">
+            <b>Included Courses:</b> 
+          </div>
+          <ul 
+            v-for="(value, key) in includedCourses" 
+            :key="key"
+          >
+            <li>
+              <a 
+                :href="'/course/view.php?id=' + value.id"
+                target="_blank"
+              >
+                {{ value.name }}
+              </a>
+            </li>
+          </ul>
         </div>
         <OverviewRestrictionCompletion :node="data" />
       </div>

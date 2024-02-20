@@ -33,8 +33,8 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
         :class="{ dark }" 
         :fit-view-on-init="true" 
-        :max-zoom="3" 
-        :min-zoom="0.3"
+        :max-zoom="1.5" 
+        :min-zoom="0.2"
         class="learning-path-flow"
         @dragover="onDragOver"
       >
@@ -204,9 +204,10 @@ function onDrop(event) {
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
       intersectedNode.value.closestnode.childCourse.push(data.node_id)
-      position.y += 300
+      position.y += 100
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
       const addConditions = addAndConditions(intersectedNode.value, getEdges, id)
+      position.x -= intersectedNode.value.dropzone.dimensions.width
       parentCourse = addConditions.parentNodes
       childCourse = addConditions.childNodes
       newNode.restriction = addConditions.newRestrictions

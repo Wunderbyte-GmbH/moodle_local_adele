@@ -130,9 +130,9 @@ const checkRoute = (currentRoute) => {
 
 // Trigger web services on mount
 onMounted(() => {
+  store.dispatch('fetchAvailablecourses');
   if(store.state.view!='student'){
     store.dispatch('fetchLearningpaths');
-    store.dispatch('fetchAvailablecourses');
   }
   checkRoute(router.value);
 });
@@ -168,6 +168,8 @@ const goBack = () => {
   store.state.editingadding = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
+  store.state.editingpretest = false
+  store.state.learningPathID = null
 }
 
 </script>

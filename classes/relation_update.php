@@ -53,7 +53,6 @@ class relation_update {
      */
     public static function updated_single($event) {
         // Get the user path relation.
-        global $USER;
         $userpath = $event->other['userpath'];
         if ($userpath) {
             foreach ($userpath->json['tree']['nodes'] as $node) {
