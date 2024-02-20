@@ -38,7 +38,7 @@ class user_path_relation {
     /**
      * Get learning paths that contain course.
      *
-     * @param int $courseid
+     * @param int $userid
      * @return object
      *
      */

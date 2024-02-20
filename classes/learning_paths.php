@@ -168,7 +168,10 @@ class learning_paths {
             $copiedname = $learningpath->name .= ' copy';
             while (true) {
                 if ($copyindex > 1) {
-                    $existinglearningpath = $DB->get_record('local_adele_learning_paths', ['name' => $copiedname . ' ' . $copyindex], 'id');
+                    $existinglearningpath = $DB->get_record(
+                        'local_adele_learning_paths',
+                        ['name' => $copiedname . ' ' . $copyindex], 'id'
+                    );
                 } else {
                     $existinglearningpath = $DB->get_record('local_adele_learning_paths', ['name' => $copiedname], 'id');
                 }
