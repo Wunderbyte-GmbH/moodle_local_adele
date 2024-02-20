@@ -62,7 +62,7 @@ class timed implements course_restriction {
      * @return array availability and Information string (for admin) about all restrictions on
      *   this item
      */
-    public function get_description() : array {
+    public function get_description(): array {
         $description = $this->get_description_string();
         $name = $this->get_name_string();
         $label = $this->label;
