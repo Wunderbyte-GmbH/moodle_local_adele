@@ -44,12 +44,14 @@
         v-else-if="$store.state.editingadding == true" 
         class="fade-in"
       >
-        <button 
+        <router-link 
+          :to="{ name: 'learningpaths-edit-overview' }" 
+          tag="button" 
           class="btn btn-outline-primary mb-2"
           @click="goBack" 
         >
           <i class="fa fa-arrow-left" /> Go Back to Overview
-        </button>
+        </router-link>
         <div class="card p-4" style="padding: 2.5rem !important;">
           <h2 class="mt-3">
             {{ store.state.strings.learningpath_form_title_edit }}

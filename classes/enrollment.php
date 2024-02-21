@@ -27,10 +27,8 @@ declare(strict_types=1);
 
 namespace local_adele;
 
-use block_accessreview\external\get_module_data;
-use context_system;
-
 use local_adele\event\user_path_updated;
+use context_system;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -51,7 +49,6 @@ class enrollment {
      * @param object $event
      */
     public static function enrolled($event) {
-        global $DB, $CFG;
         $params = $event;
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {

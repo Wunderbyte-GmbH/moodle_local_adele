@@ -51,12 +51,6 @@ class learning_path_update {
      */
     public static function updated_learning_path($event) {
         // Get the user path relations.
-        $manualconditions = [
-            'manualcompletion',
-            'manualcompletionvalue',
-            'manualrestriction',
-            'manualrestrictionvalue',
-        ];
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_user_path_relations($event->other['learningpathid']);
         foreach ($records as $userpath) {
