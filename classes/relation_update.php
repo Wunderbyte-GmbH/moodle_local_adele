@@ -138,7 +138,8 @@ class relation_update {
                                     $currentcondition['childCondition'], 'id');
                             }
                             if ($validationcondition && !$failedcompletion &&
-                                (($node['restriction'] == null) ||count($restrictionnodepaths) || !count($node['restriction']['nodes']))) {
+                                (($node['restriction'] == null) ||count($restrictionnodepaths) ||
+                                    !count($node['restriction']['nodes']))) {
                                 $completionnodepaths[] = $validationconditionstring;
                                 $nodefinished = node_finished::create([
                                     'objectid' => $userpath->id,

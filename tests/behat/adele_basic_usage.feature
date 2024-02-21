@@ -22,7 +22,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I wait until the page is ready
     And I click on "Learning Paths" "button"
     And I wait until the page is ready
-    Then I should see "Overview of all Learningpaths"
+    Then I should see "Overview of all learning paths"
     And I follow "Add a new learning path"
     And I set the field "goalnameplaceholder" to "New Learning path"
     And I set the field "goalsubjectplaceholder" to "New Learning path description for auto testing"
