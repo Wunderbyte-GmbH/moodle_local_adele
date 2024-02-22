@@ -3,19 +3,18 @@
     import { onMounted, ref, watch } from 'vue';
     import { useStore } from 'vuex';
 
-    // Colors for restriction and completion
-    const restrictionColor = ref("#539be7");
-    const completionColor = ref("#f1b00c");
-
+    
     // Load Store 
     const store = useStore();
     const props = defineProps({
-        node: {
-          type: Object,
-          required: true,
-        }
+      node: {
+        type: Object,
+        required: true,
+      }
     });
-    // Calculate searched courses
+    // Colors for restriction and completion
+    const restrictionColor = ref(store.state.strings.LIGHT_STEEL_BLUE);
+    const completionColor = ref(store.state.strings.DARK_ORANGE);
 
     // Create a ref for conditions
     const conditions = ref([]);
@@ -40,16 +39,18 @@
 
 });
 function triggerGetConditions() {
-    store.state.learningpath.json.tree.nodes.forEach((node) => {
-        if (node.id == props.node.node_id) {
-            if (node.completion != undefined) {
+    if (store.state.learningpath) {
+      store.state.learningpath.json.tree.nodes.forEach((node) => {
+          if (node.id == props.node.node_id) {
+              if (node.completion != undefined) {
                 conditions.value.completion = getConditions(node.completion.nodes) 
-            }
-            if (node.restriction != undefined) {
+              }
+              if (node.restriction != undefined) {
                 conditions.value.restriction = getConditions(node.restriction.nodes) 
-            }
-        }
-    })
+              }
+          }
+      })
+    }
 }
 function getConditions(completion_nodes) {
     let count = 0
@@ -78,35 +79,31 @@ const toggleCards = () => {
   <div>
     <div 
       v-if="conditions.restriction" 
-      class="card-container mt-2"
+      class="card-container"
+      :class="{ 'card-hover': showCard }"
       @click="toggleCards"
     >
       <div 
-        class="card" 
-        :class="{ 'card-hover': showCard }"
+        class="restriction" 
+        :style="{ color: restrictionColor }"
       >
-        <div 
-          class="restriction" 
-          :style="{ color: restrictionColor }"
-        >
-          <i class="fa-solid fa-key" />
-          <span class="count">
-            {{ conditions.restriction.count }}
-          </span>
-        </div>
-        <div 
-          class="completion" 
-          :style="{ color: completionColor }"
-        >
-          <i class="fa-solid fa-check-to-slot" />
-          <span class="count">
-            {{ conditions.completion.count }}
-          </span>
-        </div>
-        <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
-          <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
-        </button>
+        <i class="fa-solid fa-key" />
+        <span class="count">
+          {{ conditions.restriction.count }}
+        </span>
       </div>
+      <div 
+        class="completion" 
+        :style="{ color: completionColor }"
+      >
+        <i class="fa-solid fa-check-to-slot" />
+        <span class="count">
+          {{ conditions.completion.count }}
+        </span>
+      </div>
+      <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
+        <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
+      </button>
     </div>
 
     <!-- Left Card -->
@@ -175,23 +172,18 @@ const toggleCards = () => {
 
 <style scoped>
 .card-container {
-  display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: flex-end; /* Align items at the bottom */
   cursor: pointer;
-  position: absolute;
-  width: 92%;
-  bottom: 0;
-  margin-bottom: 1rem;
-}
-
-.card {
+  width: 100%;
   display: -webkit-box;
   width: 100%;
   padding: 5px;
   border-radius: 8px;
   background-color: #EAEAEA;
   font-weight: bold; /* Make the text bold */
+}
+
+.card-container:hover {
+  background-color: rgb(213, 207, 207); /* Change background color on hover */
 }
 
 .restriction,
@@ -208,29 +200,23 @@ const toggleCards = () => {
   border-radius: 8px;
   margin-top: 10px;
   position: absolute;
+  top: 70%;
 }
 
 .left {
   right: 105%;
-  top: 70%;
 }
 
 .right {
   left: 105%;
 }
 
-.card:hover {
-  background-color: rgb(213, 207, 207); /* Change background color on hover */
-}
-
-
 .cancel-button {
   float: inline-end;
-  margin-left: auto; /* Push the button to the right */
+  margin-left: auto; 
   background-color: rgb(109, 107, 107);
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 4px 8px;
 }
 </style>
