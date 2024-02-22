@@ -25,6 +25,7 @@ const props = defineProps({
 
 <style scoped>
 .progress-container {
+  width: 80%;
   height: 20px;
   overflow: hidden;
   border-radius: 10px;

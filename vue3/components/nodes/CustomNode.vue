@@ -77,45 +77,70 @@ const setStartNode = (node_id) => {
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
+const childStyle = {
+  borderColor: store.state.strings.GRAY,
+  borderWidth: '2px',
+};
+
 </script>
 
 <template>
   <div>
     <div 
-      class="custom-node text-center rounded p-3" 
-      style="height: 200px; width: 400px;"
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
-      <div v-if="store.state.view!='teacher'">
-        <button 
-          type="button" 
-          class="btn btn-secondary" 
-          @click="setRestrictionView"
-        >
-          <i class="fa fa-cogs" /> Edit Restrictions
-        </button>
+      <div class="card-header text-center">
+        <div class="row align-items-center">
+          <div class="col">
+            <h5>
+              {{ data.fullname }}
+            </h5>
+          </div>
+          <div v-if="store.state.view!='teacher'" class="col-auto">
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              data-toggle="modal" 
+              data-target="#nodeModal"
+              @click="setNodeModal"
+            >
+              <i class="fa fa-edit" /> Edit
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="mb-2">
-        <strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}
+
+      <div 
+        v-if="store.state.view!='teacher'"
+        class="card-body"
+      >
+        <div class="row align-items-center">
+          <div class="col">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              :style="{backgroundColor: store.state.strings.LIGHT_STEEL_BLUE}"
+              @click="setRestrictionView"
+            >
+              <i class="fa-solid fa-key" /> Edit Restriction
+            </button>
+          </div>
+          <div class="col-auto">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              :style="{backgroundColor: store.state.strings.DARK_ORANGE}"
+              @click="setPretestView"
+            >
+              <i class="fa-solid fa-check-to-slot" /> Edit Completion
+            </button>
+          </div>
+        </div>
       </div>
-      <div v-if="store.state.view!='teacher'">
-        <button 
-          type="button" 
-          class="btn btn-primary" 
-          data-toggle="modal" 
-          data-target="#nodeModal"
-          @click="setNodeModal"
-        >
-          <i class="fa fa-edit" /> {{ store.state.strings.edit_course_node }}
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-secondary" 
-          @click="setPretestView"
-        >
-          <i class="fa fa-tasks" /> {{ store.state.strings.edit_node_pretest }}
-        </button>
+      <div class="card-footer">
+        <OverviewRestrictionCompletion :node="data" />
       </div>
-      <OverviewRestrictionCompletion :node="data" />
     </div>
     <Handle 
       id="target" 

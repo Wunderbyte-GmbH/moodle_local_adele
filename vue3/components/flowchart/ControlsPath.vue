@@ -160,7 +160,7 @@ function updatePos() {
           }
       })
     })
-    yvalue += 600;
+    yvalue += 350;
     newlabels == [...new Set(newlabels)]
     nodelabels = newlabels
     if (nodelabels.length == 0 ) {

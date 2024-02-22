@@ -47,13 +47,16 @@ const props = defineProps({
 onMounted(() => {
   const userpath = JSON.parse(store.state.lpuserpathrelation.json)
   userpath.tree.nodes.forEach((node) => {
-     if (props.data.node_id == node.id) {
+    if (props.data.node_id == node.id) {
        if (node.restriction && node.restriction.nodes) {
         node.restriction.nodes.forEach((restrictionnode) => {
           if(restrictionnode.data.label == 'timed'){
             date.value = restrictionnode.data.value
           }
         })
+       }
+       if (node.parentCourse.includes('starting_node')) {
+        isParentNode.value = true;
        }
      }
   })
@@ -72,16 +75,15 @@ onMounted(() => {
     }
   });
 })
-
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
   if (props.data.completion.completionnode) {
     return {
-      backgroundColor: props.data.completion.completionnode.valid ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+      backgroundColor: props.data.completion.completionnode.valid ? store.state.strings.LIGHT_STEEL_BLUE : store.state.strings.LIGHT_GRAY,
     };
   }
   return {
-    backgroundColor: props.data.completion ? '#5cb85c' : 'rgba(169, 169, 169, 0.5)',
+    backgroundColor: props.data.completion ? store.state.strings.LIGHT_STEEL_BLUE : store.state.strings.LIGHT_GRAY,
   };
 });
 
@@ -90,6 +92,7 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
 
 const isCompletionVisible = ref(false);
 const isRestrictionVisible = ref(false);
+const isParentNode = ref(false);
 
 const toggleTable = (condition) => {
   const otherCondition = condition == 'Completion' ? 'Restriction' : 'Completion';
@@ -99,123 +102,105 @@ const toggleTable = (condition) => {
   otherconditionRef.value = false;
 };
 
+const parentStyle = {
+  borderColor: store.state.strings.DEEP_SKY_BLUE,
+  borderWidth: '3px',
+};
+
+const childStyle = {
+  borderColor: store.state.strings.GRAY,
+  borderWidth: '2px',
+};
+
 </script>
 
 <template>
   <div>
     <div 
-      class="custom-node rounded p-3"
-      :style="[nodeBackgroundColor, { height: '200px', width: '400px' }]"
+      v-if="isParentNode"
+      class="starting-node"
     >
-      <div class="row mb-2 ">
-        <div class="col-5 text-left">
-          <b>{{ store.state.strings.node_coursefullname }}</b> 
-        </div>
-        <div class="col-7 text-right">
-          {{ data.fullname }}
-        </div>
-      </div>
+      <i 
+        class="fa-solid fa-arrow-down mr-2"
+        :style="{color: store.state.strings.PUMPKIN}" 
+      />
+      Potential starting node
+    </div>
 
-      <div v-if="store.state.learningpath && store.state.view=='student'">
-        <div v-if="date">
-          <DateInfo :date="date" />
-        </div>
-        <div class="row mb-2">
-          <div class="col-4 text-left">
-            <b>Node progress:</b>
-          </div>
-          <div class="col-8">
-            <ProgressBar :progress="data.progress" />
-          </div>
-        </div>
-        <div v-if="includedCourses" class="row mb-2">
-          <div class="col-5 text-left">
-            <b>Included Courses:</b> 
-          </div>
-          <ul 
-            v-for="(value, key) in includedCourses" 
-            :key="key"
-          >
-            <li>
-              <a 
-                :href="'/course/view.php?id=' + value.id"
-                target="_blank"
-              >
-                {{ value.name }}
-              </a>
-            </li>
-          </ul>
-        </div>
-        <OverviewRestrictionCompletion :node="data" />
+    <div 
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
+    >
+      <div class="card-header text-center">
+        <h5>
+          {{ data.fullname }}
+        </h5>
       </div>
-      <div v-else>
-        <div v-if="data.manualrestriction">
-          <RestrictionOutPutItem 
-            :data="data"
-          />
-        </div>
-        <div v-if="data.manualcompletion">
-          <CompletionOutPutItem :data="data" />
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div v-if="data.completion.singlecompletionnode">
-              <button 
-                class="btn btn-link" 
-                aria-expanded="false" 
-                aria-controls="collapseTable"
-                @click="toggleTable('Completion')"
-              >
-                {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
-              </button>
-              <div
-                v-show="isCompletionVisible" 
-                class="table-container table-container-left"
-              >
-                <table class="table table-bordered table-hover fancy-table">
-                  <thead class="thead-light">
-                    <tr>
-                      <th>Key</th>
-                      <th>Checkmark</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr 
-                      v-for="(value, key) in data.completion.singlecompletionnode" 
-                      :key="key"
-                    >
-                      <td>{{ key }}</td>
-                      <td>
-                        {{ value }}
-                        <span 
-                          v-if="value" 
-                          class="text-success"
-                        >
-                          &#10004;
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+      <div 
+        class="card-body"
+        :style="[nodeBackgroundColor]"
+      >
+        <div v-if="store.state.learningpath && store.state.view=='student'">
+          <div v-if="date">
+            <DateInfo :date="date" />
+          </div>
+          <div 
+            class="row mb-2"
+          >
+            <div class="col-4 text-left">
+              <b>Progres:</b>
+            </div>
+            <div 
+              class="col-8" 
+              style="display: flex; justify-content: end;"
+            >
+              <ProgressBar :progress="data.progress" />
             </div>
           </div>
-          <div class="col-md-6">
-            <div v-if="data.completion.singlerestrictionnode">
-              <button 
-                class="btn btn-link" 
-                aria-expanded="false" 
-                aria-controls="collapseTable"
-                @click="toggleTable('Restriction')"
-              >
-                {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
-              </button>
-              <div 
-                v-show="isRestrictionVisible" 
-                class="table-container"
-              >
-                <div v-if="data.completion.singlerestrictionnode">
-                  <table class="table table-bordered table-hover fancy-table" style="right: -150%;">
+          <div v-if="includedCourses" class="row mb-2">
+            <div class="col-5 text-left">
+              <b>Courses:</b> 
+            </div>
+            <ul 
+              v-for="(value, key) in includedCourses" 
+              :key="key"
+            >
+              <li>
+                <a 
+                  :href="'/course/view.php?id=' + value.id"
+                  target="_blank"
+                >
+                  {{ value.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div v-else>
+          <div v-if="data.manualrestriction">
+            <RestrictionOutPutItem 
+              :data="data"
+            />
+          </div>
+          <div v-if="data.manualcompletion">
+            <CompletionOutPutItem :data="data" />
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div v-if="data.completion.singlecompletionnode">
+                <button 
+                  class="btn btn-link" 
+                  aria-expanded="false" 
+                  aria-controls="collapseTable"
+                  @click="toggleTable('Completion')"
+                >
+                  {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
+                </button>
+                <div
+                  v-show="isCompletionVisible" 
+                  class="table-container table-container-left"
+                >
+                  <table class="table table-bordered table-hover fancy-table">
                     <thead class="thead-light">
                       <tr>
                         <th>Key</th>
@@ -224,7 +209,7 @@ const toggleTable = (condition) => {
                     </thead>
                     <tbody>
                       <tr 
-                        v-for="(value, key) in data.completion.singlerestrictionnode" 
+                        v-for="(value, key) in data.completion.singlecompletionnode" 
                         :key="key"
                       >
                         <td>{{ key }}</td>
@@ -241,10 +226,54 @@ const toggleTable = (condition) => {
                     </tbody>
                   </table>
                 </div>
-                <div v-else>
-                  <div class="card">
-                    <div class="card-body">
-                      No conditions are defined
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div v-if="data.completion.singlerestrictionnode">
+                <button 
+                  class="btn btn-link" 
+                  aria-expanded="false" 
+                  aria-controls="collapseTable"
+                  @click="toggleTable('Restriction')"
+                >
+                  {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
+                </button>
+                <div 
+                  v-show="isRestrictionVisible" 
+                  class="table-container"
+                >
+                  <div v-if="data.completion.singlerestrictionnode">
+                    <table class="table table-bordered table-hover fancy-table" style="right: -150%;">
+                      <thead class="thead-light">
+                        <tr>
+                          <th>Key</th>
+                          <th>Checkmark</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr 
+                          v-for="(value, key) in data.completion.singlerestrictionnode" 
+                          :key="key"
+                        >
+                          <td>{{ key }}</td>
+                          <td>
+                            {{ value }}
+                            <span 
+                              v-if="value" 
+                              class="text-success"
+                            >
+                              &#10004;
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div v-else>
+                    <div class="card">
+                      <div class="card-body">
+                        No conditions are defined
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -252,6 +281,9 @@ const toggleTable = (condition) => {
             </div>
           </div>
         </div>
+      </div>
+      <div class="card-footer">
+        <OverviewRestrictionCompletion :node="data" />
       </div>
     </div>
     <Handle 
@@ -272,10 +304,7 @@ const toggleTable = (condition) => {
 </template>
 
 <style scoped>
-.custom-node {
-  padding: 10px;
-  border: 1px solid #ccc;
-}
+
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;
   
@@ -289,8 +318,6 @@ const toggleTable = (condition) => {
   transform: translate(-50%, 0);
 }
 
-
-/* Fancy table styles */
 .fancy-table {
   border-radius: 10px; /* Rounded corners */
 }
@@ -311,6 +338,11 @@ const toggleTable = (condition) => {
 .fancy-table tbody tr:hover {
   background-color: #bdc3c7; /* Hovered row background color */
 }
-
+.starting-node {
+  font-size: 20px; /* Adjust the font size as needed */
+  font-weight: bold; /* Make the text bold */
+  display: flex; /* Align icon and text horizontally */
+  align-items: center; /* Center items vertically */
+}
 
 </style>

@@ -136,70 +136,93 @@ const setStartNode = (node_id) => {
     startnode: node_id, 
   });
 };
+
+const childStyle = {
+  borderColor: store.state.strings.GRAY,
+  borderWidth: '2px',
+};
+
  
 </script>
 <template>
   <div>
     <div 
-      class="custom-node text-center rounded p-3" 
-      :style="{ height: cardHeight + 'px', width: '400px' }"
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
-      <div>
-        <button 
-          v-if="store.state.view != 'teacher'"
-          type="button" 
-          class="btn btn-secondary" 
-          @click="setRestrictionView"
-        >
-          <i class="fa fa-cogs" /> Edit Restrictions
-        </button>
-      </div>
-      <div class="mb-2">
-        <strong>{{ store.state.strings.node_coursefullname }}</strong> {{ data.fullname }}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">
-          Included Courses
-        </h5>
-        <div 
-          v-for="(value, key) in courses" 
-          :key="key" 
-          class="card-text"
-        >
-          <div class="fullname-container">
-            {{ value.fullname }}
+      <div class="card-header text-center">
+        <div class="row align-items-center">
+          <div class="col">
+            <h5>
+              {{ data.fullname }}
+            </h5>
+          </div>
+          <div v-if="store.state.view!='teacher'" class="col-auto">
             <button 
-              v-if="store.state.view != 'teacher'"
               type="button" 
-              class="btn btn-danger btn-sm trash-button" 
-              @click="removeCourse(value.id)"
+              class="btn btn-primary" 
+              data-toggle="modal" 
+              data-target="#nodeModal"
+              @click="setNodeModal"
             >
-              <i class="fa fa-trash" />
+              <i class="fa fa-edit" /> Edit
             </button>
           </div>
         </div>
       </div>
-      <div>
-        <button 
-          v-if="store.state.view != 'teacher'"
-          type="button" 
-          class="btn btn-primary" 
-          data-toggle="modal" 
-          data-target="#nodeModal"
-          @click="setNodeModal"
-        >
-          <i class="fa fa-edit" /> {{ store.state.strings.edit_course_node }}
-        </button>
-        <button 
-          v-if="store.state.view != 'teacher'"
-          type="button" 
-          class="btn btn-secondary" 
-          @click="setPretestView"
-        >
-          <i class="fa fa-tasks" /> {{ store.state.strings.edit_node_pretest }}
-        </button>
+
+      <div 
+        v-if="store.state.view!='teacher'"
+        class="card-body"
+      >
+        <div class="card-body">
+          <h5 class="card-title">
+            Included Courses
+          </h5>
+          <div 
+            v-for="(value, key) in courses" 
+            :key="key" 
+            class="card-text"
+          >
+            <div class="fullname-container">
+              {{ value.fullname }}
+              <button 
+                v-if="store.state.view != 'teacher'"
+                type="button" 
+                class="btn btn-danger btn-sm trash-button" 
+                @click="removeCourse(value.id)"
+              >
+                <i class="fa fa-trash" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              :style="{backgroundColor: store.state.strings.LIGHT_STEEL_BLUE}"
+              @click="setRestrictionView"
+            >
+              <i class="fa-solid fa-key" /> Edit Restriction
+            </button>
+          </div>
+          <div class="col-auto">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              :style="{backgroundColor: store.state.strings.DARK_ORANGE}"
+              @click="setPretestView"
+            >
+              <i class="fa-solid fa-check-to-slot" /> Edit Completion
+            </button>
+          </div>
+        </div>
       </div>
-      <OverviewRestrictionCompletion :node="data" />
+      <div class="card-footer">
+        <OverviewRestrictionCompletion :node="data" />
+      </div>
     </div>
     <Handle 
       id="target" 
