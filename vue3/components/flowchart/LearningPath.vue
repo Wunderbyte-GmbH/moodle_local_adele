@@ -25,7 +25,7 @@
 <template>
   <div>
     <div 
-      class="dndflow" 
+      class="dndflow mt-4" 
       @drop="onDrop"
     >
       <Modal v-if="store.state.view != 'teacher'" />
@@ -57,12 +57,17 @@
             @typeChange="typeChanged"
           />
         </template>
-        <MiniMap node-color="grey" />
+        <MiniMap 
+          v-if="shouldShowMiniMap"
+          node-color="grey" 
+        />
       </VueFlow>
       <Sidebar 
         v-if="store.state.view != 'teacher'"
         :courses="store.state.availablecourses" 
+        :learningmodule="learningpath" 
         :strings="store.state.strings" 
+        :style="{ backgroundColor: backgroundSidebar }"
         @nodesIntersected="handleNodesIntersected"
       />
     </div>
@@ -81,7 +86,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, computed } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -106,10 +111,38 @@ import addAndConditions from '../../composables/conditions/addAndConditions'
 // Load Store and Router
 const store = useStore()
 
+const props = defineProps({
+  learningpath: {
+    type: Array,
+    required: true,
+  }
+});
+
+
 // Define constants that will be referenced
 const dark = ref(false)
 // Intersected node
 const intersectedNode = ref(null);
+// check the page width
+const dndFlowWidth = ref(0);
+
+const backgroundSidebar = store.state.strings.DEEP_SKY_BLUE
+
+const shouldShowMiniMap = computed(() => {
+  return dndFlowWidth.value > 768;
+});
+
+onMounted(() => {
+  const observer = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      if (entry.target.classList.contains('dndflow')) {
+        dndFlowWidth.value = entry.contentRect.width;
+        break;
+      }
+    }
+  });
+  observer.observe(document.querySelector('.dndflow'));
+});
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
@@ -228,6 +261,10 @@ function onDrop(event) {
         dropzoneNode.data.course_node_id.push(data.course_node_id[0])
         nodes.value.forEach((node) => {
           if (node.id == dropzoneNode.id){
+            if (dropzoneNode.data.course_node_id.length == 2 &&
+              dropzoneNode.data.fullname == dropzoneNode.data.shortname ) {
+              dropzoneNode.data.fullname = '' 
+            }
             node = dropzoneNode
           }
         })
@@ -243,12 +280,13 @@ function onDrop(event) {
       position.x += intersectedNode.value.closestnode.dimensions.width
     }
 
+    
     newNode = { ...newNode, ...{
-        data: data,
-        parentCourse: parentCourse,
-        childCourse: childCourse,
-        position,
-      }
+      data: data,
+      parentCourse: parentCourse,
+      childCourse: childCourse,
+      position,
+    }
     }
 
     nextTick(() => {
@@ -329,6 +367,58 @@ watch(
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
 
-.dndflow{flex-direction:column;display:flex;height:600px}.dndflow aside{color:#fff;font-weight:700;border-right:1px solid #eee;padding:15px 10px;font-size:12px;background:rgba(16,185,129,.75);-webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);box-shadow:0 5px 10px #0000004d}.dndflow aside .nodes>*{margin-bottom:10px;cursor:grab;font-weight:500;-webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);box-shadow:5px 5px 10px 2px #00000040}.dndflow aside .description{margin-bottom:10px}.dndflow .vue-flow-wrapper{flex-grow:1;height:100%}@media screen and (min-width: 640px){.dndflow{flex-direction:row}.dndflow aside{min-width:25%}}@media screen and (max-width: 639px){.dndflow aside .nodes{display:flex;flex-direction:row;gap:5px}}
-.learning-path-flow.dark{background:#4e574f;}
+.dndflow{
+  flex-direction:column;
+  display:flex;height:600px
+}
+.dndflow aside{
+  color:#fff;
+  font-weight:700;
+  border-right:1px solid #eee;
+  padding:15px 10px;
+  font-size:12px;
+  -webkit-box-shadow:0px 5px 10px 0px rgba(0,0,0,.3);
+  box-shadow:0 5px 10px #0000004d;
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1em;
+}
+.dndflow aside 
+.nodes>*{
+  margin-bottom:10px;
+  cursor:grab;
+  font-weight:500;
+  -webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);
+  box-shadow:5px 5px 10px 2px #00000040
+}
+.dndflow aside 
+.description{
+  margin-bottom:10px
+}
+.dndflow 
+.vue-flow-wrapper{
+  flex-grow:1;
+  height:100%
+}
+@media screen and (min-width: 640px)
+{
+  .dndflow{flex-direction:row}
+  .dndflow 
+  aside{min-width:20%}
+}
+@media screen and (max-width: 639px)
+{
+  .dndflow aside 
+  .nodes{
+    display:flex;
+    flex-direction:row;
+    gap:5px
+  }
+}
+.learning-path-flow{
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1em;
+}
+.learning-path-flow.dark{
+  background:#4e574f;
+}
 </style>

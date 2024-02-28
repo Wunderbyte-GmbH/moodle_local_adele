@@ -52,30 +52,38 @@ const toggleVisibility = () => {
 <template>
   <div>
     <div 
-      class="custom-node text-center rounded p-3" 
-      style="height: 250px; width: 350px;"
+      class="card"
+      :style="[{ minHeight: '250px', width: '350px' }, childStyle]"
     >
-      <b>
-        {{ data.name }}
-      </b>
-      <button 
-        style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
-        @click="toggleVisibility" 
-      >
-        <i 
-          class="fa" 
-          :class="{ 
-            'fa-eye': props.data.visibility, 
-            'fa-eye-slash': !props.data.visibility, 
-            'strikethrough': !props.data.visibility 
-          }"
-        />
-      </button>
-      <div v-if="props.type == 'restriction'">
-        <RestrictionItem :restriction="data" />
+      <div class="card-header text-center">
+        <div class="row align-items-center">
+          <div class="col">
+            <h5>
+              {{ data.name }}
+            </h5>
+            <button 
+              style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
+              @click="toggleVisibility" 
+            >
+              <i 
+                class="fa" 
+                :class="{ 
+                  'fa-eye': props.data.visibility, 
+                  'fa-eye-slash': !props.data.visibility, 
+                  'strikethrough': !props.data.visibility 
+                }"
+              />
+            </button>
+          </div>
+        </div>
       </div>
-      <div v-else-if="props.type == 'completion'">
-        <CompletionItem :completion="data" />
+      <div class="card-body">
+        <div v-if="props.type == 'Restriction'">
+          <RestrictionItem :restriction="data" />
+        </div>
+        <div v-else-if="props.type == 'completion'">
+          <CompletionItem :completion="data" />
+        </div>
       </div>
     </div>
     <Handle 
@@ -110,6 +118,10 @@ const toggleVisibility = () => {
   background-color: white;
   padding: 10px;
   border: 1px solid #ccc;
+}
+
+.card-body {
+  font-weight: bold;
 }
 
 .fa-eye {

@@ -59,7 +59,7 @@
             </button>
           </div>
           <div 
-            class="modal-body" 
+            class="modal-body d-flex"
             :style="{ backgroundColor: store.state.strings.LIGHT_GRAY }"
           >
             <div 
@@ -71,14 +71,23 @@
               <div class="carousel-inner helping-slide">
                 <div 
                   v-for="(imagepath, index) in imagepaths" 
-                  :key="index" 
-                  :class="{ 'carousel-item': true, 'active': index === 0 }"
+                  :key="index"
+                  :class="{
+                    'carousel-item': true,
+                    'active': index === 0,
+                  }"
+                  style="min-height: 500px;"
                 >
-                  <img 
-                    :src="imagepath.path" 
-                    class="d-block w-100" 
-                    :alt="'Slide ' + (index + 1)"
+                  <div 
+                    class="d-flex justify-content-center align-items-center w-100"
+                    style="min-height: 500px;"
                   >
+                    <img 
+                      :src="imagepath.path" 
+                      class="d-block w-100" 
+                      :alt="'Slide ' + (index + 1)"
+                    >
+                  </div>
                 </div>
               </div>
 

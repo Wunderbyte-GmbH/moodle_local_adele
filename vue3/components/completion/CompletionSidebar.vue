@@ -244,6 +244,10 @@ const props = defineProps({
     type: Array,
     default: null,
   },
+  type: {
+    type: String,
+    required: true,
+  },
 });
 
 // Calculate searched courses
@@ -256,12 +260,12 @@ const filteredConditions = computed(() => {
 </script>
 
 <template>
-  <aside class="col-md-2">
+  <aside 
+    class="col-md-4"
+    style="max-width: 20% !important;"
+  >
     <div type="text">
-      {{ strings.fromavailablecourses }}
-    </div>
-    <div type="text">
-      {{ strings.tagsearch_description }}
+      List of available {{ type }} criteria
     </div>
     <input 
       id="searchTerm" 
@@ -274,14 +278,22 @@ const filteredConditions = computed(() => {
         <div 
           v-for="condition in filteredConditions" 
           :key="condition.description"
-          class="vue-flow__node-input mt-1" 
+          class="vue-flow__node-input mt-1 row align-items-center justify-content-center" 
           :draggable="true" 
           :data="condition" 
-          style="width: 100%;"
+          style="width: 95%; margin-left: 0.025rem;"
           @dragstart="onDragStart($event, condition, this)" 
           @drag="onDrag($event, condition)"
           @dragend="onDragEnd()"
         >
+          <div 
+            class="col-auto"
+            data-toggle="tooltip" 
+            data-placement="left" 
+            :title="condition.description"
+          >
+            <i class="fa-solid fa-circle-info fa-lg" />
+          </div>
           {{ condition.name }}
         </div>
       </div>

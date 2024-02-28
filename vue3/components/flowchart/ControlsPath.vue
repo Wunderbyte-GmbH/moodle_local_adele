@@ -90,38 +90,46 @@ if (store.state.learningpath.json.tree != undefined) {
 
 // Prepare and save learning path
 const onSave = () => {
-    removeNodes(['starting_node'])
-    let obj = {};
-    obj['tree'] = toObject();
-    obj['tree'] = removeDropzones(obj['tree'])
-    const singleNodes = standaloneNodeCheck(obj['tree'])
-    if (singleNodes) {
+    if (!props.learningpath.name || !props.learningpath.description) {
       notify({
-        title: 'Invalid Path',
-        text: 'Found standalone nodes. Every node must be connected to the path',
+        title: 'Saved failed',
+        text: 'Provide a title and a short description for the learning path',
         type: 'error'
       });
     } else {
-      obj['tree'] = recalculateParentChild(obj['tree'], 'parentCourse', 'childCourse', 'starting_node')
-      obj = JSON.stringify(obj);
-      let result = {
-          learningpathid: props.learningpath.id,
-          name: props.learningpath.name,
-          description: props.learningpath.description,
-          json: obj,
-      };
-      store.dispatch('saveLearningpath', result);
-      store.dispatch('fetchLearningpaths');
-      store.state.learningPathID = 0;
-      store.state.editingadding = false;
-      router.push({name: 'learningpaths-edit-overview'});
-      window.scrollTo(0,0);
-  
-      notify({
-        title: store.state.strings.title_save,
-        text: store.state.strings.description_save,
-        type: 'success'
-      });
+      removeNodes(['starting_node'])
+      let obj = {};
+      obj['tree'] = toObject();
+      obj['tree'] = removeDropzones(obj['tree'])
+      const singleNodes = standaloneNodeCheck(obj['tree'])
+      if (singleNodes) {
+        notify({
+          title: 'Invalid Path',
+          text: 'Found standalone nodes. Every node must be connected to the path',
+          type: 'error'
+        });
+      } else {
+        obj['tree'] = recalculateParentChild(obj['tree'], 'parentCourse', 'childCourse', 'starting_node')
+        obj = JSON.stringify(obj);
+        let result = {
+            learningpathid: props.learningpath.id,
+            name: props.learningpath.name,
+            description: props.learningpath.description,
+            json: obj,
+        };
+        store.dispatch('saveLearningpath', result);
+        store.dispatch('fetchLearningpaths');
+        store.state.learningPathID = 0;
+        store.state.editingadding = false;
+        router.push({name: 'learningpaths-edit-overview'});
+        window.scrollTo(0,0);
+    
+        notify({
+          title: store.state.strings.title_save,
+          text: store.state.strings.description_save,
+          type: 'success'
+        });
+      }
     }
 };
 
