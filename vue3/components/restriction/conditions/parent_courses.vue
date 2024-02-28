@@ -1,26 +1,35 @@
 <template>
   <div class="form-check">
     {{ restriction.description }}
-    <div v-if="data">
-      <select 
-        v-model="data.min_courses" 
-        @change="emitSelectedParentCourse"
+    <div class="form-group">
+      <label 
+        class="form-label" 
+        for="courseSelect"
       >
-        <option 
-          disabled 
-          value="" 
-          selected
+        Select a Number:
+      </label>
+      <div v-if="data">
+        <select 
+          v-model="data.min_courses"
+          class="form-select" 
+          @change="emitSelectedParentCourse"
         >
-          Choose a number
-        </option>
-        <option 
-          v-for="number in parentCourses" 
-          :key="number" 
-          :value="number"
-        >
-          {{ number }}
-        </option>
-      </select>
+          <option 
+            disabled 
+            value="" 
+            selected
+          >
+            Choose a number
+          </option>
+          <option 
+            v-for="number in parentCourses" 
+            :key="number" 
+            :value="number"
+          >
+            {{ number }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 </template>
@@ -81,3 +90,31 @@ onMounted(() => {
 });
 
 </script>
+
+<style scoped>
+.form-check {
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-select {
+  width: 100%; /* Make the inputs fill their container */
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.form-select {
+  max-width: 100%; /* Set a maximum width for the select */
+}
+</style>

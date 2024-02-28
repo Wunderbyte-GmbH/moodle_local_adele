@@ -187,48 +187,6 @@ const childStyle = {
           </div>
           <div class="row">
             <div class="col-md-6">
-              <div v-if="data.completion.singlecompletionnode">
-                <button 
-                  class="btn btn-link" 
-                  aria-expanded="false" 
-                  aria-controls="collapseTable"
-                  @click="toggleTable('Completion')"
-                >
-                  {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
-                </button>
-                <div
-                  v-show="isCompletionVisible" 
-                  class="table-container table-container-left"
-                >
-                  <table class="table table-bordered table-hover fancy-table">
-                    <thead class="thead-light">
-                      <tr>
-                        <th>Key</th>
-                        <th>Checkmark</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr 
-                        v-for="(value, key) in data.completion.singlecompletionnode" 
-                        :key="key"
-                      >
-                        <td>{{ key }}</td>
-                        <td>
-                          {{ value }}
-                          <span 
-                            v-if="value" 
-                            class="text-success"
-                          >
-                            &#10004;
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
               <div v-if="data.completion.singlerestrictionnode">
                 <button 
                   class="btn btn-link" 
@@ -240,9 +198,9 @@ const childStyle = {
                 </button>
                 <div 
                   v-show="isRestrictionVisible" 
-                  class="table-container"
+                  class="table-container table-container-left"
                 >
-                  <div v-if="data.completion.singlerestrictionnode">
+                  <div v-if="Object.keys(data.completion.singlerestrictionnode).length > 0">
                     <table class="table table-bordered table-hover fancy-table" style="right: -150%;">
                       <thead class="thead-light">
                         <tr>
@@ -272,7 +230,58 @@ const childStyle = {
                   <div v-else>
                     <div class="card">
                       <div class="card-body">
-                        No conditions are defined
+                        No Restrictions are defined
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div v-if="data.completion.singlecompletionnode">
+                <button 
+                  class="btn btn-link" 
+                  aria-expanded="false" 
+                  aria-controls="collapseTable"
+                  @click="toggleTable('Completion')"
+                >
+                  {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
+                </button>
+                <div
+                  v-show="isCompletionVisible" 
+                  class="table-container"
+                >
+                  <div v-if="Object.keys(data.completion.singlecompletionnode).length > 0">
+                    <table class="table table-bordered table-hover fancy-table">
+                      <thead class="thead-light">
+                        <tr>
+                          <th>Key</th>
+                          <th>Checkmark</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr 
+                          v-for="(value, key) in data.completion.singlecompletionnode" 
+                          :key="key"
+                        >
+                          <td>{{ key }}</td>
+                          <td>
+                            {{ value }}
+                            <span 
+                              v-if="value" 
+                              class="text-success"
+                            >
+                              &#10004;
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div v-else>
+                    <div class="card">
+                      <div class="card-body">
+                        No Completions are defined
                       </div>
                     </div>
                   </div>

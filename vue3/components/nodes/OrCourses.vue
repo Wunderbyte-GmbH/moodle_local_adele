@@ -154,7 +154,7 @@ const childStyle = {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname }}
+              {{ data.fullname || 'Collection' }}
             </h5>
           </div>
           <div v-if="store.state.view!='teacher'" class="col-auto">
@@ -172,10 +172,10 @@ const childStyle = {
       </div>
 
       <div 
-        v-if="store.state.view!='teacher'"
+        
         class="card-body"
       >
-        <div class="card-body">
+        <div>
           <h5 class="card-title">
             Included Courses
           </h5>
@@ -197,7 +197,10 @@ const childStyle = {
             </div>
           </div>
         </div>
-        <div class="row align-items-center">
+        <div 
+          v-if="store.state.view!='teacher'"
+          class="row align-items-center"
+        >
           <div class="col">
             <button 
               type="button" 

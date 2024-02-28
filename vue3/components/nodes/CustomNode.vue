@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed  } from 'vue';
+import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { useVueFlow } from '@vue-flow/core'
@@ -40,7 +40,27 @@ const props = defineProps({
   },
 });
 
+const courses = ref([])
+
 const { toObject } = useVueFlow()
+
+onMounted(() => {
+  getCourseNamesIds()
+})
+
+const getCourseNamesIds = () => {
+  if (store.state.availablecourses) {
+    courses.value = []
+    store.state.availablecourses.forEach(course => {
+      if (props.data.course_node_id.includes(course.course_node_id[0])) {
+        courses.value.push({
+          fullname : course.fullname,
+          id : [course.course_node_id[0]]
+        })
+      }
+    });
+  }
+}
 
 // Set node data for the modal
 const setNodeModal = () => {
@@ -111,11 +131,23 @@ const childStyle = {
         </div>
       </div>
 
-      <div 
-        v-if="store.state.view!='teacher'"
-        class="card-body"
-      >
-        <div class="row align-items-center">
+      <div class="card-body">
+        <h5 class="card-title">
+          Included Courses
+        </h5>
+        <div 
+          v-for="(value, key) in courses" 
+          :key="key" 
+          class="card-text"
+        >
+          <div class="fullname-container">
+            {{ value.fullname }}
+          </div>
+        </div>
+        <div 
+          v-if="store.state.view!='teacher'"
+          class="row align-items-center"
+        >
           <div class="col">
             <button 
               type="button" 
@@ -168,6 +200,15 @@ const childStyle = {
 }
 .card-text {
   padding: 5px;
+}
+
+.fullname-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f0f0; /* Set your desired background color */
+  padding: 10px; /* Adjust padding as needed */
+  border-radius: 10px; /* Set your desired border-radius */
 }
 
 </style>

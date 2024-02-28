@@ -26,7 +26,7 @@
   <div>
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
-    <div>
+    <div class="d-flex justify-content-between">
       <router-link 
         :to="{ name: 'learningpath-new' }" 
         tag="button" 
@@ -40,12 +40,12 @@
         data-toggle="modal" 
         data-target="#helpingSlider"
       >
-        Show helping slider
+        Introduction slider
+        <i class="fa-solid fa-book-open-reader" />
       </button>
     </div>
     <h2>{{ store.state.strings.overviewlearningpaths }}</h2>
 
-    <div>{{ store.state.strings.learningpaths_edit_site_description }}</div>
     <span v-if="store.state.learningpaths == ''">
       {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
     </span>
@@ -56,17 +56,18 @@
         style="margin-bottom: 10px"
       >
         <div v-if="singlelearningpath.name !== 'not found'">
-          <div>
-            <div 
-              class="card" 
-              style="width: 18rem;"
-            >
-              <div class="card-body">
-                <h5 class="card-title">{{ singlelearningpath.name }}</h5>
-                <p class="card-text">{{ singlelearningpath.description }}</p>
+          <div 
+            class="card shadow mt-4"
+            style="max-width: 20%;"
+          >
+            <div class="card-header text-center">
+              <h5>
+                {{ singlelearningpath.name }}
                 <a 
-                  :title="store.state.strings.edit"
                   href="" 
+                  data-toggle="tooltip" 
+                  data-placement="right" 
+                  title="Edit learning path."
                   @click.prevent="editLearningpath(singlelearningpath.id)" 
                 >
                   <i 
@@ -74,37 +75,52 @@
                     :title="store.state.strings.edit" 
                   />
                 </a>
-                <a 
-                  :title="store.state.strings.duplicate"
-                  href="" 
-                  @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
-                >
-                  <i 
-                    class="icon fa fa-copy fa-fw iconsmall m-r-0" 
-                    :title="store.state.strings.duplicate" 
-                  />
-                </a>
-                <a 
+              </h5>
+            </div>
+            <div 
+              class="card-body"
+              :style="[nodeBackgroundColor]"
+            >
+              <b>
+                Description: 
+              </b>
+              {{ singlelearningpath.description ||'No description was provided' }}
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              <a 
+                :title="store.state.strings.duplicate"
+                href="" 
+                @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
+              >
+                Duplicate 
+                <i 
+                  class="icon fa fa-copy fa-fw iconsmall m-r-0" 
+                  :title="store.state.strings.duplicate" 
+                />
+              </a>
+              <a 
+                :title="store.state.strings.delete"
+                href="" 
+                @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
+              >
+                Delete
+                <i 
+                  class="icon fa fa-trash fa-fw iconsmall" 
                   :title="store.state.strings.delete"
-                  href="" 
-                  @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
-                >
-                  <i 
-                    class="icon fa fa-trash fa-fw iconsmall" 
-                    :title="store.state.strings.delete"
-                  />
-                </a>
-              </div>
+                />
+              </a>
             </div>
           </div>
           <div 
             v-show="clicked[singlelearningpath.id]"
-            class="alert-danger p-3 m-t-1 m-b-1" 
+            class="alert-danger p-3 m-t-1 m-b-1 rounded"
+            style="max-width: 20%;"
           >
             <div>{{ store.state.strings.deletepromptpre }}{{ singlelearningpath.name }}{{ store.state.strings.deletepromptpost }}</div>
-            <div class="m-t-1">
+
+            <div class="mt-4 d-flex justify-content-between">
               <button 
-                class="btn btn-danger m-r-0" 
+                class="btn btn-danger mr-2" 
                 :title="store.state.strings.btnconfirmdelete"
                 @click="deleteLearningpathConfirm(singlelearningpath.id)" 
               >
@@ -147,6 +163,10 @@ const showDeleteConfirm = (index) => {
 
 // Edit learning path deletion
 const editLearningpath = (singlelearningpathid) => {
+  const tooltips = document.querySelectorAll('.tooltip');
+  tooltips.forEach(tooltip => {
+      tooltip.style.display = 'none';
+  });
   store.state.learningPathID = singlelearningpathid
   router.push({
     name: 'learningpath-edit',

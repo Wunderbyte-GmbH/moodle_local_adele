@@ -52,20 +52,21 @@
         >
           <i class="fa fa-arrow-left" /> Go Back to Overview
         </router-link>
-        <div class="card p-4" style="padding: 2.5rem !important;">
+        <div 
+          class="card p-4" 
+          style="padding: 2.5rem !important;"
+        >
           <h2 class="mt-3">
             {{ store.state.strings.learningpath_form_title_edit }}
           </h2>
           <div class="card-body">
-            <div>
-              <div v-if="store.state.learningpath">
-                <TextInputs 
-                  :goal="store.state.learningpath" 
-                  @change-GoalName="changeGoalName" 
-                  @change-GoalDescription="changeGoalDescription"
-                />
-                <LearingPath />
-              </div>
+            <div v-if="store.state.learningpath">
+              <TextInputs 
+                :goal="store.state.learningpath" 
+                @change-GoalName="changeGoalName" 
+                @change-GoalDescription="changeGoalDescription"
+              />
+              <LearingPath :learningpath="store.state.learningpath" />
             </div>
           </div>
         </div>
