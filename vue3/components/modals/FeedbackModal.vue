@@ -55,46 +55,6 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <div 
-                class="btn-toolbar" 
-                role="toolbar" 
-                aria-label="Formatting Buttons"
-              >
-                <div 
-                  class="btn-group me-2" 
-                  role="group" 
-                  aria-label="Bold, Italic, Underline, and Code Buttons"
-                >
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-bold border" 
-                    @click="toggleFormatting('bold')"
-                  >
-                    <i class="fa fa-bold" />
-                  </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-italic border" 
-                    @click="toggleFormatting('italic')"
-                  >
-                    <i class="fa fa-italic" />
-                  </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-underline border" 
-                    @click="toggleFormatting('underline')"
-                  >
-                    <i class="fa fa-underline" />
-                  </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-secondary btn-code border" 
-                    @click="toggleFormatting('code')"
-                  >
-                    <i class="fa fa-code" />
-                  </button>
-                </div>
-              </div>
               <div
                 id="feedbackContent"
                 ref="feedbackContent"
@@ -140,48 +100,38 @@ const store = useStore();
 const initialFeedback = ref(null);
 const feedbackContent = ref(null);
 
-const toggleFormatting = (format) => {
-  const selection = window.getSelection();
-  if (format === 'code') {
-    const codeWrapper = document.createElement('code');
-    const selectedText = selection.toString();
-    // Check if the selected text already has the code format
-    if (selection.rangeCount > 0 && selection.getRangeAt(0).commonAncestorContainer.parentNode.tagName === 'CODE') {
-      document.execCommand('removeFormat', false, null);
-    } else {
-      codeWrapper.appendChild(document.createTextNode(selectedText));
-      document.execCommand('insertHTML', false, codeWrapper.outerHTML);
-    }
-  } else {
-    document.execCommand(format, false, null);
-  }
-};
 // closing modal
 const closeModal = () => {
+  store.state.feedback = null
   $('#feedbackModal').modal('hide');
 };
 // updating changes and closing modal
 const saveChanges = () => {
   // Loop over nodes and macht node
-  let learningpath = store.state.learningpath
-
-  // Serialize the modified DOM back to a string
+  let learningpathfeedback = store.state.learningpath.json
+  if (typeof learningpathfeedback == 'string') {
+    learningpathfeedback = JSON.parse(learningpathfeedback)
+  }
+  // // Serialize the modified DOM back to a string
   const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML) 
-  learningpath.json.tree.nodes.forEach((node) => {
+  learningpathfeedback.tree.nodes.forEach((node) => {
     if (node.id == store.state.node.node_id) {
       // Find the feedback node.
       node.completion.nodes.forEach((completionnode) => {
         if (completionnode.type == 'feedback' &&
           completionnode.data.childCondition == store.state.feedback.childCondition) {
-          completionnode.data.feedback = cleanedHtml;
-        }
-      })
-    }
+            completionnode.data.feedback = cleanedHtml;
+          }
+        })
+      }
+    });
+  learningpathfeedback = JSON.stringify(learningpathfeedback); 
+  store.dispatch('updateLearningpath', {
+    id: 0,
+    json: learningpathfeedback,
   });
-  learningpath.json = JSON.stringify(learningpath.json); 
-  store.dispatch('saveLearningpath', learningpath);
-  store.state.feedback.feedback = cleanedHtml
-  learningpath.json = JSON.parse(learningpath.json); 
+  
+  store.state.feedback = null
   $('#feedbackModal').modal('hide');
 };
 
@@ -202,19 +152,10 @@ onMounted(() => {
   });
 });
 
-watch(() => store.state.feedback, () => {
-  initialFeedback.value = store.state.feedback.feedback;
-});
+watch(() => store.state.feedback, async () => {
+  if (store.state.feedback != null) {
+    initialFeedback.value = store.state.feedback.feedback;
+  }
+}, { deep: true } );
 
 </script>
-
-<style scoped>
-/* Add this style block to your component or globally in your project to style the buttons */
-.btn-bold i,
-.btn-italic i,
-.btn-underline i,
-.btn-code i {
-  font-size: 1rem;
-  margin-top: -2px; /* Adjust the alignment of the icon */
-}
-</style>

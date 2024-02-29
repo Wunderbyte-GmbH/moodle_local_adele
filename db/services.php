@@ -159,4 +159,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_update_learningpath' => [
+      'classname' => 'local_adele\external\update_learningpath',
+      'classpath' => '',
+      'description' => 'Update learning path',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

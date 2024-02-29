@@ -166,12 +166,19 @@ export function createAppStore() {
                   learningpathid: context.state.learningPathID, 
                   name: payload.name, 
                   description: payload.description, 
-                  json: payload.json });
+                  json: payload.json });                
                 context.dispatch('fetchLearningpaths');
                 context.commit('setLearningpath', result.learningpath);
                 context.commit('setlearningPathID', result.learningpath.id);
                 return result.learningpath.id;
             },
+            async updateLearningpath(context, payload) {
+              await ajax('local_adele_update_learningpath',
+              {
+                id: payload.id, 
+                json: payload.json 
+              });
+          },
             async deleteLearningpath(context, payload) {
                 const result = await ajax('local_adele_delete_learningpath', 
                 {userid: context.state.user, learningpathid: payload.learningpathid});

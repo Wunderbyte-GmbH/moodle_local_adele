@@ -28,6 +28,7 @@ import { ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
+import LearningModule from './LearningModule.vue'
 const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } = useVueFlow()
 
 // Reference on searchTerm
@@ -40,8 +41,14 @@ const intersectingNode = ref(null);
 // Prev closest node
 const prevClosestNode = ref(null);
 
+const activeTab = ref(0);
+
 // Defined props from the parent component
 const props = defineProps({
+  learningmodule: {
+    type: Array,
+    required: true,
+  },
   courses: {
     type: Array,
     required: true,
@@ -52,6 +59,8 @@ const props = defineProps({
   }
 });
 
+const tabInactiveColor = props.strings.LIGHT_GRAY
+const tabActiveColor = props.strings.LIGHT_SEA_GREEN
 // Function sets up data for nodes
 function onDragStart(event, data) {
   if (event.dataTransfer) {
@@ -161,47 +170,99 @@ function onDragEnd(){
   removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
 }
 
+function changeTab(index) {
+  activeTab.value = index;
+}
+
 </script>
 
 <template>
   <aside 
     class="col-md-2" 
-    style="min-width: 10% !important;"
+    style="max-width: 20% !important;"
   >
-    <div type="text">
-      {{ strings.fromavailablecourses }}
-    </div>
-    <div type="text">
-      {{ strings.tagsearch_description }}
-    </div>
-    <input 
-      id="searchTerm" 
-      v-model="searchTerm" 
-      class="form-control" 
-      :placeholder="strings.placeholder_search" 
-    >
-    <div class="learning-path-nodes-container">
-      <div class="nodes">
-        <div 
-          v-for="course in filteredCourses" 
-          :key="course.id"
-          class="vue-flow__node-input mt-1" 
-          :draggable="true" 
-          :data="course" 
-          style="width: 100%;"
-          @dragstart="onDragStart($event, course)" 
-          @drag="onDrag($event)"
-          @dragend="onDragEnd()"
+    <div class="nav nav-tabs">
+      <div
+        class="nav-item"
+      >
+        <a
+          :class="['nav-link', { 'active': activeTab === 0 }]"
+          :style="{ backgroundColor: activeTab === 0 ? tabActiveColor : tabInactiveColor }"
+          @click="changeTab(0)"
         >
-          {{ course.fullname }}
-          <a 
-            :href="'/course/view.php?id=' + course.course_node_id[0]" 
-            target="_blank"
+          Courses
+        </a>
+      </div>
+      <div
+        class="nav-item"
+      >
+        <a
+          :class="['nav-link', { 'active': activeTab === 1 }]"
+          :style="{ backgroundColor: activeTab === 1 ? tabActiveColor : tabInactiveColor }"
+          @click="changeTab(1)"
+        >
+          Learning package
+        </a>
+      </div>
+    </div>
+
+    <div v-if="!activeTab">
+      <div type="text">
+        {{ strings.fromavailablecourses }}
+      </div>
+      <div type="text">
+        {{ strings.tagsearch_description }}
+      </div>
+      <input 
+        id="searchTerm" 
+        v-model="searchTerm" 
+        class="form-control" 
+        :placeholder="strings.placeholder_search" 
+      >
+      <div class="learning-path-nodes-container">
+        <div class="nodes">
+          <div 
+            v-for="course in filteredCourses" 
+            :key="course.id"
+            class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
+            :draggable="true" 
+            :data="course" 
+            style="width: 95%; padding-left: 1rem; margin-left: 0.025rem;"
+            @dragstart="onDragStart($event, course)" 
+            @drag="onDrag($event)"
+            @dragend="onDragEnd()"
           >
-            <i class="fa fa-link" />
-          </a>
+            <div 
+              class="col-auto"
+              data-toggle="tooltip" 
+              data-placement="left" 
+              title="Drag and drop the course inside the drop zones to include it in the learning path." 
+            >
+              <i class="fa-solid fa-circle-info fa-lg" />
+            </div>
+            {{ course.fullname }}
+            <div 
+              class="col-auto"
+              data-toggle="tooltip" 
+              data-placement="right" 
+              title="Click here to go to course" 
+            >
+              <a 
+                :href="'/course/view.php?id=' + course.course_node_id[0]" 
+                target="_blank"
+              >
+                <i class="fa fa-link" />
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+    <div v-else>
+      <LearningModule 
+        :learningmodule="learningmodule"
+        :strings="strings" 
+      />
     </div>
   </aside>
 </template>
@@ -212,4 +273,21 @@ function onDragEnd(){
   height: 80%;
   overflow-y: auto;
 }
+.nav-item{
+  margin-right: 2px;
+}
+.nav-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  border-bottom: 1px solid #e0e0e0; /* Light gray bottom border */
+}
+.nav-link {
+  padding: 0.5rem 1rem;
+  color: #555555c7; /* Dark gray text color */
+}
+
+.nav-link.active {
+  color: #fff; /* White text color for active tab */
+}
+
 </style>
