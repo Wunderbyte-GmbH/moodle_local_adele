@@ -28,7 +28,7 @@
 import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { nextTick, onMounted, watch } from 'vue';
+import { nextTick, onMounted, watch, ref } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart';
 import setStartingNode from '../../composables/setStartingNode';
@@ -51,6 +51,8 @@ const props = defineProps({
     default: null,
   }
 }); 
+
+const showCacelConfirmation = ref(false)
 
 // Emit to parent component
 const emit = defineEmits(['change-class']);
@@ -135,6 +137,10 @@ const onSave = () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
+  showCacelConfirmation.value = !showCacelConfirmation.value
+};
+
+const onCancelConfirmation = () => {
     store.state.learningPathID = 0;
     store.state.editingadding = false;
     store.state.editingrestriction = false;
@@ -196,10 +202,31 @@ function updatePos() {
     <button 
       id="cancel-learning-path"
       class="btn btn-secondary m-2" 
+      :disabled="showCacelConfirmation"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
+    <div 
+      v-if="showCacelConfirmation"
+      class="cancelConfi"
+    >
+      All unsaved changes will be lost
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-primary m-2" 
+        @click="onCancel"
+      >
+        Back
+      </button>
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-warning m-2"
+        @click="onCancelConfirmation"
+      >
+        Cancel
+      </button>
+    </div>
     <button 
       id="update-learning-path-position"
       class="btn btn-info m-2" 
@@ -227,3 +254,13 @@ function updatePos() {
     </a>
   </Panel>
 </template>
+
+<style scoped>
+.cancelConfi{
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
+}
+</style>

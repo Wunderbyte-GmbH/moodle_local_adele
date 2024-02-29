@@ -247,7 +247,10 @@ function changeTab(index) {
       </div>
     </div>
 
-    <div v-if="!activeTab">
+    <div 
+      v-if="!activeTab"
+      style="height: -webkit-fill-available;"
+    >
       <div type="text">
         {{ strings.fromavailablecourses }}
       </div>
