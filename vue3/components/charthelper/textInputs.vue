@@ -82,9 +82,18 @@ watch(() => store.state.learningpath, async () => {
           </h5>
         </div>
         <div class="card-body">
-          <p class="card-text">
-            {{ goalname ? goalname : 'No name provided.' }}
-          </p>
+          <div v-if="goalname">
+            {{ goalname }}
+            <a 
+              :href="'/local/adele/index.php#/learningpaths/edit/' + props.goal.id" 
+              target="_blank"
+            >
+              <i class="fa fa-link" />
+            </a>
+          </div>
+          <div v-else>
+            No name provided.
+          </div>
         </div>
       </div>
       <div class="card border-secondary">
