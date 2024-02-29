@@ -34,6 +34,9 @@ const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } 
 // Reference on searchTerm
 const searchTerm = ref('');
 
+// Reference on searchTerm
+const activeNode = ref('');
+
 // Ref to store intersecting node
 const emit = defineEmits(['nodesIntersected']);
 const intersectingNode = ref(null);
@@ -91,16 +94,21 @@ function onDrag(event) {
   //add drop zones to this node 
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
   if(closestNode && startingNodeIntersecting){
-    const newDrop = drawDropzone(closestNode)
-    addNodes(newDrop.nodes);
-    addEdges(newDrop.edges);
-    checkIntersetcion(event, closestNode)
+    if (dropzoneShown()) {
+      activeNode.value = closestNode
+      const newDrop = drawDropzone(closestNode)
+      addNodes(newDrop.nodes);
+      addEdges(newDrop.edges);
+      checkIntersetcion(event, closestNode)
+    }
   }else{
-    removeNodes(['dropzone', 'dropzone_and', 'dropzone_or'])
+    activeNode.value = null
+    removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
   }
 
   // Check if the closest node has changed
-  if (closestNode !== prevClosestNode.value) {
+  if (closestNode !== prevClosestNode.value && (dropzoneShown() ||aboveDistance())) {
+    activeNode.value = null
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
     prevClosestNode.value = closestNode;
   }
@@ -129,6 +137,34 @@ function checkIntersetcion(event, closestNode) {
   return insideStartingNode
 }
 
+function aboveDistance() {
+  if (activeNode.value != null) {
+    const { left, top } = vueFlowRef.value.getBoundingClientRect();
+    const position = project({
+      x: event.clientX - left,
+      y: event.clientY - top,
+    });
+
+    const middleNode = {
+      x: activeNode.value.position.x + activeNode.value.dimensions.width/2,
+      y: activeNode.value.position.y + activeNode.value.dimensions.height/2,
+    };
+  
+
+    if (Math.sqrt(Math.pow(position.x - middleNode.x, 2) + Math.pow(position.y - middleNode.y, 2)) > 500) {
+      return true
+    }
+  }
+  return false
+}
+
+function dropzoneShown() {
+  if (findNode('dropzone_or')){
+    return false;
+  }
+  return true
+}
+
 // Function to check if two nodes intersect
 function areNodesIntersecting(position, node) {
   return (
@@ -141,7 +177,7 @@ function areNodesIntersecting(position, node) {
 
 // Find the closest node within a set boundary
 function findClosestNode(event) {
-  const connectionRadius = 800;
+  const connectionRadius = 550;
   const { left, top } = vueFlowRef.value.getBoundingClientRect();
   const position = project({
     x: event.clientX - left,
@@ -153,11 +189,16 @@ function findClosestNode(event) {
 
   nodes.value.forEach((node) => {
     if(node.type != 'dropzone' && node.type != 'conditionaldropzone'){
+      const nodeCenter = {
+        x: node.position.x + node.dimensions.width / 2,
+        y: node.position.y + node.dimensions.height / 2
+      };
       const distance = Math.sqrt(
-        Math.pow(position.x - node.position.x, 2) +
-        Math.pow(position.y - node.position.y, 2)
+        Math.pow(position.x - nodeCenter.x, 2) +
+        Math.pow(position.y - nodeCenter.y, 2)
       );
-      if (distance < closestDistance && distance < connectionRadius) {
+      if (distance < closestDistance && distance < connectionRadius &&
+      Math.abs(position.y - nodeCenter.y) < 360) {
         closestDistance = distance;
         closestNode = node;
       }
