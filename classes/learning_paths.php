@@ -108,6 +108,22 @@ class learning_paths {
     }
 
     /**
+     * Save learning path.
+     *
+     * @param array $params
+     * @return bool
+     */
+    public static function update_learning_path($params) {
+        global $DB;
+        $data = new stdClass;
+        $data->id = $params['id'];
+        $data->json = $params['json'];
+        $data->createdby = '100';
+        $data->timemodified = time();
+        return $DB->update_record('local_adele_learning_paths', $data);
+    }
+
+    /**
      * Get all learning paths.
      *
      * @return array
