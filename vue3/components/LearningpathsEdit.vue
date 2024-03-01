@@ -66,7 +66,9 @@
                 @change-GoalName="changeGoalName" 
                 @change-GoalDescription="changeGoalDescription"
               />
-              <LearingPath :learningpath="store.state.learningpath" />
+              <div v-if="learningpath">
+                <LearingPath :learningpath="learningpath" />
+              </div>
             </div>
           </div>
         </div>
@@ -75,7 +77,7 @@
         v-else-if="$store.state.editingpretest == true" 
         class="fade-in"
       >
-        <Completion />
+        <Completion :learningpath="learningpath" />
       </div>
       <div 
         v-else-if="$store.state.editingrestriction == true" 
@@ -108,6 +110,7 @@ const router = useRouter()
 // Define constants that will be referenced
 const goalname = ref('')
 const goaldescription = ref('')
+const learningpath = ref('')
 
 const changeGoalName = (newGoalName) => {
   store.state.learningpath.name = newGoalName;
@@ -146,13 +149,13 @@ const showForm = async (learningpathId = null) => {
   goaldescription.value = ''
   if (learningpathId) {
     store.state.learningPathID = learningpathId;
-    store.dispatch('fetchLearningpath')
+    learningpath.value = await store.dispatch('fetchLearningpath')
     store.dispatch('fetchUserPathRelations')
 
     store.state.editingadding = true
     // Do something here in case of an edit.
   } else {
-    store.dispatch('fetchLearningpath')
+    learningpath.value = await store.dispatch('fetchLearningpath')
     store.state.editingadding = true
     // Do something here in case of an add.
   }

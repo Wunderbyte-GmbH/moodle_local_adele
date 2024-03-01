@@ -58,7 +58,7 @@
         <div v-if="singlelearningpath.name !== 'not found'">
           <div 
             class="card shadow mt-4"
-            style="max-width: 20%;"
+            style="max-width: 20%; min-width: 450px;"
           >
             <div class="card-header text-center">
               <h5>

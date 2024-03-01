@@ -90,7 +90,6 @@ class save_learningpath extends external_api {
         if (!has_capability('local/adele:canmanage', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_adele');
         }
-
         return ['learningpath' => learning_paths::save_learning_path($params)];
     }
 
@@ -108,7 +107,7 @@ class save_learningpath extends external_api {
                     'timecreated' => new external_value(PARAM_TEXT, 'Condition label'),
                     'timemodified' => new external_value(PARAM_TEXT, 'Condition label'),
                     'createdby' => new external_value(PARAM_TEXT, 'Condition label'),
-                    'json' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'json' => new external_value(PARAM_RAW, 'Condition label'),
                 ]
             ),
             ]

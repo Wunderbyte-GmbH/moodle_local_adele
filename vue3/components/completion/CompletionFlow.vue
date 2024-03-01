@@ -26,7 +26,7 @@
             class="dndflowcompletion" 
             @drop="onDrop"
           >
-            <FeedbackModal />
+            <FeedbackModal :learningpath="learningpathcompletion" />
             <VueFlow 
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
               class="completions" 
@@ -102,6 +102,14 @@ const { nodes, edges, addNodes, project, vueFlowRef, onConnect, addEdges, findNo
 
 // Load Store 
 const store = useStore();
+const learningpathcompletion= ref({})
+
+const props = defineProps({
+  learningpath: {
+    type: Object,
+    default: null,
+  }
+});
 
 // Define constants that will be referenced
 const dark = ref(false)
@@ -129,6 +137,7 @@ const childNodes = ref([]);
 const backgroundSidebar = store.state.strings.DARK_ORANGE
 
 onMounted(async () => {
+    learningpathcompletion.value = props.learningpath
     try {
         completions.value = await store.dispatch('fetchCompletions');
     } catch (error) {

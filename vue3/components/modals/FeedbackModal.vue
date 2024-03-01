@@ -99,6 +99,15 @@ const store = useStore();
 
 const initialFeedback = ref(null);
 const feedbackContent = ref(null);
+const learningpathfeedback= ref({})
+
+
+const props = defineProps({
+  learningpath: {
+    type: Object,
+    default: null,
+  }
+});
 
 // closing modal
 const closeModal = () => {
@@ -108,13 +117,8 @@ const closeModal = () => {
 // updating changes and closing modal
 const saveChanges = () => {
   // Loop over nodes and macht node
-  let learningpathfeedback = store.state.learningpath.json
-  if (typeof learningpathfeedback == 'string') {
-    learningpathfeedback = JSON.parse(learningpathfeedback)
-  }
-  // // Serialize the modified DOM back to a string
   const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML) 
-  learningpathfeedback.tree.nodes.forEach((node) => {
+  learningpathfeedback.value.json.tree.nodes.forEach((node) => {
     if (node.id == store.state.node.node_id) {
       // Find the feedback node.
       node.completion.nodes.forEach((completionnode) => {
@@ -125,12 +129,7 @@ const saveChanges = () => {
         })
       }
     });
-  learningpathfeedback = JSON.stringify(learningpathfeedback); 
-  store.dispatch('updateLearningpath', {
-    id: 0,
-    json: learningpathfeedback,
-  });
-  
+  store.dispatch('saveLearningpath', learningpathfeedback.value)
   store.state.feedback = null
   $('#feedbackModal').modal('hide');
 };
@@ -147,6 +146,7 @@ const adjustContenteditableHeight = () => {
 
 onMounted(() => {
   //initialFeedback.value = store.state.feedback.feedback
+  learningpathfeedback.value = props.learningpath
   $('#feedbackModal').on('shown.bs.modal', () => {
     adjustContenteditableHeight();
   });

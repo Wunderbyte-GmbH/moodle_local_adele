@@ -99,8 +99,8 @@ function onDrag(event) {
       const newDrop = drawDropzone(closestNode)
       addNodes(newDrop.nodes);
       addEdges(newDrop.edges);
-      checkIntersetcion(event, closestNode)
     }
+    checkIntersetcion(event, closestNode)
   }else{
     activeNode.value = null
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])

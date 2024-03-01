@@ -38,13 +38,22 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  learningpath: {
+    type: Object,
+    required: true,
+  },
 });
 
 const courses = ref([])
+const learningmodule = ref({})
+const selectedmodule = ref('')
 
 const { toObject } = useVueFlow()
 
 onMounted(() => {
+  if (props.learningpath.json && props.learningpath.json.modules) {
+    learningmodule.value = props.learningpath.json.modules
+  }
   getCourseNamesIds()
 })
 
@@ -132,6 +141,27 @@ const childStyle = {
       </div>
 
       <div class="card-body">
+        <div v-if="learningmodule">
+          <h5 class="card-title">
+            Learning Module
+          </h5>
+          <div>
+            <select 
+              v-model="selectedmodule"
+              class="form-select form-control"
+              @change="updateModule"
+            >
+              <option value="" selected disabled>Select a module</option>
+              <option 
+                v-for="module in learningmodule" 
+                :key="module.id" 
+                :value="module.id"
+              >
+                {{ module.name }}
+              </option>
+            </select>
+          </div>
+        </div>
         <h5 class="card-title">
           Included Courses
         </h5>
@@ -211,4 +241,16 @@ const childStyle = {
   border-radius: 10px; /* Set your desired border-radius */
 }
 
+.form-select {
+  max-width: 100%; /* Set a maximum width for the select */
+}
+
+.color-circle {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid black; /* Adjust border width and color as needed */
+  border-radius: 50%; /* Make it a circle */
+  margin-right: 5px; /* Adjust spacing between circle and module name */
+}
 </style>

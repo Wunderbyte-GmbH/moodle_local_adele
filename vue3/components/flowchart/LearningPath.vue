@@ -43,7 +43,10 @@
           gap="8"
         />
         <template #node-custom="{ data }">
-          <CustomNode :data="data" />
+          <CustomNode 
+            :data="data" 
+            :learningpath="learningpath"
+          />
         </template>
         <template #node-dropzone="{ data }">
           <DropzoneNode :data="data" />
@@ -76,7 +79,7 @@
       class="d-flex justify-content-center"
     >
       <Controls 
-        :learningpath="store.state.learningpath"
+        :learningpath="learningpath"
         @change-class="toggleClass"
       />
     </div>
@@ -331,7 +334,7 @@ function onDrop(event) {
     tree = removeDropzones(tree)
     store.state.learningpath.json = {
       tree: tree,
-    }
+    };
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view)
     }

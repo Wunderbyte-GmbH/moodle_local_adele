@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
  
-
 <script setup>
 // Import needed libraries
 import { Panel, useVueFlow } from '@vue-flow/core'
@@ -36,10 +35,10 @@ import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 
-
 // Load Store and Router
 const store = useStore();
 const router = useRouter();
+const learningpathcontrol = ref({})
 
 const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
   addNodes, nodes } = useVueFlow()
@@ -70,7 +69,6 @@ watch(() => store.state.learningpath, (newValue) => {
       })
     }
 
-    //loadFlowChart(newValue.json.tree, store.state.view)
     setNodes(newValue.json.tree.nodes)
     setEdges(newValue.json.tree.edges)
   }else{
@@ -82,6 +80,7 @@ watch(() => store.state.learningpath, (newValue) => {
 
 // Trigger web services on mount
 onMounted(() => {
+  learningpathcontrol.value = props.learningpath
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
 
@@ -92,7 +91,7 @@ if (store.state.learningpath.json.tree != undefined) {
 
 // Prepare and save learning path
 const onSave = () => {
-    if (!props.learningpath.name || !props.learningpath.description) {
+    if (!learningpathcontrol.value.name || !learningpathcontrol.value.description) {
       notify({
         title: 'Saved failed',
         text: 'Provide a title and a short description for the learning path',
@@ -100,10 +99,10 @@ const onSave = () => {
       });
     } else {
       removeNodes(['starting_node'])
-      let obj = {};
-      obj['tree'] = toObject();
-      obj['tree'] = removeDropzones(obj['tree'])
-      const singleNodes = standaloneNodeCheck(obj['tree'])
+      let tree = {};
+      tree = toObject();
+      tree = removeDropzones(tree)
+      const singleNodes = standaloneNodeCheck(tree)
       if (singleNodes) {
         notify({
           title: 'Invalid Path',
@@ -111,15 +110,10 @@ const onSave = () => {
           type: 'error'
         });
       } else {
-        obj['tree'] = recalculateParentChild(obj['tree'], 'parentCourse', 'childCourse', 'starting_node')
-        obj = JSON.stringify(obj);
-        let result = {
-            learningpathid: props.learningpath.id,
-            name: props.learningpath.name,
-            description: props.learningpath.description,
-            json: obj,
-        };
-        store.dispatch('saveLearningpath', result);
+        tree = recalculateParentChild(tree, 'parentCourse', 'childCourse', 'starting_node')
+        learningpathcontrol.value.json.tree = tree
+        learningpathcontrol.value.json = JSON.stringify(learningpathcontrol.value.json)
+        store.dispatch('saveLearningpath', learningpathcontrol.value);
         store.dispatch('fetchLearningpaths');
         store.state.learningPathID = 0;
         store.state.editingadding = false;

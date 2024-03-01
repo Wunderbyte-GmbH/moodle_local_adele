@@ -39,7 +39,7 @@
 
 });
 function triggerGetConditions() {
-    if (store.state.learningpath) {
+    if (store.state.learningpath && store.state.learningpath.tree) {
       store.state.learningpath.json.tree.nodes.forEach((node) => {
           if (node.id == props.node.node_id) {
               if (node.completion != undefined) {

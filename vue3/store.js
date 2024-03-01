@@ -65,6 +65,9 @@ export function createAppStore() {
                 state.learningpaths = ajaxdata;
             },
             setLearningpath(state, ajaxdata) {
+              if (typeof ajaxdata.json === 'string' && ajaxdata.json != '') {
+                  ajaxdata.json = JSON.parse(ajaxdata.json);
+              }
               state.learningpath = ajaxdata;
             },
             setAvailablecourses(state, ajaxdata) {
@@ -128,9 +131,10 @@ export function createAppStore() {
                 const learningpath = await ajax('local_adele_get_learningpath',
                     { userid: 0, learningpathid: context.state.learningPathID });
                 if (learningpath.json != '') {
-                    learningpath.json = JSON.parse(learningpath.json); 
+                    learningpath.json = await JSON.parse(learningpath.json); 
                 }
                 context.commit('setLearningpath', learningpath);
+                return learningpath
             },
             async fetchUserPathRelations(context) {
                 const lpUserPathRelations = await ajax('local_adele_get_user_path_relations',
@@ -166,19 +170,12 @@ export function createAppStore() {
                   learningpathid: context.state.learningPathID, 
                   name: payload.name, 
                   description: payload.description, 
-                  json: payload.json });                
+                  json: JSON.stringify(payload.json) });                
                 context.dispatch('fetchLearningpaths');
                 context.commit('setLearningpath', result.learningpath);
                 context.commit('setlearningPathID', result.learningpath.id);
                 return result.learningpath.id;
             },
-            async updateLearningpath(context, payload) {
-              await ajax('local_adele_update_learningpath',
-              {
-                id: payload.id, 
-                json: payload.json 
-              });
-          },
             async deleteLearningpath(context, payload) {
                 const result = await ajax('local_adele_delete_learningpath', 
                 {userid: context.state.user, learningpathid: payload.learningpathid});
