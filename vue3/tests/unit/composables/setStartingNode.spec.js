@@ -36,7 +36,7 @@ describe('setStartingNode', () => {
         height: '200px',
         width: '400px',
       },
-      draggable: false,
+      draggable: true,
       parentCourse: '',
     }]);
   });

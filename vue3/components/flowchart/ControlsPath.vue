@@ -32,6 +32,8 @@ import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart';
 import setStartingNode from '../../composables/setStartingNode';
 import removeDropzones from '../../composables/removeDropzones';
+import drawModules from '../../composables/nodesHelper/drawModules'
+import removeModules from '../../composables/nodesHelper/removeModules';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 
@@ -61,7 +63,8 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-watch(() => store.state.learningpath, (newValue) => {
+watch(() => props.learningpath, (newValue) => {
+  learningpathcontrol.value = props.learningpath
   if (newValue.json.tree != undefined) {
     if(store.state.view == 'teacher'){
       newValue.json.tree.nodes.forEach((node) => {
@@ -78,19 +81,43 @@ watch(() => store.state.learningpath, (newValue) => {
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
 
-// Trigger web services on mount
-onMounted(() => {
+// Watch for changes of the learning path
+watch(() => props.learningpath, (newValue) => {
   learningpathcontrol.value = props.learningpath
+  if (newValue.json.tree != undefined) {
+    if(store.state.view == 'teacher'){
+      newValue.json.tree.nodes.forEach((node) => {
+        node.draggable = false
+      })
+    }
+    setNodes(newValue.json.tree.nodes)
+    setEdges(newValue.json.tree.edges)
+  }else{
+    setNodes([])
+    setEdges([])
+  }
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
 
-// Watch for changes of the learning path
-if (store.state.learningpath.json.tree != undefined) {
-  loadFlowChart(store.state.learningpath.json.tree, store.state.view)
-}
+watch(() => props.learningpath.json.tree, () => {
+  if (props.learningpath.json.tree != undefined) {
+    loadFlowChart(props.learningpath.json.tree, store.state.view)
+    drawModules(props.learningpath, addNodes, removeNodes)
+  }
+}, { deep: true } )
+
+// Trigger web services on mount
+onMounted( async () => {
+  learningpathcontrol.value = props.learningpath
+  if (learningpathcontrol.value.json.tree != undefined) {
+    loadFlowChart(learningpathcontrol.value.json.tree, store.state.view)
+    drawModules(learningpathcontrol.value, addNodes, removeNodes)
+  }
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
+});
 
 // Prepare and save learning path
-const onSave = () => {
+const onSave = async () => {
     if (!learningpathcontrol.value.name || !learningpathcontrol.value.description) {
       notify({
         title: 'Saved failed',
@@ -101,6 +128,7 @@ const onSave = () => {
       removeNodes(['starting_node'])
       let tree = {};
       tree = toObject();
+      tree = await removeModules(tree, null)
       tree = removeDropzones(tree)
       const singleNodes = standaloneNodeCheck(tree)
       if (singleNodes) {
@@ -112,14 +140,9 @@ const onSave = () => {
       } else {
         tree = recalculateParentChild(tree, 'parentCourse', 'childCourse', 'starting_node')
         learningpathcontrol.value.json.tree = tree
-        learningpathcontrol.value.json = JSON.stringify(learningpathcontrol.value.json)
         store.dispatch('saveLearningpath', learningpathcontrol.value);
         store.dispatch('fetchLearningpaths');
-        store.state.learningPathID = 0;
-        store.state.editingadding = false;
-        router.push({name: 'learningpaths-edit-overview'});
-        window.scrollTo(0,0);
-    
+        onCancelConfirmation()
         notify({
           title: store.state.strings.title_save,
           text: store.state.strings.description_save,
@@ -135,6 +158,7 @@ const onCancel = () => {
 };
 
 const onCancelConfirmation = () => {
+    store.state.learningpath = null;
     store.state.learningPathID = 0;
     store.state.editingadding = false;
     store.state.editingrestriction = false;
@@ -160,7 +184,7 @@ function updatePos() {
     let xvalue = 0;
     elements.nodes.forEach((el) => {
       nodelabels.forEach((label) => {
-          if(el.parentCourse.includes(label)){
+          if(el.parentCourse && el.parentCourse.includes(label)){
             el.position.y = yvalue
             el.position.x = xvalue
             xvalue -= 500;
@@ -214,7 +238,7 @@ function updatePos() {
         Back
       </button>
       <button 
-        id="cancel-learning-path"
+        id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="onCancelConfirmation"
       >

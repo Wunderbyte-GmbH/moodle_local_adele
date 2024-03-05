@@ -118,19 +118,21 @@ const closeModal = () => {
 const saveChanges = () => {
   // Loop over nodes and macht node
   const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML) 
-  learningpathfeedback.value.json.tree.nodes.forEach((node) => {
-    if (node.id == store.state.node.node_id) {
-      // Find the feedback node.
-      node.completion.nodes.forEach((completionnode) => {
-        if (completionnode.type == 'feedback' &&
-          completionnode.data.childCondition == store.state.feedback.childCondition) {
-            completionnode.data.feedback = cleanedHtml;
-          }
-        })
-      }
-    });
-  store.dispatch('saveLearningpath', learningpathfeedback.value)
-  store.state.feedback = null
+  if (learningpathfeedback.value.json) {
+    learningpathfeedback.value.json.tree.nodes.forEach((node) => {
+      if (node.id == store.state.node.node_id) {
+        // Find the feedback node.
+        node.completion.nodes.forEach((completionnode) => {
+          if (completionnode.type == 'feedback' &&
+            completionnode.data.childCondition == store.state.feedback.childCondition) {
+              completionnode.data.feedback = cleanedHtml;
+            }
+          })
+        }
+      });
+    store.dispatch('saveLearningpath', learningpathfeedback.value)
+    store.state.feedback = null
+  }
   $('#feedbackModal').modal('hide');
 };
 

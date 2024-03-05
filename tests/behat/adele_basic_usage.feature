@@ -33,6 +33,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I set the field "goalnameplaceholder" to "Newer Learning path"
     And I set the field "goalsubjectplaceholder" to "Newer Learning path description for auto testing"
     And I click on "//*[@id='cancel-learning-path']" "xpath_element"
+    And I click on "//*[@id="confim-cancel-learning-path"]"
     And I follow "Delete"
     Then I should see "Confirm delete"
     And I click on "Confirm delete" "button"

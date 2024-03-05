@@ -27,13 +27,14 @@
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
     <div class="d-flex justify-content-between">
-      <router-link 
-        :to="{ name: 'learningpath-new' }" 
-        tag="button" 
-        class="btn btn-primary mr-2"
+      <button 
+        type="button" 
+        class="btn btn-primary"
+        @click.prevent="addNewLearningpath()" 
       >
         {{ store.state.strings.learningpath_form_title_add }}
-      </router-link>
+      </button>
+
       <button 
         type="button" 
         class="btn btn-secondary"
@@ -162,15 +163,26 @@ const showDeleteConfirm = (index) => {
 };
 
 // Edit learning path deletion
-const editLearningpath = (singlelearningpathid) => {
+const editLearningpath = async (singlelearningpathid) => {
   const tooltips = document.querySelectorAll('.tooltip');
   tooltips.forEach(tooltip => {
       tooltip.style.display = 'none';
   });
   store.state.learningPathID = singlelearningpathid
+  await store.dispatch('fetchLearningpath')
   router.push({
     name: 'learningpath-edit',
     params: { learningpathId: singlelearningpathid  }
+  })
+};
+
+// Edit learning path deletion
+const addNewLearningpath = async () => {
+  store.state.learningPathID = 0
+  await store.dispatch('fetchLearningpath')
+  router.push({
+    name: 'learningpath-new',
+    params: { learningpathId: 0  }
   })
 };
 

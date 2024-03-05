@@ -174,8 +174,9 @@ const goBack = () => {
   store.state.editingadding = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
-  store.state.editingpretest = false
   store.state.learningPathID = null
+  store.state.learningpath = null;
+  router.push({name: 'learningpaths-edit-overview'});
 }
 
 </script>

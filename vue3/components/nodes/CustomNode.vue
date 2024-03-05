@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, onMounted, ref  } from 'vue';
+import { computed, onMounted, ref, watch  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { useVueFlow } from '@vue-flow/core'
@@ -45,12 +45,17 @@ const props = defineProps({
 });
 
 const courses = ref([])
+const dataValue = ref('')
 const learningmodule = ref({})
-const selectedmodule = ref('')
 
 const { toObject } = useVueFlow()
 
 onMounted(() => {
+  dataValue.value = props.data
+  let parsedLearningModule = props.learningpath.json
+  if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
+    parsedLearningModule = JSON.parse(props.learningpath.json)
+  }
   if (props.learningpath.json && props.learningpath.json.modules) {
     learningmodule.value = props.learningpath.json.modules
   }
@@ -70,6 +75,14 @@ const getCourseNamesIds = () => {
     });
   }
 }
+
+// watch values from selected node
+watch(() => props.learningpath, () => {
+  if (props.learningpath.json && props.learningpath.json.modules) {
+    learningmodule.value = props.learningpath.json.modules
+  }
+}, { deep: true } );
+
 
 // Set node data for the modal
 const setNodeModal = () => {
@@ -113,7 +126,7 @@ const childStyle = {
 
 </script>
 
-<template>
+<template >
   <div>
     <div 
       class="card"
@@ -145,13 +158,19 @@ const childStyle = {
           <h5 class="card-title">
             Learning Module
           </h5>
-          <div>
+          <div v-if="dataValue">
             <select 
-              v-model="selectedmodule"
+              v-model="dataValue.module"
               class="form-select form-control"
-              @change="updateModule"
+              @change="changeModule"
             >
-              <option value="" selected disabled>Select a module</option>
+              <option 
+                value="" 
+                selected 
+                disabled
+              >
+                Select a module
+              </option>
               <option 
                 v-for="module in learningmodule" 
                 :key="module.id" 
@@ -243,14 +262,5 @@ const childStyle = {
 
 .form-select {
   max-width: 100%; /* Set a maximum width for the select */
-}
-
-.color-circle {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 1px solid black; /* Adjust border width and color as needed */
-  border-radius: 50%; /* Make it a circle */
-  margin-right: 5px; /* Adjust spacing between circle and module name */
 }
 </style>

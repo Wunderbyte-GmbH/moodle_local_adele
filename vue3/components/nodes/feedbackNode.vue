@@ -25,11 +25,7 @@
  <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-
-// Load Store 
-const store = useStore();
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
   data: {
@@ -38,25 +34,14 @@ const props = defineProps({
   },
 });
 
-// Set node data for the modal
-const setFeedbackModal = () => {
-  store.state.feedback = props.data
-};
+const feedback = ref([])
+
+onMounted(async () => {
+  feedback.value = props.data
+});
 
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
-
-const processedFeedback = computed(() => {
-  const maxTextLength = 150; // Set your desired maximum text length
-  const feedback = props.data.feedback;
-
-  if (feedback && feedback.length > maxTextLength) {
-    // If the feedback exceeds the maximum length, truncate it and add ellipsis
-    return feedback.slice(0, maxTextLength) + '...';
-  } else {
-    return feedback;
-  }
-});
 
 </script>
 
@@ -64,40 +49,33 @@ const processedFeedback = computed(() => {
   <div
     :class="{ 'custom-node': true, 'has-text': props.data.feedback }"
     class="custom-node rounded p-3"
-    style="width: 350px; height: 200px;"
+    style="width: 350px; min-height: 200px;"
   >
     <div class="text-center">
-      <h5 class="mb-1">
-        Feedback
-      </h5>
-
-      <div 
-        v-if="processedFeedback" 
-        class="feedback-section"
-      >
-        <div v-html="processedFeedback" />
-      </div>
-
-      <div 
-        v-else 
-        class="no-feedback-section"
-      >
-        <p class="text-muted">
-          No feedback set...
-        </p>
-      </div>
-
-      <div>
-        <button
-          type="button"
-          class="btn btn-secondary m-2"
-          data-toggle="modal"
-          data-target="#feedbackModal"
-          style="opacity: 1 !important;"
-          @click="setFeedbackModal"
-        >
-          Edit Feedback
-        </button>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div 
+            class="col-md-12"
+          >
+            <div class="mb-3">
+              <label 
+                for="exampleFormControlTextarea1" 
+                class="form-label"
+              >
+                <h5>
+                  Feedback
+                </h5>
+              </label>
+              <textarea 
+                id="exampleFormControlTextarea1" 
+                v-model="feedback.feedback" 
+                class="form-control"
+                placeholder="No feedback set..."
+                rows="5" 
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -121,19 +99,4 @@ const processedFeedback = computed(() => {
 .has-text {
   opacity: 1;
 }
-
-.feedback-section {
-  background-color: #f8f9fa; /* Set your desired background color */
-  padding: 3px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-
-.no-feedback-section {
-  background-color: #f8f9fa; /* Set your desired background color */
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
 </style>

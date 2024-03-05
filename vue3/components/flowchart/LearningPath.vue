@@ -37,6 +37,7 @@
         :min-zoom="0.2"
         class="learning-path-flow"
         @dragover="onDragOver"
+        @node-drag="onDrag"
       >
         <Background 
           :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -59,6 +60,9 @@
             :data="data" 
             @typeChange="typeChanged"
           />
+        </template>
+        <template #node-module="{ data }">
+          <ModuleNode :data="data" />
         </template>
         <MiniMap 
           v-if="shouldShowMiniMap"
@@ -100,6 +104,7 @@ import Modal from '../modals/ModalNode.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
+import ModuleNode from '../nodes/ModuleNode.vue'
 import ConditionalDropzoneNode from '../nodes/ConditionalDropzoneNode.vue'
 import OrCourses from '../nodes/OrCourses.vue'
 import { notify } from "@kyvg/vue3-notification"
@@ -110,6 +115,7 @@ import removeDropzones from '../../composables/removeDropzones';
 import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 import addAndConditions from '../../composables/conditions/addAndConditions'
+import drawModules from '../../composables/nodesHelper/drawModules'
 
 // Load Store and Router
 const store = useStore()
@@ -160,12 +166,19 @@ const typeChanged = (changedNode) => {
   })
 }
 
+const onDrag = ($event) => {
+  if (typeof $event.nodes[0].data.module == 'number') {
+    drawModules(props.learningpath, addNodes, removeNodes, $event.nodes[0])
+  }
+}
+
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
     addNodes, removeNodes, fitView,
     toObject, getEdges } = useVueFlow({
 nodes: [],
 })
+
 
 // Prevent default event if node has been dropped
 function handleNodesIntersected({ intersecting }) {
@@ -355,7 +368,13 @@ watch(
         fitView({ duration: 1000, padding: 0.5 });
       }, 100);
       if(oldNodes > newNodes){
-        setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
+        if (props.learningpath.json) {
+          const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
+          setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
+          if (deletedNode[0] && deletedNode[0].id) {
+            drawModules(props.learningpath, addNodes, removeNodes, null, deletedNode[0].id)
+          }
+        }
       }
     }
   },
