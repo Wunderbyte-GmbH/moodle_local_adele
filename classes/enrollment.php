@@ -82,6 +82,7 @@ class enrollment {
                     'createdby' => $params->userid,
                     'json' => json_encode([
                         'tree' => $learningpath->json['tree'],
+                        'modules' => $learningpath->json['modules'] ?? null,
                     ]),
                 ]);
                 $userpath = $DB->get_record('local_adele_path_user', ['id' => $id]);

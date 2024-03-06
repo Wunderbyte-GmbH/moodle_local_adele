@@ -127,13 +127,13 @@ const childStyle = {
       Potential starting node
     </div>
 
-    <div 
-      class="card"
+    <div
+      class="card test"
       :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
     >
       <div class="card-header text-center">
         <h5>
-          {{ data.fullname }}
+          {{ data.fullname || 'Collection' }}
         </h5>
       </div>
       <div 

@@ -43,7 +43,7 @@ const router = useRouter();
 const learningpathcontrol = ref({})
 
 const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
-  addNodes, nodes } = useVueFlow()
+  addNodes, nodes, fitView, findNode } = useVueFlow()
 
 // Define props in the setup block
 const props = defineProps({
@@ -65,6 +65,7 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => props.learningpath, (newValue) => {
   learningpathcontrol.value = props.learningpath
+  
   if (newValue.json.tree != undefined) {
     if(store.state.view == 'teacher'){
       newValue.json.tree.nodes.forEach((node) => {
@@ -72,24 +73,6 @@ watch(() => props.learningpath, (newValue) => {
       })
     }
 
-    setNodes(newValue.json.tree.nodes)
-    setEdges(newValue.json.tree.edges)
-  }else{
-    setNodes([])
-    setEdges([])
-  }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
-});
-
-// Watch for changes of the learning path
-watch(() => props.learningpath, (newValue) => {
-  learningpathcontrol.value = props.learningpath
-  if (newValue.json.tree != undefined) {
-    if(store.state.view == 'teacher'){
-      newValue.json.tree.nodes.forEach((node) => {
-        node.draggable = false
-      })
-    }
     setNodes(newValue.json.tree.nodes)
     setEdges(newValue.json.tree.edges)
   }else{
@@ -102,7 +85,7 @@ watch(() => props.learningpath, (newValue) => {
 watch(() => props.learningpath.json.tree, () => {
   if (props.learningpath.json.tree != undefined) {
     loadFlowChart(props.learningpath.json.tree, store.state.view)
-    drawModules(props.learningpath, addNodes, removeNodes)
+    drawModules(props.learningpath, addNodes, removeNodes, fitView)
   }
 }, { deep: true } )
 
@@ -111,10 +94,16 @@ onMounted( async () => {
   learningpathcontrol.value = props.learningpath
   if (learningpathcontrol.value.json.tree != undefined) {
     loadFlowChart(learningpathcontrol.value.json.tree, store.state.view)
-    drawModules(learningpathcontrol.value, addNodes, removeNodes)
+    let nodesDimensions = []
+    learningpathcontrol.value.json.tree.nodes.forEach((node) => {
+      nodesDimensions.push(findNode(node.id))
+    })
+    learningpathcontrol.value.json.tree.nodes = nodesDimensions
+    drawModules(learningpathcontrol.value, addNodes, removeNodes, fitView)
   }
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
+
 
 // Prepare and save learning path
 const onSave = async () => {

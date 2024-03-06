@@ -166,12 +166,6 @@ const typeChanged = (changedNode) => {
   })
 }
 
-const onDrag = ($event) => {
-  if (typeof $event.nodes[0].data.module == 'number') {
-    drawModules(props.learningpath, addNodes, removeNodes, $event.nodes[0])
-  }
-}
-
 // load useVueFlow properties / functions
 const { nodes, findNode, onConnect, addEdges, 
     addNodes, removeNodes, fitView,
@@ -179,6 +173,11 @@ const { nodes, findNode, onConnect, addEdges,
 nodes: [],
 })
 
+const onDrag = ($event) => {
+  if (typeof $event.nodes[0].data.module == 'number') {
+    drawModules(props.learningpath, addNodes, removeNodes, $event.nodes[0])
+  }
+}
 
 // Prevent default event if node has been dropped
 function handleNodesIntersected({ intersecting }) {

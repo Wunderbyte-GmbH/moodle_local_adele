@@ -25,12 +25,12 @@
 <template>
   <div>
     <div>
-      <div v-if="store.state.learningpath">
+      <div v-if="learningpath">
         <TextInputs 
-          :goal="store.state.learningpath"
+          :goal="learningpath"
         />
-        <LearningPath />
-        <UserList :learning-path-id="store.state.learningpath" /> 
+        <LearningPath :learningpath="learningpath" />
+        <UserList :learning-path-id="learningpath" />
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
   
   <script setup>
   // Import needed libraries
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import LearningPath from '../flowchart/LearningPath.vue';
 import TextInputs from '../charthelper/textInputs.vue';
@@ -46,8 +46,10 @@ import UserList from '../user_view/UserList.vue';
 
 const store = useStore()
 
-onMounted(() => {
-  store.dispatch('fetchLearningpath')
+const learningpath = ref(null)
+
+onMounted( async () => {
+  learningpath.value = await store.dispatch('fetchLearningpath')
   store.dispatch('fetchUserPathRelations')
 })
 </script>

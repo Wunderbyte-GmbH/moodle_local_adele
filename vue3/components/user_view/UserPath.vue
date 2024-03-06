@@ -73,6 +73,9 @@
             <template #node-orcourses="{ data }">
               <CustomNodeEdit :data="data" />
             </template>
+            <template #node-module="{ data }">
+              <ModuleNode :data="data" />
+            </template>
           </VueFlow>
         </div>
         <div 
@@ -93,7 +96,9 @@ import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
+import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
+import drawModules from '../../composables/nodesHelper/drawModules'
 
 // Load Router
 const router = useRouter()
@@ -101,7 +106,7 @@ const route = useRoute()
 // Load Store 
 const store = useStore()
 
-const { fitView } = useVueFlow()
+const { fitView, addNodes, removeNodes, findNode } = useVueFlow()
   
 // Function to go back
 const goBack = () => {
@@ -112,8 +117,9 @@ const goBack = () => {
 const nodes = ref([]);
 const edges = ref([]);
 const viewport = ref({});
+const learningpath = ref(null)
 
-onMounted(() => {
+onMounted( async () => {
   let params = []
   if (store.state.view == 'student') {
     params = {
@@ -123,7 +129,7 @@ onMounted(() => {
   }else {
     params = route.params
   }
-  store.dispatch('fetchUserPathRelation', params)
+  learningpath.value = await store.dispatch('fetchUserPathRelation', params)
 })
 // Watch for changes in the nodes
 watch(
@@ -138,9 +144,22 @@ watch(
     viewport.value = flowchart.tree.viewport;
     setTimeout(() => {
       fitView({ duration: 1000, padding: 0.5 });
-    }, 100);
-
+    }, 100);    
   },
   { deep: true } // Enable deep watching to capture changes in nested properties
 );
+
+watch(() => learningpath.value, () => {
+  const flowchart = learningpath.value.json
+  nodes.value = flowchart.tree.nodes;
+  edges.value = flowchart.tree.edges;
+  edges.value.forEach((edge) => {
+    edge.deletable = false
+  })
+  viewport.value = flowchart.tree.viewport;
+  setTimeout(() => {
+    fitView({ duration: 1000, padding: 0.5 });
+    drawModules(learningpath.value, addNodes, removeNodes, findNode)
+  }, 100);   
+}, { deep: true } )
 </script>
