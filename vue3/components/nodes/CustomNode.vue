@@ -77,6 +77,11 @@ const getCourseNamesIds = () => {
 }
 
 // watch values from selected node
+watch(() => store.state.availablecourses, () => {
+  getCourseNamesIds()
+}, { deep: true } );
+
+// watch values from selected node
 watch(() => props.learningpath, () => {
   if (props.learningpath.json && props.learningpath.json.modules) {
     learningmodule.value = props.learningpath.json.modules
@@ -126,9 +131,9 @@ const childStyle = {
 
 </script>
 
-<template >
+<template>
   <div>
-    <div 
+    <div
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
@@ -136,7 +141,7 @@ const childStyle = {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname }}
+              {{ data.fullname || 'Collection' }}
             </h5>
           </div>
           <div v-if="store.state.view!='teacher'" class="col-auto">
@@ -154,7 +159,7 @@ const childStyle = {
       </div>
 
       <div class="card-body">
-        <div v-if="learningmodule">
+        <div v-if="learningmodule && store.state.view!='teacher'">
           <h5 class="card-title">
             Learning Module
           </h5>

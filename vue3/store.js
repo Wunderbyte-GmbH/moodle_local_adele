@@ -145,6 +145,10 @@ export function createAppStore() {
                 const lpUserPathRelation = await ajax('local_adele_get_user_path_relation',
                     { learningpathid: route.learningpathId, userpathid: route.userId});
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
+                if (lpUserPathRelation.json != '') {
+                  lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json); 
+                }
+                return lpUserPathRelation
             },
             async saveUserPathRelation(context, params) {
                 await ajax('local_adele_save_user_path_relation',

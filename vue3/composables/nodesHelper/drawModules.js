@@ -1,16 +1,19 @@
 import removeModules from './removeModules'
+import findNodeDimensions from './findNodeDimensions'
 
-const drawModules = async (learningpath, addNodes, removeNodes, draggedNode = null, deletedNodeId = null) => {
+const drawModules = async (learningpath, addNodes, removeNodes, findNode, draggedNode = null, deletedNodeId = null) => {
   if (learningpath.json.modules) {
     await removeModules(learningpath.json.tree, removeNodes)
     let allModules = []
-    learningpath.json.modules.forEach(module => {
+    learningpath.json.modules.forEach( async module => {
       let newModule = {
         type: 'module',
         zIndex: -10,
         position: { x: 0 , y: 0 },
         label: `module node`,
         draggable: false,
+        deletable: false,
+        selectable: false,
         data: module
       }
       newModule.data.opacity = '0.2'
@@ -45,7 +48,11 @@ const drawModules = async (learningpath, addNodes, removeNodes, draggedNode = nu
       if (insertModule) {
         // Check if rightestNode and lowestNode are assigned values
         if (rightestNode && lowestNode) {
-          const height = Math.abs(newModule.position.y - lowestNode.position.y) + 400
+          let lowestNodeHeight = findNodeDimensions(lowestNode, findNode)
+          if (lowestNode.dimensions) {
+            lowestNodeHeight = lowestNode.dimensions.height
+          }
+          const height = Math.abs(newModule.position.y - lowestNode.position.y) + lowestNodeHeight + 20
           const width = Math.abs(newModule.position.x - rightestNode.position.x) + 420
           newModule.data.height = height + 'px'
           newModule.data.width = width + 'px'
