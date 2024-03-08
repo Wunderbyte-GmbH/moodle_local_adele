@@ -28,8 +28,6 @@ import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref, watch  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
-import { useVueFlow } from '@vue-flow/core'
-
 
 // Load Store 
 const store = useStore();
@@ -48,8 +46,6 @@ const courses = ref([])
 const dataValue = ref('')
 const learningmodule = ref({})
 
-const { toObject } = useVueFlow()
-
 onMounted(() => {
   dataValue.value = props.data
   let parsedLearningModule = props.learningpath.json
@@ -58,6 +54,8 @@ onMounted(() => {
   }
   if (props.learningpath.json && props.learningpath.json.modules) {
     learningmodule.value = props.learningpath.json.modules
+  } else {
+    learningmodule.value = {}
   }
   getCourseNamesIds()
 })
@@ -85,6 +83,8 @@ watch(() => store.state.availablecourses, () => {
 watch(() => props.learningpath, () => {
   if (props.learningpath.json && props.learningpath.json.modules) {
     learningmodule.value = props.learningpath.json.modules
+  } else {
+    learningmodule.value = {}
   }
 }, { deep: true } );
 
@@ -96,8 +96,6 @@ const setNodeModal = () => {
 
 // Set node data for the modal
 const setPretestView = () => {
-  let tree = toObject()
-  store.state.learningpath.json.tree = tree
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -106,8 +104,6 @@ const setPretestView = () => {
 
 // Set node data for the modal
 const setRestrictionView = () => {
-  let tree = toObject()
-  store.state.learningpath.json.tree = tree
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false
@@ -159,7 +155,7 @@ const childStyle = {
       </div>
 
       <div class="card-body">
-        <div v-if="learningmodule && store.state.view!='teacher'">
+        <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
             Learning Module
           </h5>

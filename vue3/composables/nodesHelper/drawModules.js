@@ -52,12 +52,12 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
           if (lowestNode.dimensions) {
             lowestNodeHeight = lowestNode.dimensions.height
           }
-          const height = Math.abs(newModule.position.y - lowestNode.position.y) + lowestNodeHeight + 20
-          const width = Math.abs(newModule.position.x - rightestNode.position.x) + 420
+          const height = Math.abs(newModule.position.y - lowestNode.position.y) + lowestNodeHeight + 40
+          const width = Math.abs(newModule.position.x - rightestNode.position.x) + 440
           newModule.data.height = height + 'px'
           newModule.data.width = width + 'px'
-          newModule.position.y -= 10
-          newModule.position.x -= 10
+          newModule.position.y -= 20
+          newModule.position.x -= 20
         }
         allModules.push(newModule)
       } else {

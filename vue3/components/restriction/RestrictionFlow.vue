@@ -66,6 +66,7 @@
           <div class="d-flex justify-content-center">
             <Controls 
               :condition="'restriction'"
+              :learningpath="learningpathrestriction"
               @change-class="toggleClass" 
             />
           </div>
@@ -98,6 +99,14 @@ const { nodes, edges, addNodes, project, vueFlowRef, addEdges, findNode } = useV
 
 // Load Store 
 const store = useStore();
+const learningpathrestriction= ref({})
+
+const props = defineProps({
+  learningpath: {
+    type: Object,
+    default: null,
+  }
+});
 
 // Define constants that will be referenced
 const dark = ref(false)
@@ -119,16 +128,16 @@ const childNodes = ref([]);
 const backgroundSidebar = store.state.strings.LIGHT_STEEL_BLUE
 
 onMounted(async () => {
+  learningpathrestriction.value = props.learningpath
     try {
       restrictions.value = await store.dispatch('fetchRestrictions');
     } catch (error) {
         console.error('Error fetching conditions:', error);
     }
-    const learningGoal = store.state.learningpath;
-    if (learningGoal && learningGoal.json && learningGoal.json.tree &&
-      learningGoal.json.tree.nodes &&
+    if (learningpathrestriction.value.json && learningpathrestriction.value.json.tree &&
+      learningpathrestriction.value.json.tree.nodes &&
       store.state.node) {
-        learningGoal.json.tree.nodes.forEach((node) => {
+        learningpathrestriction.value.json.tree.nodes.forEach((node) => {
             if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {
                 parentNodes.value.push(node);
             } else if (node.parentCourse && node.parentCourse.includes(store.state.node.node_id)) {
@@ -224,7 +233,7 @@ function onDrop(event) {
         data: edgeData,
       };
       // Add the new edge
-    addEdges([newEdge]);
+      addEdges([newEdge]);
     }
     } else{
     notify({

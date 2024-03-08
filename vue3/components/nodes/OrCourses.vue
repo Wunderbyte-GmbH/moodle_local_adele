@@ -32,16 +32,20 @@ import { computed, onMounted, ref, watch } from 'vue';
 const courses = ref([])
 const cardHeight = ref(200);
 const dataValue = ref('')
+const learningmodule = ref({})
 
  const props = defineProps({
   data: {
     type: Object,
     required: true,
   },
+  learningpath: {
+    type: Object,
+    required: true,
+  },
 });
 // Load Store 
 const store = useStore();
-
 const emit = defineEmits(['typeChange']);
 
 // Set node data for the modal
@@ -66,9 +70,18 @@ const setRestrictionView = () => {
 };
 
 onMounted(() => {
+  dataValue.value = props.data
+  let parsedLearningModule = props.learningpath.json
+  if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
+    parsedLearningModule = JSON.parse(props.learningpath.json)
+  }
+  if (props.learningpath.json && props.learningpath.json.modules) {
+    learningmodule.value = props.learningpath.json.modules
+  } else {
+    learningmodule.value = {}
+  }
   getCourseNamesIds() 
   calculateHeight(courses.value.length)
-  dataValue.value = props.data
 })
 
 const getCourseNamesIds = () => {
@@ -142,7 +155,6 @@ const childStyle = {
   borderWidth: '2px',
 };
 
- 
 </script>
 <template>
   <div>
@@ -172,29 +184,51 @@ const childStyle = {
       </div>
 
       <div 
-        
         class="card-body"
       >
-        <div>
+        <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
-            Included Courses
+            Learning Module
           </h5>
-          <div 
-            v-for="(value, key) in courses" 
-            :key="key" 
-            class="card-text"
+          <select 
+            v-model="dataValue.module"
+            class="form-select form-control"
+            @change="changeModule"
           >
-            <div class="fullname-container">
-              {{ value.fullname }}
-              <button 
-                v-if="store.state.view != 'teacher'"
-                type="button" 
-                class="btn btn-danger btn-sm trash-button" 
-                @click="removeCourse(value.id)"
-              >
-                <i class="fa fa-trash" />
-              </button>
-            </div>
+            <option 
+              value="" 
+              selected 
+              disabled
+            >
+              Select a module
+            </option>
+            <option 
+              v-for="module in learningmodule" 
+              :key="module.id" 
+              :value="module.id"
+            >
+              {{ module.name }}
+            </option>
+          </select>
+        </div>
+        <h5 class="card-title">
+          Included Courses
+        </h5>
+        <div 
+          v-for="(value, key) in courses" 
+          :key="key" 
+          class="card-text"
+        >
+          <div class="fullname-container">
+            {{ value.fullname }}
+            <button 
+              v-if="store.state.view != 'teacher'"
+              type="button" 
+              class="btn btn-danger btn-sm trash-button" 
+              @click="removeCourse(value.id)"
+            >
+              <i class="fa fa-trash" />
+            </button>
           </div>
         </div>
         <div 

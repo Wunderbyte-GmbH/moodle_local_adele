@@ -175,6 +175,20 @@ const childStyle = {
               </li>
             </ul>
           </div>
+          <div 
+            class="row mb-2"
+          >
+            <div class="col-4 text-left">
+              <b>Completion</b>
+            </div>
+
+            <div 
+              class="col-8" 
+              style="display: flex; justify-content: end;"
+            >
+              {{ 'data.completion' }}
+            </div>
+          </div>
         </div>
         <div v-else>
           <div v-if="data.manualrestriction">

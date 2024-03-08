@@ -63,11 +63,11 @@
               @nodesIntersected="handleNodesIntersected" 
             />
           </div>
-  
           <ChildNodes :child-nodes="childNodes" />
           <div class="d-flex justify-content-center">
             <Controls 
               :condition="'completion'"
+              :learningpath="learningpathcompletion"
               @change-class="toggleClass" 
             />
           </div>
@@ -143,9 +143,9 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching completions:', error);
     }
-    const learningGoal = props.learningpath;
-    if (learningGoal && learningGoal.json && learningGoal.json.tree && learningGoal.json.tree.nodes) {
-        learningGoal.json.tree.nodes.forEach((node) => {
+    if (learningpathcompletion.value.json && learningpathcompletion.value.json.tree &&
+      learningpathcompletion.value.json.tree.nodes) {
+        learningpathcompletion.value.json.tree.nodes.forEach((node) => {
             if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {
                 parentNodes.value.push(node);
             } else if (node.parentCourse && node.parentCourse.includes(store.state.node.node_id)) {
@@ -240,7 +240,7 @@ function onDrop(event) {
         data: edgeData,
       };
       // Add the new edge
-    addEdges([newEdge]);
+      addEdges([newEdge]);
     }
     } else{
     notify({

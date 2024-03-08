@@ -43,7 +43,7 @@ const router = useRouter();
 const learningpathcontrol = ref({})
 
 const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
-  addNodes, nodes, fitView, findNode } = useVueFlow()
+  addNodes, nodes, findNode } = useVueFlow()
 
 // Define props in the setup block
 const props = defineProps({
@@ -56,7 +56,10 @@ const props = defineProps({
 const showCacelConfirmation = ref(false)
 
 // Emit to parent component
-const emit = defineEmits(['change-class']);
+const emit = defineEmits([
+  'change-class',
+  'finish-edit'
+]);
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
   emit('change-class');
@@ -72,7 +75,6 @@ watch(() => props.learningpath, (newValue) => {
         node.draggable = false
       })
     }
-
     setNodes(newValue.json.tree.nodes)
     setEdges(newValue.json.tree.edges)
   }else{
@@ -82,10 +84,12 @@ watch(() => props.learningpath, (newValue) => {
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
 
-watch(() => props.learningpath.json.tree, () => {
-  if (props.learningpath.json.tree != undefined) {
-    loadFlowChart(props.learningpath.json.tree, store.state.view)
-    drawModules(props.learningpath, addNodes, removeNodes, fitView)
+watch(() => learningpathcontrol.value, async() => {
+  if (learningpathcontrol.value.json.tree != undefined) {
+    // const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
+    // setNodes(flowchart.nodes)
+    // setEdges(flowchart.edges)
+    await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
 }, { deep: true } )
 
@@ -93,13 +97,15 @@ watch(() => props.learningpath.json.tree, () => {
 onMounted( async () => {
   learningpathcontrol.value = props.learningpath
   if (learningpathcontrol.value.json.tree != undefined) {
-    loadFlowChart(learningpathcontrol.value.json.tree, store.state.view)
+    const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
+    setNodes(flowchart.nodes)
+    setEdges(flowchart.edges)
     let nodesDimensions = []
     learningpathcontrol.value.json.tree.nodes.forEach((node) => {
       nodesDimensions.push(findNode(node.id))
     })
     learningpathcontrol.value.json.tree.nodes = nodesDimensions
-    drawModules(learningpathcontrol.value, addNodes, removeNodes, fitView)
+    drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
 });
@@ -114,30 +120,29 @@ const onSave = async () => {
         type: 'error'
       });
     } else {
-      removeNodes(['starting_node'])
+      //removeNodes(['starting_node'])
       let tree = {};
-      tree = toObject();
-      tree = await removeModules(tree, null)
-      tree = removeDropzones(tree)
-      const singleNodes = standaloneNodeCheck(tree)
-      if (singleNodes) {
-        notify({
-          title: 'Invalid Path',
-          text: 'Found standalone nodes. Every node must be connected to the path',
-          type: 'error'
-        });
-      } else {
-        tree = recalculateParentChild(tree, 'parentCourse', 'childCourse', 'starting_node')
-        learningpathcontrol.value.json.tree = tree
-        store.dispatch('saveLearningpath', learningpathcontrol.value);
-        store.dispatch('fetchLearningpaths');
+      //tree = toObject();
+      //tree = await removeModules(tree, null)
+      //tree = removeDropzones(tree)
+      // const singleNodes = standaloneNodeCheck(tree)
+      // if (singleNodes && false) {
+      //   notify({
+      //     title: 'Invalid Path',
+      //     text: 'Found standalone nodes. Every node must be connected to the path',
+      //     type: 'error'
+      //   });
+      // } else {
+      //   //tree = recalculateParentChild(tree, 'parentCourse', 'childCourse', 'starting_node')
+      //   //learningpathcontrol.value.json.tree = tree
+        await store.dispatch('saveLearningpath', learningpathcontrol.value);
         onCancelConfirmation()
         notify({
           title: store.state.strings.title_save,
           text: store.state.strings.description_save,
           type: 'success'
         });
-      }
+      // }
     }
 };
 
@@ -152,6 +157,7 @@ const onCancelConfirmation = () => {
     store.state.editingadding = false;
     store.state.editingrestriction = false;
     store.state.editingpretest = false;
+    emit('finish-edit');
     router.push({name: 'learningpaths-edit-overview'});
 };
 

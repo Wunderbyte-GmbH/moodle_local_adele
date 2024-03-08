@@ -176,8 +176,6 @@ export function createAppStore() {
                   description: payload.description, 
                   json: JSON.stringify(payload.json) });                
                 context.dispatch('fetchLearningpaths');
-                context.commit('setLearningpath', result.learningpath);
-                context.commit('setlearningPathID', result.learningpath.id);
                 return result.learningpath.id;
             },
             async deleteLearningpath(context, payload) {

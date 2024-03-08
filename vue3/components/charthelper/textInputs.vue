@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, inject } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
   goal: {
@@ -10,6 +11,7 @@ const props = defineProps({
  
 // Load Store and Router
 const store = inject('store');
+const router = useRouter()
 
 const emit = defineEmits([
     'change-GoalName',
@@ -42,6 +44,18 @@ watch(() => store.state.learningpath, async () => {
   goalname.value = store.state.learningpath.name
   goaldescription.value = store.state.learningpath.description
 }, { deep: true } );
+
+// Edit learning path deletion
+const editLearningpath = async (singlelearningpathid) => {
+  // '/local/adele/index.php#/learningpaths/edit/' + 
+  const tooltips = document.querySelectorAll('.tooltip');
+  tooltips.forEach(tooltip => {
+    tooltip.remove()
+  });
+  store.state.learningPathID = singlelearningpathid
+  window.open('/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
+};
+
 </script>
 
 <template>
@@ -85,8 +99,11 @@ watch(() => store.state.learningpath, async () => {
           <div v-if="goalname">
             {{ goalname }}
             <a 
-              :href="'/local/adele/index.php#/learningpaths/edit/' + props.goal.id" 
               target="_blank"
+              data-toggle="tooltip" 
+              data-placement="right" 
+              title="Go to learning path editing."
+              @click.prevent="editLearningpath(props.goal.id)" 
             >
               <i class="fa fa-link" />
             </a>

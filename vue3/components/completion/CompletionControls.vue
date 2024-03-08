@@ -33,6 +33,7 @@ import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 import { useRouter } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
 
 // Load Store and Router
 const store = useStore();
@@ -44,9 +45,19 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  learningpath: {
+    type: String,
+    required: true,
+  },
 });
 
-const { onPaneReady, toObject } = useVueFlow()
+const learningpathCompletion = ref(null)
+
+onMounted(() => {
+  learningpathCompletion.value = props.learningpath
+})
+
+const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['change-class']);
@@ -55,16 +66,20 @@ function toggleClass() {
   emit('change-class');
 }
 
-// Watch for changes of the learning path
-if (store.state.node != undefined && store.state.learningpath.json != '') {
-    let condition = store.state.learningpath.json.tree.nodes.filter(node => {
-      return node.id === store.state.node.node_id
-    })
-    loadFlowChart(condition[0][props.condition], store.state.view)
-}
+watch(() => learningpathCompletion.value, async () => {
+  // Watch for changes of the learning path
+  if (learningpathCompletion.value && store.state.node != undefined && learningpathCompletion.value.json != '') {
+      let condition = learningpathCompletion.value.json.tree.nodes.filter(node => {
+        return node.id === store.state.node.node_id
+      })
+      const flowchart = loadFlowChart(condition[0][props.condition], store.state.view)
+      setNodes(flowchart.nodes)
+      setEdges(flowchart.edges)
+  }
+}, { deep: true } );
 
 // Prepare and save learning path
-const onSave = () => {
+const onSave = async () => {
   let condition = toObject();
   condition = removeDropzones(condition)
   const singleNodes = standaloneNodeCheck(condition)
@@ -77,44 +92,22 @@ const onSave = () => {
   } else{
     condition = recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
     //save learning path
-    store.state.learningpath.json.tree.nodes = store.state.learningpath.json.tree.nodes.map(element_node => {
+    learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
           return { ...element_node, [props.condition]: condition };
         }
         return element_node;
     });
-    store.state.learningpath.json = JSON.stringify(store.state.learningpath.json); 
-    const savePromise = new Promise((resolve, reject) => {
-      store.dispatch('saveLearningpath', store.state.learningpath)
-        .then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-    
-    savePromise.then(() => {
-      // Fetch learning paths after saving
-      store.dispatch('fetchLearningpaths');
-      store.state.learningpath.json = JSON.parse(store.state.learningpath.json); 
-      router.push('/learningpaths/edit/' + store.state.learningpath.id);
-      onCancel();
 
-      notify({
-        title: store.state.strings.title_save,
-        text: store.state.strings.description_save,
-        type: 'success'
-      });
-    }).catch((error) => {
-      // Handle errors if necessary
-      console.error('Error saving learning path:', error);
-      notify({
-        title: 'Error',
-        text: 'Failed to save learning path.',
-        type: 'error'
-      });
-    });
+    const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
+    router.push('/learningpaths/edit/' + learningpathID);
+    onCancel();
+    notify({
+      title: store.state.strings.title_save,
+      text: store.state.strings.description_save,
+      type: 'success'
+    })
+
   }
 };
 

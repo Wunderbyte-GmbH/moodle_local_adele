@@ -67,7 +67,10 @@
                 @change-GoalDescription="changeGoalDescription"
               />
               <div v-if="learningpath">
-                <LearingPath :learningpath="learningpath" />
+                <LearingPath 
+                  :learningpath="learningpath" 
+                  @finish-edit="finishEdit"
+                />
               </div>
             </div>
           </div>
@@ -83,7 +86,7 @@
         v-else-if="$store.state.editingrestriction == true" 
         class="fade-in"
       >
-        <Restriction />
+        <Restriction :learningpath="learningpath" />
       </div>
     </div>
   </div>
@@ -149,18 +152,10 @@ const showForm = async (learningpathId = null) => {
   goaldescription.value = ''
   if (learningpathId) {
     store.state.learningPathID = learningpathId;
-    learningpath.value = await store.dispatch('fetchLearningpath')
-    store.dispatch('fetchUserPathRelations')
-
-    store.state.editingadding = true
-    // Do something here in case of an edit.
-  } else {
-    learningpath.value = await store.dispatch('fetchLearningpath')
-    store.state.editingadding = true
-    // Do something here in case of an add.
   }
+  learningpath.value = await store.dispatch('fetchLearningpath')
+  store.state.editingadding = true
   window.scrollTo(0, 0)
-  // This has to happen after the save button is hit.
 };
 
 // Trigger the checking route function
@@ -177,6 +172,10 @@ const goBack = () => {
   store.state.learningPathID = null
   store.state.learningpath = null;
   router.push({name: 'learningpaths-edit-overview'});
+}
+
+const finishEdit = () => {
+  learningpath.value = null
 }
 
 </script>

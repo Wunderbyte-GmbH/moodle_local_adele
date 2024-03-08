@@ -33,12 +33,31 @@ import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
 
 // Load Store and Router
 const store = useStore();
 const router = useRouter();
 
-const { onPaneReady, toObject } = useVueFlow()
+// Defined props from the parent component
+const props = defineProps({
+  condition: {
+    type: String,
+    default: null,
+  },
+  learningpath: {
+    type: String,
+    required: true,
+  },
+});
+
+const learningpathRestriction = ref(null)
+
+onMounted(() => {
+  learningpathRestriction.value = props.learningpath
+})
+
+const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['']);
@@ -48,15 +67,17 @@ function toggleClass() {
 }
 
 // Watch for changes of the learning path
-if (store.state.node != undefined && store.state.learningpath.json != '') {
-    let restriction = store.state.learningpath.json.tree.nodes.filter(node => {
+if (store.state.node != undefined && learningpathRestriction.value.json != '') {
+    let restriction = learningpathRestriction.value.json.tree.nodes.filter(node => {
       return node.id === store.state.node.node_id
     })
-    loadFlowChart(restriction[0].restriction, store.state.view)
+    const flowchart = loadFlowChart(restriction[0].restriction, store.state.view)
+    setNodes(flowchart.nodes)
+    setEdges(flowchart.edges)
 }
 
 // Prepare and save learning path
-const onSave = () => {
+const onSave = async () => {
   let restriction = toObject();
   restriction = removeDropzones(restriction)
   const singleNodes = standaloneNodeCheck(restriction)
@@ -69,44 +90,20 @@ const onSave = () => {
   } else{
     restriction = recalculateParentChild(restriction, 'parentCondition', 'childCondition', 'starting_condition')
     //save learning path
-    store.state.learningpath.json.tree.nodes = store.state.learningpath.json.tree.nodes.map(element_node => {
+    learningpathRestriction.value.json.tree.nodes = learningpathRestriction.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
           return { ...element_node, restriction: restriction };
         }
         return element_node;
     });
-    store.state.learningpath.json = JSON.stringify(store.state.learningpath.json); 
-    const savePromise = new Promise((resolve, reject) => {
-      store.dispatch('saveLearningpath', store.state.learningpath)
-        .then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-    
-    savePromise.then(() => {
-      // Fetch learning paths after saving
-      store.dispatch('fetchLearningpaths');
-      store.state.learningpath.json = JSON.parse(store.state.learningpath.json); 
-      router.push('/learningpaths/edit/' + store.state.learningpath.id);
-      onCancel();
-
-      notify({
-        title: store.state.strings.title_save,
-        text: store.state.strings.description_save,
-        type: 'success'
-      });
-    }).catch((error) => {
-      // Handle errors if necessary
-      console.error('Error saving learning path:', error);
-      notify({
-        title: 'Error',
-        text: 'Failed to save learning path.',
-        type: 'error'
-      });
-    });
+    const learningpathID = await store.dispatch('saveLearningpath', learningpathRestriction.value)
+    router.push('/learningpaths/edit/' + learningpathID);
+    onCancel();
+    notify({
+      title: store.state.strings.title_save,
+      text: store.state.strings.description_save,
+      type: 'success'
+    })
   }
 };
 

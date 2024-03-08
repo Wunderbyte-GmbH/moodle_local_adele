@@ -35,6 +35,8 @@
         :fit-view-on-init="true" 
         :max-zoom="1.5" 
         :min-zoom="0.2"
+        :snap-to-grid="true"
+        :snap-grid="snapGrid"
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
@@ -57,7 +59,8 @@
         </template>
         <template #node-orcourses="{ data }">
           <OrCourses 
-            :data="data" 
+            :data="data"
+            :learningpath="learningpath"
             @typeChange="typeChanged"
           />
         </template>
@@ -85,6 +88,7 @@
       <Controls 
         :learningpath="learningpath"
         @change-class="toggleClass"
+        @finish-edit="finishEdit"
       />
     </div>
     <p />
@@ -127,19 +131,27 @@ const props = defineProps({
   }
 });
 
-
+// Emit to parent component
+const emit = defineEmits([
+  'finish-edit'
+]);
 // Define constants that will be referenced
 const dark = ref(false)
 // Intersected node
 const intersectedNode = ref(null);
 // check the page width
 const dndFlowWidth = ref(0);
+const snapGrid = [100,100]
 
 const backgroundSidebar = store.state.strings.DEEP_SKY_BLUE
 
 const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
+
+const finishEdit = () => {
+  emit('finish-edit');
+}
 
 onMounted(() => {
   const observer = new ResizeObserver(entries => {
@@ -175,7 +187,7 @@ nodes: [],
 
 const onDrag = ($event) => {
   if (typeof $event.nodes[0].data.module == 'number') {
-    drawModules(props.learningpath, addNodes, removeNodes, $event.nodes[0])
+    drawModules(props.learningpath, addNodes, removeNodes, findNode, $event.nodes[0])
   }
 }
 
@@ -371,7 +383,7 @@ watch(
           const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
           setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
           if (deletedNode[0] && deletedNode[0].id) {
-            drawModules(props.learningpath, addNodes, removeNodes, null, deletedNode[0].id)
+            drawModules(props.learningpath, addNodes, removeNodes, findNode, null, deletedNode[0].id)
           }
         }
       }

@@ -1,9 +1,6 @@
 // Build flow-chart with edges and nodes
-import { useVueFlow } from '@vue-flow/core';
-
 const  loadFlowChart = (flow, view) => {
     if (flow) {
-        const { setNodes, setEdges } = useVueFlow();
         if (view == 'teacher') {
           flow.nodes.forEach((nodes) => {
             nodes.draggable = false
@@ -13,8 +10,10 @@ const  loadFlowChart = (flow, view) => {
             edge.deletable = false
           })
         }
-        setNodes(flow.nodes)
-        setEdges(flow.edges)
+        return {
+          nodes: flow.nodes,
+          edges: flow.edges,
+        }
     }
 }
 

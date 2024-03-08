@@ -17,6 +17,7 @@ const  removeModules = (tree, removeNodes) => {
         }
     })
   }
+  return 1
 }
 
 export default removeModules;
