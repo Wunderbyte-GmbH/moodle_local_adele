@@ -68,13 +68,17 @@ function toggleClass() {
 
 watch(() => learningpathCompletion.value, async () => {
   // Watch for changes of the learning path
-  if (learningpathCompletion.value && store.state.node != undefined && learningpathCompletion.value.json != '') {
+  if (learningpathCompletion.value && learningpathCompletion.value.json.tree &&
+    store.state.node != undefined && learningpathCompletion.value.json != '') {
+
       let condition = learningpathCompletion.value.json.tree.nodes.filter(node => {
         return node.id === store.state.node.node_id
       })
       const flowchart = loadFlowChart(condition[0][props.condition], store.state.view)
-      setNodes(flowchart.nodes)
-      setEdges(flowchart.edges)
+      if (flowchart) {
+        setNodes(flowchart.nodes)
+        setEdges(flowchart.edges)
+      }
   }
 }, { deep: true } );
 

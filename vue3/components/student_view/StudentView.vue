@@ -33,16 +33,18 @@
   
 <script setup>
 // Import needed libraries
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import UserList from '../user_view/UserList.vue';
 import UserPath from '../user_view/UserPath.vue';
 import { useStore } from 'vuex'
 
 const store = useStore()
+const learningpath = ref(null)
+const userLearningpaths = ref(null)
 
-onMounted(() => {
-  store.dispatch('fetchLearningpath')
-  store.dispatch('fetchUserPathRelations')
+onMounted(async() => {
+  learningpath.value = await store.dispatch('fetchLearningpath')
+  userLearningpaths.value = await store.dispatch('fetchUserPathRelations')
 })
 
 </script>

@@ -10,11 +10,15 @@
       node: {
         type: Object,
         required: true,
-      }
+      },
+      learningpath: {
+        type: Object,
+        required: true,
+      },
     });
     // Colors for restriction and completion
-    const restrictionColor = ref(store.state.strings.LIGHT_STEEL_BLUE);
-    const completionColor = ref(store.state.strings.DARK_ORANGE);
+    const restrictionColor = store.state.strings.LIGHT_STEEL_BLUE;
+    const completionColor = store.state.strings.DARK_ORANGE;
 
     // Create a ref for conditions
     const conditions = ref([]);
@@ -33,14 +37,14 @@
         };
         triggerGetConditions()
     // watch values from selected node
-    watch(() => store.state.learningpath, async () => {
+    watch(() => props.learningpath, async () => {
         triggerGetConditions()
     }, { deep: true } );
 
 });
 function triggerGetConditions() {
-    if (store.state.learningpath && store.state.learningpath.tree) {
-      store.state.learningpath.json.tree.nodes.forEach((node) => {
+    if (props.learningpath.json && props.learningpath.json.tree) {
+      props.learningpath.json.tree.nodes.forEach((node) => {
           if (node.id == props.node.node_id) {
               if (node.completion != undefined) {
                 conditions.value.completion = getConditions(node.completion.nodes) 

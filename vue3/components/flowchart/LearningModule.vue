@@ -198,7 +198,8 @@ watch(() => props.learningmodule, async () => {
 
 const setLearningModules = () => {
   learningpath.value = props.learningmodule
-  if (props.learningmodule.json.modules) {
+  if (props.learningmodule.json != '' &&
+    props.learningmodule.json.modules) {
     learningmodules.value = props.learningmodule.json.modules
   } else {
     learningmodules.value = []
@@ -228,10 +229,20 @@ const addLearningModule = () => {
         newModule
         )
     } else {
-      learningpath.value.json.modules = [newModule]
+      if (learningpath.value.json == '') {
+        learningpath.value.json = {
+          modules: [newModule]
+        }
+      }else {
+        learningpath.value.json.modules = [newModule]
+      }      
     }
-    learningmodules.value = learningpath.value.json.modules
-    store.dispatch('saveLearningpath', learningpath.value)
+    if (learningpath.value.id != 0) {
+      learningmodules.value = learningpath.value.json.modules
+      store.dispatch('saveLearningpath', learningpath.value)
+    } else{
+      store.state.modules = learningpath.value.json.modules
+    }
     toggleAddForm()
   }
 }

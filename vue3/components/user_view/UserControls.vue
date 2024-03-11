@@ -29,6 +29,7 @@ import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import { notify } from "@kyvg/vue3-notification";
 import { useRoute, useRouter } from 'vue-router';
+import removeModules from '../../composables/nodesHelper/removeModules';
  
  // Load Store and Router
  const store = useStore();
@@ -37,9 +38,10 @@ import { useRoute, useRouter } from 'vue-router';
  const { toObject } = useVueFlow()
    
  // Prepare and save learning path
- const onSave = () => {
-    const completion = toObject();
+ const onSave = async () => {
+    let completion = toObject();
     const route_params = route.params;
+    completion = await removeModules(completion, null)
     store.dispatch('saveUserPathRelation', { 
         nodes: completion.nodes, 
         route: route_params});

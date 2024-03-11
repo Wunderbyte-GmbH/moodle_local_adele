@@ -32,6 +32,7 @@ import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
+import CourseRating from '../nodes_items/CourseRating.vue';
 
 // Load Store 
 const store = useStore();
@@ -42,11 +43,16 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  learningpath: {
+    type: Object,
+    required: true,
+  },
 });
+const active = ref(false)
 
 onMounted(() => {
-  const userpath = JSON.parse(store.state.lpuserpathrelation.json)
-  userpath.tree.nodes.forEach((node) => {
+  const userpath = props.learningpath
+  userpath.json.tree.nodes.forEach((node) => {
     if (props.data.node_id == node.id) {
        if (node.restriction && node.restriction.nodes) {
         node.restriction.nodes.forEach((restrictionnode) => {
@@ -74,6 +80,15 @@ onMounted(() => {
       })
     }
   });
+  if (props.data.completion.singlerestrictionnode.length == 0) {
+    active.value = true
+  } else {
+    for (let key in props.data.completion.singlerestrictionnode) {
+      if (props.data.completion.singlerestrictionnode[key]) {
+        active.value = true
+      }
+    }
+  }
 })
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
@@ -115,7 +130,7 @@ const childStyle = {
 </script>
 
 <template>
-  <div>
+  <div :class="active ? 'active-node' : 'inactive-node'">
     <div 
       v-if="isParentNode"
       class="starting-node"
@@ -168,7 +183,7 @@ const childStyle = {
               <li>
                 <a 
                   :href="'/course/view.php?id=' + value.id"
-                  target="_blank"
+                  :target="active ? '_blank' : ''" 
                 >
                   {{ value.name }}
                 </a>
@@ -176,6 +191,7 @@ const childStyle = {
             </ul>
           </div>
           <div 
+            v-if="data.completion.completionnode.valid"
             class="row mb-2"
           >
             <div class="col-4 text-left">
@@ -186,7 +202,7 @@ const childStyle = {
               class="col-8" 
               style="display: flex; justify-content: end;"
             >
-              {{ 'data.completion' }}
+              <CourseRating :data="data" />
             </div>
           </div>
         </div>
@@ -206,6 +222,7 @@ const childStyle = {
                   class="btn btn-link" 
                   aria-expanded="false" 
                   aria-controls="collapseTable"
+                  :disabled="!active"
                   @click="toggleTable('Restriction')"
                 >
                   {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
@@ -257,6 +274,7 @@ const childStyle = {
                   class="btn btn-link" 
                   aria-expanded="false" 
                   aria-controls="collapseTable"
+                  :disabled="!active"
                   @click="toggleTable('Completion')"
                 >
                   {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
@@ -306,7 +324,10 @@ const childStyle = {
         </div>
       </div>
       <div class="card-footer">
-        <OverviewRestrictionCompletion :node="data" />
+        <OverviewRestrictionCompletion 
+          :node="data" 
+          :learningpath="learningpath"
+        />
       </div>
     </div>
     <Handle 
@@ -327,6 +348,14 @@ const childStyle = {
 </template>
 
 <style scoped>
+
+.active-node{
+  z-index: 100;
+}
+.inactive-node{
+  pointer-events: none;
+  opacity: 0.5;
+}
 
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;

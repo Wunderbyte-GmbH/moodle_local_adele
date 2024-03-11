@@ -35,8 +35,6 @@
         :fit-view-on-init="true" 
         :max-zoom="1.5" 
         :min-zoom="0.2"
-        :snap-to-grid="true"
-        :snap-grid="snapGrid"
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
@@ -141,8 +139,6 @@ const dark = ref(false)
 const intersectedNode = ref(null);
 // check the page width
 const dndFlowWidth = ref(0);
-const snapGrid = [100,100]
-
 const backgroundSidebar = store.state.strings.DEEP_SKY_BLUE
 
 const shouldShowMiniMap = computed(() => {
@@ -186,6 +182,10 @@ nodes: [],
 })
 
 const onDrag = ($event) => {
+  $event.nodes[0].position = {
+    x: Math.ceil($event.nodes[0].position.x / 150) * 150,
+    y: Math.ceil($event.nodes[0].position.y / 150) * 150,
+  }
   if (typeof $event.nodes[0].data.module == 'number') {
     drawModules(props.learningpath, addNodes, removeNodes, findNode, $event.nodes[0])
   }
@@ -222,7 +222,6 @@ function onDrop(event) {
   if(intersectedNode.value){
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
-
     const position = {
       x: intersectedNode.value.dropzone.position.x + intersectedNode.value.dropzone.dimensions.width/2,
       y: intersectedNode.value.dropzone.position.y + intersectedNode.value.dropzone.dimensions.height/2,

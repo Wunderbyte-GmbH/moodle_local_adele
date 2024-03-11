@@ -68,7 +68,6 @@ function toggleClass() {
 // Watch for changes of the learning path
 watch(() => props.learningpath, (newValue) => {
   learningpathcontrol.value = props.learningpath
-  
   if (newValue.json.tree != undefined) {
     if(store.state.view == 'teacher'){
       newValue.json.tree.nodes.forEach((node) => {
@@ -86,9 +85,6 @@ watch(() => props.learningpath, (newValue) => {
 
 watch(() => learningpathcontrol.value, async() => {
   if (learningpathcontrol.value.json.tree != undefined) {
-    // const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
-    // setNodes(flowchart.nodes)
-    // setEdges(flowchart.edges)
     await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
 }, { deep: true } )
@@ -120,21 +116,23 @@ const onSave = async () => {
         type: 'error'
       });
     } else {
-      //removeNodes(['starting_node'])
-      let tree = {};
-      //tree = toObject();
-      //tree = await removeModules(tree, null)
-      //tree = removeDropzones(tree)
-      // const singleNodes = standaloneNodeCheck(tree)
-      // if (singleNodes && false) {
-      //   notify({
-      //     title: 'Invalid Path',
-      //     text: 'Found standalone nodes. Every node must be connected to the path',
-      //     type: 'error'
-      //   });
-      // } else {
-      //   //tree = recalculateParentChild(tree, 'parentCourse', 'childCourse', 'starting_node')
-      //   //learningpathcontrol.value.json.tree = tree
+      removeNodes(['starting_node'])
+      if (learningpathcontrol.value.id == 0) {
+        learningpathcontrol.value.json.modules = store.state.modules
+        store.state.modules = null;
+      }
+      learningpathcontrol.value.json.tree = await removeModules(learningpathcontrol.value.json.tree, null)
+      learningpathcontrol.value.json.tree = removeDropzones(learningpathcontrol.value.json.tree)
+      const singleNodes = standaloneNodeCheck(learningpathcontrol.value.json.tree)
+      if (singleNodes) {
+        notify({
+          title: 'Invalid Path',
+          text: 'Found standalone nodes. Every node must be connected to the path',
+          type: 'error'
+        });
+      } else {
+        learningpathcontrol.value.json.tree = 
+          recalculateParentChild(learningpathcontrol.value.json.tree, 'parentCourse', 'childCourse', 'starting_node')
         await store.dispatch('saveLearningpath', learningpathcontrol.value);
         onCancelConfirmation()
         notify({
@@ -142,7 +140,7 @@ const onSave = async () => {
           text: store.state.strings.description_save,
           type: 'success'
         });
-      // }
+      }
     }
 };
 

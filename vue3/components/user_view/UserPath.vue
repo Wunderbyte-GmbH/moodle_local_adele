@@ -40,25 +40,24 @@
         User path for:
       </h2>
       <div class="card">
-        <div v-if="store.state.lpuserpathrelation && store.state.view!='student'">
+        <div v-if="userLearningpath && store.state.view!='student'">
           <div class="card-body">
             <h5 class="card-title">
-              <i class="fa fa-user-circle" /> {{ store.state.lpuserpathrelation.username }}
+              <i class="fa fa-user-circle" /> {{ userLearningpath.username }}
             </h5>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                <i class="fa fa-user" /> Firstname: {{ store.state.lpuserpathrelation.firstname }}
+                <i class="fa fa-user" /> Firstname: {{ userLearningpath.firstname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-user" /> Lastname: {{ store.state.lpuserpathrelation.lastname }}
+                <i class="fa fa-user" /> Lastname: {{ userLearningpath.lastname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-envelope" /> Email: {{ store.state.lpuserpathrelation.email }}
+                <i class="fa fa-envelope" /> Email: {{ userLearningpath.email }}
               </li>
             </ul>
           </div>
         </div>
-      
         <div style="width: 100%; height: 600px;">
           <VueFlow 
             :nodes="nodes" 
@@ -68,10 +67,16 @@
             class="learning-path-flow"
           >
             <template #node-custom="{ data }">
-              <CustomNodeEdit :data="data" />
+              <CustomNodeEdit 
+                :data="data" 
+                :learningpath="userLearningpath"
+              />
             </template>
             <template #node-orcourses="{ data }">
-              <CustomNodeEdit :data="data" />
+              <CustomNodeEdit 
+                :data="data" 
+                :learningpath="userLearningpath"
+              />
             </template>
             <template #node-module="{ data }">
               <ModuleNode :data="data" />
@@ -117,7 +122,7 @@ const goBack = () => {
 const nodes = ref([]);
 const edges = ref([]);
 const viewport = ref({});
-const learningpath = ref(null)
+const userLearningpath = ref(null)
 
 onMounted( async () => {
   let params = []
@@ -129,28 +134,11 @@ onMounted( async () => {
   }else {
     params = route.params
   }
-  learningpath.value = await store.dispatch('fetchUserPathRelation', params)
+  userLearningpath.value = await store.dispatch('fetchUserPathRelation', params)
 })
 // Watch for changes in the nodes
-watch(
-  () => store.state.lpuserpathrelation,
-  () => {
-    const flowchart = JSON.parse(store.state.lpuserpathrelation.json)
-    nodes.value = flowchart.tree.nodes;
-    edges.value = flowchart.tree.edges;
-    edges.value.forEach((edge) => {
-      edge.deletable = false
-    })
-    viewport.value = flowchart.tree.viewport;
-    setTimeout(() => {
-      fitView({ duration: 1000, padding: 0.5 });
-    }, 100);    
-  },
-  { deep: true } // Enable deep watching to capture changes in nested properties
-);
-
-watch(() => learningpath.value, () => {
-  const flowchart = learningpath.value.json
+watch(() => userLearningpath.value, () => {
+  const flowchart = userLearningpath.value.json
   nodes.value = flowchart.tree.nodes;
   edges.value = flowchart.tree.edges;
   edges.value.forEach((edge) => {
@@ -159,7 +147,7 @@ watch(() => learningpath.value, () => {
   viewport.value = flowchart.tree.viewport;
   setTimeout(() => {
     fitView({ duration: 1000, padding: 0.5 });
-    drawModules(learningpath.value, addNodes, removeNodes, findNode)
+    drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
   }, 100);   
 }, { deep: true } )
 </script>

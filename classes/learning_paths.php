@@ -296,12 +296,15 @@ class learning_paths {
      */
     public static function getnodeprogress($relationnodes) {
         $validnodes = 0;
-        foreach ($relationnodes->user_path_relation as $node) {
-            if ($node->completionnode->valid) {
-                $validnodes++;
+        $totalnodes = 0;
+        foreach ($relationnodes->user_path_relation as $key => $node) {
+            if (strstr($key , '_module') == false) {
+                if ($node->completionnode->valid) {
+                    $validnodes++;
+                }
+                $totalnodes++;
             }
         }
-
         $pathnodes = $relationnodes->tree->nodes;
         $startingcondition = "starting_node";
         $paths = [];
@@ -336,7 +339,7 @@ class learning_paths {
             }
         }
         return [
-            'completed_nodes' => $validnodes . '/' . count((array)$relationnodes->user_path_relation),
+            'completed_nodes' => $validnodes . '/' . $totalnodes,
             'progress' => round(100 * $progress, 2),
         ];
     }

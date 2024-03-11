@@ -39,14 +39,10 @@ onMounted(() => {
 })
 
 const darkenColor = (color) => {
-  // Assuming color is in hex format, convert it to RGB
   let rgb = hexToRgb(color);
-  // Darken the RGB color by reducing each component by 20%
   rgb.r *= 0.6;
   rgb.g *= 0.6;
   rgb.b *= 0.6;
-  
-  // Convert the darkened RGB color back to hex
   return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
@@ -88,7 +84,8 @@ const rgbToHex = (r, g, b) => {
 .module-name {
   position: absolute;
   top: 95%;
-  transform: rotate(-90deg) translate(50%, -200%);
+  transform: rotate(-90deg) translate(50%);
+  left: -110px;
 }
 .bold {
   font-weight: bold;

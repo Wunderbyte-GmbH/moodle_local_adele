@@ -221,7 +221,10 @@ const childStyle = {
         </div>
       </div>
       <div class="card-footer">
-        <OverviewRestrictionCompletion :node="data" />
+        <OverviewRestrictionCompletion 
+          :node="data" 
+          :learningpath="props.learningpath"
+        />
       </div>
     </div>
     <Handle 

@@ -51,6 +51,7 @@ export function createAppStore() {
                 lpuserpathrelations: [],
                 lpuserpathrelation: null,
                 feedback: null,
+                modules: null,
             };
         },
         mutations: {
