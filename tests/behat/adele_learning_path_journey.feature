@@ -28,7 +28,7 @@ Feature: As an admin I perform import of adele alonf with questions to check Sca
     And I follow "Edit"
     Then I should see "Edit a learning path"
     And I click on "Edit Completion" "button"
-    Then I should see "Edit Completion criteria of course node"
+    Then I should see "Completion Criteria for"
     And I click on "change view" "button"
     And I click on "Go Back to Learningpath" "button"
     Then I should see "Edit a learning path"

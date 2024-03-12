@@ -23,7 +23,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I click on "Learning Paths" "button"
     And I wait until the page is ready
     Then I should see "Overview of all learning paths"
-    And I follow "Add a new learning path"
+    And I click on "Add a new learning path" "button"
     And I set the field "goalnameplaceholder" to "New Learning path"
     And I set the field "goalsubjectplaceholder" to "New Learning path description for auto testing"
     And I click on "//*[@id='save-learning-path']" "xpath_element"
@@ -42,7 +42,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I follow "Add a new learning path"
     And I set the field "goalnameplaceholder" to "Newest Learning path"
     And I set the field "goalsubjectplaceholder" to "Newest Learning path description for auto testing"
-    Then I click on "//*[@id='save-learning-path']" "xpath_element"
+    And I click on "//*[@id='save-learning-path']" "xpath_element"
     And I follow "Edit"
     And I set the field "goalnameplaceholder" to "Newer Learning path"
     And I set the field "goalsubjectplaceholder" to "Newer Learning path description for auto testing"
