@@ -49,7 +49,7 @@ class manual implements course_completion {
     /** @var string $label of the redered condition in frontend. */
     public $label = 'manual';
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $priority = COURSES_PRIORITY_FORTH;
+    public $priority = COURSES_PRIORITY_THIRD;
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to

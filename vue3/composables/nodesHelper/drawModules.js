@@ -25,7 +25,6 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
       learningpath.json.tree.nodes.forEach(node => {
         if (node.data.module == newModule.data.id &&
           deletedNodeId != node.id) {
-            
             if (node.data.completion ) {
               userpath = true
               if (node.data.completion.singlerestrictionnode.length == 0) {

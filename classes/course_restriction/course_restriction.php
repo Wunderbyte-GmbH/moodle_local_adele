@@ -68,10 +68,10 @@ interface course_restriction {
      * (when displaying only conditions they don't meet).
      *
      * @param array $node
-     * @param int $userid
+     * @param object $userpath
      * @return array Information string (for admin) about all restrictions on
      *   this item
      */
-    public function get_restriction_status($node, $userid);
+    public function get_restriction_status($node, $userpath);
 
 }

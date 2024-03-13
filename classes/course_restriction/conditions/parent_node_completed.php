@@ -17,7 +17,7 @@
 /**
  * Base class for a single booking option availability condition.
  *
- * All bo condition types must extend this class.
+ * All bo condition label must extend this class.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_adele\course_restriction\conditions;
+namespace local_adele\course_restriction\conditions;
 
 use completion_info;
 use local_adele\course_restriction\course_restriction;
@@ -33,6 +33,7 @@ use local_adele\course_restriction\course_restriction;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/adele/lib.php');
+require_once("{$CFG->libdir}/completionlib.php");
 
 /**
  * Class for a single learning path course condition.
@@ -42,13 +43,12 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class parent_courses implements course_restriction {
+class parent_node_completed implements course_restriction {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_TIMED;
-    /** @var string $type of the redered condition in frontend. */
-    public $label = 'parent_courses';
-
+    public $id = COURSES_COND_PARENT_NODE;
+    /** @var string $label of the redered condition in frontend. */
+    public $label = 'parent_node_completed';
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -81,7 +81,7 @@ class parent_courses implements course_restriction {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_parent_courses', 'local_adele');
+        $description = get_string('course_description_condition_parent_node_completed', 'local_adele');
         return $description;
     }
 
@@ -91,45 +91,34 @@ class parent_courses implements course_restriction {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_parent_courses', 'local_adele');
+        $description = get_string('course_name_condition_parent_node_completed', 'local_adele');
         return $description;
     }
 
     /**
      * Helper function to return localized description strings.
+     *
      * @param array $node
      * @param object $userpath
      * @return boolean
      */
     public function get_restriction_status($node, $userpath) {
-        $parentcourses = [];
-        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+        $courserestriction = [];
+        $parentnodes = [];
+        if (isset($node['restriction']) && isset($node['restriction']['nodes']) &&
+            empty($parentnodes)) {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
-                if ( $restriction['data']['label'] == 'parent_courses') {
-                    $coursescompleted = false;
-                    $coursestable = [];
-                    foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
-                        $coursecompleted = false;
-                        $course = get_course($coursesid);
-                        // Check if the course completion is enabled.
-                        if ($course->enablecompletion) {
-                            // Get the course completion instance.
-                            $completion = new completion_info($course);
-                            // Check if the user has completed the course.
-                            $coursecompleted = $completion->is_course_complete($userpath->userid);
-                            if ($coursecompleted) {
-                                $coursestable[] = $coursesid;
-                            }
-                        }
-                    }
-                    if ($restriction['data']['value']['min_courses'] <= count($coursestable)) {
-                        $coursescompleted = true;
-                    }
-                    $parentcourses[$restriction['id']] = $coursescompleted;
+                if ( $restriction['data']['label'] == 'parent_node_completed') {
+                    $parentnodes = $node['parentCourse'];
                 }
             }
         }
-        return $parentcourses;
+        foreach ($userpath->json['tree']['nodes'] as $usernode) {
+            if (in_array($usernode['id'], $parentnodes)) {
+                $courserestriction[$usernode['id']] = $usernode;
+            }
+        }
+        return $courserestriction;
     }
 }

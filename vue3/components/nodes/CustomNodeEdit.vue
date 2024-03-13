@@ -80,15 +80,16 @@ onMounted(() => {
       })
     }
   });
-  if (props.data.completion.singlerestrictionnode.length == 0) {
+  if (store.state.view!='student') {
     active.value = true
-  } else {
-    for (let key in props.data.completion.singlerestrictionnode) {
-      if (props.data.completion.singlerestrictionnode[key]) {
-        active.value = true
-      }
-    }
   }
+  else if (props.data.completion.singlerestrictionnode.length == 0) {
+    active.value = true
+  } else if (props.data.completion.restrictionnode.valid) {
+    active.value = true
+  }
+
+
 })
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
@@ -130,7 +131,7 @@ const childStyle = {
 </script>
 
 <template>
-  <div :class="active ? 'active-node' : 'inactive-node'">
+  <div>
     <div 
       v-if="isParentNode"
       class="starting-node"
@@ -147,23 +148,31 @@ const childStyle = {
       :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
     >
       <div class="card-header text-center">
-        <h5>
-          {{ data.fullname || 'Collection' }}
-        </h5>
+        <div class="row">
+          <div class="col-10">
+            <h5>
+              {{ data.fullname || 'Collection' }}
+            </h5>
+          </div>
+          <div 
+            v-if="data.completion.completionnode.valid"
+            class="col-2 d-flex justify-content-end"
+          >
+            <CourseRating :data="data" />
+          </div>
+        </div>
       </div>
       <div 
         class="card-body"
+        :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
         <div v-if="store.state.learningpath && store.state.view=='student'">
-          <div v-if="date">
-            <DateInfo :date="date" />
-          </div>
           <div 
             class="row mb-2"
           >
             <div class="col-4 text-left">
-              <b>Progres:</b>
+              <b>Progress:</b>
             </div>
             <div 
               class="col-8" 
@@ -176,34 +185,24 @@ const childStyle = {
             <div class="col-5 text-left">
               <b>Courses:</b> 
             </div>
-            <ul 
-              v-for="(value, key) in includedCourses" 
-              :key="key"
-            >
-              <li>
-                <a 
-                  :href="'/course/view.php?id=' + value.id"
-                  :target="active ? '_blank' : ''" 
-                >
-                  {{ value.name }}
-                </a>
-              </li>
-            </ul>
+            <div class="col-7">
+              <ul 
+                v-for="(value, key) in includedCourses" 
+                :key="key"
+              >
+                <li>
+                  <a 
+                    :href="'/course/view.php?id=' + value.id"
+                    :target="active ? '_blank' : ''" 
+                  >
+                    {{ value.name }}
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div 
-            v-if="data.completion.completionnode.valid"
-            class="row mb-2"
-          >
-            <div class="col-4 text-left">
-              <b>Completion</b>
-            </div>
-
-            <div 
-              class="col-8" 
-              style="display: flex; justify-content: end;"
-            >
-              <CourseRating :data="data" />
-            </div>
+          <div v-if="date">
+            <DateInfo :date="date" />
           </div>
         </div>
         <div v-else>

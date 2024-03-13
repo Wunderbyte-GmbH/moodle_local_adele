@@ -143,6 +143,8 @@ $string['course_description_condition_catquiz'] = 'Accroding to catquiz results/
 $string['course_name_condition_catquiz'] = 'Catquiz Quiz';
 $string['course_description_condition_modquiz'] = 'Accroding to mod Quiz result';
 $string['course_name_condition_modquiz'] = 'Mod Quiz';
+$string['course_description_condition_parent_node_completed'] = 'If one parent node is finished';
+$string['course_name_condition_parent_node_completed'] = 'Parent node finished';
 
 // Event Strings.
 $string['event_learnpath_deleted'] = 'Learning path deleted';

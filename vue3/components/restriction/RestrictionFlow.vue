@@ -43,6 +43,7 @@
                 <ConditionNode 
                   :data="data" 
                   :type="'Restriction'" 
+                  :learningpath="learningpathrestriction"
                 />
               </template>
               <template #node-dropzone="{ data }">

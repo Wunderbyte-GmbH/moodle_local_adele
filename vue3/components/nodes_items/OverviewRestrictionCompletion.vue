@@ -17,14 +17,16 @@
       },
     });
     // Colors for restriction and completion
-    const restrictionColor = store.state.strings.LIGHT_STEEL_BLUE;
-    const completionColor = store.state.strings.DARK_ORANGE;
+    const restrictionColor = ref('#87b8ce');
+    const completionColor = ref('#df843b');
 
     // Create a ref for conditions
     const conditions = ref([]);
     const showCard = ref(false);
 
     onMounted(async () => {
+        restrictionColor.value = store.state.strings.LIGHT_STEEL_BLUE;
+        completionColor.value = store.state.strings.DARK_ORANGE;
         conditions.value = {
         completion: {
             count: 0,
@@ -40,37 +42,70 @@
     watch(() => props.learningpath, async () => {
         triggerGetConditions()
     }, { deep: true } );
+  });
 
-});
+const shownCondition = ref(null)
+const toggleCompletion = (type) => {
+  showCard.value = !showCard.value
+  shownCondition.value = type
+}
+
 function triggerGetConditions() {
     if (props.learningpath.json && props.learningpath.json.tree) {
       props.learningpath.json.tree.nodes.forEach((node) => {
           if (node.id == props.node.node_id) {
               if (node.completion != undefined) {
-                conditions.value.completion = getConditions(node.completion.nodes) 
+                conditions.value.completion = getConditions(node.completion.nodes, 'completion') 
               }
               if (node.restriction != undefined) {
-                conditions.value.restriction = getConditions(node.restriction.nodes) 
+                conditions.value.restriction = getConditions(node.restriction.nodes, 'restriction') 
               }
           }
       })
     }
 }
-function getConditions(completion_nodes) {
+function getConditions(completion_nodes, type) {
     let count = 0
     let conditions = []
     completion_nodes.forEach((node_completion) => {
         if (node_completion.type != 'feedback' && !(
           store.state.view=='student' && !node_completion.data.visibility
         )) {
+            let valid = false
+            if(store.state.view=='student') {
+              if (type == 'completion') {
+                valid = getValidStatus(props.node.completion.completioncriteria[node_completion.data.label])
+              } else {
+                valid = getValidStatus(props.node.completion.restrictioncriteria[node_completion.data.label])
+              }
+            }
             count ++
-            conditions.push(node_completion.data.description)
+            conditions.push({
+              name: node_completion.data.description,
+              valid: valid,
+            })
         }
     })
     return {
         count: count,
         conditions: conditions,
     }
+}
+
+function getValidStatus(validation) {
+  if (validation == null ||!validation) {
+    return false
+  } else if (validation == true) {
+    return true
+  } else if (typeof validation == 'object') {
+    for (const key in validation) {
+      if (validation[key]) {
+        return true
+      }
+    }
+    return false
+  }
+  return false
 }
 
 const toggleCards = () => {
@@ -81,94 +116,200 @@ const toggleCards = () => {
 
 <template>
   <div>
-    <div 
-      v-if="conditions.restriction" 
-      class="card-container"
-      :class="{ 'card-hover': showCard }"
-      @click="toggleCards"
-    >
+    <div v-if="store.state.view=='student'">
       <div 
-        class="restriction" 
-        :style="{ color: restrictionColor }"
+        v-if="node.completion && (
+          (node.completion.restrictionnode && node.completion.restrictionnode.valid) ||
+          (node.completion.completionnode && node.completion.completionnode.valid)
+        )"
       >
+        <div
+          class="card-container"
+          :class="{ 'card-hover': showCard }"
+          @click="toggleCompletion('completion')"
+        >
+          <div 
+            class="completion" 
+            :style="{ color: completionColor }"
+          >
+            Completions
+            <i class="ml-2 fa-solid fa-check-to-slot" />
+          </div>
+          <button 
+            v-if="showCard" 
+            class="cancel-button" 
+            @click="toggleCompletion('completion')"
+          >
+            <i
+              class="fa-solid fa-times cancel-icon"
+              @click="toggleCompletion('completion')"
+            />
+          </button>
+        </div>
+      </div>
+      <div v-else>
+        <div
+          class="card-container"
+          :class="{ 'card-hover': showCard }"
+          @click="toggleCompletion('restriction')"
+        >
+          <div 
+            class="restriction" 
+            :style="{ color: restrictionColor }"
+          >
+            Restrictions
+            <i class="ml-2 fa-solid fa-key" />
+          </div>
+          <button 
+            v-if="showCard" 
+            class="cancel-button" 
+            @click="toggleCompletion('restriction')"
+          >
+            <i
+              class="fa-solid fa-times cancel-icon" 
+              @click="toggleCompletion('restriction')"
+            />
+          </button>
+        </div>
+      </div>
+      <div 
+        v-if="showCard" 
+        class="additional-card left" 
+        :style="{ backgroundColor: shownCondition=='completion' ? completionColor : restrictionColor}"
+      >
+        <div v-if="shownCondition=='restriction' && conditions.restriction.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.restriction.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+              <i 
+                v-if="condition.valid" 
+                class="fas fa-check fa-xl"
+                style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div v-else-if="shownCondition=='completion' && conditions.completion.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.completion.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+              <i 
+                v-if="condition.valid" 
+                class="fas fa-check fa-xl"
+                style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div v-else>
+          <ul class="list-group mt-3">
+            <li class="list-group-item">
+              No conditions are defined
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <div 
+        v-if="conditions.restriction" 
+        class="card-container"
+        :class="{ 'card-hover': showCard }"
+        @click="toggleCards"
+      >
+        <div 
+          class="restriction" 
+          :style="{ color: restrictionColor }"
+        >
+          <i class="fa-solid fa-key" />
+          <span class="count">
+            {{ conditions.restriction.count }}
+          </span>
+        </div>
+        <div 
+          class="completion" 
+          :style="{ color: completionColor }"
+        >
+          <i class="fa-solid fa-check-to-slot" />
+          <span class="count">
+            {{ conditions.completion.count }}
+          </span>
+        </div>
+        <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
+          <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
+        </button>
+      </div>
+  
+      <!-- Left Card -->
+      <div 
+        v-if="showCard" 
+        class="additional-card left" 
+        :style="{ backgroundColor: restrictionColor }"
+      >
+        <!-- Content for the left card -->
         <i class="fa-solid fa-key" />
-        <span class="count">
-          {{ conditions.restriction.count }}
-        </span>
+        <b>
+          Restriction
+        </b>
+        <div v-if="conditions.restriction.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.restriction.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <ul class="list-group mt-3">
+            <li class="list-group-item">
+              No restrictions are defined
+            </li>
+          </ul>
+        </div>
       </div>
+  
+      <!-- Right Card -->
       <div 
-        class="completion" 
-        :style="{ color: completionColor }"
+        v-if="showCard" 
+        class="additional-card right" 
+        :style="{ backgroundColor: completionColor }"
       >
-        <i class="fa-solid fa-check-to-slot" />
-        <span class="count">
-          {{ conditions.completion.count }}
-        </span>
-      </div>
-      <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
-        <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
-      </button>
-    </div>
-
-    <!-- Left Card -->
-    <div 
-      v-if="showCard" 
-      class="additional-card left" 
-      :style="{ backgroundColor: restrictionColor }"
-    >
-      <!-- Content for the left card -->
-      <i class="fa-solid fa-key" />
-      <b>
-        Restriction
-      </b>
-      <div v-if="conditions.restriction.count > 0 ">
-        <ul class="list-group mt-3">
-          <li 
-            v-for="(condition, index) in conditions.restriction.conditions" 
-            :key="index"
-            class="list-group-item"
-          >
-            {{ condition }}
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <ul class="list-group mt-3">
-          <li class="list-group-item">
-            No restrictions are defined
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Right Card -->
-    <div 
-      v-if="showCard" 
-      class="additional-card right" 
-      :style="{ backgroundColor: completionColor }"
-    >
-      <!-- Content for the left card -->
-      <i class="fa-solid fa-key" />
-      <b>
-        Completion
-      </b>
-      <div v-if="conditions.completion.count > 0 ">
-        <ul class="list-group mt-3">
-          <li 
-            v-for="(condition, index) in conditions.completion.conditions" 
-            :key="index"
-            class="list-group-item"
-          >
-            {{ condition }}
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <ul class="list-group mt-3">
-          <li class="list-group-item">
-            No restrictions are defined
-          </li>
-        </ul>
+        <!-- Content for the left card -->
+        <i class="fa-solid fa-key" />
+        <b>
+          Completion
+        </b>
+        <div v-if="conditions.completion.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.completion.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <ul class="list-group mt-3">
+            <li class="list-group-item">
+              No restrictions are defined
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('COURSES_COND_PARENT_NODE', 180);
 define('COURSES_COND_CATQUIZ', 170);
 define('COURSES_COND_MODQUIZ', 160);
 define('COURSES_COND_MANUALLY', 150);
@@ -30,9 +31,6 @@ define('COURSES_COND_TIMED', 140);
 define('COURSES_PRIORITY_BEST', 1);
 define('COURSES_PRIORITY_SECOND', 2);
 define('COURSES_PRIORITY_THIRD', 3);
-define('COURSES_PRIORITY_FORTH', 4);
-define('COURSES_PRIORITY_WARNING', 5);
-
 
 /**
  * Renders the popup Link.

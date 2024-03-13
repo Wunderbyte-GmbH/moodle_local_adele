@@ -5,7 +5,10 @@
       class="row mb-2"
     >
       <div class="col-4 text-left">
-        <b>Start Date:</b>
+        <b>
+          <i class="fas fa-calendar-alt mr-2" /> 
+          Start:
+        </b>
       </div>
       <div class="col-8 text-right">
         {{ formatDate(props.date.start) }}
@@ -16,7 +19,10 @@
       class="row mb-2"
     >
       <div class="col-4 text-left">
-        <b>End Date:</b>
+        <b>
+          <i class="fas fa-calendar-alt mr-2" />
+          End:
+        </b>
       </div>
       <div class="col-8 text-right">
         {{ formatDate(props.date.end) }}

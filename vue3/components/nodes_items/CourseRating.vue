@@ -32,42 +32,28 @@ const props = defineProps({
   },
 });
 
-const totalRanks = 4
-const stars = ref(0)
+const medaille = ref(null)
 
 onMounted(() => {
-  const rating = props.data.completion.completionnode.priority
-  stars.value = totalRanks - rating + 1
+  switch (props.data.completion.completionnode.priority) {
+      case '1':
+        medaille.value = '#FFD700'
+        break;
+      case '2':
+        medaille.value = '#C0C0C0'
+        break;
+      default:
+        medaille.value = '#CD7F32'
+    }
 })
 
-const totalStars = [1,2,3,4]
-
- </script>
+</script>
  
 <template>
   <div>
-    <div class="rating">
-      <span 
-        v-for="star in totalStars" 
-        :key="star"
-        :class="{ filled: star <= stars }"
-      >
-        &#9733;
-      </span>
-    </div>
+    <i 
+      class="fa-solid fa-award fa-2xl"
+      :style="{ color: medaille, textShadow: '0 0 2px #000' }"
+    />
   </div>
 </template>
-
-<style>
-  .rating {
-    display: inline-block;
-  }
-
-  .rating span {
-    font-size: 24px;
-  }
-
-  .rating .filled {
-    color: gold;
-  }
-</style>

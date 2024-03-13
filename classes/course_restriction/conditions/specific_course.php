@@ -98,10 +98,10 @@ class specific_course implements course_restriction {
      * Helper function to return localized description strings.
      * TODO check if get_strategy_selectcontext suits.
      * @param array $node
-     * @param int $userid
+     * @param object $userpath
      * @return boolean
      */
-    public function get_restriction_status($node, $userid) {
+    public function get_restriction_status($node, $userpath) {
         $specificcourses = [];
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             $restrictions = $node['restriction']['nodes'];
@@ -116,7 +116,7 @@ class specific_course implements course_restriction {
                             // Get the course completion instance.
                             $completion = new completion_info($course);
                             // Check if the user has completed the course.
-                            $coursecompleted = $completion->is_course_complete($userid);
+                            $coursecompleted = $completion->is_course_complete($userpath->userid);
                             if ($coursecompleted) {
                                 $coursecompleted = true;
                             }

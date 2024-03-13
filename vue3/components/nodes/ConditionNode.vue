@@ -40,6 +40,10 @@ const props = defineProps({
   type: {
     type: String,
     default: null
+  },
+  learningpath: {
+    type: Object,
+    required: true,
   }
 });
 
@@ -79,7 +83,10 @@ const toggleVisibility = () => {
       </div>
       <div class="card-body">
         <div v-if="props.type == 'Restriction'">
-          <RestrictionItem :restriction="data" />
+          <RestrictionItem 
+            :restriction="data" 
+            :learningpath="learningpath"
+          />
         </div>
         <div v-else-if="props.type == 'completion'">
           <CompletionItem :completion="data" />

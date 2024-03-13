@@ -96,10 +96,10 @@ class manual implements course_restriction {
     /**
      * Helper function to return localized description strings.
      * @param array $node
-     * @param int $userid
+     * @param object $userpath
      * @return boolean
      */
-    public function get_restriction_status($node, $userid) {
+    public function get_restriction_status($node, $userpath) {
         $containsmanual = false;
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {

@@ -2,7 +2,7 @@
 const  addAutoRestrictions = (newNode, oldNode, relation) => {
   if (relation == 'child') {
     // Add restriction to new node.
-    newNode.restriction = createRestriction(newNode.id, oldNode.data.course_node_id)
+    newNode.restriction = createRestriction(newNode.id, oldNode.id)
     return newNode
   } else if (relation == 'parent') {
     // Add restriction to already exsisting node.
@@ -10,7 +10,7 @@ const  addAutoRestrictions = (newNode, oldNode, relation) => {
       oldNode = expandRestriction(newNode, oldNode, relation)
     } else {
       
-      oldNode.restriction = createRestriction(oldNode.id, newNode.data.course_node_id)
+      oldNode.restriction = createRestriction(oldNode.id, newNode.id)
     }
     return oldNode
   } else if (relation == 'and') {
@@ -19,20 +19,20 @@ const  addAutoRestrictions = (newNode, oldNode, relation) => {
   }
 }
 
-function createRestriction (node_id, course_id) {
+function createRestriction (node_id, parent_node_id) {
   return {
     "edges": [],
     "nodes": [
       {
         "childCondition": [],
         "data": {
-          "description": "Only if a certain course of this learning path is completed",
+          "description": "If one parent node is finished",
           "id": 150,
-          "label": "specific_course",
-          "name": "Certain course completed",
+          "label": "parent_node_completed",
+          "name": "Parent node finished",
           "node_id": node_id,
           "value": {
-            "courseid": course_id
+            "node_id": parent_node_id
           },
           "visibility": true
         },
@@ -86,13 +86,13 @@ function expandRestriction (newNode, oldNode, relation) {
   oldNode.restriction.nodes.push({
     "childCondition": [],
     "data": {
-      "description": "Only if a certain course of this learning path is completed",
+      "description": "If one parent node is finished",
       "id": 150,
-      "label": "specific_course",
-      "name": "Certain course completed",
+      "label": "parent_node_completed",
+      "name": "Parent node finished",
       "node_id": 'condition_' + id,
       "value": {
-        "courseid": newNode.data.course_node_id
+        "node_id": newNode.id
       },
       "visibility": true
     },

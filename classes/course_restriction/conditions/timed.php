@@ -98,10 +98,10 @@ class timed implements course_restriction {
     /**
      * Helper function to return localized description strings.
      * @param array $node
-     * @param int $userid
+     * @param object $userpath
      * @return boolean
      */
-    public function get_restriction_status($node, $userid) {
+    public function get_restriction_status($node, $userpath) {
         $timed = [];
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
@@ -123,6 +123,8 @@ class timed implements course_restriction {
                         if ($datetimestamp >= $currenttimestamp &&
                             $validstart) {
                             $validtime = true;
+                        } else {
+                            $validtime = false;
                         }
                     }
                     $timed[$restrictionnode['id']] = $validtime;
@@ -138,7 +140,7 @@ class timed implements course_restriction {
      * @param string $format
      * @return boolean
      */
-    public function isvaliddate($datestring, $format = 'Y-m-d') {
+    public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
         $datetime = DateTime::createFromFormat($format, $datestring);
         return $datetime && $datetime->format($format) === $datestring;
     }

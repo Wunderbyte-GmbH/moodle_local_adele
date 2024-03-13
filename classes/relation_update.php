@@ -57,17 +57,15 @@ class relation_update {
         if ($userpath) {
             foreach ($userpath->json['tree']['nodes'] as $node) {
                 $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
-                $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath->user_id);
-                $completionnodepaths = [];
+                $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
                 $restrictionnodepaths = [];
-                $singlecompletionnode = [];
                 $singlerestrictionnode = [];
                 if (isset($node['restriction'])) {
-                    foreach ($node['restriction']['nodes'] as $restrictionnnode) {
+                    foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
                         $failedrestriction = false;
                         $validationconditionstring = [];
-                        if ($restrictionnnode['parentCondition'][0] == 'starting_condition') {
-                            $currentcondition = $restrictionnnode;
+                        if ($restrictionnodepath['parentCondition'][0] == 'starting_condition') {
+                            $currentcondition = $restrictionnodepath;
                             $validationcondition = false;
                             while ( $currentcondition ) {
                                 if ($currentcondition['data']['label'] == 'timed' ||
@@ -79,6 +77,21 @@ class relation_update {
                                         . '_' . $currentcondition['id']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label']
                                         . '_' . $currentcondition['id'];
+                                } else if ($currentcondition['data']['label'] == 'parent_node_completed')  {
+                                    foreach ($restrictioncriteria[$currentcondition['data']['label']] as $keynode => $parentnode) {
+                                        $parentnode = self::validatenodecompletion(
+                                            $parentnode,
+                                            $completioncriteria,
+                                            $userpath,
+                                            $restrictionnodepaths,
+                                            0
+                                        );
+                                        if ($parentnode) {
+                                            $validationcondition = true;
+                                        }
+                                    }
+                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                                    $validationconditionstring[] = $currentcondition['data']['label'];
                                 } else {
                                     $validationcondition = $restrictioncriteria[$currentcondition['data']['label']];
                                     $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
@@ -99,76 +112,106 @@ class relation_update {
                     }
                 }
                 if (isset($node['completion'])) {
-                    foreach ($node['completion']['nodes'] as $completionnode) {
-                        $failedcompletion = false;
-                        $validationconditionstring = [];
-                        if (isset($completionnode['parentCondition']) &&
-                          $completionnode['parentCondition'][0] == 'starting_condition') {
-                            $currentcondition = $completionnode;
-                            $validationcondition = false;
-                            while ( $currentcondition ) {
-                                $label = $currentcondition['data']['label'];
-                                if ($label == 'catquiz' ||
-                                $label == 'modquiz') {
-                                    $validationcondition =
-                                        $completioncriteria[$label][$currentcondition['id']];
-                                    $singlecompletionnode[$label
-                                        . '_' . $currentcondition['id']] = $validationcondition;
-                                    $validationconditionstring[] = $label
-                                        . '_' . $currentcondition['id'];
-                                } else if ($label == 'course_completed') {
-                                    foreach ($completioncriteria[$label] as $coursecompleted) {
-                                        if ($coursecompleted) {
-                                            $validationcondition = true;
-                                            $validationconditionstring[] = $label;
-                                        }
-                                    }
-                                    $singlecompletionnode[$label] = $validationcondition;
-                                } else {
-                                    $validationcondition = $completioncriteria[$label];
-                                    $singlecompletionnode[$label] = $validationcondition;
-                                    $validationconditionstring[] = $label;
-                                }
-                                // Check if the conditon is true and break if one condition is not met.
-                                if (!$validationcondition) {
-                                    $failedcompletion = true;
-                                }
-                                // Get next Condition and return null if no child node exsists.
-                                $currentcondition = self::searchnestedarray($node['completion']['nodes'],
-                                    $currentcondition['childCondition'], 'id');
-                            }
-                            if ($validationcondition && !$failedcompletion &&
-                                (($node['restriction'] == null) ||count($restrictionnodepaths) ||
-                                    !count($node['restriction']['nodes']))) {
-                                $completionnodepaths[] = $validationconditionstring;
-                                $nodefinished = node_finished::create([
-                                    'objectid' => $userpath->id,
-                                    'context' => context_system::instance(),
-                                    'other' => [
-                                        'node' => $node,
-                                        'userpath' => $userpath,
-                                    ],
-                                ]);
-                                $nodefinished->trigger();
-                            }
-                        }
-                    }
+                    $validatenodecompletion = self::validatenodecompletion(
+                        $node,
+                        $completioncriteria,
+                        $userpath,
+                        $restrictionnodepaths,
+                        1
+                    );
                 }
-                $completionnode = self::getconditionnode($completionnodepaths);
+                $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths']);
                 $restrictionnode = self::getconditionnode($restrictionnodepaths);
                 $userpath->json['user_path_relation'][$node['id']] = [
                     'completioncriteria' => $completioncriteria,
                     'completionnode' => $completionnode,
-                    'singlecompletionnode' => $singlecompletionnode,
+                    'singlecompletionnode' => $validatenodecompletion['singlecompletionnode'],
                     'restrictioncriteria' => $restrictioncriteria,
                     'restrictionnode' => $restrictionnode,
                     'singlerestrictionnode' => $singlerestrictionnode,
                 ];
-                // Match completions.
             }
             $userpathrelationhelper = new user_path_relation();
             $userpathrelationhelper->revision_user_path_relation($userpath);
         }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param completionnode $completionnode
+     * @return array
+     */
+    public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
+        $completionnodepaths = [];
+        $singlecompletionnode = [];
+        foreach ($node['completion']['nodes'] as $completionnode) {
+            $failedcompletion = false;
+            $validationconditionstring = [];
+            if (isset($completionnode['parentCondition']) &&
+                $completionnode['parentCondition'][0] == 'starting_condition') {
+                $currentcondition = $completionnode;
+                $validationcondition = false;
+                while ( $currentcondition ) {
+                    $label = $currentcondition['data']['label'];
+                    if ($label == 'catquiz' ||
+                    $label == 'modquiz') {
+                        $validationcondition =
+                            $completioncriteria[$label][$currentcondition['id']];
+                        $singlecompletionnode[$label
+                            . '_' . $currentcondition['id']] = $validationcondition;
+                        $validationconditionstring[] = $label
+                            . '_' . $currentcondition['id'];
+                    } else if ($label == 'course_completed') {
+                        foreach ($completioncriteria[$label] as $coursecompleted) {
+                            if ($coursecompleted) {
+                                $validationcondition = true;
+                                $validationconditionstring[] = $label;
+                            }
+                        }
+                        $singlecompletionnode[$label] = $validationcondition;
+                    } else {
+                        if (!$mode) {
+                            $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
+                        }
+                        $validationcondition = $completioncriteria[$label];
+                        $singlecompletionnode[$label] = $validationcondition;
+                        $validationconditionstring[] = $label;
+                    }
+                    // Check if the conditon is true and break if one condition is not met.
+                    if (!$validationcondition) {
+                        $failedcompletion = true;
+                    }
+                    // Get next Condition and return null if no child node exsists.
+                    $currentcondition = self::searchnestedarray($node['completion']['nodes'],
+                        $currentcondition['childCondition'], 'id');
+                }
+                if ($validationcondition && !$failedcompletion ) {
+                    if (!$mode) {
+                        return true;
+                    } else if ($node['restriction'] == null ||count($restrictionnodepaths) ||
+                    !count($node['restriction']['nodes'])) {
+                        $completionnodepaths[] = $validationconditionstring;
+                        $nodefinished = node_finished::create([
+                            'objectid' => $userpath->id,
+                            'context' => context_system::instance(),
+                            'other' => [
+                                'node' => $node,
+                                'userpath' => $userpath,
+                            ],
+                        ]);
+                        $nodefinished->trigger();
+                    }
+                }
+            }
+        }
+        if (!$mode) {
+            return false;
+        }
+        return [
+            'completionnodepaths' => $completionnodepaths,
+            'singlecompletionnode' => $singlecompletionnode,
+        ];
     }
 
     /**

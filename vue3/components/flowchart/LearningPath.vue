@@ -378,7 +378,7 @@ watch(
         fitView({ duration: 1000, padding: 0.5 });
       }, 100);
       if(oldNodes > newNodes){
-        if (props.learningpath.json) {
+        if (props.learningpath.json && props.learningpath.json.tree) {
           const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
           setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
           if (deletedNode[0] && deletedNode[0].id) {

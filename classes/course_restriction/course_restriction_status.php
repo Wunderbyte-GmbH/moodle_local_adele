@@ -50,10 +50,10 @@ class course_restriction_status {
      * Returns conditions depending on the conditions param.
      *
      * @param array $node
-     * @param int $userid
+     * @param object $userpath
      * @return array
      */
-    public static function get_restriction_status($node, $userid): array {
+    public static function get_restriction_status($node, $userpath): array {
         global $CFG;
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_restriction/conditions/*.php';
@@ -66,7 +66,7 @@ class course_restriction_status {
             // We instantiate all the classes, because we need some information.
             if (class_exists($filename)) {
                 $conditionclass = new $filename();
-                $completionstatus[$path['filename']] = $conditionclass->get_restriction_status($node, $userid);
+                $completionstatus[$path['filename']] = $conditionclass->get_restriction_status($node, $userpath);
             }
         }
         return $completionstatus;
