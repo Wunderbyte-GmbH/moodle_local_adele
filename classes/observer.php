@@ -49,6 +49,7 @@ class local_adele_observer {
      * @param base $event
      */
     public static function user_enrolment_created(base $event) {
+        return;
         $observer = enrollment::enrolled($event);
     }
 

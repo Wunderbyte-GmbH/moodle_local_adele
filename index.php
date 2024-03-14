@@ -41,7 +41,7 @@ require_login();
 // Set page context.
 $PAGE->set_context(context_system::instance());
 // Set page layout.
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
 
 $PAGE->set_title($SITE->fullname . ': ' . get_string('pluginname', 'local_adele'));
 $PAGE->set_heading($SITE->fullname);
@@ -53,13 +53,7 @@ $PAGE->set_pagelayout('admin');
 $output = $PAGE->get_renderer('local_adele');
 
 echo $OUTPUT->header();
-$PAGE->requires->js_call_amd('local_adele/app-lazy', 'init');
 
-echo <<<EOT
-    <div id="local-adele-app" name="local-adele-app"
-        user="{$USER->id}">
-      <router-view></router-view>
-    </div>
-    EOT;
+echo $OUTPUT->render_from_template('local_adele/initview', ['userid' => $USER->id]);
 
 echo $OUTPUT->footer();
