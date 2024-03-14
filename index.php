@@ -48,7 +48,6 @@ $PAGE->set_heading($SITE->fullname);
 $PAGE->set_url(new moodle_url('/local/adele/index.php#/learningpaths'));
 $PAGE->navbar->ignore_active(true);
 $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/local/adele/index.php#/learningpaths'));
-$PAGE->set_pagelayout('admin');
 
 $output = $PAGE->get_renderer('local_adele');
 
