@@ -42,7 +42,7 @@
               id="exampleModalLabel"
               class="modal-title" 
             >
-              Edit {{ fullname }}
+              {{ store.state.strings.modals_edit }} {{ fullname }}
             </h5>
             <button 
               type="button" 
@@ -56,7 +56,11 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label for="fullname"><b>Longname:</b></label>
+              <label for="fullname">
+                <b>
+                  {{ store.state.strings.modals_longname }}
+                </b>
+              </label>
               <input
                 id="fullname"
                 v-model="fullname"
@@ -65,7 +69,9 @@
               >
             </div>
             <div class="form-group">
-              <b>Shortname:</b>
+              <b>
+                {{ store.state.strings.modals_shortname }}
+              </b>
               <p class="form-control-static">
                 {{ shortname }}
               </p>
@@ -84,14 +90,14 @@
               data-dismiss="modal" 
               @click="closeModal"
             >
-              Close
+              {{ store.state.strings.modals_close }}
             </button>
             <button 
               type="button" 
               class="btn btn-primary" 
               @click="saveChanges"
             >
-              Save Changes
+              {{ store.state.strings.modals_save_changes }}
             </button>
           </div>
         </div>

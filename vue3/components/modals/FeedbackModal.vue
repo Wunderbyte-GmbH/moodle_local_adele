@@ -41,7 +41,7 @@
               id="exampleModalLabel"
               class="modal-title" 
             >
-              Edit Feedback
+              {{ store.state.strings.modals_edit_feedback }}
             </h5>
             <button 
               type="button" 
@@ -73,14 +73,14 @@
               data-dismiss="modal" 
               @click="closeModal"
             >
-              Close
+              {{ store.state.strings.modals_close }}
             </button>
             <button 
               type="button" 
               class="btn btn-primary" 
               @click="saveChanges"
             >
-              Save Changes
+              {{ store.state.strings.modals_save_changes }}
             </button>
           </div>
         </div>

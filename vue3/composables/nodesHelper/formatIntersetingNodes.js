@@ -1,30 +1,28 @@
-// generate a new id
-
 const  formatIntersetingNodes = (nodesIntersecting, node, intersectingNode,
-    closestNode, insideStartingNode) => {
+    closestNode, insideStartingNode, store) => {
     if(nodesIntersecting){
         intersectingNode = { closestnode: closestNode, dropzone: node};
         node.data = { ...node.data, ...{
             opacity: '0.75',
             bgcolor: 'chartreuse',
-            infotext: 'Drop to connect here',
+            infotext: store.state.strings.completion_drop_here,
           }
         }
     }else{
         node.data = { ...node.data, ...{
             opacity: '0.6',
             bgcolor: 'grey',
-            infotext: 'New Staring node',
+            infotext: store.state.strings.composables_new_node,
           }
         }
         if(node.id == 'dropzone_parent'){
-            node.data.infotext = 'Drop zone Parent'
+            node.data.infotext = store.state.strings.composables_drop_zone_parent
         }else if(node.id == 'dropzone_child'){
-            node.data.infotext = 'Drop zone Child'
+            node.data.infotext = store.state.strings.composables_drop_zone_child
         }else if(node.id == 'dropzone_and'){
-            node.data.infotext = 'And drop zone'
+            node.data.infotext = store.state.strings.composables_drop_zone_add
         }else if(node.id == 'dropzone_or'){
-            node.data.infotext = 'Or drop zone'
+            node.data.infotext = store.state.strings.composables_drop_zone_or
         }else {
             insideStartingNode = true;
         }

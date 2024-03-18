@@ -166,7 +166,7 @@ const childStyle = {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname || 'Collection' }}
+              {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
           </div>
           <div v-if="store.state.view!='teacher'" class="col-auto">
@@ -177,7 +177,8 @@ const childStyle = {
               data-target="#nodeModal"
               @click="setNodeModal"
             >
-              <i class="fa fa-edit" /> Edit
+              <i class="fa fa-edit" /> 
+              {{ store.state.strings.nodes_edit }}
             </button>
           </div>
         </div>
@@ -188,7 +189,7 @@ const childStyle = {
       >
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
-            Learning Module
+            {{ store.state.strings.nodes_learning_module }}
           </h5>
           <select 
             v-model="dataValue.module"
@@ -200,7 +201,7 @@ const childStyle = {
               selected 
               disabled
             >
-              Select a module
+              {{ store.state.strings.nodes_select_module }}
             </option>
             <option 
               v-for="module in learningmodule" 
@@ -212,7 +213,7 @@ const childStyle = {
           </select>
         </div>
         <h5 class="card-title">
-          Included Courses
+          {{ store.state.strings.nodes_included_courses }}
         </h5>
         <div 
           v-for="(value, key) in courses" 
@@ -242,7 +243,8 @@ const childStyle = {
               :style="{backgroundColor: store.state.strings.LIGHT_STEEL_BLUE}"
               @click="setRestrictionView"
             >
-              <i class="fa-solid fa-key" /> Edit Restriction
+              <i class="fa-solid fa-key" /> 
+              {{ store.state.strings.nodes_edit_restriction }}
             </button>
           </div>
           <div class="col-auto">
@@ -252,13 +254,17 @@ const childStyle = {
               :style="{backgroundColor: store.state.strings.DARK_ORANGE}"
               @click="setPretestView"
             >
-              <i class="fa-solid fa-check-to-slot" /> Edit Completion
+              <i class="fa-solid fa-check-to-slot" /> 
+              {{ store.state.strings.nodes_edit_completion }}
             </button>
           </div>
         </div>
       </div>
       <div class="card-footer">
-        <OverviewRestrictionCompletion :node="data" />
+        <OverviewRestrictionCompletion 
+          :node="data" 
+          :learningpath="learningpath"
+        />
       </div>
     </div>
     <Handle 

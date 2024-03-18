@@ -70,6 +70,7 @@
                 <LearingPath 
                   :learningpath="learningpath" 
                   @finish-edit="finishEdit"
+                  @removeNode="handleRemoveNode"
                 />
               </div>
             </div>
@@ -176,6 +177,33 @@ const goBack = () => {
 
 const finishEdit = () => {
   learningpath.value = null
+}
+
+const handleRemoveNode = (nodeId) => {
+  if (nodeId) {
+
+    const nodesArray = learningpath.value.json.tree.nodes;
+    const edgesArray = learningpath.value.json.tree.edges; 
+    const nodeIndex = nodesArray.findIndex(node => node.id === nodeId);
+
+    if (nodeIndex !== -1) {
+      nodesArray.splice(nodeIndex, 1); // Remove the node
+    }
+
+    const updatedEdges = edgesArray.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
+    learningpath.value.json.tree.edges = updatedEdges;
+
+    nodesArray.forEach(node => {
+      ['childCourse', 'parentCourse'].forEach(key => {
+        if (node[key]) {
+          const index = node[key].indexOf(nodeId);
+          if (index !== -1) {
+            node[key].splice(index, 1); // Remove the nodeId from the array
+          }
+        }
+      });
+    });
+  }
 }
 
 </script>

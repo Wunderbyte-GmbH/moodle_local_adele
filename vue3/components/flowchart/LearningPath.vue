@@ -28,7 +28,10 @@
       class="dndflow mt-4" 
       @drop="onDrop"
     >
-      <Modal v-if="store.state.view != 'teacher'" />
+      <Modal 
+        v-if="store.state.view != 'teacher'" 
+        :learningpath="learningpath"
+      />
       <VueFlow 
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
         :class="{ dark }" 
@@ -131,7 +134,8 @@ const props = defineProps({
 
 // Emit to parent component
 const emit = defineEmits([
-  'finish-edit'
+  'finish-edit',
+  'remove-node',
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -223,8 +227,8 @@ function onDrop(event) {
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
     const position = {
-      x: intersectedNode.value.dropzone.position.x + intersectedNode.value.dropzone.dimensions.width/2,
-      y: intersectedNode.value.dropzone.position.y + intersectedNode.value.dropzone.dimensions.height/2,
+      x: intersectedNode.value.closestnode.computedPosition.x,
+      y: intersectedNode.value.closestnode.computedPosition.y,
     }
 
     const id = getNodeId('dndnode_', nodes.value);
@@ -259,14 +263,13 @@ function onDrop(event) {
           intersectedNode.value.closestnode.parentCourse.splice(index, 1)
           shiftNodesDown(data.node_id, nodes.value)
         }
-        position.y = intersectedNode.value.dropzone.dimensions.height/2
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
       intersectedNode.value.closestnode.childCourse.push(data.node_id)
-      position.y += 100
+      position.y += + intersectedNode.value.dropzone.dimensions.height/2 + 300
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
       const addConditions = addAndConditions(intersectedNode.value, getEdges, id)
-      position.x -= intersectedNode.value.dropzone.dimensions.width
+      position.x += 200
       parentCourse = addConditions.parentNodes
       childCourse = addConditions.childNodes
       newNode.restriction = addConditions.newRestrictions
@@ -275,7 +278,7 @@ function onDrop(event) {
       addEdges(addConditions.newEdges)
       nodes.value.forEach((node) => {
         if (addConditions.newOtherRestrictions.includes(node.id)){
-          node = addAutoRestrictions(newNode, node, 'and')
+          node = addAutoRestrictions(newNode, node, 'and', store)
         }
       })
     }
@@ -296,8 +299,8 @@ function onDrop(event) {
         })
       } else {
         notify({
-          title: 'Course already inside',
-          text: 'The course is already inside the node included',
+          title: store.state.strings.flowchart_course_already_inside_title,
+          text: store.state.strings.flowchart_course_already_inside_text,
           type: 'warn'
         });
       }
@@ -306,7 +309,6 @@ function onDrop(event) {
       position.x += intersectedNode.value.closestnode.dimensions.width
     }
 
-    
     newNode = { ...newNode, ...{
       data: data,
       parentCourse: parentCourse,
@@ -315,42 +317,27 @@ function onDrop(event) {
     }
     }
 
-    nextTick(() => {
-    const node = findNode(newNode.id)
-    if (node != undefined) {
-      const stop = watch(
-        () => node.dimensions,
-        (dimensions) => {
-          if (dimensions.width > 0 && dimensions.height > 0) {
-            node.position = { x: Math.round((node.position.x - node.dimensions.width / 2) * 10)/10, y:  Math.round((node.position.y - node.dimensions.height / 2) * 10)/10 }
-            stop()
-          }
-        },
-        { deep: true, flush: 'post' },
-      )
-    }
-    })
     if((intersectedNode.value.dropzone.id.includes('dropzone_') &&
       !intersectedNode.value.dropzone.id.includes('_and')) &&
       !intersectedNode.value.dropzone.id.includes('_or')){
       
-      newNode = addAutoCompletions(newNode)
+      newNode = addAutoCompletions(newNode, store)
       let source = intersectedNode.value.closestnode.id  
       let target = newNode.id
       if(intersectedNode.value.dropzone.id.includes('child')){
         source = newNode.id 
         target = intersectedNode.value.closestnode.id
-        newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child')
+        newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child', store)
         addNodes([newNode])
       }else{
-        addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent')
+        addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent', store)
         addNodes([newNode])
       }
       // Add the new edge
       addEdges(addCustomEdge(source, target));
     } else if (!intersectedNode.value.dropzone.id.includes('_or')) {
       // Add Completion addAutoAndCompletions.
-      newNode = addAutoCompletions(newNode)
+      newNode = addAutoCompletions(newNode, store)
       addNodes([newNode])
     }
     let tree = toObject()
@@ -359,12 +346,12 @@ function onDrop(event) {
       tree: tree,
     };
     if(intersectedNode.value.closestnode.id == 'starting_node'){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view)
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store)
     }
   } else{
     notify({
-      title: 'Node drop refused',
-      text: 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.',
+      title: store.state.strings.flowchart_drop_refused_title,
+      text: store.state.strings.flowchart_drop_refused_text,
       type: 'warn'
     });
   }
@@ -374,13 +361,16 @@ watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
     if(oldNodes != newNodes){
-      setTimeout(() => {
+      if (Math.abs(oldNodes - newNodes) < 2) {
         fitView({ duration: 1000, padding: 0.5 });
-      }, 100);
+      }
       if(oldNodes > newNodes){
         if (props.learningpath.json && props.learningpath.json.tree) {
           const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
-          setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store.state.view, true)
+          if (deletedNode[0]) {
+            emit('removeNode', deletedNode[0].id);
+          }
+          setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, true)
           if (deletedNode[0] && deletedNode[0].id) {
             drawModules(props.learningpath, addNodes, removeNodes, findNode, null, deletedNode[0].id)
           }

@@ -7,11 +7,16 @@
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
     >
-    <label :for="data.node_id">Finish course manually</label>
+    <label :for="data.node_id">
+      {{ store.state.strings.conditions_finish_course }}
+    </label>
   </div>
 </template>
 
 <script setup>
+
+import { useStore } from 'vuex';
+const store = useStore();
 
 defineProps({
   modelValue: {

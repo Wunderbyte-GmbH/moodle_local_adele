@@ -31,11 +31,11 @@ import { notify } from "@kyvg/vue3-notification";
 import { useRoute, useRouter } from 'vue-router';
 import removeModules from '../../composables/nodesHelper/removeModules';
  
- // Load Store and Router
- const store = useStore();
- const router = useRouter()
- const route = useRoute()
- const { toObject } = useVueFlow()
+// Load Store and Router
+const store = useStore();
+const router = useRouter()
+const route = useRoute()
+const { toObject } = useVueFlow()
    
  // Prepare and save learning path
  const onSave = async () => {
@@ -54,7 +54,7 @@ import removeModules from '../../composables/nodesHelper/removeModules';
  
  // Cancel learning path edition and return to overview
  const onCancel = () => {
-    router.go(-1) // Go back one step in the history
+    router.go(-1)
  };
  
  </script>

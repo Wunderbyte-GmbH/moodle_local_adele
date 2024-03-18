@@ -7,11 +7,16 @@
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
     >
-    <label :for="data.node_id">Grant access to course manually</label>
+    <label :for="data.node_id">
+      {{ store.state.strings.restriction_access_manually }}
+    </label>
   </div>
 </template>
 
 <script setup>
+import { useStore } from 'vuex'
+
+const store = useStore()
 
 defineProps({
   modelValue: {

@@ -4,23 +4,24 @@
       class="btn btn-outline-primary"
       @click="goBack"
     >
-      <i class="fa fa-arrow-left" /> Go Back to Learningpath
+      <i class="fa fa-arrow-left" /> {{ store.state.strings.restriction_go_back_learningpath }}
     </button>
-  
+
     <h3>
-      Edit Restrictions to enter course node
+      {{ store.state.strings.restriction_edit_restrictions }}
     </h3>
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">
-          <i class="fa fa-check-circle" />Restrictions for:
+          <i class="fa fa-check-circle" />
+          {{ store.state.strings.restriction_restrictions_for }}
         </h5>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <i class="fa fa-header" /> Course Title: {{ store.state.node.fullname }}
+            <i class="fa fa-header" /> {{ store.state.strings.restriction_course_title }} {{ store.state.node.fullname }}
           </li>
           <li class="list-group-item">
-            <i class="fa fa-tag" /> Tags: {{ store.state.node.tags }}
+            <i class="fa fa-tag" /> {{ store.state.strings.restriction_tags }} {{ store.state.node.tags }}
           </li>
         </ul>
         <div v-if="restrictions !== null">
@@ -73,7 +74,7 @@
           </div>
         </div>
         <div v-else>
-          Loading restrictions...
+          {{ store.state.strings.restriction_loading_restrictions }}
         </div>
       </div>
     </div>
@@ -238,8 +239,8 @@ function onDrop(event) {
     }
     } else{
     notify({
-      title: 'Node drop refused',
-      text: 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.',
+      title: store.state.strings.restriction_node_drop_refused_title,
+      text: store.state.strings.restriction_node_drop_refused_text,
       type: 'warn'
     });
   }

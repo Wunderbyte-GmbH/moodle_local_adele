@@ -1,35 +1,39 @@
+
 // generate a new id
-const  addAutoRestrictions = (newNode, oldNode, relation) => {
+const  addAutoRestrictions = (newNode, oldNode, relation, store) => {
   if (relation == 'child') {
     // Add restriction to new node.
-    newNode.restriction = createRestriction(newNode.id, oldNode.id)
+    newNode.restriction = createRestriction(newNode.id, oldNode.id, store)
     return newNode
   } else if (relation == 'parent') {
     // Add restriction to already exsisting node.
     if (oldNode.restriction != undefined) {
-      oldNode = expandRestriction(newNode, oldNode, relation)
+      //oldNode = expandRestriction(newNode, oldNode, relation)
+      return oldNode
     } else {
       
-      oldNode.restriction = createRestriction(oldNode.id, newNode.id)
+      oldNode.restriction = createRestriction(oldNode.id, newNode.id, store)
     }
     return oldNode
   } else if (relation == 'and') {
     // Add restriction to already exsisting node.
-    return expandRestriction(newNode, oldNode, relation)
+    //return expandRestriction(newNode, oldNode, relation, store)
+    return oldNode
   }
 }
 
-function createRestriction (node_id, parent_node_id) {
+function createRestriction (node_id, parent_node_id, store) {
+
   return {
     "edges": [],
     "nodes": [
       {
         "childCondition": [],
         "data": {
-          "description": "If one parent node is finished",
+          "description": store.state.strings.course_description_condition_parent_node_completed,
           "id": 150,
           "label": "parent_node_completed",
-          "name": "Parent node finished",
+          "name": store.state.strings.course_name_condition_parent_node_completed,
           "node_id": node_id,
           "value": {
             "node_id": parent_node_id
@@ -63,7 +67,7 @@ function createRestriction (node_id, parent_node_id) {
   }
 }
 
-function expandRestriction (newNode, oldNode, relation) {
+function expandRestriction (newNode, oldNode, relation, store) {
   let x = null
   let y = null
   let id = 0
@@ -86,10 +90,10 @@ function expandRestriction (newNode, oldNode, relation) {
   oldNode.restriction.nodes.push({
     "childCondition": [],
     "data": {
-      "description": "If one parent node is finished",
+      "description": store.state.strings.course_description_condition_parent_node_completed,
       "id": 150,
       "label": "parent_node_completed",
-      "name": "Parent node finished",
+      "name": store.state.strings.course_name_condition_parent_node_completed,
       "node_id": 'condition_' + id,
       "value": {
         "node_id": newNode.id

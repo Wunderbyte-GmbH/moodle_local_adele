@@ -57,7 +57,7 @@ onMounted(() => {
   learningpathRestriction.value = props.learningpath
 })
 
-const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
+const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['']);
@@ -83,8 +83,8 @@ const onSave = async () => {
   const singleNodes = standaloneNodeCheck(restriction)
   if (singleNodes) {
     notify({
-        title: 'Invalid Path',
-        text: 'Found standalone nodes. Every node must be connected to the path',
+        title: store.state.strings.restriction_invalid_path_title,
+        text: store.state.strings.restriction_invalid_path_text,
         type: 'error'
       });
   } else{

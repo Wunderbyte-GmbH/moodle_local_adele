@@ -15,8 +15,18 @@
           @mousedown.prevent="selectOption(option)"
         >
           <div class="test-info">
-            <div><b>Testname:</b> {{ option.name }}</div>
-            <div><b>Coursename:</b> {{ option.coursename }}</div>
+            <div>
+              <b>
+                {{ store.state.strings.nodes_items_testname }}
+              </b>
+              {{ option.name }}
+            </div>
+            <div>
+              <b>
+                {{ store.state.strings.nodes_items_coursename }}
+              </b>
+              {{ option.coursename }}
+            </div>
           </div>
         </li>
       </ul>
@@ -26,8 +36,9 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 
-// Load Store 
+const store = useStore();
 const showDropdown = ref(false)
 const selectedTest = ref(null)
 const emit = defineEmits(['update:value'])

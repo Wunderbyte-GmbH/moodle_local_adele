@@ -6,7 +6,7 @@
         class="form-label" 
         for="courseSelect"
       >
-        Select a Course:
+        {{ store.state.strings.restriction_select_course }}
       </label>
       <select 
         id="courseSelect" 
@@ -17,7 +17,7 @@
           :value="null" 
           disabled
         >
-          Select a Course
+          {{ store.state.strings.restriction_select_course }}
         </option>
         <option 
           v-for="course in courses" 
@@ -66,7 +66,6 @@ onMounted(async () => {
     selectedCourse.value = props.restriction.value.courseid;
   }
 });
-
 
 // Watch for changes in selectedCourse
 watch(() => selectedCourse.value, async () => {

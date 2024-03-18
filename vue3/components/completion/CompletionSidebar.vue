@@ -26,6 +26,9 @@
 // Import needed libraries
 import { ref, computed } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
+import { useStore } from 'vuex';
+
+const store = useStore()
 const { project, vueFlowRef, addNodes, addEdges, removeNodes} = useVueFlow()
 
 // Reference on searchTerm
@@ -96,7 +99,7 @@ function checkIntersetcion(event, closestNode) {
         node.data = {
           opacity: '0.75',
           bgcolor: 'chartreuse',
-          infotext: 'Drop to connect here',
+          infotext: store.state.strings.composables_new_node,
           height: nodeHeight,
           width: '350px',
         }
@@ -146,7 +149,7 @@ function drawDropZones(freeEdges, closestNode) {
       const data = {
         opacity: '0.6',
         bgcolor: 'grey',
-        infotext: 'Drop zone',
+        infotext: store.state.strings.completion_drop_zone,
         height: nodeHeight,
         width: '350px',
       }
@@ -265,7 +268,7 @@ const filteredConditions = computed(() => {
     style="max-width: 20% !important;"
   >
     <div type="text">
-      List of available {{ type }} criteria
+      {{ store.state.strings.completion_list_of_criteria }} {{ type }} {{ store.state.strings.completion_criteria }}
     </div>
     <input 
       id="searchTerm" 

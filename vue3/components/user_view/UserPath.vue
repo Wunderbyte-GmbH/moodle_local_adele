@@ -31,13 +31,13 @@
         class="btn btn-outline-primary"
         @click="goBack" 
       >
-        <i class="fa fa-arrow-left" /> Go Back to Overview
+        <i class="fa fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
       </button>
       <h2 
         v-if="store.state.view!='student'"
         class="mt-3"
       >
-        User path for:
+        {{ store.state.strings.user_view_user_path_for }}
       </h2>
       <div class="card">
         <div v-if="userLearningpath && store.state.view!='student'">
@@ -47,13 +47,13 @@
             </h5>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                <i class="fa fa-user" /> Firstname: {{ userLearningpath.firstname }}
+                <i class="fa fa-user" /> {{ store.state.strings.user_view_firstname }}: {{ userLearningpath.firstname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-user" /> Lastname: {{ userLearningpath.lastname }}
+                <i class="fa fa-user" /> {{ store.state.strings.user_view_lastname }}: {{ userLearningpath.lastname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-envelope" /> Email: {{ userLearningpath.email }}
+                <i class="fa fa-envelope" /> {{ store.state.strings.user_view_email }}: {{ userLearningpath.email }}
               </li>
             </ul>
           </div>

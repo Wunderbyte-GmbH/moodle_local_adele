@@ -26,6 +26,9 @@
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore()
 
 const props = defineProps({
   data: {
@@ -63,14 +66,14 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
                 class="form-label"
               >
                 <h5>
-                  Feedback
+                  {{ store.state.strings.nodes_feedback }}
                 </h5>
               </label>
               <textarea 
                 id="exampleFormControlTextarea1" 
                 v-model="feedback.feedback" 
                 class="form-control"
-                placeholder="No feedback set..."
+                :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5" 
               />
             </div>

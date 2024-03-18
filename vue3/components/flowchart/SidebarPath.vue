@@ -29,6 +29,8 @@ import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
 import LearningModule from './LearningModule.vue'
+import { useStore } from 'vuex';
+const store = useStore()
 const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } = useVueFlow()
 
 // Reference on searchTerm
@@ -96,7 +98,7 @@ function onDrag(event) {
   if(closestNode && startingNodeIntersecting){
     if (dropzoneShown()) {
       activeNode.value = closestNode
-      const newDrop = drawDropzone(closestNode)
+      const newDrop = drawDropzone(closestNode, store)
       addNodes(newDrop.nodes);
       addEdges(newDrop.edges);
     }
@@ -126,7 +128,7 @@ function checkIntersetcion(event, closestNode) {
       });
       const nodesIntersecting = areNodesIntersecting(position, node)
       const nodeFormat = formatIntersetingNodes(nodesIntersecting, node, intersectingNode.value,
-        closestNode, insideStartingNode)
+        closestNode, insideStartingNode, store)
       node = nodeFormat.node
       intersectingNode.value = nodeFormat.intersectingNode
       insideStartingNode = nodeFormat.insideStartingNode
@@ -231,7 +233,7 @@ function changeTab(index) {
           :style="{ backgroundColor: activeTab === 0 ? tabActiveColor : tabInactiveColor }"
           @click="changeTab(0)"
         >
-          Courses
+          {{ store.state.strings.flowchart_courses }}
         </a>
       </div>
       <div
@@ -242,11 +244,10 @@ function changeTab(index) {
           :style="{ backgroundColor: activeTab === 1 ? tabActiveColor : tabInactiveColor }"
           @click="changeTab(1)"
         >
-          Learning package
+          {{ store.state.strings.flowchart_learning_package }}
         </a>
       </div>
     </div>
-
     <div 
       v-if="!activeTab"
       style="height: -webkit-fill-available;"
@@ -280,7 +281,7 @@ function changeTab(index) {
               class="col-auto"
               data-toggle="tooltip" 
               data-placement="left" 
-              title="Drag and drop the course inside the drop zones to include it in the learning path." 
+              :title="store.state.strings.flowchart_hover_darg_drop" 
             >
               <i class="fa-solid fa-circle-info fa-lg" />
             </div>
@@ -289,7 +290,7 @@ function changeTab(index) {
               class="col-auto"
               data-toggle="tooltip" 
               data-placement="right" 
-              title="Click here to go to course" 
+              :title="store.state.strings.flowchart_hover_click_here" 
             >
               <a 
                 :href="'/course/view.php?id=' + course.course_node_id[0]" 

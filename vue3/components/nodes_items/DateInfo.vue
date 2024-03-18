@@ -7,7 +7,7 @@
       <div class="col-4 text-left">
         <b>
           <i class="fas fa-calendar-alt mr-2" /> 
-          Start:
+          {{ store.state.strings.nodes_items_start }}
         </b>
       </div>
       <div class="col-8 text-right">
@@ -21,7 +21,7 @@
       <div class="col-4 text-left">
         <b>
           <i class="fas fa-calendar-alt mr-2" />
-          End:
+          {{ store.state.strings.nodes_items_end }}
         </b>
       </div>
       <div class="col-8 text-right">
@@ -32,6 +32,9 @@
 </template>
 
 <script setup>
+  import { useStore } from 'vuex';
+  const store = useStore();
+
   const props = defineProps({
     date: {
       type: Object,

@@ -34,18 +34,19 @@
       >
         {{ store.state.strings.learningpath_form_title_add }}
       </button>
-
       <button 
         type="button" 
         class="btn btn-secondary"
         data-toggle="modal" 
         data-target="#helpingSlider"
       >
-        Introduction slider
+        {{ store.state.strings.main_intro_slider }}
         <i class="fa-solid fa-book-open-reader" />
       </button>
     </div>
-    <h2>{{ store.state.strings.overviewlearningpaths }}</h2>
+    <h2>
+      {{ store.state.strings.overviewlearningpaths }}
+    </h2>
 
     <span v-if="store.state.learningpaths == ''">
       {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
@@ -83,7 +84,7 @@
               :style="[nodeBackgroundColor]"
             >
               <b>
-                Description: 
+                {{ store.state.strings.main_description }}
               </b>
               {{ singlelearningpath.description ||'No description was provided' }}
             </div>
@@ -93,7 +94,7 @@
                 href="" 
                 @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
               >
-                Duplicate 
+                {{ store.state.strings.main_duplicate }}
                 <i 
                   class="icon fa fa-copy fa-fw iconsmall m-r-0" 
                   :title="store.state.strings.duplicate" 
@@ -104,7 +105,7 @@
                 href="" 
                 @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
               >
-                Delete
+                {{ store.state.strings.main_delete }}
                 <i 
                   class="icon fa fa-trash fa-fw iconsmall" 
                   :title="store.state.strings.delete"

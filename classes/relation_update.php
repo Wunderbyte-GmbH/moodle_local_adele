@@ -55,6 +55,7 @@ class relation_update {
         // Get the user path relation.
         $userpath = $event->other['userpath'];
         if ($userpath) {
+            self::subscribe_user_startin_node($userpath);
             foreach ($userpath->json['tree']['nodes'] as $node) {
                 $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                 $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
@@ -77,7 +78,7 @@ class relation_update {
                                         . '_' . $currentcondition['id']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label']
                                         . '_' . $currentcondition['id'];
-                                } else if ($currentcondition['data']['label'] == 'parent_node_completed')  {
+                                } else if ($currentcondition['data']['label'] == 'parent_node_completed') {
                                     foreach ($restrictioncriteria[$currentcondition['data']['label']] as $keynode => $parentnode) {
                                         $parentnode = self::validatenodecompletion(
                                             $parentnode,
@@ -139,7 +140,11 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param completionnode $completionnode
+     * @param  Array $node
+     * @param  Array $completioncriteria
+     * @param  Object $userpath
+     * @param  Array $restrictionnodepaths
+     * @param  Number $mode
      * @return array
      */
     public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
@@ -260,5 +265,35 @@ class relation_update {
             }
         }
         return null;
+    }
+
+    /**
+     * Subscribe to starting nodes
+     *
+     * @param object $userpath
+     */
+    public static function subscribe_user_startin_node($userpath) {
+        global $DB;
+        foreach ($userpath->json['tree']['nodes'] as $node) {
+            if (in_array('starting_node', $node['parentCourse'])) {
+                foreach ($node['data']['course_node_id'] as $courseid) {
+                    if (!enrol_is_enabled('manual')) {
+                        break; // Manual enrolment not enabled.
+                    }
+                    if (!$enrol = enrol_get_plugin('manual')) {
+                        break; // No manual enrolment plugin.
+                    }
+                    if (!$instances = $DB->get_records(
+                            'enrol',
+                            ['enrol' => 'manual', 'courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED],
+                            'sortorder,id ASC'
+                        )) {
+                        break; // No manual enrolment instance on this course.
+                    }
+                    $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                    $enrol->enrol_user($instance, $userpath->user_id);
+                }
+            }
+        }
     }
 }

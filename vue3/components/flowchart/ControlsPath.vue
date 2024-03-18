@@ -80,7 +80,7 @@ watch(() => props.learningpath, (newValue) => {
     setNodes([])
     setEdges([])
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
 });
 
 watch(() => learningpathcontrol.value, async() => {
@@ -103,7 +103,7 @@ onMounted( async () => {
     learningpathcontrol.value.json.tree.nodes = nodesDimensions
     drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
 });
 
 
@@ -111,11 +111,15 @@ onMounted( async () => {
 const onSave = async () => {
     if (!learningpathcontrol.value.name || !learningpathcontrol.value.description) {
       notify({
-        title: 'Saved failed',
-        text: 'Provide a title and a short description for the learning path',
+        title: store.state.strings.flowchart_save_notification_title,
+        text: store.state.strings.flowchart_save_notification_text,
         type: 'error'
       });
     } else {
+      // learningpathcontrol.value.json.tree.nodes.forEach((node) => {
+      //   const computedPositionNode = findNode(node.id)
+      //   node.position = computedPositionNode.computedPosition
+      // })
       removeNodes(['starting_node'])
       if (learningpathcontrol.value.id == 0) {
         if (learningpathcontrol.value.json != '') {
@@ -133,10 +137,11 @@ const onSave = async () => {
         learningpathcontrol.value.json.tree = 
           recalculateParentChild(learningpathcontrol.value.json.tree, 'parentCourse', 'childCourse', 'starting_node')
       }
+
       if (singleNodes) {
         notify({
-          title: 'Invalid Path',
-          text: 'Found standalone nodes. Every node must be connected to the path',
+          title: store.state.strings.flowchart_invalid_path_notification_title,
+          text: store.state.strings.flowchart_save_notification_text,
           type: 'error'
         });
       } else {
@@ -200,7 +205,7 @@ function updatePos() {
     }
   }
   setNodes(elements.nodes)
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store.state.view)
+  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
 }
 
 </script>
@@ -229,20 +234,20 @@ function updatePos() {
       v-if="showCacelConfirmation"
       class="cancelConfi"
     >
-      All unsaved changes will be lost
+      {{ store.state.strings.flowchart_cancel_confirmation }}
       <button 
         id="cancel-learning-path"
         class="btn btn-primary m-2" 
         @click="onCancel"
       >
-        Back
+        {{ store.state.strings.flowchart_back_button }}
       </button>
       <button 
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="onCancelConfirmation"
       >
-        Cancel
+        {{ store.state.strings.flowchart_cancel_button }}
       </button>
     </div>
     <button 

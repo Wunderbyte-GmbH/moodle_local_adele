@@ -92,6 +92,8 @@ $string['fromlearningdescriptionplaceholder'] = 'Please provide a short descript
 $string['placeholder_search'] = 'Search courses';
 $string['edit_course_node'] = 'Edit course node';
 $string['edit_node_pretest'] = 'Edit completion criteria';
+$string['from_default_node_image'] = 'Default node image:';
+
 
 
 // Overview String.
@@ -145,6 +147,13 @@ $string['course_description_condition_modquiz'] = 'Accroding to mod Quiz result'
 $string['course_name_condition_modquiz'] = 'Mod Quiz';
 $string['course_description_condition_parent_node_completed'] = 'If one parent node is finished';
 $string['course_name_condition_parent_node_completed'] = 'Parent node finished';
+$string['course_description_condition_timed_duration'] = 'Duration in which it is possible to edit the course';
+$string['course_name_condition_timed_duration'] = 'Course edit duration';
+$string['course_select_condition_timed_duration_learning_path'] = 'Since learning path subscription';
+$string['course_select_condition_timed_duration_node'] = 'Since node subscription';
+$string['course_select_condition_timed_duration_days'] = 'days';
+$string['course_select_condition_timed_duration_weeks'] = 'weeks';
+$string['course_select_condition_timed_duration_months'] = 'months';
 
 // Event Strings.
 $string['event_learnpath_deleted'] = 'Learning path deleted';
@@ -175,3 +184,156 @@ $string['GRAY'] = '#ababab';
 $string['DIM_GRAY'] = '#737373';
 $string['VERY_DARK_GRAY'] = '#373737';
 $string['BLACK'] = '#0c0c0c';
+
+// Charthelper strings.
+$string['charthelper_child_nodes'] = 'Child Nodes:';
+$string['charthelper_no_child_nodes'] = 'No child nodes found.';
+$string['charthelper_parent_nodes'] = 'Parent Nodes:';
+$string['charthelper_no_parent_nodes'] = 'No parent nodes found.';
+$string['charthelper_no_name'] = 'No name provided.';
+$string['charthelper_no_description'] = 'No description provided.';
+$string['charthelper_go_to_learningpath'] = 'Go to learning path editing.';
+
+// Conditions strings.
+$string['conditions_no_scales'] = 'No scales available';
+$string['conditions_name'] = 'Name';
+$string['conditions_scale_value'] = 'Scale value:';
+$string['conditions_attempts'] = 'Attempts:';
+$string['conditions_set_values'] = 'Set Values';
+$string['conditions_catquiz_warning_description'] = 'The Catquiz that is inside the same course as the Learning path';
+$string['conditions_catquiz_warning_name'] = 'Catquiz inside course';
+$string['conditions_min_grad'] = 'Min. Grade:';
+$string['conditions_finish_course'] = 'Finish course manually';
+
+// Completion strings.
+$string['completion_invalid_path_title'] = 'Invalid Path';
+$string['completion_invalid_path_text'] = 'Found standalone nodes. Every node must be connected to the path.';
+$string['completion_go_back_learningpath'] = 'Go Back to Learningpath';
+$string['completion_edit_completion'] = 'Edit Completion criteria of course node';
+$string['completion_completion_for'] = 'Completion Criteria for:';
+$string['completion_course_title'] = 'Course Title:';
+$string['completion_course_tags'] = 'Tags:';
+$string['completion_node_refused_title'] = 'Node drop refused';
+$string['completion_node_refused_text'] = 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.';
+$string['completion_feedback_node'] = 'Feedback node';
+$string['completion_loading_completion'] = 'Loading completion...';
+$string['completion_drop_here'] = 'Drop to connect here';
+$string['completion_drop_zone'] = 'Drop zone';
+$string['completion_list_of_criteria'] = 'List of available ';
+$string['completion_criteria'] = ' criteria';
+
+// Flowchart strings.
+$string['flowchart_add_learning'] = 'Add a learning module';
+$string['flowchart_title'] = 'Title:';
+$string['flowchart_please_provide'] = 'Please provide a name!';
+$string['flowchart_color'] = 'Color:';
+$string['flowchart_cancel'] = 'Cancel:';
+$string['flowchart_cancel_button'] = 'Cancel';
+$string['flowchart_add'] = 'Add';
+$string['flowchart_existing_learning_modules'] = 'Existing learning modules';
+$string['flowchart_provide_name'] = 'Please provide a name!';
+$string['flowchart_save_button'] = 'Save';
+$string['flowchart_delete_button'] = 'Delete';
+$string['flowchart_save_notification_title'] = 'Saved failed';
+$string['flowchart_save_notification_text'] = 'Provide a title and a short description for the learning path';
+$string['flowchart_invalid_path_notification_title'] = 'Invalid Path';
+$string['flowchart_save_notification_text'] = 'Found standalone nodes. Every node must be connected to the path';
+$string['flowchart_cancel_confirmation'] = 'All unsaved changes will be lost';
+$string['flowchart_back_button'] = 'Back';
+$string['flowchart_course_already_inside_title'] = 'Course already inside';
+$string['flowchart_course_already_inside_text'] = 'The course is already inside the node included';
+$string['flowchart_drop_refused_title'] = 'Node drop refused';
+$string['flowchart_drop_refused_text'] = 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.';
+$string['flowchart_learning_package'] = 'Learning package';
+$string['flowchart_courses'] = 'Courses';
+$string['flowchart_hover_darg_drop'] = 'Drag and drop the course inside the drop zones to include it in the learning path.';
+$string['flowchart_hover_click_here'] = 'Click here to go to course';
+
+// Modals strings.
+$string['modals_edit_feedback'] = 'Edit Feedback';
+$string['modals_close'] = 'Close';
+$string['modals_save_changes'] = 'Save Changes';
+$string['modals_how_to_learningpath'] = 'How To Learning Path';
+$string['modals_previous'] = 'Previous';
+$string['modals_next'] = 'Next';
+$string['modals_edit'] = 'Edit';
+$string['modals_longname'] = 'Longname:';
+$string['modals_shortname'] = 'Shortname:';
+
+
+// Nodes strings.
+$string['nodes_collection'] = 'Collection';
+$string['nodes_edit'] = 'Edit';
+$string['nodes_learning_module'] = 'Learning Module';
+$string['nodes_select_module'] = 'Select a module';
+$string['nodes_included_courses'] = 'Included Courses';
+$string['nodes_edit_restriction'] = 'Edit Restriction';
+$string['nodes_edit_completion'] = 'Edit Completion';
+$string['nodes_completion'] = 'Completion';
+$string['nodes_restriction'] = 'Restriction';
+$string['nodes_potential_start'] = 'Potential starting node';
+$string['nodes_progress'] = 'Progress:';
+$string['nodes_courses'] = 'Courses:';
+$string['nodes_table_key'] = 'Key';
+$string['nodes_table_checkmark'] = 'Checkmark';
+$string['nodes_no_restriction_defined'] = 'No Restrictions are defined';
+$string['nodes_no_completion_defined'] = 'No Completions are defined';
+$string['nodes_hide_completion'] = 'Hide Completion';
+$string['nodes_show_completion'] = 'Show Completion';
+$string['nodes_feedback'] = 'Feedback';
+$string['nodes_no_feedback'] = 'No feedback set...';
+
+// Nodes Items strings.
+$string['nodes_items_start'] = 'Start:';
+$string['nodes_items_end'] = 'End:';
+$string['nodes_items_testname'] = 'Testname:';
+$string['nodes_items_coursename'] = 'Coursename:';
+$string['nodes_items_restrictions'] = 'Restrictions';
+$string['nodes_items_no_conditions'] = 'No conditions are defined';
+$string['nodes_items_restriction'] = 'Restriction';
+$string['nodes_items_no_restrictions'] = 'No restrictions are defined';
+$string['nodes_items_completion'] = 'Completion';
+$string['nodes_items_no_progress'] = 'No Progress';
+
+// Conditions strings.
+$string['composables_new_node'] = 'New Starting node';
+$string['composables_drop_zone_parent'] = 'Drop zone Parent';
+$string['composables_drop_zone_child'] = 'Drop zone Child';
+$string['composables_drop_zone_add'] = 'And drop zone';
+$string['composables_drop_zone_or'] = 'Or drop zone';
+
+$string['composables_feedback_node'] = 'Feedback node';
+
+// Restriction strings.
+$string['restriction_select_number'] = 'Select a Number:';
+$string['restriction_select_course'] = 'Select a Course:';
+$string['restriction_choose_number'] = 'Choose a number';
+$string['restriction_parents_found'] = 'Found following parent nodes:';
+$string['restriction_access_manually'] = 'Grant access to course manually';
+$string['restriction_invalid_path_title'] = 'Invalid Path';
+$string['restriction_invalid_path_text'] = 'Found standalone nodes. Every node must be connected to the path';
+$string['restriction_go_back_learningpath'] = 'Go Back to Learningpath';
+$string['restriction_edit_restrictions'] = 'Edit Restrictions to enter course node';
+$string['restriction_restrictions_for'] = 'Restrictions for:';
+$string['restriction_course_title'] = 'Course Title:';
+$string['restriction_tags'] = 'Tags:';
+$string['restriction_loading_restrictions'] = 'Loading restrictions...';
+$string['restriction_node_drop_refused_title'] = 'Node drop refused';
+$string['restriction_node_drop_refused_text'] = 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.';
+
+// User view strings.
+$string['user_view_id'] = 'ID';
+$string['user_view_username'] = 'Username';
+$string['user_view_firstname'] = 'Firstname';
+$string['user_view_lastname'] = 'Lastname';
+$string['user_view_email'] = 'Email';
+$string['user_view_mail'] = 'Progress';
+$string['user_view_nodes'] = 'Nodes';
+$string['user_view_go_back_overview'] = 'Go Back to Overview';
+$string['user_view_user_path_for'] = 'User path for:';
+
+// Main strings.
+$string['main_intro_slider'] = 'Introduction slider';
+$string['main_description'] = 'Description:';
+$string['main_duplicate'] = 'Duplicate';
+$string['main_delete'] = 'Delete';

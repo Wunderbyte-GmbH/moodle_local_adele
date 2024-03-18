@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch, onMounted, inject } from 'vue';
-import { useRouter } from 'vue-router';
 
 const props = defineProps({
   goal: {
@@ -11,7 +10,6 @@ const props = defineProps({
  
 // Load Store and Router
 const store = inject('store');
-const router = useRouter()
 
 const emit = defineEmits([
     'change-GoalName',
@@ -64,7 +62,7 @@ const editLearningpath = async (singlelearningpathid) => {
       <h4 class="font-weight-bold">
         {{ store.state.strings.fromlearningtitel }}
       </h4>
-      <div>
+      <div class="mb-2">
         <input
           id="goalnameplaceholder"
           v-model="goalname"
@@ -78,7 +76,7 @@ const editLearningpath = async (singlelearningpathid) => {
       <h4 class="font-weight-bold">
         {{ store.state.strings.fromlearningdescription }}
       </h4>
-      <div>
+      <div class="mb-2">
         <textarea
           id="goalsubjectplaceholder"
           v-model="goaldescription"
@@ -86,6 +84,12 @@ const editLearningpath = async (singlelearningpathid) => {
           class="form-control fancy-input"
           :placeholder="store.state.strings.goalsubjectplaceholder"
         />
+      </div>
+      <h4 class="font-weight-bold">
+        {{ store.state.strings.from_default_node_image }}
+      </h4>
+      <div class="mb-2">
+        Upload your default node image
       </div>
     </div>
     <div v-else>
@@ -102,14 +106,14 @@ const editLearningpath = async (singlelearningpathid) => {
               target="_blank"
               data-toggle="tooltip" 
               data-placement="right" 
-              title="Go to learning path editing."
+              :title="store.state.strings.charthelper_go_to_learningpath"
               @click.prevent="editLearningpath(props.goal.id)" 
             >
               <i class="fa fa-link" />
             </a>
           </div>
           <div v-else>
-            No name provided.
+            {{ store.state.strings.charthelper_no_name }}
           </div>
         </div>
       </div>
@@ -121,7 +125,7 @@ const editLearningpath = async (singlelearningpathid) => {
         </div>
         <div class="card-body">
           <p class="card-text">
-            {{ goaldescription ? goaldescription : 'No description provided.' }}
+            {{ goaldescription ? goaldescription : store.state.strings.charthelper_no_name }}
           </p>
         </div>
       </div>

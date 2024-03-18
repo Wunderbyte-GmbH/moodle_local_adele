@@ -27,7 +27,6 @@ const props = defineProps({
   }
 });
 
-
 const dynamicComponent = computed(() => {
   switch (getInputLabel()) {
     case 'manual':

@@ -6,7 +6,7 @@
         class="form-label" 
         for="courseSelect"
       >
-        Select a Number:
+        {{ store.state.strings.restriction_select_number }}
       </label>
       <div v-if="data">
         <select 
@@ -19,7 +19,7 @@
             value="" 
             selected
           >
-            Choose a number
+            {{ store.state.strings.restriction_choose_number }}
           </option>
           <option 
             v-for="number in parentCourses" 

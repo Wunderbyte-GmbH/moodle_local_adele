@@ -57,7 +57,7 @@ onMounted(() => {
   learningpathCompletion.value = props.learningpath
 })
 
-const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
+const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['change-class']);
@@ -89,8 +89,8 @@ const onSave = async () => {
   const singleNodes = standaloneNodeCheck(condition)
   if (singleNodes) {
     notify({
-        title: 'Invalid Path',
-        text: 'Found standalone nodes. Every node must be connected to the path',
+        title: store.state.strings.completion_invalid_path_title,
+        text: store.state.strings.completion_invalid_path_text,
         type: 'error'
       });
   } else{
@@ -102,7 +102,6 @@ const onSave = async () => {
         }
         return element_node;
     });
-
     const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
     router.push('/learningpaths/edit/' + learningpathID);
     onCancel();
@@ -111,7 +110,6 @@ const onSave = async () => {
       text: store.state.strings.description_save,
       type: 'success'
     })
-
   }
 };
 

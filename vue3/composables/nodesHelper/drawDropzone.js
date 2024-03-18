@@ -1,30 +1,30 @@
 // generate a new id
-const  drawDropzone = (closestNode) => {
+const  drawDropzone = (closestNode, store) => {
     let newDrop = {
         nodes: [],
         edges: [],
     }
     const dropZoneCourseNodes = {
         parent: {
-            name: 'Drop zone Parent',
+            name: store.state.strings.composables_drop_zone_parent,
             positionY: -250,
             positionX: 0,
             type: 'dropzone',
         },
         child: {
-            name: 'Drop zone Child',
+            name: store.state.strings.composables_drop_zone_child,
             positionY: 50 + closestNode.dimensions.height,
             positionX: 0,
             type: 'dropzone',
         },
         and: {
-            name: 'And drop zone',
+            name: store.state.strings.composables_drop_zone_add,
             positionY: 200,
             positionX: 450,
             type: 'conditionaldropzone',
         },
         or: {
-            name: 'Or drop zone',
+            name: store.state.strings.composables_drop_zone_or,
             positionY: 300,
             positionX: -350,
             type: 'conditionaldropzone',

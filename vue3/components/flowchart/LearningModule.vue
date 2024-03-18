@@ -29,7 +29,7 @@
       class="btn btn-secondary"
       @click="toggleAddForm" 
     >
-      Add a learning module
+      {{ store.state.strings.flowchart_add_learning }}
     </button>
     <transition name="fade">
       <div 
@@ -39,20 +39,24 @@
       >
         <div class="row">
           <div class="col-md-12">
-            <label for="title" class="form-label">Title:</label>
+            <label for="title" class="form-label">
+              {{ store.state.strings.flowchart_title }}
+            </label>
             <input type="text" id="title" v-model="title" class="form-control">
             <div 
               v-if="showValidation"
               class="titleValidation"
               :style="{backgroundColor: backgroundValidation, color: colorValidation}"
             >
-              Please provide a name!
+              {{ store.state.strings.flowchart_please_provide }}
             </div>
           </div>
         </div>
         <div class="row mt-2">
           <div class="col-md-12">
-            <label for="color" class="form-label">Color:</label>
+            <label for="color" class="form-label">
+              {{ store.state.strings.flowchart_color }}
+            </label>
             <input type="color" id="color" v-model="color" class="form-control">
           </div>
         </div>
@@ -62,20 +66,20 @@
             class="btn btn-secondary me-2"
             @click="toggleAddForm" 
           >
-            Cancel
+            {{ store.state.strings.flowchart_cancel }}
           </button>
           <button 
             type="button" 
             class="btn btn-primary"
             @click="addLearningModule" 
           >
-            Add
+            {{ store.state.strings.flowchart_add }}
           </button>
         </div>
       </div>
     </transition>
     <div v-if="learningmodules.length > 0">
-      Existing learning modules
+      {{ store.state.strings.flowchart_existing_learning_modules }}
       <div 
         v-for="module in learningmodules" 
         :key="module.id"
@@ -89,7 +93,7 @@
             class="color-circle" 
             :style="{ backgroundColor: module.color }"
           />
-          <span class="ml-2">{{ module.name }}</span> <!-- Add margin to the left -->
+          <span class="ml-2">{{ module.name }}</span>
         </div>
         <a 
           href="" 
@@ -106,19 +110,23 @@
             class="col-12 text-center mt-2"
           >
             <div class="col-md-12">
-              <label for="canceltitle" class="form-label">Title:</label>
+              <label for="canceltitle" class="form-label">
+                {{ store.state.strings.flowchart_title }}
+              </label>
               <input type="text" id="canceltitle" v-model="cancelTitle" class="form-control">
               <div 
                 v-if="showValidation"
                 class="titleValidation"
                 :style="{backgroundColor: backgroundValidation, color: colorValidation}"
               >
-                Please provide a name!
+                {{ store.state.strings.flowchart_provide_name }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-md-12">
-                <label for="color" class="form-label">Color:</label>
+                <label for="color" class="form-label">
+                  {{ store.state.strings.flowchart_color }}
+                </label>
                 <input type="color" id="color" v-model="cancelColor" class="form-control">
               </div>
             </div>
@@ -129,21 +137,21 @@
                   class="btn btn-secondary mr-2"
                   @click="cancelModule()"
                 >
-                  Cancel
+                  {{ store.state.strings.flowchart_cancel_button }}
                 </button>
                 <button 
                   type="button" 
                   class="btn btn-primary mr-2"
                   @click="saveModule(module.id)"
                 >
-                  Save
+                  {{ store.state.strings.flowchart_save_button }}
                 </button>
                 <button 
                   type="button" 
                   class="btn btn-danger"
                   @click="deleteModule(module.id)"
                 >
-                  Delete
+                  {{ store.state.strings.flowchart_delete_button }}
                 </button>
               </div>
             </div>

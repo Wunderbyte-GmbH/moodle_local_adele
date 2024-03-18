@@ -157,7 +157,7 @@ const toggleCards = () => {
             class="restriction" 
             :style="{ color: restrictionColor }"
           >
-            Restrictions
+            {{ store.state.strings.nodes_items_restrictions }}
             <i class="ml-2 fa-solid fa-key" />
           </div>
           <button 
@@ -214,7 +214,7 @@ const toggleCards = () => {
         <div v-else>
           <ul class="list-group mt-3">
             <li class="list-group-item">
-              No conditions are defined
+              {{ store.state.strings.nodes_items_no_conditions }}
             </li>
           </ul>
         </div>
@@ -245,8 +245,16 @@ const toggleCards = () => {
             {{ conditions.completion.count }}
           </span>
         </div>
-        <button v-if="showCard" class="cancel-button" @click.stop="toggleCards">
-          <i v-if="showCard" class="fa-solid fa-times cancel-icon" @click.stop="toggleCards" />
+        <button 
+          v-if="showCard" 
+          class="cancel-button" 
+          @click.stop="toggleCards"
+        >
+          <i 
+            v-if="showCard" 
+            class="fa-solid fa-times cancel-icon" 
+            @click.stop="toggleCards" 
+          />
         </button>
       </div>
   
@@ -259,7 +267,7 @@ const toggleCards = () => {
         <!-- Content for the left card -->
         <i class="fa-solid fa-key" />
         <b>
-          Restriction
+          {{ store.state.strings.nodes_items_restriction }}
         </b>
         <div v-if="conditions.restriction.count > 0 ">
           <ul class="list-group mt-3">
@@ -275,7 +283,7 @@ const toggleCards = () => {
         <div v-else>
           <ul class="list-group mt-3">
             <li class="list-group-item">
-              No restrictions are defined
+              {{ store.state.strings.nodes_items_no_restrictions }}
             </li>
           </ul>
         </div>
@@ -290,7 +298,7 @@ const toggleCards = () => {
         <!-- Content for the left card -->
         <i class="fa-solid fa-key" />
         <b>
-          Completion
+          {{ store.state.strings.nodes_items_completion }}
         </b>
         <div v-if="conditions.completion.count > 0 ">
           <ul class="list-group mt-3">
@@ -306,7 +314,7 @@ const toggleCards = () => {
         <div v-else>
           <ul class="list-group mt-3">
             <li class="list-group-item">
-              No restrictions are defined
+              {{ store.state.strings.nodes_items_no_restrictions }}
             </li>
           </ul>
         </div>

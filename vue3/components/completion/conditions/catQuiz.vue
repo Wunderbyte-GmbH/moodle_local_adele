@@ -30,7 +30,7 @@
       </button>
 
       <div v-else>
-        No scales available
+        {{ store.state.strings.conditions_no_scales }}
       </div>
       <div 
         v-if="showTable" 
@@ -39,7 +39,9 @@
         <table class="table table-bordered table-striped bg-white">
           <thead class="thead-light">
             <tr>
-              <th>Name</th>
+              <th>
+                {{ store.state.strings.conditions_name }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -56,7 +58,9 @@
                   v-if="scale.showDetails" 
                   class="dynamic-content-container"
                 >
-                  <label for="scalevalue">Scale value:</label>
+                  <label for="scalevalue">
+                    {{ store.state.strings.conditions_scale_value }}
+                  </label>
                   <input 
                     id="scalevalue" 
                     v-model="scalevalue" 
@@ -66,7 +70,7 @@
                     for="attempts" 
                     class="mt-3"
                   >
-                    Attempts:
+                    {{ store.state.strings.conditions_attempts }}
                   </label>
                   <input 
                     id="attempts" 
@@ -77,7 +81,7 @@
                     class="btn btn-primary rounded-pill"
                     @click="setValues(scale.id)" 
                   >
-                    Set Values
+                    {{ store.state.strings.conditions_set_values }}
                   </button>
                 </div>
               </td>
@@ -121,8 +125,8 @@ onMounted(async () => {
   tests.value.push({
     id: '0',
     componentid: '0',
-    coursename: 'The Catquiz that is inside the same course as the Learning path',
-    name: 'Catquiz inside course'
+    coursename: store.state.strings.conditions_catquiz_warning_description,
+    name: store.state.strings.conditions_catquiz_warning_name
   })
   if (props.completion.value !== undefined) {
     data.value = props.completion.value;

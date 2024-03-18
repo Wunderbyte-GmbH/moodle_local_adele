@@ -2,7 +2,7 @@
   <div class="form-check">
     {{ restriction.description }}
     <div v-if="parentNodes">
-      Found following parent nodes:
+      {{ store.state.strings.restriction_parents_found }}
       <div 
         v-for="(value, key) in parentNodes" 
         :key="key" 

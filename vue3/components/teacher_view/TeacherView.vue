@@ -45,7 +45,6 @@ import TextInputs from '../charthelper/textInputs.vue';
 import UserList from '../user_view/UserList.vue';
 
 const store = useStore()
-
 const learningpath = ref(null)
 
 onMounted( async () => {

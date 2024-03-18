@@ -46,7 +46,7 @@
               id="exampleModalLabel"
               class="modal-title" 
             >
-              How To Learning Path
+              {{ store.state.strings.modals_how_to_learningpath }}
             </h5>
             <button 
               type="button" 
@@ -76,11 +76,11 @@
                     'carousel-item': true,
                     'active': index === 0,
                   }"
-                  style="min-height: 500px;"
+                  style="height: 500px;"
                 >
                   <div 
                     class="d-flex justify-content-center align-items-center w-100"
-                    style="min-height: 500px;"
+                    style="height: 500px;"
                   >
                     <img 
                       :src="imagepath.path" 
@@ -90,7 +90,6 @@
                   </div>
                 </div>
               </div>
-
               <a 
                 class="carousel-control-prev" 
                 href="#carouselExampleControls" 
@@ -101,7 +100,9 @@
                 @click="updateCarouselHeight"
               >
                 <span class="slider-button">&lt;</span>
-                <span class="sr-only">Previous</span>
+                <span class="sr-only">
+                  {{ store.state.strings.modals_previous }}
+                </span>
               </a>
               <a 
                 class="carousel-control-next" 
@@ -115,7 +116,9 @@
                 <span class="slider-button">
                   &gt;
                 </span>
-                <span class="sr-only">Next</span>
+                <span class="sr-only">
+                  {{ store.state.strings.modals_next }}
+                </span>
               </a>
               <ol 
                 class="carousel-indicators"
@@ -141,7 +144,7 @@
               data-dismiss="modal" 
               @click="closeModal"
             >
-              Close
+              {{ store.state.strings.modals_close }}
             </button>
           </div>
         </div>

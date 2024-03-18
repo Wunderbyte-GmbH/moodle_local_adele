@@ -14,7 +14,7 @@
           class="form-label" 
           for="grade"
         >
-          Min. Grade:
+          {{ store.state.strings.conditions_min_grad }}
         </label>
         <input 
           id="grade" 

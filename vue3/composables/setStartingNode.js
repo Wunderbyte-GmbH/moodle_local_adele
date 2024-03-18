@@ -8,7 +8,6 @@ let startingNode = {
     data: {
       opacity: '0.6',
       bgcolor: 'grey',
-      infotext: 'New Starting node',
       height: '200px',
       width: '400px',
     },
@@ -16,9 +15,9 @@ let startingNode = {
     parentCourse: '',
   }
 
-const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, view, backwards = false) => {
+const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, store, backwards = false) => {
 
-  if (view != 'teacher') {
+  if (store.state.view != 'teacher') {
       nextTick(() => {
           let rightStartingNode = 0
           let shifted = false
@@ -39,6 +38,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, view, ba
           if(shifted) {
               startingNode.position.x = rightStartingNode + skip
           }
+          startingNode.data.infotext = store.state.strings.composables_new_node;
           removeNodes(['starting_node'])
           nextTick(() => {
             addNodes([startingNode])

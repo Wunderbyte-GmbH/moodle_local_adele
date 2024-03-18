@@ -1,5 +1,6 @@
+
 // generate a new id
-const  addAutoCompletions = (node) => {
+const  addAutoCompletions = (node, store) => {
     node.completion = {
         "edges": [
           {
@@ -23,10 +24,10 @@ const  addAutoCompletions = (node) => {
               "condition_1_feedback"
             ],
             "data": {
-              "description": "Course has been completed by student",
+              "description": store.state.strings.course_description_condition_course_completed,
               "id": 150,
               "label": "course_completed",
-              "name": "Course completed",
+              "name": store.state.strings.course_name_condition_course_completed,
               "node_id": 'condition_1',
               "visibility": true
             },
@@ -51,7 +52,7 @@ const  addAutoCompletions = (node) => {
             "draggable": false,
             "events": {},
             "id": "condition_1_feedback",
-            "label": "Feedback node",
+            "label": store.state.strings.composables_feedback_node,
             "position": {
               "x": 683,
               "y": -5

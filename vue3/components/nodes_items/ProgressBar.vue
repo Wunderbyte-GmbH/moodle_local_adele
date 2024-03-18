@@ -9,12 +9,15 @@
       aria-valuemin="0"
       aria-valuemax="100"
     >
-      {{ props.progress > 0 ? props.progress + '%' : 'No Progress' }}
+      {{ props.progress > 0 ? props.progress + '%' : store.state.strings.nodes_items_no_progress }}
     </div>
   </div>
 </template>
 
 <script setup>
+import { useStore } from 'vuex';
+const store = useStore();
+
 const props = defineProps({
   progress: {
     type: Number,

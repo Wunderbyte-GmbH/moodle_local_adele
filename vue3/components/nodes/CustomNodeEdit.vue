@@ -88,8 +88,6 @@ onMounted(() => {
   } else if (props.data.completion.restrictionnode.valid) {
     active.value = true
   }
-
-
 })
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
@@ -111,7 +109,7 @@ const isRestrictionVisible = ref(false);
 const isParentNode = ref(false);
 
 const toggleTable = (condition) => {
-  const otherCondition = condition == 'Completion' ? 'Restriction' : 'Completion';
+  const otherCondition = condition == store.state.strings.nodes_completion ? store.state.strings.nodes_completion : store.state.strings.nodes_completion;
   const conditionRef = eval(`is${condition}Visible`);
   conditionRef.value = !conditionRef.value;
   const otherconditionRef = eval(`is${otherCondition}Visible`);
@@ -140,7 +138,7 @@ const childStyle = {
         class="fa-solid fa-arrow-down mr-2"
         :style="{color: store.state.strings.PUMPKIN}" 
       />
-      Potential starting node
+      {{ store.state.strings.nodes_potential_start }}
     </div>
 
     <div
@@ -151,7 +149,7 @@ const childStyle = {
         <div class="row">
           <div class="col-10">
             <h5>
-              {{ data.fullname || 'Collection' }}
+              {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
           </div>
           <div 
@@ -172,7 +170,9 @@ const childStyle = {
             class="row mb-2"
           >
             <div class="col-4 text-left">
-              <b>Progress:</b>
+              <b>
+                {{ store.state.strings.nodes_progress }}
+              </b>
             </div>
             <div 
               class="col-8" 
@@ -183,7 +183,9 @@ const childStyle = {
           </div>
           <div v-if="includedCourses" class="row mb-2">
             <div class="col-5 text-left">
-              <b>Courses:</b> 
+              <b>
+                {{ store.state.strings.nodes_courses }}
+              </b> 
             </div>
             <div class="col-7">
               <ul 
@@ -231,11 +233,18 @@ const childStyle = {
                   class="table-container table-container-left"
                 >
                   <div v-if="Object.keys(data.completion.singlerestrictionnode).length > 0">
-                    <table class="table table-bordered table-hover fancy-table" style="right: -150%;">
+                    <table 
+                      class="table table-bordered table-hover fancy-table" 
+                      style="right: -150%;"
+                    >
                       <thead class="thead-light">
                         <tr>
-                          <th>Key</th>
-                          <th>Checkmark</th>
+                          <th>
+                            {{ store.state.strings.nodes_table_key }}
+                          </th>
+                          <th>
+                            {{ store.state.strings.nodes_table_checkmark }}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -260,7 +269,7 @@ const childStyle = {
                   <div v-else>
                     <div class="card">
                       <div class="card-body">
-                        No Restrictions are defined
+                        {{ store.state.strings.nodes_no_restriction_defined }}
                       </div>
                     </div>
                   </div>
@@ -276,7 +285,7 @@ const childStyle = {
                   :disabled="!active"
                   @click="toggleTable('Completion')"
                 >
-                  {{ isCompletionVisible ? 'Hide Completion' : 'Show Completion' }}
+                  {{ isCompletionVisible ? store.state.strings.nodes_hide_completion : store.state.strings.nodes_show_completion }}
                 </button>
                 <div
                   v-show="isCompletionVisible" 
@@ -286,8 +295,12 @@ const childStyle = {
                     <table class="table table-bordered table-hover fancy-table">
                       <thead class="thead-light">
                         <tr>
-                          <th>Key</th>
-                          <th>Checkmark</th>
+                          <th>
+                            {{ store.state.strings.nodes_table_key }}
+                          </th>
+                          <th>
+                            {{ store.state.strings.nodes_table_checkmark }}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -312,7 +325,7 @@ const childStyle = {
                   <div v-else>
                     <div class="card">
                       <div class="card-body">
-                        No Completions are defined
+                        {{ store.state.strings.nodes_no_completion_defined }}
                       </div>
                     </div>
                   </div>
