@@ -2,11 +2,31 @@
   <div>
     <button 
       class="btn btn-outline-primary"
+      :disabled="showBackConfirmation"
       @click="goBack"
     >
       <i class="fa fa-arrow-left" /> {{ store.state.strings.restriction_go_back_learningpath }}
     </button>
-
+    <div 
+      v-if="showBackConfirmation"
+      class="cancelConfi"
+    >
+      {{ store.state.strings.flowchart_cancel_confirmation }}
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-primary m-2" 
+        @click="goBack"
+      >
+        {{ store.state.strings.flowchart_back_button }}
+      </button>
+      <button 
+        id="confim-cancel-learning-path"
+        class="btn btn-warning m-2"
+        @click="goBackConfirmation"
+      >
+        {{ store.state.strings.flowchart_cancel_button }}
+      </button>
+    </div>
     <h3>
       {{ store.state.strings.restriction_edit_restrictions }}
     </h3>
@@ -102,6 +122,7 @@ const { nodes, edges, addNodes, project, vueFlowRef, addEdges, findNode } = useV
 // Load Store 
 const store = useStore();
 const learningpathrestriction= ref({})
+const showBackConfirmation = ref(false)
 
 const props = defineProps({
   learningpath: {
@@ -151,9 +172,14 @@ onMounted(async () => {
 
 // Function to go back
 const goBack = () => {
+  showBackConfirmation.value = !showBackConfirmation.value
+}
+
+const goBackConfirmation = () => {
   store.state.editingadding = !store.state.editingadding
   store.state.editingrestriction = !store.state.editingrestriction
 }
+
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {
@@ -300,5 +326,14 @@ aside{
   border-bottom-left-radius: 1em;
 }
 .completions.dark{background:#4e574f;}
+
+.cancelConfi{
+  z-index: 1;
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
+}
 
 </style>

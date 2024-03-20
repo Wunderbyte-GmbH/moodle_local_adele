@@ -28,6 +28,7 @@ import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref, watch  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
+import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 
 // Load Store 
 const store = useStore();
@@ -132,6 +133,10 @@ const childStyle = {
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
+      <OverviewRestrictionCompletion 
+        :node="data" 
+        :learningpath="props.learningpath"
+      />
       <div class="card-header text-center">
         <div class="row align-items-center">
           <div class="col">
@@ -221,11 +226,11 @@ const childStyle = {
           </div>
         </div>
       </div>
-      <div class="card-footer">
-        <OverviewRestrictionCompletion 
-          :node="data" 
-          :learningpath="props.learningpath"
-        />
+      <div 
+        v-if="dataValue"
+        class="card-footer"
+      >
+        <NodeFeedbackArea :data="dataValue" />
       </div>
     </div>
     <Handle 

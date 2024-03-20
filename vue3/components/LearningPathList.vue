@@ -29,14 +29,14 @@
     <div class="d-flex justify-content-between">
       <button 
         type="button" 
-        class="btn btn-primary"
+        class="btn btn-primary mt-4 mb-4"
         @click.prevent="addNewLearningpath()" 
       >
         {{ store.state.strings.learningpath_form_title_add }}
       </button>
       <button 
         type="button" 
-        class="btn btn-secondary"
+        class="btn btn-secondary  mt-4 mb-4"
         data-toggle="modal" 
         data-target="#helpingSlider"
       >

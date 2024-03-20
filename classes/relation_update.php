@@ -55,7 +55,7 @@ class relation_update {
         // Get the user path relation.
         $userpath = $event->other['userpath'];
         if ($userpath) {
-            self::subscribe_user_startin_node($userpath);
+            self::subscribe_user_starting_node($userpath);
             foreach ($userpath->json['tree']['nodes'] as $node) {
                 $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                 $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
@@ -70,6 +70,7 @@ class relation_update {
                             $validationcondition = false;
                             while ( $currentcondition ) {
                                 if ($currentcondition['data']['label'] == 'timed' ||
+                                    $currentcondition['data']['label'] == 'timed_duration' ||
                                     $currentcondition['data']['label'] == 'specific_course' ||
                                     $currentcondition['data']['label'] == 'parent_courses') {
                                     $validationcondition =
@@ -272,9 +273,9 @@ class relation_update {
      *
      * @param object $userpath
      */
-    public static function subscribe_user_startin_node($userpath) {
+    public static function subscribe_user_starting_node($userpath) {
         global $DB;
-        foreach ($userpath->json['tree']['nodes'] as $node) {
+        foreach ($userpath->json['tree']['nodes'] as &$node) {
             if (in_array('starting_node', $node['parentCourse'])) {
                 foreach ($node['data']['course_node_id'] as $courseid) {
                     if (!enrol_is_enabled('manual')) {
@@ -290,10 +291,21 @@ class relation_update {
                         )) {
                         break; // No manual enrolment instance on this course.
                     }
+                    if (!$node['data']['first_enrolled']) {
+                        $node['data']['first_enrolled'] = time();
+                        $firstenrollededit = true;
+                    }
                     $instance = reset($instances); // Use the first manual enrolment plugin in the course.
                     $enrol->enrol_user($instance, $userpath->user_id);
                 }
             }
+        }
+        if ($firstenrollededit) {
+            $data = [
+                'id' => $userpath->id,
+                'json' => json_encode($userpath->json),
+            ];
+            $DB->update_record('local_adele_path_user', $data);
         }
     }
 }

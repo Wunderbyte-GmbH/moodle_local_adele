@@ -15,6 +15,7 @@ import timed from '../restriction/conditions/timed_dates.vue'
 import specific_course from '../restriction/conditions/specific_course.vue'
 import parent_node_completed from '../restriction/conditions/parent_node_completed.vue'
 import parent_courses from '../restriction/conditions/parent_courses.vue'
+import timed_duration from '../restriction/conditions/timed_duration.vue'
 
 const props = defineProps({
   restriction: {
@@ -41,6 +42,8 @@ const dynamicComponent = computed(() => {
       return parent_courses;
     case 'parent_node_completed':
       return parent_node_completed;
+    case 'timed_duration':
+      return timed_duration;
     default:
       return null;
   }
@@ -54,6 +57,7 @@ const getInputLabel = () => {
     specific_course: 'specific_course',
     parent_courses: 'parent_courses',
     parent_node_completed: 'parent_node_completed',
+    timed_duration: 'timed_duration',
   };
   return labelToComponent[props.restriction.label] || 'manual';
 };

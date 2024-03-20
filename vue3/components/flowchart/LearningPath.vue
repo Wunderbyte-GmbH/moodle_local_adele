@@ -187,8 +187,8 @@ nodes: [],
 
 const onDrag = ($event) => {
   $event.nodes[0].position = {
-    x: Math.ceil($event.nodes[0].position.x / 150) * 150,
-    y: Math.ceil($event.nodes[0].position.y / 150) * 150,
+    x: Math.round($event.nodes[0].position.x / 150) * 150,
+    y: Math.round($event.nodes[0].position.y / 150) * 150,
   }
   if (typeof $event.nodes[0].data.module == 'number') {
     drawModules(props.learningpath, addNodes, removeNodes, findNode, $event.nodes[0])

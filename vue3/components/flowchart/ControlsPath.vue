@@ -116,10 +116,6 @@ const onSave = async () => {
         type: 'error'
       });
     } else {
-      // learningpathcontrol.value.json.tree.nodes.forEach((node) => {
-      //   const computedPositionNode = findNode(node.id)
-      //   node.position = computedPositionNode.computedPosition
-      // })
       removeNodes(['starting_node'])
       if (learningpathcontrol.value.id == 0) {
         if (learningpathcontrol.value.json != '') {

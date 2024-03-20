@@ -53,11 +53,13 @@ const props = defineProps({
 
 const learningpathCompletion = ref(null)
 
+const showCancelConfirmation = ref(false)
+
 onMounted(() => {
   learningpathCompletion.value = props.learningpath
 })
 
-const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
+const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['change-class']);
@@ -104,7 +106,7 @@ const onSave = async () => {
     });
     const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
     router.push('/learningpaths/edit/' + learningpathID);
-    onCancel();
+    onCancelConfirmation();
     notify({
       title: store.state.strings.title_save,
       text: store.state.strings.description_save,
@@ -115,6 +117,10 @@ const onSave = async () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
+  showCancelConfirmation.value = !showCancelConfirmation.value
+};
+
+const onCancelConfirmation = () => {
   store.state.editingpretest = false
   store.state.editingrestriction = false
   store.state.editingadding = true
@@ -138,10 +144,31 @@ onPaneReady(({ fitView,}) => {
     </button>
     <button 
       class="btn btn-secondary m-2" 
+      :disabled="showCancelConfirmation"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
+    <div 
+      v-if="showCancelConfirmation"
+      class="cancelConfi"
+    >
+      {{ store.state.strings.flowchart_cancel_confirmation }}
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-primary m-2" 
+        @click="onCancel"
+      >
+        {{ store.state.strings.flowchart_back_button }}
+      </button>
+      <button 
+        id="confim-cancel-learning-path"
+        class="btn btn-warning m-2"
+        @click="onCancelConfirmation"
+      >
+        {{ store.state.strings.flowchart_cancel_button }}
+      </button>
+    </div>
     <button 
       class="btn btn-warning m-2" 
       @click="toggleClass"
@@ -150,3 +177,13 @@ onPaneReady(({ fitView,}) => {
     </button>
   </Panel>
 </template>
+
+<style scoped>
+.cancelConfi{
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
+}
+</style>

@@ -53,11 +53,13 @@ const props = defineProps({
 
 const learningpathRestriction = ref(null)
 
+const showCancelConfirmation = ref(false)
+
 onMounted(() => {
   learningpathRestriction.value = props.learningpath
 })
 
-const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
+const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits(['']);
@@ -98,7 +100,7 @@ const onSave = async () => {
     });
     const learningpathID = await store.dispatch('saveLearningpath', learningpathRestriction.value)
     router.push('/learningpaths/edit/' + learningpathID);
-    onCancel();
+    onCancelConfirmation();
     notify({
       title: store.state.strings.title_save,
       text: store.state.strings.description_save,
@@ -108,10 +110,14 @@ const onSave = async () => {
 };
 
 // Cancel learning path edition and return to overview
-const onCancel = () => {
+const onCancelConfirmation = () => {
   store.state.editingrestriction = false
   store.state.editingadding = true
   store.state.node = null
+};
+
+const onCancel = () => {
+  showCancelConfirmation.value = !showCancelConfirmation.value
 };
 
 // Fit pane into view
@@ -129,11 +135,32 @@ onPaneReady(({ fitView,}) => {
       {{ store.state.strings.save }}
     </button>
     <button 
-      class="btn btn-secondary m-2" 
+      class="btn btn-secondary m-2"
+      :disabled="showCancelConfirmation"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
+    <div 
+      v-if="showCancelConfirmation"
+      class="cancelConfi"
+    >
+      {{ store.state.strings.flowchart_cancel_confirmation }}
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-primary m-2" 
+        @click="onCancel"
+      >
+        {{ store.state.strings.flowchart_back_button }}
+      </button>
+      <button 
+        id="confim-cancel-learning-path"
+        class="btn btn-warning m-2"
+        @click="onCancelConfirmation"
+      >
+        {{ store.state.strings.flowchart_cancel_button }}
+      </button>
+    </div>
     <button 
       class="btn btn-warning m-2" 
       @click="toggleClass"
@@ -142,3 +169,13 @@ onPaneReady(({ fitView,}) => {
     </button>
   </Panel>
 </template>
+
+<style scoped>
+.cancelConfi{
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
+}
+</style>

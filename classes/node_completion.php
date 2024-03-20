@@ -49,6 +49,7 @@ class node_completion {
         // Get the user path relation.
         global $DB;
         $userpath = json_decode($event->other['userpath']->json);
+        $firstenrollededit = false;
         foreach ($userpath->tree->nodes as $node) {
             if (in_array($node->id, $event->other['node']['childCourse'])) {
                 foreach ($node->data->course_node_id as $subscribecourse) {
@@ -66,9 +67,21 @@ class node_completion {
                         break; // No manual enrolment instance on this course.
                     }
                     $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+
+                    if (!$node->data->first_enrolled) {
+                        $node->data->first_enrolled = time();
+                        $firstenrollededit = true;
+                    }
                     $enrol->enrol_user($instance, $event->other['userpath']->user_id);
                 }
             }
+        }
+        if ($firstenrollededit) {
+            $data = [
+                'id' => $event->other['userpath']->id,
+                'json' => json_encode($userpath),
+            ];
+            $DB->update_record('local_adele_path_user', $data);
         }
     }
 }

@@ -1,17 +1,57 @@
 <template>
-  <div class="form-check">
-    <div class="input-group mb-3 d-flex flex-column align-items-center">
-      <span class="input-group-text rounded-end-0">{{ descriptions.start }}</span>
-      <input
-        type="datetime-local"
-        class="form-control"
-        style="
-          width: 80%;
-          border-radius: 0.5rem !important;
-        "
-        :value="data.start"
-        @input="updateSelectedDateTime('start', $event)"
+  <div class="form-group">
+    <div class="input-group mb-3">
+      <select 
+        v-model="data.selectedOption"
+        class="form-select"
+        @change="onChange()"
       >
+        <option 
+          disabled 
+          value="" 
+          selected
+        >
+          Select the duration start
+        </option>
+        <option 
+          v-for="(label, key) in options" 
+          :key="key" 
+          :value="key"
+        >
+          {{ label }}
+        </option>
+      </select>
+    </div>
+    <div 
+      class="row input-group mb-3"
+      style="margin-left: 0;"
+    >
+      <input
+        v-model="data.selectedDuration"
+        class="col-md-6 form-control"
+        placeholder="Duration value"
+        @change="onChange()"
+      >
+      <select 
+        v-model="data.durationValue"
+        class="col-md-6 form-select ml-0" 
+        @change="onChange()"
+      >
+        <option 
+          disabled 
+          value="" 
+          selected
+        >
+          Select a duration format
+        </option>
+        <option 
+          v-for="(label, key) in durationOptions" 
+          :key="key" 
+          :value="key"
+        >
+          {{ label }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
@@ -31,27 +71,32 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  });
-const data = ref({
-  start: null,
-  end: null,
 });
 
-const options = {
+const data = ref({
+  selectedOption: null,
+  durationValue: null,
+  selectedDuration: null,
+});
+
+// Options for the first select
+const options = ref({
   0: store.state.strings.course_select_condition_timed_duration_learning_path,
   1: store.state.strings.course_select_condition_timed_duration_node,
-}
+});
 
-const duration = {
+// Options for the duration select
+const durationOptions = ref({
   0: store.state.strings.course_select_condition_timed_duration_days,
   1: store.state.strings.course_select_condition_timed_duration_weeks,
   2: store.state.strings.course_select_condition_timed_duration_months,
-}
+});
+
 
 const emit = defineEmits(['update:modelValue'])
 
-const updateSelectedDuration = (type, event) => {
-  data.value[type] = event.target.value;
+const onChange = () => {
+  console.log(data.value)
   emit('update:modelValue', data.value);
 };
 
@@ -67,4 +112,28 @@ watch(() => props.modelValue, (newValue) => {
   data.value = newValue;
 }, { deep: true } );
 
+watch(() => data.value.selectedDuration, (newValue, oldValue) => {
+  const parsedValue = parseInt(newValue, 10);
+
+  // Check if it's not a number (NaN), less than 1, or a float
+  if (isNaN(parsedValue) || parsedValue < 1 || parsedValue !== parseFloat(newValue)) {
+    // Reset to old value if it was valid, otherwise, default to 1
+    data.value.selectedDuration = oldValue && oldValue > 0 && parseInt(oldValue, 10) === parseFloat(oldValue) ? oldValue : '';
+  } else {
+    data.value.selectedDuration = parsedValue.toString();
+  }
+}, { deep: true });
+
 </script>
+
+<style scoped>
+
+.form-select {
+  width: 100%; /* Make the inputs fill their container */
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+</style>

@@ -44,14 +44,35 @@
         v-else-if="$store.state.editingadding == true" 
         class="fade-in"
       >
-        <router-link 
+        <button 
           :to="{ name: 'learningpaths-edit-overview' }" 
           tag="button" 
           class="btn btn-outline-primary mb-2"
+          :disabled="showBackConfirmation"
           @click="goBack" 
         >
           <i class="fa fa-arrow-left" /> Go Back to Overview
-        </router-link>
+        </button>
+        <div 
+          v-if="showBackConfirmation"
+          class="cancelConfi"
+        >
+          {{ store.state.strings.flowchart_cancel_confirmation }}
+          <button 
+            id="cancel-learning-path"
+            class="btn btn-primary m-2" 
+            @click="goBack"
+          >
+            {{ store.state.strings.flowchart_back_button }}
+          </button>
+          <button 
+            id="confim-cancel-learning-path"
+            class="btn btn-warning m-2"
+            @click="goBackConfirmation"
+          >
+            {{ store.state.strings.flowchart_cancel_button }}
+          </button>
+        </div>
         <div 
           class="card p-4" 
           style="padding: 2.5rem !important;"
@@ -115,6 +136,7 @@ const router = useRouter()
 const goalname = ref('')
 const goaldescription = ref('')
 const learningpath = ref('')
+const showBackConfirmation = ref(false)
 
 const changeGoalName = (newGoalName) => {
   store.state.learningpath.name = newGoalName;
@@ -167,6 +189,10 @@ onBeforeRouteUpdate((to, from, next) => {
 
 // Function to go back
 const goBack = () => {
+  showBackConfirmation.value = !showBackConfirmation.value
+}
+
+const goBackConfirmation = () => {
   store.state.editingadding = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
@@ -181,7 +207,6 @@ const finishEdit = () => {
 
 const handleRemoveNode = (nodeId) => {
   if (nodeId) {
-
     const nodesArray = learningpath.value.json.tree.nodes;
     const edgesArray = learningpath.value.json.tree.edges; 
     const nodeIndex = nodesArray.findIndex(node => node.id === nodeId);
@@ -225,6 +250,15 @@ const handleRemoveNode = (nodeId) => {
 @keyframes fadeIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
+}
+
+.cancelConfi{
+  z-index: 1;
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
 }
 
 </style>

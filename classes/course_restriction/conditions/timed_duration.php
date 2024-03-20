@@ -27,6 +27,7 @@
 
  namespace local_adele\course_restriction\conditions;
 
+use DateInterval;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,7 +43,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class timed_duration implements course_restriction {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_TIMED;
     /** @var string $type of the redered condition in frontend. */
@@ -100,8 +100,44 @@ class timed_duration implements course_restriction {
      * @param object $userpath
      * @return boolean
      */
+    /**
+     * Helper function to return localized description strings.
+     * @param array $node
+     * @param object $userpath
+     * @return boolean
+     */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
+        $currenttime = time();
+        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+            foreach ($node['restriction']['nodes'] as $restrictionnode) {
+                if ($restrictionnode['data']['label'] == 'timed_duration') {
+                    $iscurrenttimeinrange = false;
+                    $starttime = $userpath->timecreated;
+
+                    if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
+                        $starttime->setTimestamp($node['data']['first_enrolled']);
+                    }
+
+                    $durationvalue = $restrictionnode['data']['value']['durationValue'];
+                    $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
+                    // Check if the duration type is valid and calculate the end time
+                    if (isset($this->durationvaluearray[$durationvalue])) {
+                        $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
+                        $endtime = $starttime + $totalseconds;
+                        // Check if the current timestamp is between the start and end timestamps
+                        $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
+                    }
+                    $timed[$restrictionnode['id']] = $iscurrenttimeinrange;
+                }
+            }
+        }
         return $timed;
     }
+
+    private $durationvaluearray = [
+        '0' => 86400, // Days.
+        '1' => 604800, // Weeks.
+        '2' => 2629746, // Months.
+    ];
 }

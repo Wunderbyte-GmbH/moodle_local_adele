@@ -30,6 +30,7 @@ import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
+import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
 import CourseRating from '../nodes_items/CourseRating.vue';
@@ -146,6 +147,10 @@ const childStyle = {
       :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
     >
       <div class="card-header text-center">
+        <OverviewRestrictionCompletion 
+          :node="data" 
+          :learningpath="learningpath"
+        />
         <div class="row">
           <div class="col-10">
             <h5>
@@ -335,11 +340,11 @@ const childStyle = {
           </div>
         </div>
       </div>
-      <div class="card-footer">
-        <OverviewRestrictionCompletion 
-          :node="data" 
-          :learningpath="learningpath"
-        />
+      <div 
+        v-if="data"
+        class="card-footer"
+      >
+        <NodeFeedbackArea :data="data" />
       </div>
     </div>
     <Handle 

@@ -115,87 +115,110 @@ const toggleCards = () => {
 </script>
 
 <template>
-  <div
-    class="icon-container"
-    :class="{ 'card-hover': showCard }"
-  >
+  <div>
     <div v-if="store.state.view=='student'">
       <div 
         v-if="node.completion && (
           (node.completion.restrictionnode && node.completion.restrictionnode.valid) ||
           (node.completion.completionnode && node.completion.completionnode.valid)
         )"
-        
-        @click="toggleCompletion('completion')"
       >
-        <div 
-          class="completion" 
-          :style="{ color: completionColor }"
+        <div
+          class="card-container"
+          :class="{ 'card-hover': showCard }"
+          @click="toggleCompletion('completion')"
         >
-          <i class="fa-solid fa-check-to-slot" />
+          <div 
+            class="completion" 
+            :style="{ color: completionColor }"
+          >
+            Completions
+            <i class="ml-2 fa-solid fa-check-to-slot" />
+          </div>
+          <button 
+            v-if="showCard" 
+            class="cancel-button" 
+            @click="toggleCompletion('completion')"
+          >
+            <i
+              class="fa-solid fa-times cancel-icon"
+              @click="toggleCompletion('completion')"
+            />
+          </button>
         </div>
       </div>
       <div v-else>
         <div
+          class="card-container"
+          :class="{ 'card-hover': showCard }"
           @click="toggleCompletion('restriction')"
         >
           <div 
             class="restriction" 
             :style="{ color: restrictionColor }"
           >
-            <i class="fa-solid fa-key" />
+            {{ store.state.strings.nodes_items_restrictions }}
+            <i class="ml-2 fa-solid fa-key" />
           </div>
+          <button 
+            v-if="showCard" 
+            class="cancel-button" 
+            @click="toggleCompletion('restriction')"
+          >
+            <i
+              class="fa-solid fa-times cancel-icon" 
+              @click="toggleCompletion('restriction')"
+            />
+          </button>
         </div>
       </div>
-      <transition name="unfold">
-        <div 
-          v-if="showCard" 
-          class="additional-card-student" 
-          :style="{ backgroundColor: shownCondition=='completion' ? completionColor : restrictionColor}"
-        >
-          <div v-if="shownCondition=='restriction' && conditions.restriction.count > 0 ">
-            <ul class="list-group mt-3">
-              <li 
-                v-for="(condition, index) in conditions.restriction.conditions" 
-                :key="index"
-                class="list-group-item"
-              >
-                {{ condition.name }}
-                <i 
-                  v-if="condition.valid" 
-                  class="fas fa-check fa-xl"
-                  style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
-                />
-              </li>
-            </ul>
-          </div>
-  
-          <div v-else-if="shownCondition=='completion' && conditions.completion.count > 0 ">
-            <ul class="list-group mt-3">
-              <li 
-                v-for="(condition, index) in conditions.completion.conditions" 
-                :key="index"
-                class="list-group-item"
-              >
-                {{ condition.name }}
-                <i 
-                  v-if="condition.valid" 
-                  class="fas fa-check fa-xl"
-                  style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
-                />
-              </li>
-            </ul>
-          </div>
-  
-          <div v-else>
-            <ul class="list-group mt-3">
-              <li class="list-group-item">
-                {{ store.state.strings.nodes_items_no_conditions }}
-              </li>
-            </ul>
-          </div>
+      <div 
+        v-if="showCard" 
+        class="additional-card left" 
+        :style="{ backgroundColor: shownCondition=='completion' ? completionColor : restrictionColor}"
+      >
+        <div v-if="shownCondition=='restriction' && conditions.restriction.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.restriction.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+              <i 
+                v-if="condition.valid" 
+                class="fas fa-check fa-xl"
+                style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
+              />
+            </li>
+          </ul>
         </div>
-      </transition>
+
+        <div v-else-if="shownCondition=='completion' && conditions.completion.count > 0 ">
+          <ul class="list-group mt-3">
+            <li 
+              v-for="(condition, index) in conditions.completion.conditions" 
+              :key="index"
+              class="list-group-item"
+            >
+              {{ condition.name }}
+              <i 
+                v-if="condition.valid" 
+                class="fas fa-check fa-xl"
+                style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div v-else>
+          <ul class="list-group mt-3">
+            <li class="list-group-item">
+              {{ store.state.strings.nodes_items_no_conditions }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div v-else>
       <div 
@@ -301,18 +324,6 @@ const toggleCards = () => {
 </template>
 
 <style scoped>
-
-.icon-container {
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  display: inline-flex; /* Use flexbox for centering */
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 1;
-}
-
 .card-container {
   cursor: pointer;
   width: 100%;
@@ -331,24 +342,8 @@ const toggleCards = () => {
 .restriction,
 .completion {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px; /* Diameter of the round button */
-  height: 40px; /* Diameter of the round button */
-  border-radius: 50%; /* Makes the div round */
-  border: 1px solid rgba(0,0,0,0.2);
-  background-color: #f0f0f0; /* Light background for the button */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adds depth with a shadow */
-  transition: background-color 0.3s, box-shadow 0.3s; 
-}
-
-.completion:hover, .restriction:hover {
-  background-color: #e2e2e2; /* Darker background on hover for feedback */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Larger shadow on hover for depth */
-}
-
-.fa-check-to-slot, .fa-key {
-  font-size: 20px; /* Adjust icon size as needed */
+  align-items: flex-end; /* Align items at the bottom within each child */
+  margin-right: 10px; /* Add margin to separate items within each child */
 }
 
 .additional-card {
@@ -359,16 +354,6 @@ const toggleCards = () => {
   margin-top: 10px;
   position: absolute;
   top: 70%;
-}
-
-.additional-card-student {
-  width: 300px;
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px;
-  position: absolute;
-  left: 40px;
-  bottom: 40px;
 }
 
 .left {
@@ -387,24 +372,4 @@ const toggleCards = () => {
   border: none;
   border-radius: 4px;
 }
-
-/* Starting state for entering */
-.unfold-enter-from, .unfold-leave-to {
-  transform: scaleX(0);
-  opacity: 0;
-  transform-origin: left; /* Ensures scaling happens left to right */
-}
-
-/* Ending state for entering and starting state for leaving */
-.unfold-enter-to, .unfold-leave-from {
-  transform: scaleX(1);
-  opacity: 1;
-}
-
-/* Active state for entering and leaving */
-.unfold-enter-active, .unfold-leave-active {
-  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-  visibility: visible;
-}
-
 </style>
