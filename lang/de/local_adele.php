@@ -47,7 +47,7 @@ $string['learningpaths_edit_site_description'] = 'Sie können einen neuen Lernpf
 $string['learningpaths_edit_site_no_learningpaths'] = 'Noch keine Lernpfade vorhanden.';
 $string['learningpaths_edit_no_learningpaths'] = 'Es gibt keine Ziele zum Anzeigen.';
 
-// Übersicht Lernziele.
+// Uebersicht Lernziele.
 $string['edit'] = 'Bearbeiten';
 $string['delete'] = 'Löschen';
 $string['deletepromptpre'] = 'Möchten Sie das Lernziel "';
@@ -90,7 +90,7 @@ $string['placeholder_search'] = 'Kurse suchen';
 $string['edit_course_node'] = 'Kursknoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
 
-// Übersichtszeichenfolge.
+// Uebersichtszeichenfolge.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
 $string['overviewaddingbtn'] = 'Neuen Lernpfad erstellen';
 

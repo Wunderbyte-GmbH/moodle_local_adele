@@ -100,12 +100,6 @@ class timed_duration implements course_restriction {
      * @param object $userpath
      * @return boolean
      */
-    /**
-     * Helper function to return localized description strings.
-     * @param array $node
-     * @param object $userpath
-     * @return boolean
-     */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
         $currenttime = time();
@@ -121,11 +115,11 @@ class timed_duration implements course_restriction {
 
                     $durationvalue = $restrictionnode['data']['value']['durationValue'];
                     $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
-                    // Check if the duration type is valid and calculate the end time
+                    // Check if the duration type is valid and calculate the end time.
                     if (isset($this->durationvaluearray[$durationvalue])) {
                         $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
                         $endtime = $starttime + $totalseconds;
-                        // Check if the current timestamp is between the start and end timestamps
+                        // Check if the current timestamp is between the start and end timestamps.
                         $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
                     }
                     $timed[$restrictionnode['id']] = $iscurrenttimeinrange;
@@ -135,6 +129,14 @@ class timed_duration implements course_restriction {
         return $timed;
     }
 
+    /**
+     * Maps duration types to their equivalent durations in seconds.
+     *
+     * @var array The keys represent the duration types as follows:
+     *            '0' for days, with each day being 86400 seconds;
+     *            '1' for weeks, with each week being 604800 seconds;
+     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
+     */
     private $durationvaluearray = [
         '0' => 86400, // Days.
         '1' => 604800, // Weeks.
