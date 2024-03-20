@@ -27,7 +27,18 @@
 
 <div id="local-adele-app"
     name="local-adele-app"
-    user="{{userid}}">
+    user="{{userid}}"
+    contextid="{{contextid}}"  
+    {{#learningpath}}
+      learningpath="{{learningpath}}"
+    {{/learningpath}}
+    {{#userlist}}
+      userlist="{{userlist}}"
+    {{/userlist}}
+    {{#view}}
+      view="{{view}}"
+    {{/view}}
+  >
     <router-view></router-view>
 </div>
 

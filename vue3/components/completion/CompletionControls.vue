@@ -121,6 +121,7 @@ const onCancel = () => {
 };
 
 const onCancelConfirmation = () => {
+  onCancel()
   store.state.editingpretest = false
   store.state.editingrestriction = false
   store.state.editingadding = true

@@ -96,7 +96,6 @@ const durationOptions = ref({
 const emit = defineEmits(['update:modelValue'])
 
 const onChange = () => {
-  console.log(data.value)
   emit('update:modelValue', data.value);
 };
 

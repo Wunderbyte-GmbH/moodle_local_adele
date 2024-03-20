@@ -27,13 +27,12 @@ declare(strict_types=1);
 
 namespace local_adele\external;
 
-use context_system;
+use core\context;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
 use local_adele\learning_paths;
-use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -58,6 +57,7 @@ class duplicate_learningpath extends external_api {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
+            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             ]
         );
     }
@@ -67,20 +67,20 @@ class duplicate_learningpath extends external_api {
      *
      * @param int $userid
      * @param int $learningpathid
+     * @param int $contextid
      * @return array
      */
-    public static function execute($userid, $learningpathid): array {
+    public static function execute($userid, $learningpathid, $contextid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
+            'contextid' => $contextid,
         ]);
 
         require_login();
 
-        $context = context_system::instance();
-        if (!has_capability('local/adele:canmanage', $context)) {
-            throw new moodle_exception('norighttoaccess', 'local_adele');
-        }
+        $context = context::instance_by_id($contextid);
+        require_capability('local/adele:canmanage', $context);
 
         return learning_paths::duplicate_learning_path($params);
     }

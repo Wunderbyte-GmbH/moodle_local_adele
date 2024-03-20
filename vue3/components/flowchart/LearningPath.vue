@@ -31,6 +31,7 @@
       <Modal 
         v-if="store.state.view != 'teacher'" 
         :learningpath="learningpath"
+        @saveEdit="handleSaveEdit"
       />
       <VueFlow 
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
@@ -136,6 +137,9 @@ const props = defineProps({
 const emit = defineEmits([
   'finish-edit',
   'remove-node',
+  'add-edge',
+  'remove-edge',
+  'save-edit',
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -179,10 +183,11 @@ const typeChanged = (changedNode) => {
 }
 
 // load useVueFlow properties / functions
-const { nodes, findNode, onConnect, addEdges, 
+const { nodes, edges, findNode, onConnect, addEdges, 
     addNodes, removeNodes, fitView,
     toObject, getEdges } = useVueFlow({
 nodes: [],
+edges: [],
 })
 
 const onDrag = ($event) => {
@@ -216,10 +221,26 @@ if (params.source !== store.state.startnode) {
  params.source = store.state.startnode;
 }
 addEdges(addCustomEdge( params.target, params.source));
+emit('add-edge', addCustomEdge( params.target, params.source));
+}
+
+function handleSaveEdit(params){
+  emit('save-edit', params);
 }
 
 // Triggers handle connect 
 onConnect(handleConnect);
+
+watch(
+  () => edges.value.length,
+  (newEdges, oldEdges) => {
+    if(oldEdges > newEdges){
+      emit('remove-edge', edges.value);
+    }
+  },
+  { deep: true }
+);
+
 
 // Adding setting up nodes and potentional edges
 function onDrop(event) {

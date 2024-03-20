@@ -38,7 +38,7 @@ export function createAppStore() {
                 user: null,
                 userlist: null,
                 learningPathID: 0,
-                contextID: 0,
+                contextid: 0,
                 strings: {},
                 learningpaths: null,
                 learningpath: null,
@@ -130,7 +130,11 @@ export function createAppStore() {
             },
             async fetchLearningpath(context) {
                 const learningpath = await ajax('local_adele_get_learningpath',
-                    { userid: 0, learningpathid: context.state.learningPathID });
+                    { 
+                      userid: 0, 
+                      learningpathid: context.state.learningPathID,
+                      contextid: context.state.contextid,
+                    });
                 if (learningpath.json != '') {
                     learningpath.json = await JSON.parse(learningpath.json); 
                 }
@@ -139,12 +143,20 @@ export function createAppStore() {
             },
             async fetchUserPathRelations(context) {
                 const lpUserPathRelations = await ajax('local_adele_get_user_path_relations',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                { 
+                  userid: context.state.user, 
+                  learningpathid: context.state.learningPathID,
+                  contextid: context.state.contextid,
+                });
                 context.commit('setLpUserPathRelations', lpUserPathRelations);
             },
             async fetchUserPathRelation(context, route) {
                 const lpUserPathRelation = await ajax('local_adele_get_user_path_relation',
-                    { learningpathid: route.learningpathId, userpathid: route.userId});
+                    { 
+                      learningpathid: route.learningpathId,
+                      userpathid: route.userId,
+                      contextid: context.state.contextid,
+                    });
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
                 if (lpUserPathRelation.json != '') {
                   lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json); 
@@ -155,18 +167,28 @@ export function createAppStore() {
                 await ajax('local_adele_save_user_path_relation',
                     { userid: context.state.user,
                       learningpathid: context.state.learningPathID,
-                      params: JSON.stringify(params)});
+                      params: JSON.stringify(params),
+                      contextid: context.state.contextid,
+                    });
                 context.dispatch('fetchUserPathRelation', params.route);
                 context.dispatch('fetchUserPathRelations');
             },
             async fetchLearningpaths(context) {
                 const learningpaths = await ajax('local_adele_get_learningpaths',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                { 
+                  userid: context.state.user, 
+                  learningpathid: context.state.learningPathID,
+                  contextid: context.state.contextid,
+                });
                 context.commit('setLearningpaths', learningpaths);
             },
             async fetchAvailablecourses(context) {
                 const availablecourses = await ajax('local_adele_get_availablecourses',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                { 
+                  userid: context.state.user,
+                  learningpathid: context.state.learningPathID,
+                  contextid: context.state.contextid,
+                });
                 context.commit('setAvailablecourses', availablecourses);
             },
             async saveLearningpath(context, payload) {
@@ -175,59 +197,91 @@ export function createAppStore() {
                   learningpathid: context.state.learningPathID, 
                   name: payload.name, 
                   description: payload.description, 
-                  json: JSON.stringify(payload.json) });                
+                  json: JSON.stringify(payload.json),
+                  contextid: context.state.contextid,
+                });                
                 context.dispatch('fetchLearningpaths');
                 return result.learningpath.id;
             },
             async deleteLearningpath(context, payload) {
                 const result = await ajax('local_adele_delete_learningpath', 
-                {userid: context.state.user, learningpathid: payload.learningpathid});
+                {
+                  userid: context.state.user, 
+                  learningpathid: payload.learningpathid,
+                  contextid: context.state.contextid,
+                });
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
             async duplicateLearningpath(context, payload) {
                 const result = await ajax('local_adele_duplicate_learningpath', 
-                {userid: context.state.user, learningpathid: payload.learningpathid});
+                {
+                  userid: context.state.user, 
+                  learningpathid: payload.learningpathid,
+                  contextid: context.state.contextid,
+                });
                 context.dispatch('fetchLearningpaths');
                 return result.result;
             },
             async fetchCompletions(context) {
                 const result = await ajax('local_adele_get_completions',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                {
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchRestrictions(context) {
                 const result = await ajax('local_adele_get_restrictions',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                {
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchCatquizTests(context) {
                 const result = await ajax('local_adele_get_catquiz_tests',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                {
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchCatquizScales(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_scales', 
-                { userid: context.state.user, learningpathid: context.state.learningPathID, testid: payload.testid});
+                { 
+                  userid: context.state.user,
+                  learningpathid: context.state.learningPathID,
+                  testid: payload.testid,
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchCatquizParentScales(context) {
                 const result = await ajax('local_adele_get_catquiz_parent_scales',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                {
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchCatquizParentScale(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_parent_scale',
-                { userid: context.state.user, learningpathid: context.state.learningPathID, sacleid: payload.scaleid });
+                { 
+                  userid: context.state.user, 
+                  learningpathid: context.state.learningPathID, 
+                  sacleid: payload.scaleid,
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
             async fetchModQuizzes(context) {
                 const result = await ajax('local_adele_get_mod_quizzes',
-                { userid: context.state.user, learningpathid: context.state.learningPathID });
+                { 
+                  contextid: context.state.contextid,
+                });
                 return result;
             },
-            async fetchImagePaths() {
-              const result = await ajax('local_adele_get_image_paths', {});
+            async fetchImagePaths(context) {
+              const result = await ajax('local_adele_get_image_paths', {
+                contextid: context.state.contextid,
+              });
               return result;
           },
         }

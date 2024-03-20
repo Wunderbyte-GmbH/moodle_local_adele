@@ -92,6 +92,9 @@
                   :learningpath="learningpath" 
                   @finish-edit="finishEdit"
                   @removeNode="handleRemoveNode"
+                  @addEdge="handleAddEdge"
+                  @removeEdge="handleRemoveEdge"
+                  @saveEdit="handleSaveEdit"
                 />
               </div>
             </div>
@@ -193,6 +196,7 @@ const goBack = () => {
 }
 
 const goBackConfirmation = () => {
+  goBack()
   store.state.editingadding = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
@@ -230,6 +234,27 @@ const handleRemoveNode = (nodeId) => {
     });
   }
 }
+
+const handleAddEdge = (edge) => {
+  if (edge && learningpath.value.json.tree.edges) {
+    learningpath.value.json.tree.edges.push(edge)
+  }
+}
+const handleRemoveEdge = (edges) => {
+  if (edges && learningpath.value.json) {
+    learningpath.value.json.tree.edges = edges
+  }
+}
+
+const handleSaveEdit = async (params) => {
+  learningpath.value.json.tree.nodes.forEach((node) => {
+    if (node.id == params.node_id) {
+      node.data.fullname = params.fullname
+    }
+  })
+
+}
+
 
 </script>
 

@@ -38,8 +38,10 @@ if ($learningpathid > 0) {
 
 require_login();
 
+$context = context_system::instance();
 // Set page context.
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context($context);
+
 // Set page layout.
 $PAGE->set_pagelayout('base');
 
@@ -53,6 +55,6 @@ $output = $PAGE->get_renderer('local_adele');
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->render_from_template('local_adele/initview', ['userid' => $USER->id]);
+echo $OUTPUT->render_from_template('local_adele/initview', ['userid' => $USER->id, 'contextid' => $context->id]);
 
 echo $OUTPUT->footer();

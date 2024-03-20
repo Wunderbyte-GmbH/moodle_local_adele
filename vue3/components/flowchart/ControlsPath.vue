@@ -112,7 +112,7 @@ const onSave = async () => {
     if (!learningpathcontrol.value.name || !learningpathcontrol.value.description) {
       notify({
         title: store.state.strings.flowchart_save_notification_title,
-        text: store.state.strings.flowchart_save_notification_text,
+        text: store.state.strings.flowchart_save_notification_text_missing_strings,
         type: 'error'
       });
     } else {
@@ -133,7 +133,6 @@ const onSave = async () => {
         learningpathcontrol.value.json.tree = 
           recalculateParentChild(learningpathcontrol.value.json.tree, 'parentCourse', 'childCourse', 'starting_node')
       }
-
       if (singleNodes) {
         notify({
           title: store.state.strings.flowchart_invalid_path_notification_title,
@@ -158,6 +157,7 @@ const onCancel = () => {
 };
 
 const onCancelConfirmation = () => {
+    onCancel()
     store.state.learningpath = null;
     store.state.learningPathID = 0;
     store.state.editingadding = false;

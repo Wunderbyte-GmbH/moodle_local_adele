@@ -27,14 +27,13 @@ declare(strict_types=1);
 
 namespace local_adele\external;
 
-use context_system;
+use core\context;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use local_adele\asset_handler;
-use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -56,21 +55,22 @@ class get_image_paths extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([]);
+        return new external_function_parameters([
+          'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+        ]);
     }
 
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
+     * @param int $contextid
      * @return array
      */
-    public static function execute(): array {
+    public static function execute($contextid): array {
         require_login();
 
-        $context = context_system::instance();
-        if (!has_capability('local/adele:canmanage', $context)) {
-            throw new moodle_exception('norighttoaccess', 'local_adele');
-        }
+        $context = context::instance_by_id($contextid);
+        require_capability('local/adele:canmanage', $context);
 
         return asset_handler::get_image_paths();
     }

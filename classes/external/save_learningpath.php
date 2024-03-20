@@ -27,13 +27,12 @@ declare(strict_types=1);
 
 namespace local_adele\external;
 
-use context_system;
+use core\context;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
 use local_adele\learning_paths;
-use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -61,6 +60,7 @@ class save_learningpath extends external_api {
             'name'  => new external_value(PARAM_TEXT, 'name', VALUE_REQUIRED),
             'description'  => new external_value(PARAM_TEXT, 'description', VALUE_REQUIRED),
             'json'  => new external_value(PARAM_RAW, 'json', VALUE_REQUIRED),
+            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             ]
         );
     }
@@ -75,21 +75,21 @@ class save_learningpath extends external_api {
      * @param string $json
      * @return bool
      */
-    public static function execute($userid, $learningpathid, $name, $description, $json): array {
+    public static function execute($userid, $learningpathid, $name, $description, $json, $contextid ): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
             'name' => $name,
             'description' => $description,
             'json' => $json,
+            'contextid' => $contextid,
         ]);
 
         require_login();
 
-        $context = context_system::instance();
-        if (!has_capability('local/adele:canmanage', $context)) {
-            throw new moodle_exception('norighttoaccess', 'local_adele');
-        }
+        $context = context::instance_by_id($contextid);
+        require_capability('local/adele:canmanage', $context);
+
         return ['learningpath' => learning_paths::save_learning_path($params)];
     }
 

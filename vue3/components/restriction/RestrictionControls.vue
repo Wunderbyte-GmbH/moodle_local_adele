@@ -111,6 +111,7 @@ const onSave = async () => {
 
 // Cancel learning path edition and return to overview
 const onCancelConfirmation = () => {
+  onCancel()
   store.state.editingrestriction = false
   store.state.editingadding = true
   store.state.node = null

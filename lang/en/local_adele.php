@@ -94,8 +94,6 @@ $string['edit_course_node'] = 'Edit course node';
 $string['edit_node_pretest'] = 'Edit completion criteria';
 $string['from_default_node_image'] = 'Default node image:';
 
-
-
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all learning paths';
 $string['overviewaddingbtn'] = 'Create new learning path';
@@ -235,7 +233,7 @@ $string['flowchart_provide_name'] = 'Please provide a name!';
 $string['flowchart_save_button'] = 'Save';
 $string['flowchart_delete_button'] = 'Delete';
 $string['flowchart_save_notification_title'] = 'Saved failed';
-$string['flowchart_save_notification_text'] = 'Provide a title and a short description for the learning path';
+$string['flowchart_save_notification_text_missing_strings'] = 'Provide a title and a short description for the learning path';
 $string['flowchart_invalid_path_notification_title'] = 'Invalid Path';
 $string['flowchart_save_notification_text'] = 'Found standalone nodes. Every node must be connected to the path';
 $string['flowchart_cancel_confirmation'] = 'All unsaved changes will be lost';
@@ -259,7 +257,6 @@ $string['modals_next'] = 'Next';
 $string['modals_edit'] = 'Edit';
 $string['modals_longname'] = 'Longname:';
 $string['modals_shortname'] = 'Shortname:';
-
 
 // Nodes strings.
 $string['nodes_collection'] = 'Collection';
@@ -306,6 +303,7 @@ $string['composables_feedback_node'] = 'Feedback node';
 
 // Restriction strings.
 $string['restriction_select_number'] = 'Select a Number:';
+$string['restriction_no_select_number'] = 'No parent courses where found';
 $string['restriction_select_course'] = 'Select a Course:';
 $string['restriction_choose_number'] = 'Choose a number';
 $string['restriction_parents_found'] = 'Found following parent nodes:';

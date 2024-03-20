@@ -176,6 +176,7 @@ const goBack = () => {
 }
 
 const goBackConfirmation = () => {
+  goBack()
   store.state.editingadding = !store.state.editingadding
   store.state.editingrestriction = !store.state.editingrestriction
 }

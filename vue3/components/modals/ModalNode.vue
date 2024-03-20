@@ -109,15 +109,31 @@
 <script setup>
 // import dependancies
 import { useStore } from 'vuex'
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import $ from 'jquery';
 
 // define constants
 const store = useStore();
+const learningpathModal = ref(null);
 const fullname = ref('')
 const shortname = ref('')
 const tags = ref('')
 const node_id = ref('')
+
+const props = defineProps({
+  learningpath: {
+    type: Array,
+    required: true,
+  }
+});
+
+onMounted(() => {
+  learningpathModal.value = props.learningpath
+})
+
+const emit = defineEmits([
+  'save-edit',
+]);
 
 // closing modal
 const closeModal = () => {
@@ -126,13 +142,22 @@ const closeModal = () => {
 
 // updating changes and closing modal
 const saveChanges = () => {
+  learningpathModal.value.json.tree.nodes.forEach((node) => {
+    if(node.id == store.state.node.node_id){
+      node.data.fullname = fullname.value
+    }
+  })
   store.commit('updatedNode', {
     fullname: fullname.value, 
     shortname: shortname.value,
     node_id: node_id.value,
+  })
+  emit('save-edit', {
+    fullname: fullname.value,
+    node_id: node_id.value,
   });
-  $('#nodeModal').modal('hide');
-};
+  closeModal()
+}
 
 // watch values from selected node
 watch(() => store.state.node, (newValue) => {

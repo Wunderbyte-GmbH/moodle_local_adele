@@ -27,14 +27,13 @@ declare(strict_types=1);
 
 namespace local_adele\external;
 
-use context_system;
+use core\context;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use local_adele\learning_path_courses;
-use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -59,6 +58,7 @@ class get_availablecourses extends external_api {
         return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathd', VALUE_REQUIRED),
+            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             ]
         );
     }
@@ -68,21 +68,19 @@ class get_availablecourses extends external_api {
      *
      * @param int $userid
      * @param int $learningpathid
+     * @param int $contextid
      * @return array
      */
-    public static function execute($userid, $learningpathid): array {
+    public static function execute($userid, $learningpathid, $contextid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
+            'contextid' => $contextid,
         ]);
 
         require_login();
-
-        $context = context_system::instance();
-        if (!has_capability('local/adele:canmanage', $context) &&
-            !has_capability('local/adele:view', $context)) {
-            throw new moodle_exception('norighttoaccess', 'local_adele');
-        }
+        $context = context::instance_by_id($contextid);
+        require_capability('local/adele:view', $context);
 
         return learning_path_courses::get_availablecourses();
     }

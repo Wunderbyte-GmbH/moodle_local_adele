@@ -2,13 +2,13 @@
   <div class="form-check">
     {{ restriction.description }}
     <div class="form-group">
-      <label 
-        class="form-label" 
-        for="courseSelect"
-      >
-        {{ store.state.strings.restriction_select_number }}
-      </label>
-      <div v-if="data">
+      <div v-if="data.courses_id && data.courses_id.length > 0">
+        <label 
+          class="form-label" 
+          for="courseSelect"
+        >
+          {{ store.state.strings.restriction_select_number }}
+        </label>
         <select 
           v-model="data.min_courses"
           class="form-select" 
@@ -29,6 +29,10 @@
             {{ number }}
           </option>
         </select>
+        / {{ data.courses_id.length }}
+      </div>
+      <div v-else>
+        {{ store.state.strings.restriction_no_select_number }}
       </div>
     </div>
   </div>
@@ -107,14 +111,9 @@ onMounted(() => {
 }
 
 .form-select {
-  width: 100%; /* Make the inputs fill their container */
   padding: 8px;
   font-size: 14px;
   border: 1px solid #ced4da;
   border-radius: 4px;
-}
-
-.form-select {
-  max-width: 100%; /* Set a maximum width for the select */
 }
 </style>

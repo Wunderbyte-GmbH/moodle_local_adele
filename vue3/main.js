@@ -44,13 +44,11 @@ function init() {
     localAdeleAppElements.forEach((localAdeleAppElement) => {
         if (!localAdeleAppElement.__vue_app__) {
             const app = createApp({});
-
             app.use(VueInputAutowidth);
             app.use(Notifications);
-
             const store = createAppStore();
             store.dispatch('loadComponentStrings');
-        
+      
             app.use(store);
             app.use(router);
             const viewAttributeValue = localAdeleAppElement.getAttribute('view');
@@ -61,6 +59,8 @@ function init() {
             store.state.user = userAttributeValue;
             const userListAttributeValue = localAdeleAppElement.getAttribute('userlist');
             store.state.userlist = userListAttributeValue;
+            const contextIdValue = localAdeleAppElement.getAttribute('contextid');
+            store.state.contextid = contextIdValue;
             app.mount(localAdeleAppElement);
             router.push({ name: 'learningpaths-edit-overview' });
         }
