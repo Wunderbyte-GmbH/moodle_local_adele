@@ -140,6 +140,7 @@ const emit = defineEmits([
   'add-edge',
   'remove-edge',
   'save-edit',
+  'move-node',
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -185,11 +186,15 @@ const typeChanged = (changedNode) => {
 // load useVueFlow properties / functions
 const { nodes, edges, findNode, onConnect, addEdges, 
     addNodes, removeNodes, fitView,
-    toObject, getEdges } = useVueFlow({
+    toObject, getEdges, onNodeDragStop } = useVueFlow({
 nodes: [],
 edges: [],
 })
 
+
+onNodeDragStop(({node}) => {
+  emit('move-node', node);
+})
 const onDrag = ($event) => {
   $event.nodes[0].position = {
     x: Math.round($event.nodes[0].position.x / 150) * 150,

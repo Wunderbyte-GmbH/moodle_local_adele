@@ -53,7 +53,7 @@ const props = defineProps({
   }
 }); 
 
-const showCacelConfirmation = ref(false)
+const showCancelConfirmation = ref(false)
 
 // Emit to parent component
 const emit = defineEmits([
@@ -153,7 +153,7 @@ const onSave = async () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-  showCacelConfirmation.value = !showCacelConfirmation.value
+  showCancelConfirmation.value = !showCancelConfirmation.value
 };
 
 const onCancelConfirmation = () => {
@@ -221,13 +221,13 @@ function updatePos() {
     <button 
       id="cancel-learning-path"
       class="btn btn-secondary m-2" 
-      :disabled="showCacelConfirmation"
+      :disabled="showCancelConfirmation"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
     <div 
-      v-if="showCacelConfirmation"
+      v-if="showCancelConfirmation"
       class="cancelConfi"
     >
       {{ store.state.strings.flowchart_cancel_confirmation }}

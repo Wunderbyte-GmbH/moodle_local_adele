@@ -68,6 +68,7 @@ class get_learningpaths extends external_api {
      *
      * @param int $userid
      * @param int $learningpathid
+     * @param int $contextid
      * @return array
      */
     public static function execute($userid, $learningpathid, $contextid): array {
@@ -79,7 +80,7 @@ class get_learningpaths extends external_api {
 
         require_login();
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:canmanage', $context);
+        require_capability('local/adele:view', $context);
 
         return learning_paths::get_learning_paths();
     }

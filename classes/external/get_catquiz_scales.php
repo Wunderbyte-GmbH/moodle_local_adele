@@ -70,6 +70,7 @@ class get_catquiz_scales extends external_api {
      * @param int $userid
      * @param int $learningpathid
      * @param int $testid
+     * @param int $contextid
      * @return array
      */
     public static function execute($userid, $learningpathid, $testid, $contextid): array {

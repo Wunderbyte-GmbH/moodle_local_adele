@@ -97,6 +97,7 @@ const onSave = async () => {
       });
   } else{
     condition = recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
+
     //save learning path
     learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {

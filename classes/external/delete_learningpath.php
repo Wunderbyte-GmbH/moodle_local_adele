@@ -74,7 +74,7 @@ class delete_learningpath extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
-            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'contextid'  => $contextid,
         ]);
 
         require_login();

@@ -95,6 +95,7 @@
                   @addEdge="handleAddEdge"
                   @removeEdge="handleRemoveEdge"
                   @saveEdit="handleSaveEdit"
+                  @moveNode="handleMoveNode"
                 />
               </div>
             </div>
@@ -252,7 +253,15 @@ const handleSaveEdit = async (params) => {
       node.data.fullname = params.fullname
     }
   })
+}
 
+const handleMoveNode = (params) => {
+  learningpath.value.json.tree.nodes.forEach((node) => {
+    if (node.id == params.id) {
+      node.position = params.position
+      node.computedPosition = params.computedPosition
+    }
+  })
 }
 
 

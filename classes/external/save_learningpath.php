@@ -73,6 +73,7 @@ class save_learningpath extends external_api {
      * @param string $name
      * @param string $description
      * @param string $json
+     * @param int $contextid
      * @return bool
      */
     public static function execute($userid, $learningpathid, $name, $description, $json, $contextid ): array {

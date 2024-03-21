@@ -30,12 +30,15 @@ import { useStore } from 'vuex';
 import { notify } from "@kyvg/vue3-notification";
 import { useRoute, useRouter } from 'vue-router';
 import removeModules from '../../composables/nodesHelper/removeModules';
+import { ref } from 'vue';
  
 // Load Store and Router
 const store = useStore();
 const router = useRouter()
 const route = useRoute()
 const { toObject } = useVueFlow()
+
+const showCancelConfirmation = ref(false)
    
  // Prepare and save learning path
  const onSave = async () => {
@@ -51,11 +54,15 @@ const { toObject } = useVueFlow()
         type: 'success'
     });
  };
- 
+
  // Cancel learning path edition and return to overview
- const onCancel = () => {
-    router.go(-1)
- };
+const onCancel = () => {
+  showCancelConfirmation.value = !showCancelConfirmation.value
+};
+
+const onCancelConfirmation = () => {
+  router.go(-1)
+};
  
  </script>
  
@@ -73,6 +80,36 @@ const { toObject } = useVueFlow()
     >
       {{ store.state.strings.btncancel }}
     </button>
+    <div 
+      v-if="showCancelConfirmation"
+      class="cancelConfi"
+    >
+      {{ store.state.strings.flowchart_cancel_confirmation }}
+      <button 
+        id="cancel-learning-path"
+        class="btn btn-primary m-2" 
+        @click="onCancel"
+      >
+        {{ store.state.strings.flowchart_back_button }}
+      </button>
+      <button 
+        id="confim-cancel-learning-path"
+        class="btn btn-warning m-2"
+        @click="onCancelConfirmation"
+      >
+        {{ store.state.strings.flowchart_cancel_button }}
+      </button>
+    </div>
   </Panel>
 </template>
  
+<style scoped>
+.cancelConfi{
+  position: absolute;
+  background-color: lightgray;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin: 0.25rem;
+  width: max-content;
+}
+</style>

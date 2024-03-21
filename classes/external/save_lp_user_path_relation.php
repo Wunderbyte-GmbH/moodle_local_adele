@@ -84,7 +84,6 @@ class save_lp_user_path_relation extends external_api {
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
-        
         return learning_paths::save_learning_user_relation($params);
     }
 
