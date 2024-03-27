@@ -29,10 +29,12 @@ use local_adele\event\learnpath_created;
 use local_adele\event\learnpath_updated;
 use stdClass;
 use context_system;
+use context_course;
 use local_adele\event\learnpath_deleted;
 use local_adele\event\user_path_updated;
 use local_adele\helper\user_path_relation;
 use core_completion\progress;
+use moodle_url;
 
 /**
  * Class learning_paths
@@ -153,9 +155,29 @@ class learning_paths {
         global $DB;
         $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
             'id, name, description, json');
+        $learningpath = self::get_image_paths($learningpath);
         return (array) $learningpath;
     }
 
+    public static function get_image_paths($learningpath) {
+        $learningpathjson = json_decode($learningpath->json);
+        foreach ($learningpathjson->tree->nodes as $nodes) {
+            $imagepaths = [];
+            foreach ($nodes->data->course_node_id as $coursenodeid) {
+                $context = context_course::instance($coursenodeid);
+                $fs = get_file_storage();
+                $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'itemid, filepath, filename', false);
+                if ($file = reset($files)) {
+                    $path = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
+                                                             $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                    $imagepaths[$coursenodeid] = str_replace('/0/', '/', $path->out());
+                }
+            }
+            $nodes->data->imagepaths = $imagepaths;
+        }
+        $learningpath->json = json_encode($learningpathjson);
+        return $learningpath;
+    }
     /**
      * Get one specific learning path by id.
      *

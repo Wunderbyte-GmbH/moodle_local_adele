@@ -24,6 +24,9 @@
 
 namespace local_adele;
 
+use moodle_url;
+use context_course;
+
 /**
  * Class learning_path_courses
  *
@@ -86,7 +89,19 @@ class learning_path_courses {
             " WHERE c.visible=1
             GROUP BY ti.itemid, c.id
         ) AS s1 " . $whereparamsquery['wherequery'];
-        return $DB->get_records_sql($select, $whereparamsquery['params']);
+        $entries = $DB->get_records_sql($select, $whereparamsquery['params']);
+        foreach ($entries as $entry) {
+            $context = context_course::instance($entry->course_node_id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'itemid, filepath, filename', false);
+            $entry->selected_course_image = null;
+            if ($file = reset($files)) {
+                $path = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
+                                                        $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                $entry->selected_course_image = str_replace('/0/', '/', $path->out());
+            }
+        }
+        return $entries;
     }
 
     /**

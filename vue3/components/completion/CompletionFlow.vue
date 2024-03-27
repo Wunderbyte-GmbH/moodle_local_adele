@@ -65,6 +65,7 @@
                 <ConditionNode 
                   :data="data" 
                   :type="'completion'"
+                  :learningpath="props.learningpath"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -105,7 +106,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'

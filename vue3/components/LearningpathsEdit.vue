@@ -131,6 +131,7 @@ import LearningPathList from './LearningPathList.vue'
 import TextInputs from './charthelper/textInputs.vue'
 import TeacherView from './teacher_view/TeacherView.vue';
 import StudentView from './student_view/StudentView.vue';
+import { notify } from "@kyvg/vue3-notification";
 
 const store = useStore()
 // Load Store and Router
@@ -251,7 +252,15 @@ const handleSaveEdit = async (params) => {
   learningpath.value.json.tree.nodes.forEach((node) => {
     if (node.id == params.node_id) {
       node.data.fullname = params.fullname
+      node.data.selected_image = params.selected_image
+      node.data.selected_course_image = params.selected_course_image
     }
+  })
+  await store.dispatch('saveLearningpath', learningpath.value)
+  notify({
+    title: store.state.strings.title_save,
+    text: store.state.strings.description_save,
+    type: 'success'
   })
 }
 

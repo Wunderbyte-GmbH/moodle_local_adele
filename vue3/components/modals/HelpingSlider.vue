@@ -52,8 +52,7 @@
               type="button" 
               class="close text-white" 
               data-dismiss="modal" 
-              aria-label="Close" 
-              @click="closeModal"
+              aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
@@ -141,8 +140,7 @@
             <button 
               type="button" 
               class="btn btn-secondary" 
-              data-dismiss="modal" 
-              @click="closeModal"
+              data-dismiss="modal"
             >
               {{ store.state.strings.modals_close }}
             </button>
@@ -155,7 +153,6 @@
 
 <script setup>
 // import dependancies
-import $ from 'jquery';
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
@@ -166,16 +163,14 @@ const imagepaths = ref([])
 
 onMounted(async () => {
   try {
-    const response = await store.dispatch('fetchImagePaths');
+    const response = await store.dispatch('fetchImagePaths', {
+      path: 'helpingslider'
+    });
     imagepaths.value = response; 
   } catch (error) {
     console.error('Error fetching image paths:', error);
   }
 });
-// closing modal
-const closeModal = () => {
-  $('#helpingSlider').modal('hide');
-};
 
 
 </script>

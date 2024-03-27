@@ -70,12 +70,16 @@
               <CustomNodeEdit 
                 :data="data" 
                 :learningpath="userLearningpath"
+                @nodeClicked="handleNodeClicked"
               />
             </template>
-            <template #node-orcourses="{ data }">
-              <CustomNodeEdit 
+            <template 
+              #node-orcourses="{ data }"
+            >
+              <CustomStagNodeEdit 
                 :data="data" 
                 :learningpath="userLearningpath"
+                @nodeClicked="handleNodeClicked"
               />
             </template>
             <template #node-module="{ data }">
@@ -101,6 +105,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
+import CustomStagNodeEdit from '../nodes/CustomStagNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
@@ -150,4 +155,18 @@ watch(() => userLearningpath.value, () => {
     drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
   }, 100);   
 }, { deep: true } )
+
+// Zoom in node
+function handleNodeClicked(node) {
+  if (node.node_id) {
+    fitView({ duration: 1000, padding: 1, nodes: node.node_id });
+  }
+}
+
 </script>
+
+<style>
+.vue-flow__edges {
+  z-index: 2 !important;
+}
+</style>

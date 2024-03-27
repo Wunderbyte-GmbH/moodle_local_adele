@@ -5,6 +5,7 @@ const  addAutoCompletions = (node, store) => {
         "edges": [
           {
             "data": {},
+            "deletable": false,
             "events": {},
             "id": "condition_1-condition_feedback",
             "source": "condition_1",
@@ -32,6 +33,7 @@ const  addAutoCompletions = (node, store) => {
               "visibility": true
             },
             "draggable": false,
+            "deletable": false,
             "events": {},
             "id": "condition_1",
             "label": "custom node",
@@ -50,6 +52,7 @@ const  addAutoCompletions = (node, store) => {
               "feedback": ""
             },
             "draggable": false,
+            "deletable": false,
             "events": {},
             "id": "condition_1_feedback",
             "label": store.state.strings.composables_feedback_node,

@@ -46,9 +46,17 @@ const props = defineProps({
 const courses = ref([])
 const dataValue = ref('')
 const learningmodule = ref({})
+const cover_image = ref(null)
 
 onMounted(() => {
   dataValue.value = props.data
+  if (dataValue.value.selected_course_image) {
+    cover_image.value = dataValue.value.selected_course_image
+  } else if (dataValue.value.selected_image) {
+    cover_image.value = dataValue.value.selected_image
+  } else if (dataValue.value.image_paths) {
+    cover_image.value = dataValue.value.image_paths
+  }
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
     parsedLearningModule = JSON.parse(props.learningpath.json)
@@ -159,6 +167,16 @@ const childStyle = {
       </div>
 
       <div class="card-body">
+        <div 
+          v-if="cover_image"
+          class="card-img dashboard-card-img" 
+          :style="{ 
+            height: '10rem', 
+            backgroundImage: 'url(' + cover_image + ')',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }"
+        />
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
             {{ store.state.strings.nodes_learning_module }}

@@ -89,7 +89,9 @@ const toggleVisibility = () => {
           />
         </div>
         <div v-else-if="props.type == 'completion'">
-          <CompletionItem :completion="data" />
+          <CompletionItem 
+            :completion="data"
+          />
         </div>
       </div>
     </div>

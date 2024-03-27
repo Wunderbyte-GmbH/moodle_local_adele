@@ -57,6 +57,7 @@ class get_image_paths extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
           'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+          'path'  => new external_value(PARAM_TEXT, 'path', VALUE_REQUIRED),
         ]);
     }
 
@@ -64,15 +65,16 @@ class get_image_paths extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $contextid
+     * @param string $path
      * @return array
      */
-    public static function execute($contextid): array {
+    public static function execute($contextid, $path): array {
         require_login();
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return asset_handler::get_image_paths();
+        return asset_handler::get_image_paths($path);
     }
 
     /**

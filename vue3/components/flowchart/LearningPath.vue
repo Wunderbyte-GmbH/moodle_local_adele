@@ -119,6 +119,7 @@ import setStartingNode from '../../composables/setStartingNode';
 import addCustomEdge from '../../composables/addCustomEdge';
 import removeDropzones from '../../composables/removeDropzones';
 import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
+import addStagCompletions from '../../composables/conditions/addStagCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 import addAndConditions from '../../composables/conditions/addAndConditions'
 import drawModules from '../../composables/nodesHelper/drawModules'
@@ -179,6 +180,12 @@ const typeChanged = (changedNode) => {
   nodes.value.forEach((node) => {
     if ( node.id == changedNode.id) {
       node.type = 'custom'
+      node.completion.nodes.forEach((completion_node) => {
+        if (completion_node.type == 'custom' && completion_node.data.label == 'course_completed' &&
+          completion_node.data.value != undefined) {
+            delete completion_node.data.value;
+        }
+      })
     }
   })
 }
@@ -252,6 +259,11 @@ function onDrop(event) {
   if(intersectedNode.value){
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
+    if (data.selected_course_image) {
+      data.imagepaths = {
+        [data.course_node_id]: data.selected_course_image, // Corrected this line
+      }
+    }
     const position = {
       x: intersectedNode.value.closestnode.computedPosition.x,
       y: intersectedNode.value.closestnode.computedPosition.y,
@@ -311,8 +323,8 @@ function onDrop(event) {
     else if(intersectedNode.value.dropzone.id == 'dropzone_or'){
       // get the clostestnode and change type and data 
       let dropzoneNode = intersectedNode.value.closestnode
-      dropzoneNode.type = 'orcourses'
       if ( !dropzoneNode.data.course_node_id.includes(data.course_node_id[0])) {
+        dropzoneNode.type = 'orcourses'
         dropzoneNode.data.course_node_id.push(data.course_node_id[0])
         nodes.value.forEach((node) => {
           if (node.id == dropzoneNode.id){
@@ -321,6 +333,7 @@ function onDrop(event) {
               dropzoneNode.data.fullname = '' 
             }
             node = dropzoneNode
+            node = addStagCompletions(node)
           }
         })
       } else {

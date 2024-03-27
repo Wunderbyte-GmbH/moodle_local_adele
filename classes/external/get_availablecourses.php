@@ -100,6 +100,7 @@ class get_availablecourses extends external_api {
                     'shortname' => new external_value(PARAM_TEXT, 'Item name'),
                     'category' => new external_value(PARAM_TEXT, 'Category level'),
                     'tags' => new external_value(PARAM_TEXT, 'Item tags'),
+                    'selected_course_image' => new external_value(PARAM_TEXT, 'Course image path'),
                 ]
             )
         );

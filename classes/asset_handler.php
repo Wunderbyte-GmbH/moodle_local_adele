@@ -39,9 +39,9 @@ class asset_handler {
      *
      * @return array
      */
-    public static function get_image_paths() {
+    public static function get_image_paths($path) {
         global $CFG;
-        $path = $CFG->dirroot . '/local/adele/assets/helpingslider/*';
+        $path = $CFG->dirroot . '/local/adele/public/' . $path . '/*';
         $filelist = glob($path);
         $filepath = [];
         foreach ($filelist as $file) {

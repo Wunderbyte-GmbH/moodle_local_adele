@@ -104,9 +104,6 @@ module.exports = (env, options) => {
             },
             'core/notification': {
                 amd: 'core/notification'
-            },
-            'jquery': {
-                amd: 'jquery'
             }
         }
     };

@@ -47,8 +47,7 @@
               type="button" 
               class="close text-white" 
               data-dismiss="modal" 
-              aria-label="Close" 
-              @click="closeModal"
+              aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
@@ -70,8 +69,7 @@
             <button 
               type="button" 
               class="btn btn-secondary" 
-              data-dismiss="modal" 
-              @click="closeModal"
+              data-dismiss="modal"
             >
               {{ store.state.strings.modals_close }}
             </button>
@@ -92,7 +90,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import $ from 'jquery';
 
 // Load Store 
 const store = useStore();
@@ -101,7 +98,6 @@ const initialFeedback = ref(null);
 const feedbackContent = ref(null);
 const learningpathfeedback= ref({})
 
-
 const props = defineProps({
   learningpath: {
     type: Object,
@@ -109,11 +105,6 @@ const props = defineProps({
   }
 });
 
-// closing modal
-const closeModal = () => {
-  store.state.feedback = null
-  $('#feedbackModal').modal('hide');
-};
 // updating changes and closing modal
 const saveChanges = () => {
   // Loop over nodes and macht node
@@ -133,7 +124,6 @@ const saveChanges = () => {
     store.dispatch('saveLearningpath', learningpathfeedback.value)
     store.state.feedback = null
   }
-  $('#feedbackModal').modal('hide');
 };
 
 const cleanFeedback = (feedback) => {
@@ -149,9 +139,6 @@ const adjustContenteditableHeight = () => {
 onMounted(() => {
   //initialFeedback.value = store.state.feedback.feedback
   learningpathfeedback.value = props.learningpath
-  $('#feedbackModal').on('shown.bs.modal', () => {
-    adjustContenteditableHeight();
-  });
 });
 
 watch(() => store.state.feedback, async () => {

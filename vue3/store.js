@@ -27,7 +27,6 @@ import { createStore } from 'vuex';
 import moodleAjax from 'core/ajax';
 import moodleStorage from 'core/localstorage';
 import Notification from 'core/notification';
-import $ from 'jquery';
 
 // Defining store for application
 export function createAppStore() {
@@ -101,11 +100,11 @@ export function createAppStore() {
         actions: {
             // Actions are asynchronous.
             async loadLang(context) {
-                const lang = $('html').attr('lang').replace(/-/g, '_');
+                const lang = document.documentElement.lang.replace(/-/g, '_');
                 context.commit('setLang', lang);
             },
             async loadComponentStrings(context) {
-                const lang = $('html').attr('lang').replace(/-/g, '_');
+                const lang = document.documentElement.lang.replace(/-/g, '_');
                 const cacheKey = 'local_adele/strings/' + lang;
                 const cachedStrings = moodleStorage.get(cacheKey);
                 if (cachedStrings) {
@@ -278,9 +277,10 @@ export function createAppStore() {
                 });
                 return result;
             },
-            async fetchImagePaths(context) {
+            async fetchImagePaths(context, args) {
               const result = await ajax('local_adele_get_image_paths', {
                 contextid: context.state.contextid,
+                path: args.path,
               });
               return result;
           },

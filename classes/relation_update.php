@@ -169,11 +169,21 @@ class relation_update {
                         $validationconditionstring[] = $label
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
+                        $completednodecourses = 0;
                         foreach ($completioncriteria[$label] as $coursecompleted) {
                             if ($coursecompleted) {
-                                $validationcondition = true;
-                                $validationconditionstring[] = $label;
+                                $completednodecourses += 1;
+                                if ($completionnode['data']['value'] == null) {
+                                    $validationcondition = true;
+                                    $validationconditionstring[] = $label;
+                                }
                             }
+                        }
+                        if (
+                          $completionnode['data']['value'] != null &&
+                          $completionnode['data']['value']['min_courses'] <= $completednodecourses) {
+                            $validationcondition = true;
+                            $validationconditionstring[] = $label;
                         }
                         $singlecompletionnode[$label] = $validationcondition;
                     } else {

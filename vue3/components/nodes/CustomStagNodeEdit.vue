@@ -39,6 +39,7 @@ import CourseRating from '../nodes_items/CourseRating.vue';
 const store = useStore();
 const date = ref({})
 const includedCourses = ref([])
+const stageType = ref('parallel')
 const props = defineProps({
   data: {
     type: Object,
@@ -69,8 +70,17 @@ onMounted(() => {
        if (node.parentCourse.includes('starting_node')) {
         isParentNode.value = true;
        }
+       if (node.completion && node.completion.nodes) {
+        node.completion.nodes.forEach((completionnode) => {
+          if(completionnode.data.label == 'course_completed' &&
+            completionnode.data.value.min_courses > 1){
+              stageType.value = 'non_parallel'
+          }
+        })
+       }
      }
   })
+
   watch(() => store.state.availablecourses, () => {
     if (props.data.course_node_id && store.state.availablecourses) {
       props.data.course_node_id.forEach((course_id) => {
@@ -151,6 +161,9 @@ const childStyle = {
       class="card test"
       :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
     >
+      <div 
+        :class="stageType=='parallel' ? 'parallel' : 'non_parallel'"
+      />
       <div class="card-header text-center">
         <OverviewRestrictionCompletion 
           :node="data" 
@@ -418,5 +431,50 @@ const childStyle = {
   display: flex; /* Align icon and text horizontally */
   align-items: center; /* Center items vertically */
 }
+.parallel::before,
+.parallel::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ececec; /* Example background color */
+  border-radius: 10px;
+  border: 1px solid #ccc; /* Example border */
+  z-index: -1;
+}
 
+.parallel::before {
+  top: -20px;
+  left: -20px;
+  z-index: -1;
+}
+
+.parallel::after {
+  top: -40px;
+  left: -40px;
+  z-index: -2;
+}
+.non_parallel::before,
+.non_parallel::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ececec;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  z-index: -1;
+}
+
+.non_parallel::before {
+  transform: rotate(4deg);
+  top: -20px;
+  left: -20px;
+}
+
+.non_parallel::after {
+  transform: rotate(-4deg);
+  top: -20px;
+  left: -20px;
+}
 </style>
