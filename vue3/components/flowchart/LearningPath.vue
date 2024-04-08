@@ -282,11 +282,6 @@ function onDrop(event) {
       label: `${type} node`,
       draggable: true,
     }
-    if (intersectedNode.value.dropzone.id != 'dropzone_and' && intersectedNode.value.dropzone.id != 'dropzone_or') {
-      setTimeout(() => {
-        fitView({ duration: 1000, padding: 0.5 });
-      }, 100);
-    }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       parentCourse.push('starting_node')
     }
@@ -399,20 +394,15 @@ function onDrop(event) {
 watch(
   () => nodes.value.length,
   (newNodes, oldNodes) => {
-    if(oldNodes != newNodes){
-      if (Math.abs(oldNodes - newNodes) < 2) {
-        fitView({ duration: 1000, padding: 0.5 });
-      }
-      if(oldNodes > newNodes){
-        if (props.learningpath.json && props.learningpath.json.tree) {
-          const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
-          if (deletedNode[0]) {
-            emit('removeNode', deletedNode[0].id);
-          }
-          setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, true)
-          if (deletedNode[0] && deletedNode[0].id) {
-            drawModules(props.learningpath, addNodes, removeNodes, findNode, null, deletedNode[0].id)
-          }
+    if(oldNodes > newNodes){
+      if (props.learningpath.json && props.learningpath.json.tree) {
+        const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
+        if (deletedNode[0]) {
+          emit('removeNode', deletedNode[0].id);
+        }
+        setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, true)
+        if (deletedNode[0] && deletedNode[0].id) {
+          drawModules(props.learningpath, addNodes, removeNodes, findNode, null, deletedNode[0].id)
         }
       }
     }

@@ -81,8 +81,16 @@ class get_learningpath extends external_api {
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:view', $context);
-
-        return learning_paths::get_learning_path($params);
+        $learningpath = learning_paths::get_learning_path($params);
+        if ($learningpath[0]) {
+            return $learningpath;
+        }
+        return [
+            'id' => 0,
+            'name' => get_string('not_found', 'local_adele'),
+            'description' => get_string('not_found', 'local_adele'),
+            'json' => '',
+        ];
     }
 
     /**
@@ -95,7 +103,7 @@ class get_learningpath extends external_api {
             'id' => new external_value(PARAM_INT, 'Item id'),
             'name' => new external_value(PARAM_TEXT, 'Historyid id'),
             'description' => new external_value(PARAM_TEXT, 'Item name'),
-            'json' => new external_value(PARAM_RAW, 'Item name'),
+            'json' => new external_value(PARAM_RAW, 'Additional JSON data'),
         ]
         );
     }

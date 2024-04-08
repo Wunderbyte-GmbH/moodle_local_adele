@@ -28,6 +28,7 @@ $string['modulenameplural'] = 'adeles';
 $string['modulename_help'] = 'adele';
 $string['pluginadministration'] = 'Adele-Verwaltung';
 $string['pluginname'] = 'Adele';
+$string['not_found'] = 'Learning path wurde nicht gefunden! Bitte kontaktiere die verantwortliche Person für diesen Lernpfad!';
 
 // Fähigkeiten.
 $string['adele:edit'] = 'Adele bearbeiten';
