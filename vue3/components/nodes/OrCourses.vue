@@ -72,13 +72,7 @@ const setRestrictionView = () => {
 
 onMounted(() => {
   dataValue.value = props.data
-  if (dataValue.value.selected_course_image) {
-    cover_image.value = dataValue.value.selected_course_image
-  } else if (dataValue.value.selected_image) {
-    cover_image.value = dataValue.value.selected_image
-  } else if (dataValue.value.image_paths) {
-    cover_image.value = dataValue.value.image_paths
-  }
+  cover_image.value = get_cover_image(dataValue.value)
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
     parsedLearningModule = JSON.parse(props.learningpath.json)
@@ -91,6 +85,16 @@ onMounted(() => {
   getCourseNamesIds() 
   calculateHeight(courses.value.length)
 })
+
+const get_cover_image = (data) => {
+  if (dataValue.value.selected_course_image) {
+    return data.selected_course_image
+  } else if (dataValue.value.selected_image) {
+    return data.selected_image
+  } else if (dataValue.value.image_paths) {
+    return data.image_paths
+  }
+}
 
 const getCourseNamesIds = () => {
   if (store.state.availablecourses) {
@@ -136,7 +140,7 @@ const removeElement = (array, elementToRemove) => {
 // watch values from selected node
 watch(() => props.data, () => {
   getCourseNamesIds()
-
+  cover_image.value = get_cover_image(props.data)
 }, { deep: true } );
 
 // watch values from selected node
