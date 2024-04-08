@@ -128,14 +128,25 @@ export function createAppStore() {
 
             },
             async fetchLearningpath(context) {
-                const learningpath = await ajax('local_adele_get_learningpath',
-                    { 
-                      userid: 0, 
-                      learningpathid: context.state.learningPathID,
-                      contextid: context.state.contextid,
-                    });
-                if (learningpath.json != '') {
-                    learningpath.json = await JSON.parse(learningpath.json); 
+                let learningpath = null
+                if (context.state.learningPathID == 0) {
+                  learningpath = {
+                    id: 0,
+                    name: "",
+                    description: "",
+                    json: "",
+                  }
+                }
+                else {
+                  learningpath = await ajax('local_adele_get_learningpath',
+                      { 
+                        userid: 0, 
+                        learningpathid: context.state.learningPathID,
+                        contextid: context.state.contextid,
+                      });
+                  if (learningpath.json != '') {
+                      learningpath.json = await JSON.parse(learningpath.json); 
+                  }
                 }
                 context.commit('setLearningpath', learningpath);
                 return learningpath

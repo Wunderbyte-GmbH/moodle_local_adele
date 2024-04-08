@@ -192,7 +192,7 @@ const typeChanged = (changedNode) => {
 
 // load useVueFlow properties / functions
 const { nodes, edges, findNode, onConnect, addEdges, 
-    addNodes, removeNodes, fitView,
+    addNodes, removeNodes,
     toObject, getEdges, onNodeDragStop } = useVueFlow({
 nodes: [],
 edges: [],

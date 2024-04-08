@@ -82,15 +82,15 @@ class get_learningpath extends external_api {
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:view', $context);
         $learningpath = learning_paths::get_learning_path($params);
-        if ($learningpath[0]) {
-            return $learningpath;
+        if (isset($learningpath[0]) && $learningpath[0] == false) {
+            return [
+                'id' => $learningpathid,
+                'name' => get_string('not_found', 'local_adele'),
+                'description' => get_string('not_found', 'local_adele'),
+                'json' => '',
+            ];
         }
-        return [
-            'id' => 0,
-            'name' => get_string('not_found', 'local_adele'),
-            'description' => get_string('not_found', 'local_adele'),
-            'json' => '',
-        ];
+        return $learningpath;
     }
 
     /**
