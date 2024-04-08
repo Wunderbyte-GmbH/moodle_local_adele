@@ -50,13 +50,7 @@ const cover_image = ref(null)
 
 onMounted(() => {
   dataValue.value = props.data
-  if (dataValue.value.selected_course_image) {
-    cover_image.value = dataValue.value.selected_course_image
-  } else if (dataValue.value.selected_image) {
-    cover_image.value = dataValue.value.selected_image
-  } else if (dataValue.value.image_paths) {
-    cover_image.value = dataValue.value.image_paths
-  }
+  cover_image.value = get_cover_image(dataValue.value)
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
     parsedLearningModule = JSON.parse(props.learningpath.json)
@@ -68,6 +62,20 @@ onMounted(() => {
   }
   getCourseNamesIds()
 })
+
+const get_cover_image = (data) => {
+  if (data.selected_course_image) {
+    return data.selected_course_image
+  } else if (data.selected_image) {
+    return data.selected_image
+  } else if (data.image_paths) {
+    return data.image_paths
+  }
+}
+
+watch(() => props.data, () => {
+  cover_image.value = get_cover_image(props.data)
+}, { deep: true } );
 
 const getCourseNamesIds = () => {
   if (store.state.availablecourses) {

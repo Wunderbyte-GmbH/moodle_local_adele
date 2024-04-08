@@ -257,6 +257,8 @@ const handleSaveEdit = async (params) => {
     }
   })
   await store.dispatch('saveLearningpath', learningpath.value)
+  learningpath.value = await store.dispatch('fetchLearningpath')
+
   notify({
     title: store.state.strings.title_save,
     text: store.state.strings.description_save,

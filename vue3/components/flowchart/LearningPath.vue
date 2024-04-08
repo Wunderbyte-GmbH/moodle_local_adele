@@ -323,6 +323,14 @@ function onDrop(event) {
         dropzoneNode.data.course_node_id.push(data.course_node_id[0])
         nodes.value.forEach((node) => {
           if (node.id == dropzoneNode.id){
+            if (data.imagepaths) {
+              if (dropzoneNode.data.imagepaths) {
+                dropzoneNode.data.imagepaths = {...dropzoneNode.data.imagepaths, ...data.imagepaths}
+              }else {
+                dropzoneNode.data.imagepaths = data.imagepaths
+                dropzoneNode.data.selected_course_image = data.selected_course_image
+              }
+            }
             if (dropzoneNode.data.course_node_id.length == 2 &&
               dropzoneNode.data.fullname == dropzoneNode.data.shortname ) {
               dropzoneNode.data.fullname = '' 

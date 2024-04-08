@@ -87,19 +87,11 @@
                 If no course image is available, the selected stock image will be choosen.
               </p>
               <div 
-                v-if="store.state.node && Object.keys(store.state.node.imagepaths).length == 1"
-                class="form-control-static"
-              >
-                <p>
-                  If no image is selected, the course image will be selected.
-                </p>
-              </div>
-              <div 
-                v-if="store.state.node && Object.keys(store.state.node.imagepaths).length > 1"
+                v-if="store.state.node && Object.keys(store.state.node.imagepaths).length > 0"
                 class="mb-2"
               >
                 <p>
-                  Multiple courseimages detected. Please select one image
+                  If no image is selected, the course image will be selected.
                 </p>
                 <button 
                   type="button" 
@@ -142,11 +134,22 @@
                   </div>
                 </div>
               </div>
-              <button type="button" class="btn btn-info" @click="showImageSelection = !showImageSelection">
+              <button 
+                type="button" 
+                class="btn btn-info" 
+                @click="showImageSelection = !showImageSelection"
+              >
                 Select Stock Image
               </button>
-              <div v-if="selectedImagePath" class="image-preview-container">
-                <img :src="selectedImagePath" alt="Selected Image" class="image-preview">
+              <div 
+                v-if="selectedImagePath" 
+                class="image-preview-container"
+              >
+                <img 
+                  :src="selectedImagePath" 
+                  alt="Selected Image" 
+                  class="image-preview"
+                >
                 <button @click="selectedImagePath = ''" class="deselect-btn">Deselect</button>
               </div>
               <div v-if="showImageSelection" class="image-selection-container">

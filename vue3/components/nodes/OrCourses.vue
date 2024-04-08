@@ -87,11 +87,11 @@ onMounted(() => {
 })
 
 const get_cover_image = (data) => {
-  if (dataValue.value.selected_course_image) {
+  if (data.selected_course_image) {
     return data.selected_course_image
-  } else if (dataValue.value.selected_image) {
+  } else if (data.selected_image) {
     return data.selected_image
-  } else if (dataValue.value.image_paths) {
+  } else if (data.image_paths) {
     return data.image_paths
   }
 }
@@ -181,7 +181,10 @@ const childStyle = {
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
           </div>
-          <div v-if="store.state.view!='teacher'" class="col-auto">
+          <div 
+            v-if="store.state.view!='teacher'" 
+            class="col-auto"
+          >
             <button 
               type="button" 
               class="btn btn-primary" 
