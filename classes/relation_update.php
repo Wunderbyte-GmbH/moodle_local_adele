@@ -180,6 +180,7 @@ class relation_update {
                             }
                         }
                         if (
+                          $completionnode['data']['value'] &&
                           $completionnode['data']['value'] != null &&
                           $completionnode['data']['value']['min_courses'] <= $completednodecourses) {
                             $validationcondition = true;
@@ -285,6 +286,7 @@ class relation_update {
      */
     public static function subscribe_user_starting_node($userpath) {
         global $DB;
+        $firstenrollededit = false;
         foreach ($userpath->json['tree']['nodes'] as &$node) {
             if (in_array('starting_node', $node['parentCourse'])) {
                 foreach ($node['data']['course_node_id'] as $courseid) {

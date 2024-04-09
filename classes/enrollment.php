@@ -86,16 +86,16 @@ class enrollment {
                     ]),
                 ]);
                 $userpath = $DB->get_record('local_adele_path_user', ['id' => $id]);
-                $userpath->json = json_decode($userpath->json, true);
-                $eventsingle = user_path_updated::create([
-                    'objectid' => $id,
-                    'context' => context_system::instance(),
-                    'other' => [
-                        'userpath' => $userpath,
-                    ],
-                ]);
-                $eventsingle->trigger();
             }
+            $userpath->json = json_decode($userpath->json, true);
+            $eventsingle = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
         }
     }
 

@@ -30,6 +30,7 @@ namespace local_adele;
 use local_adele\event\user_path_updated;
 use local_adele\helper\user_path_relation;
 use context_system;
+use mod_adele_observer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -64,6 +65,7 @@ class learning_path_update {
             ]);
             $eventsingle->trigger();
         }
+        self::trigger_user_subscription($event->other['learningpathid']);
     }
 
     /**
@@ -112,5 +114,30 @@ class learning_path_update {
             }
         }
         return $userpathjson;
+    }
+
+    /**
+     * Trigger user path subscription
+     *
+     * @param string $learningpathid
+     */
+    public static function trigger_user_subscription($learningpathid) {
+        global $DB, $USER;
+        $adeleactivities = $DB->get_records('adele', ['learningpathid' => $learningpathid]);
+        $data = (object) [
+          'courseid' => 0,
+          'userid' => $USER->id,
+        ];
+        foreach ($adeleactivities as $adeleactivity) {
+            $adeleactivity->participantslist = explode(',', $adeleactivity->participantslist);
+            $data->courseid = $adeleactivity->course;
+            foreach ($adeleactivity->participantslist as $participantslist) {
+                if ($participantslist == '1') {
+                    mod_adele_observer::enroll_all_participants($adeleactivity, $data, true);
+                } else if ($participantslist == '2') {
+                    mod_adele_observer::enroll_starting_nodes_participants($adeleactivity, $data, true);
+                }
+            }
+        }
     }
 }
