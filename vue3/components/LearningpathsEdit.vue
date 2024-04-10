@@ -96,6 +96,8 @@
                   @removeEdge="handleRemoveEdge"
                   @saveEdit="handleSaveEdit"
                   @moveNode="handleMoveNode"
+                  @changedModule="onChangedModule"
+                  @changedLearningpathTree="onChangedTree"
                 />
               </div>
             </div>
@@ -245,6 +247,20 @@ const handleAddEdge = (edge) => {
 const handleRemoveEdge = (edges) => {
   if (edges && learningpath.value.json) {
     learningpath.value.json.tree.edges = edges
+  }
+}
+
+const onChangedModule = (learningpath) => {
+  learningpath.value = learningpath
+}
+
+const onChangedTree = (tree) => {
+  if (learningpath.value.json == '') {
+    learningpath.value.json = {
+      tree : tree
+    }
+  } else {
+    learningpath.value.json.tree = tree
   }
 }
 

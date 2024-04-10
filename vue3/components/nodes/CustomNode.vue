@@ -133,6 +133,14 @@ const setStartNode = (node_id) => {
   });
 };
 
+const emit = defineEmits([
+  'change-module',
+]);
+
+const changeModule = (data) => {
+  emit('changeModule', data);
+}
+
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
@@ -193,7 +201,7 @@ const childStyle = {
             <select 
               v-model="dataValue.module"
               class="form-select form-control"
-              @change="changeModule"
+              @change="changeModule(dataValue)"
             >
               <option 
                 value="" 

@@ -42,7 +42,7 @@ const store = useStore();
 const router = useRouter();
 const learningpathcontrol = ref({})
 
-const { toObject, setNodes, setEdges, onPaneReady, removeNodes,
+const { toObject, setNodes, setEdges, removeNodes,
   addNodes, nodes, findNode } = useVueFlow()
 
 // Define props in the setup block
@@ -166,11 +166,6 @@ const onCancelConfirmation = () => {
     emit('finish-edit');
     router.push({name: 'learningpaths-edit-overview'});
 };
-
-// Fit pane into view
-onPaneReady(({ fitView,}) => {
-  fitView({ padding: 0.2 })
-})
 
 // Update the position of the nodes
 function updatePos() {

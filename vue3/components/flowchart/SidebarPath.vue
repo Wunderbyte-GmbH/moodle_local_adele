@@ -40,7 +40,11 @@ const searchTerm = ref('');
 const activeNode = ref('');
 
 // Ref to store intersecting node
-const emit = defineEmits(['nodesIntersected']);
+const emit = defineEmits([
+  'nodesIntersected',
+  'changedModule',
+]);
+
 const intersectingNode = ref(null);
 
 // Prev closest node
@@ -152,7 +156,6 @@ function aboveDistance() {
       y: activeNode.value.position.y + activeNode.value.dimensions.height/2,
     };
   
-
     if (Math.sqrt(Math.pow(position.x - middleNode.x, 2) + Math.pow(position.y - middleNode.y, 2)) > 500) {
       return true
     }
@@ -165,6 +168,10 @@ function dropzoneShown() {
     return false;
   }
   return true
+}
+
+function onChangedModule(learningpath) {
+  emit('changedModule', learningpath)
 }
 
 // Function to check if two nodes intersect
@@ -187,7 +194,6 @@ function findClosestNode(event) {
   });
   let closestNode = null;
   let closestDistance = Infinity;
-
 
   nodes.value.forEach((node) => {
     if(node.type != 'dropzone' && node.type != 'conditionaldropzone'){
@@ -307,6 +313,7 @@ function changeTab(index) {
       <LearningModule 
         :learningmodule="learningmodule"
         :strings="strings" 
+        @changed-module="onChangedModule($event, learningpath)"
       />
     </div>
   </aside>

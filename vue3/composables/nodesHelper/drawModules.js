@@ -10,7 +10,7 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
     learningpath.json.modules.forEach( async module => {
       let newModule = {
         type: 'module',
-        position: { x: 0 , y: 0 },
+        position: {},
         label: `module node`,
         draggable: false,
         selectable: false,
@@ -42,14 +42,14 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
           if (draggedNode && draggedNode.id == node.id) {
             node.position = draggedNode.position
           }
-
-          if (newModule.position.x == 0 || newModule.position.x > node.position.x) {
+          if (newModule.position.x == undefined || newModule.position.x > node.position.x) {
             newModule.position.x = node.position.x
           }
+
           if (rightestNode == null || rightestNode.position.x < node.position.x) {
             rightestNode = node
           }
-          if (newModule.position.y == 0 || newModule.position.y > node.position.y) {
+          if (newModule.position.y == undefined || newModule.position.y > node.position.y) {
             newModule.position.y = node.position.y
           }
           if (lowestNode == null || lowestNode.position.y < node.position.y) {
@@ -57,7 +57,6 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
           }
         }
       })
-
       if (insertModule) {
         // Check if rightestNode and lowestNode are assigned values
         if (rightestNode && lowestNode) {

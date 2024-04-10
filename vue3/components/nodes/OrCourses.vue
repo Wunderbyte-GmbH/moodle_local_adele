@@ -47,7 +47,10 @@ const cover_image = ref(null)
 });
 // Load Store 
 const store = useStore();
-const emit = defineEmits(['typeChange']);
+const emit = defineEmits([
+  'typeChange',
+  'change-module',
+]);
 
 // Set node data for the modal
 const setNodeModal = () => {
@@ -162,6 +165,10 @@ const setStartNode = (node_id) => {
   });
 };
 
+const changeModule = (data) => {
+  emit('changeModule', data);
+}
+
 const childStyle = {
   borderColor: store.state.strings.GRAY,
   borderWidth: '2px',
@@ -219,7 +226,7 @@ const childStyle = {
           <select 
             v-model="dataValue.module"
             class="form-select form-control"
-            @change="changeModule"
+            @change="changeModule(dataValue)"
           >
             <option 
               value="" 

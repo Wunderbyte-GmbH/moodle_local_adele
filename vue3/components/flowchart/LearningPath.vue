@@ -42,6 +42,7 @@
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
+        @node-click="onNodeClick"
       >
         <Background 
           :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -51,6 +52,7 @@
           <CustomNode 
             :data="data" 
             :learningpath="learningpath"
+            @change-module="onChangeModule"
           />
         </template>
         <template #node-dropzone="{ data }">
@@ -64,6 +66,7 @@
             :data="data"
             :learningpath="learningpath"
             @typeChange="typeChanged"
+            @change-module="onChangeModule"
           />
         </template>
         <template #node-module="{ data }">
@@ -81,6 +84,7 @@
         :strings="store.state.strings" 
         :style="{ backgroundColor: backgroundSidebar }"
         @nodesIntersected="handleNodesIntersected"
+        @changedModule="onChangedModule"
       />
     </div>
     <p />
@@ -142,6 +146,8 @@ const emit = defineEmits([
   'remove-edge',
   'save-edit',
   'move-node',
+  'changedModule',
+  'changedLearningpathTree'
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -155,9 +161,20 @@ const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
 
+const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
+let zooming = false;
+
 const finishEdit = () => {
   emit('finish-edit');
 }
+
+// load useVueFlow properties / functions
+const { nodes, edges, findNode, onConnect, addEdges, zoomTo,
+    addNodes, removeNodes, fitView, viewport, setCenter, getViewport,
+    toObject, getEdges, onNodeDragStop } = useVueFlow({
+nodes: [],
+edges: [],
+})
 
 onMounted(() => {
   const observer = new ResizeObserver(entries => {
@@ -169,11 +186,61 @@ onMounted(() => {
     }
   });
   observer.observe(document.querySelector('.dndflow'));
+  setTimeout(() => {
+    nextTick().then(() => {
+      fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        watch(
+          () => viewport.value,
+          (newVal, oldVal) => {
+            if (newVal.zoom && oldVal.zoom && !zooming) {
+              if (newVal.zoom > oldVal.zoom) {
+                setZoomLevel('in', newVal)
+              } else if (newVal.zoom < oldVal.zoom) {
+                setZoomLevel('out', newVal)
+              }
+            }
+          },
+          { deep: true }
+        );
+      });
+    })
+  }, 100)
 });
+
+const setZoomLevel = async (action) => {
+  zooming = true;
+  let newViewport = viewport.value.zoom
+  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
+  if (currentStepIndex === -1) {
+    currentStepIndex = zoomSteps.length;
+  }
+  if (action === 'in') {
+    if (currentStepIndex < zoomSteps.length) {
+      newViewport = zoomSteps[currentStepIndex];
+    } else {
+      newViewport = zoomSteps[currentStepIndex - 2]
+    }
+  } else if (action === 'out') {
+    if (currentStepIndex > 0) {
+      newViewport = zoomSteps[currentStepIndex - 1];
+    } else {
+      newViewport = zoomSteps[zoomSteps.length - 2]
+    }
+  }
+  if (newViewport != undefined) {
+    await zoomTo(newViewport, { duration: 500})
+  }
+  zooming = false;
+}
+
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
+}
+
+function onChangedModule(learningpath) {
+  emit('changedModule', learningpath)
 }
 
 const typeChanged = (changedNode) => {
@@ -190,14 +257,16 @@ const typeChanged = (changedNode) => {
   })
 }
 
-// load useVueFlow properties / functions
-const { nodes, edges, findNode, onConnect, addEdges, 
-    addNodes, removeNodes,
-    toObject, getEdges, onNodeDragStop } = useVueFlow({
-nodes: [],
-edges: [],
-})
-
+const onChangeModule = (data) => {
+  let learningpath_temp = props.learningpath
+  if (learningpath_temp.json.tree.nodes) {
+    learningpath_temp.json.tree.nodes.forEach((node) => {
+      if (node.id == data.node_id) {
+        node.data = data
+      }
+    })
+  }
+}
 
 onNodeDragStop(({node}) => {
   emit('move-node', node);
@@ -210,6 +279,17 @@ const onDrag = ($event) => {
   if (typeof $event.nodes[0].data.module == 'number') {
     drawModules(props.learningpath, addNodes, removeNodes, findNode, $event.nodes[0])
   }
+}
+
+const onNodeClick = (event) => {
+  zooming = true;
+  setCenter( 
+    event.node.position.x + event.node.dimensions.width/2, 
+    event.node.position.y + event.node.dimensions.height/2,
+    { zoom: 1, duration: 500}
+  ).then(() => {
+    zooming = false;
+  })
 }
 
 // Prevent default event if node has been dropped
@@ -384,9 +464,10 @@ function onDrop(event) {
     }
     let tree = toObject()
     tree = removeDropzones(tree)
-    store.state.learningpath.json = {
-      tree: tree,
-    };
+    emit('changedLearningpathTree', tree)
+    // store.state.learningpath.json = {
+    //   tree: tree,
+    // };
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store)
     }

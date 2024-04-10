@@ -196,6 +196,8 @@ const cancelColor = ref('')
 // Load Store and Router
 const store = useStore();
 
+const emit = defineEmits(['changedModule']);
+
 onMounted(() => {
   setLearningModules()
 });
@@ -247,12 +249,20 @@ const addLearningModule = () => {
     }
     if (learningpath.value.id != 0) {
       learningmodules.value = learningpath.value.json.modules
-      store.dispatch('saveLearningpath', learningpath.value)
+      //store.dispatch('saveLearningpath', learningpath.value)
     } else{
       store.state.modules = learningpath.value.json.modules
     }
+    emit('changedModule', learningpath.value)
     toggleAddForm()
   }
+}
+
+const saveModule = (id) => {
+  editElementById(learningpath.value.json.modules, id)
+  emit('changedModule', learningpath.value)
+  //store.dispatch('saveLearningpath', learningpath.value)
+  setEdit(0)
 }
 
 const editLearningModule = (module) => {
@@ -279,14 +289,11 @@ const setEdit = (type, module) => {
 const cancelModule = () => {
   setEdit(0)
 }
-const saveModule = (id) => {
-  editElementById(learningpath.value.json.modules, id)
-  store.dispatch('saveLearningpath', learningpath.value)
-  setEdit(0)
-}
+
 const deleteModule = (id) => {
   removeElementById(learningpath.value.json.modules, id);
-  store.dispatch('saveLearningpath', learningpath.value)
+  emit('changedModule', learningpath.value)
+  //store.dispatch('saveLearningpath', learningpath.value)
   setEdit(0)
 }
 
