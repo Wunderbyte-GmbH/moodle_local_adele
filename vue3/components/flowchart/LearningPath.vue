@@ -170,7 +170,7 @@ const finishEdit = () => {
 
 // load useVueFlow properties / functions
 const { nodes, edges, findNode, onConnect, addEdges, zoomTo,
-    addNodes, removeNodes, fitView, viewport, setCenter, getViewport,
+    addNodes, removeNodes, fitView, viewport, setCenter,
     toObject, getEdges, onNodeDragStop } = useVueFlow({
 nodes: [],
 edges: [],

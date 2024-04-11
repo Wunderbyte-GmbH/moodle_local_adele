@@ -1,6 +1,6 @@
 <script setup>
     // Import needed libraries
-    import { onMounted, ref, watch } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { useStore } from 'vuex';
 
     
@@ -21,27 +21,11 @@
     const completionColor = ref('#df843b');
 
     // Create a ref for conditions
-    const conditions = ref([]);
     const showCard = ref(false);
 
-    onMounted(async () => {
-        restrictionColor.value = store.state.strings.LIGHT_STEEL_BLUE;
-        completionColor.value = store.state.strings.DARK_ORANGE;
-        conditions.value = {
-        completion: {
-            count: 0,
-            conditions: null,
-        },
-        restriction: {
-            count: 0,
-            conditions: null,
-        },
-        };
-        triggerGetConditions()
-    // watch values from selected node
-    watch(() => props.learningpath, async () => {
-        triggerGetConditions()
-    }, { deep: true } );
+  onMounted(async () => {
+      restrictionColor.value = store.state.strings.LIGHT_STEEL_BLUE;
+      completionColor.value = store.state.strings.DARK_ORANGE;
   });
 
 const shownCondition = ref(null)
@@ -50,20 +34,31 @@ const toggleCompletion = (type) => {
   shownCondition.value = type
 }
 
-function triggerGetConditions() {
-    if (props.learningpath.json && props.learningpath.json.tree) {
-      props.learningpath.json.tree.nodes.forEach((node) => {
-          if (node.id == props.node.node_id) {
-              if (node.completion != undefined) {
-                conditions.value.completion = getConditions(node.completion.nodes, 'completion') 
-              }
-              if (node.restriction != undefined) {
-                conditions.value.restriction = getConditions(node.restriction.nodes, 'restriction') 
-              }
-          }
-      })
-    }
-}
+const computedTriggerGetConditions = computed(() => {
+  let returnComputed = {
+      completion: {
+          count: 0,
+          conditions: null,
+      },
+      restriction: {
+          count: 0,
+          conditions: null,
+      },
+  };
+  if (props.learningpath.json && props.learningpath.json.tree) {
+    props.learningpath.json.tree.nodes.forEach((node) => {
+        if (node.id == props.node.node_id) {
+            if (node.completion != undefined) {
+              returnComputed.completion = getConditions(node.completion.nodes, 'completion') 
+            }
+            if (node.restriction != undefined) {
+              returnComputed.restriction = getConditions(node.restriction.nodes, 'restriction') 
+            }
+        }
+    })
+  }
+  return returnComputed
+})
 function getConditions(completion_nodes, type) {
     let count = 0
     let conditions = []
@@ -153,10 +148,10 @@ const toggleCards = () => {
           class="additional-card-student" 
           :style="{ backgroundColor: shownCondition=='completion' ? completionColor : restrictionColor}"
         >
-          <div v-if="shownCondition=='restriction' && conditions.restriction.count > 0 ">
+          <div v-if="shownCondition=='restriction' && computedTriggerGetConditions.restriction.count > 0 ">
             <ul class="list-group mt-3">
               <li 
-                v-for="(condition, index) in conditions.restriction.conditions" 
+                v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions" 
                 :key="index"
                 class="list-group-item"
               >
@@ -170,10 +165,10 @@ const toggleCards = () => {
             </ul>
           </div>
   
-          <div v-else-if="shownCondition=='completion' && conditions.completion.count > 0 ">
+          <div v-else-if="shownCondition=='completion' && computedTriggerGetConditions.completion.count > 0 ">
             <ul class="list-group mt-3">
               <li 
-                v-for="(condition, index) in conditions.completion.conditions" 
+                v-for="(condition, index) in computedTriggerGetConditions.completion.conditions" 
                 :key="index"
                 class="list-group-item"
               >
@@ -199,7 +194,7 @@ const toggleCards = () => {
     </div>
     <div v-else>
       <div 
-        v-if="conditions.restriction" 
+        v-if="computedTriggerGetConditions.restriction" 
         class="card-container"
         :class="{ 'card-hover': showCard }"
         @click="toggleCards"
@@ -210,7 +205,7 @@ const toggleCards = () => {
         >
           <i class="fa-solid fa-key" />
           <span class="count">
-            {{ conditions.restriction.count }}
+            {{ computedTriggerGetConditions.restriction.count }}
           </span>
         </div>
         <div 
@@ -219,7 +214,7 @@ const toggleCards = () => {
         >
           <i class="fa-solid fa-check-to-slot" />
           <span class="count">
-            {{ conditions.completion.count }}
+            {{ computedTriggerGetConditions.completion.count }}
           </span>
         </div>
         <button 
@@ -246,10 +241,10 @@ const toggleCards = () => {
         <b>
           {{ store.state.strings.nodes_items_restriction }}
         </b>
-        <div v-if="conditions.restriction.count > 0 ">
+        <div v-if="computedTriggerGetConditions.restriction.count > 0 ">
           <ul class="list-group mt-3">
             <li 
-              v-for="(condition, index) in conditions.restriction.conditions" 
+              v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions" 
               :key="index"
               class="list-group-item"
             >
@@ -277,10 +272,10 @@ const toggleCards = () => {
         <b>
           {{ store.state.strings.nodes_items_completion }}
         </b>
-        <div v-if="conditions.completion.count > 0 ">
+        <div v-if="computedTriggerGetConditions.completion.count > 0 ">
           <ul class="list-group mt-3">
             <li 
-              v-for="(condition, index) in conditions.completion.conditions" 
+              v-for="(condition, index) in computedTriggerGetConditions.completion.conditions" 
               :key="index"
               class="list-group-item"
             >

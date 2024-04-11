@@ -33,9 +33,9 @@
     <div v-else>
       <notifications width="100%" />
       <div 
-        v-if="$store.state.editingadding == false &&
-          $store.state.editingpretest == false &&
-          $store.state.editingrestriction == false" 
+        v-if="store.state.editingadding == false &&
+          store.state.editingpretest == false &&
+          store.state.editingrestriction == false" 
         class="fade-in"
       >
         <LearningPathList />
@@ -272,8 +272,6 @@ const handleSaveEdit = async (params) => {
       node.data.selected_course_image = params.selected_course_image
     }
   })
-  await store.dispatch('saveLearningpath', learningpath.value)
-  learningpath.value = await store.dispatch('fetchLearningpath')
 
   notify({
     title: store.state.strings.title_save,

@@ -88,20 +88,20 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 // Load Store 
 const store = useStore();
 
 const initialFeedback = ref(null);
-const feedbackContent = ref(null);
+const feedbackContent = computed(() => store.state.feedback ? store.state.feedback.feedback : '');
 const learningpathfeedback= ref({})
 
 const props = defineProps({
   learningpath: {
     type: Object,
-    default: null,
+    default: () => ({}),
   }
 });
 
@@ -137,14 +137,7 @@ const adjustContenteditableHeight = () => {
 };
 
 onMounted(() => {
-  //initialFeedback.value = store.state.feedback.feedback
   learningpathfeedback.value = props.learningpath
 });
-
-watch(() => store.state.feedback, async () => {
-  if (store.state.feedback != null) {
-    initialFeedback.value = store.state.feedback.feedback;
-  }
-}, { deep: true } );
 
 </script>

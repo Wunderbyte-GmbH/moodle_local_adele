@@ -87,7 +87,7 @@
                 If no course image is available, the selected stock image will be choosen.
               </p>
               <div 
-                v-if="store.state.node && Object.keys(store.state.node.imagepaths).length > 0"
+                v-if="store.state.node && store.state.node.imagepaths && Object.keys(store.state.node.imagepaths).length > 0"
                 class="mb-2"
               >
                 <p>
@@ -232,13 +232,6 @@ const emit = defineEmits([
 
 // updating changes and closing modal
 const saveChanges = () => {
-  learningpathModal.value.json.tree.nodes.forEach((node) => {
-    if(node.id == store.state.node.node_id){
-      node.data.fullname = fullname.value
-      node.data.selected_course_image = selectedCourseImagePath.value
-      node.data.selected_image = selectedImagePath.value
-    }
-  })
   store.commit('updatedNode', {
     fullname: fullname.value, 
     shortname: shortname.value,

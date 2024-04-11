@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
@@ -71,19 +71,18 @@ onMounted(() => {
        }
      }
   })
-  watch(() => store.state.availablecourses, () => {
-    if (props.data.course_node_id && store.state.availablecourses) {
-      props.data.course_node_id.forEach((course_id) => {
-        const course = store.state.availablecourses.find(course => course.course_node_id[0] === course_id)
-        if (course) {
-          includedCourses.value.push({
-            id: course.course_node_id[0],
-            name: course.fullname,
-          })
-        }
-      })
-    }
-  });
+
+  if (props.data.course_node_id && store.state.availablecourses) {
+    props.data.course_node_id.forEach((course_id) => {
+      const course = store.state.availablecourses.find(course => course.course_node_id[0] === course_id)
+      if (course) {
+        includedCourses.value.push({
+          id: course.course_node_id[0],
+          name: course.fullname,
+        })
+      }
+    })
+  }
   if (store.state.view!='student') {
     active.value = true
   }

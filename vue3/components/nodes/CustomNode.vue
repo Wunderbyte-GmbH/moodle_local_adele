@@ -25,7 +25,7 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, onMounted, ref, watch  } from 'vue';
+import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
@@ -43,14 +43,23 @@ const props = defineProps({
   },
 });
 
-const courses = ref([])
+const courses = computed(() => store.state.availablecourses.filter(course => 
+    props.data.course_node_id.includes(course.course_node_id[0])
+  ).map(course => ({
+    fullname: course.fullname,
+    id: [course.course_node_id[0]]
+})));
 const dataValue = ref('')
-const learningmodule = ref({})
-const cover_image = ref(null)
+const learningmodule = computed(() => {
+  if (props.learningpath.json && props.learningpath.json.modules) {
+    return props.learningpath.json.modules;
+  }
+  return {};
+});
+const cover_image = computed(() => get_cover_image(props.data));
 
 onMounted(() => {
   dataValue.value = props.data
-  cover_image.value = get_cover_image(dataValue.value)
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
     parsedLearningModule = JSON.parse(props.learningpath.json)
@@ -60,7 +69,6 @@ onMounted(() => {
   } else {
     learningmodule.value = {}
   }
-  getCourseNamesIds()
 })
 
 const get_cover_image = (data) => {
@@ -72,38 +80,6 @@ const get_cover_image = (data) => {
     return data.image_paths
   }
 }
-
-watch(() => props.data, () => {
-  cover_image.value = get_cover_image(props.data)
-}, { deep: true } );
-
-const getCourseNamesIds = () => {
-  if (store.state.availablecourses) {
-    courses.value = []
-    store.state.availablecourses.forEach(course => {
-      if (props.data.course_node_id.includes(course.course_node_id[0])) {
-        courses.value.push({
-          fullname : course.fullname,
-          id : [course.course_node_id[0]]
-        })
-      }
-    });
-  }
-}
-
-// watch values from selected node
-watch(() => store.state.availablecourses, () => {
-  getCourseNamesIds()
-}, { deep: true } );
-
-// watch values from selected node
-watch(() => props.learningpath, () => {
-  if (props.learningpath.json && props.learningpath.json.modules) {
-    learningmodule.value = props.learningpath.json.modules
-  } else {
-    learningmodule.value = {}
-  }
-}, { deep: true } );
 
 // Set node data for the modal
 const setNodeModal = () => {
@@ -181,7 +157,6 @@ const childStyle = {
           </div>
         </div>
       </div>
-
       <div class="card-body">
         <div 
           v-if="cover_image"

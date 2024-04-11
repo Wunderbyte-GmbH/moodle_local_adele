@@ -82,10 +82,16 @@ export function createAppStore() {
             updatedNode(state, data) {
                 //set node name
                 state.node.fullname = data.fullname;
+                state.node.selected_course_image = data.selected_course_image;
+                state.node.selected_image = data.selected_image;
                 //save learning path
                 state.learningpath.json.tree.nodes = state.learningpath.json.tree.nodes.map(element_node => {
                     if (element_node.id === data.node_id) {
-                      return { ...element_node, fullname: data.fullname };
+                      return { ...element_node, 
+                        fullname: data.fullname,
+                        selected_course_image: data.selected_course_image,
+                        selected_image: data.selected_image,
+                      };
                     }
                     return element_node;
                 });

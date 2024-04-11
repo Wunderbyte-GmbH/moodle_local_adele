@@ -27,15 +27,25 @@
 import { Handle, Position } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-const courses = ref([])
-const cardHeight = ref(200);
+const courses = computed(() => store.state.availablecourses.filter(course => 
+    props.data.course_node_id.includes(course.course_node_id[0])
+  ).map(course => ({
+    fullname: course.fullname,
+    id: [course.course_node_id[0]]
+})));
+
+const cardHeight = computed(() => {
+  const minHeight = 275
+  return  minHeight + courses.value.length * 60
+})
+
 const dataValue = ref('')
 const learningmodule = ref({})
-const cover_image = ref(null)
+const cover_image = computed(() => get_cover_image(props.data));
 
- const props = defineProps({
+const props = defineProps({
   data: {
     type: Object,
     required: true,
@@ -85,8 +95,6 @@ onMounted(() => {
   } else {
     learningmodule.value = {}
   }
-  getCourseNamesIds() 
-  calculateHeight(courses.value.length)
 })
 
 const get_cover_image = (data) => {
@@ -97,27 +105,6 @@ const get_cover_image = (data) => {
   } else if (data.image_paths) {
     return data.image_paths
   }
-}
-
-const getCourseNamesIds = () => {
-  if (store.state.availablecourses) {
-    courses.value = []
-    store.state.availablecourses.forEach(course => {
-      if (props.data.course_node_id.includes(course.course_node_id[0])) {
-        courses.value.push({
-          fullname : course.fullname,
-          id : [course.course_node_id[0]]
-        })
-      }
-    });
-  }
-}
-
-const calculateHeight = (length) => {
-  const minHeight = 275;
-  const numberOfCourses = length;
-  const calculatedHeight = minHeight + numberOfCourses * 60;
-  cardHeight.value = calculatedHeight;
 }
 
 const removeCourse = (id) => {
@@ -139,22 +126,6 @@ const removeElement = (array, elementToRemove) => {
   }
   return array
 };
-
-// watch values from selected node
-watch(() => props.data, () => {
-  getCourseNamesIds()
-  cover_image.value = get_cover_image(props.data)
-}, { deep: true } );
-
-// watch values from selected node
-watch(() => courses.value, () => {
-  calculateHeight(courses.value.length)
-}, { deep: true } );
-
-// watch values from selected node
-watch(() => store.state.availablecourses, () => {
-  getCourseNamesIds()
-}, { deep: true } );
 
 const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
@@ -179,7 +150,7 @@ const childStyle = {
   <div>
     <div 
       class="card"
-      :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
+      :style="[{ minHeight: cardHeight + 'px', width: '400px' }, childStyle]"
     >
       <div class="card-header text-center">
         <div class="row align-items-center">
