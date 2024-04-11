@@ -10,8 +10,7 @@ const  addAutoRestrictions = (newNode, oldNode, relation, store) => {
     if (oldNode.restriction != undefined) {
       //oldNode = expandRestriction(newNode, oldNode, relation)
       return oldNode
-    } else {
-      
+    } else {   
       oldNode.restriction = createRestriction(oldNode.id, newNode.id, store)
     }
     return oldNode

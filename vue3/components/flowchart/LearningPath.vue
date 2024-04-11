@@ -374,7 +374,7 @@ function onDrop(event) {
         // If the value is found, remove it
         if (index !== -1) {
           intersectedNode.value.closestnode.parentCourse.splice(index, 1)
-          shiftNodesDown(data.node_id, nodes.value)
+          shiftNodesDown(data, nodes.value)
         }
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
@@ -450,9 +450,17 @@ function onDrop(event) {
         source = newNode.id 
         target = intersectedNode.value.closestnode.id
         newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child', store)
+        newNode.position = {
+          x: Math.round(newNode.position.x / 150) * 150,
+          y: Math.round(newNode.position.y / 150) * 150,
+        }
         addNodes([newNode])
       }else{
         addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'parent', store)
+        newNode.position = {
+          x: Math.round(newNode.position.x / 150) * 150,
+          y: Math.round(newNode.position.y / 150) * 150,
+        }
         addNodes([newNode])
       }
       // Add the new edge
@@ -465,9 +473,6 @@ function onDrop(event) {
     let tree = toObject()
     tree = removeDropzones(tree)
     emit('changedLearningpathTree', tree)
-    // store.state.learningpath.json = {
-    //   tree: tree,
-    // };
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store)
     }

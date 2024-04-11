@@ -29,12 +29,22 @@ import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { computed, onMounted, ref } from 'vue';
 
-const courses = computed(() => store.state.availablecourses.filter(course => 
+const courses = computed(() => {
+  if (
+    !store.state.availablecourses ||
+    !props.data.course_node_id ||
+    props.data.course_node_id.length === 0
+  ) {
+    return [];
+  }
+  return store.state.availablecourses.filter(course => 
     props.data.course_node_id.includes(course.course_node_id[0])
-  ).map(course => ({
-    fullname: course.fullname,
-    id: [course.course_node_id[0]]
-})));
+    ).map(course => ({
+      fullname: course.fullname,
+      id: [course.course_node_id[0]]
+    })
+  )}
+);
 
 const cardHeight = computed(() => {
   const minHeight = 275

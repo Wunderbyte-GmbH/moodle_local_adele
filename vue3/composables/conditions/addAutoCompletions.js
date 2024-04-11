@@ -74,6 +74,10 @@ const  addAutoCompletions = (node, store) => {
         },
         "zoom": 1
       }
+    node.position = {
+      x: Math.round(node.position.x / 150) * 150,
+      y: Math.round(node.position.y / 150) * 150,
+    }
     return node;
 }
 

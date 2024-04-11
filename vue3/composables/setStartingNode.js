@@ -45,6 +45,10 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, store, b
               startingNode.position.x +=150 
             }
           })
+          startingNode.position = {
+            x: Math.round(startingNode.position.x / 150) * 150,
+            y: Math.round(startingNode.position.y / 150) * 150,
+          }
           nextTick(() => {
             addNodes([startingNode])
           })

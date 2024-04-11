@@ -41,6 +41,7 @@ import recalculateParentChild from '../../composables/recalculateParentChild';
 const store = useStore();
 const router = useRouter();
 const learningpathcontrol = ref({})
+const deepCopy = ref({})
 
 const { toObject, setNodes, setEdges, removeNodes,
   addNodes, nodes, findNode } = useVueFlow()
@@ -92,6 +93,7 @@ watch(() => learningpathcontrol.value, async() => {
 // Trigger web services on mount
 onMounted( async () => {
   learningpathcontrol.value = props.learningpath
+  deepCopy.value = JSON.parse(JSON.stringify(props.learningpath))
   if (learningpathcontrol.value.json.tree != undefined) {
     const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
     setNodes(flowchart.nodes)
@@ -141,7 +143,7 @@ const onSave = async () => {
         });
       } else {
         await store.dispatch('saveLearningpath', learningpathcontrol.value);
-        onCancelConfirmation()
+        onCancelConfirmation(true)
         notify({
           title: store.state.strings.title_save,
           text: store.state.strings.description_save,
@@ -153,11 +155,17 @@ const onSave = async () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-  showCancelConfirmation.value = !showCancelConfirmation.value
+  if (JSON.stringify(store.state.comparelearningpath) == JSON.stringify(props.learningpath)) {
+    onCancelConfirmation(false)
+  } else {
+    showCancelConfirmation.value = !showCancelConfirmation.value
+  }
 };
 
-const onCancelConfirmation = () => {
-    onCancel()
+const onCancelConfirmation = (toggle) => {
+    if (toggle) {
+      onCancel()
+    }
     store.state.learningpath = null;
     store.state.learningPathID = 0;
     store.state.editingadding = false;
@@ -236,7 +244,7 @@ function updatePos() {
       <button 
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
-        @click="onCancelConfirmation"
+        @click="onCancelConfirmation(true)"
       >
         {{ store.state.strings.flowchart_cancel_button }}
       </button>

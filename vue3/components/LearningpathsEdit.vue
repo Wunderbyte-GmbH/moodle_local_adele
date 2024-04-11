@@ -41,7 +41,7 @@
         <LearningPathList />
       </div>
       <div 
-        v-else-if="$store.state.editingadding == true" 
+        v-else-if="store.state.editingadding == true" 
         class="fade-in"
       >
         <button 
@@ -68,7 +68,7 @@
           <button 
             id="confim-cancel-learning-path"
             class="btn btn-warning m-2"
-            @click="goBackConfirmation"
+            @click="goBackConfirmation(true)"
           >
             {{ store.state.strings.flowchart_cancel_button }}
           </button>
@@ -196,11 +196,17 @@ onBeforeRouteUpdate((to, from, next) => {
 
 // Function to go back
 const goBack = () => {
-  showBackConfirmation.value = !showBackConfirmation.value
+  if (JSON.stringify(store.state.comparelearningpath) == JSON.stringify(learningpath.value)) {
+    goBackConfirmation(false)
+  } else {
+    showBackConfirmation.value = !showBackConfirmation.value
+  }
 }
 
-const goBackConfirmation = () => {
-  goBack()
+const goBackConfirmation = (toggle) => {
+  if (toggle) {
+    goBack()
+  }
   store.state.editingadding = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
@@ -288,7 +294,6 @@ const handleMoveNode = (params) => {
     }
   })
 }
-
 
 </script>
 
