@@ -36,7 +36,7 @@ class asset_handler {
 
     /**
      * Start a new attempt for a user.
-     *
+     * @param string $path
      * @return array
      */
     public static function get_image_paths($path) {

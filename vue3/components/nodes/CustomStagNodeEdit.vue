@@ -31,19 +31,27 @@ import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
+import CourseCarousel from '../nodes_items/CourseCarousel.vue';
+import CourseCompletion from '../nodes_items/CourseCompletion.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
-import CourseRating from '../nodes_items/CourseRating.vue';
 
 // Load Store 
 const store = useStore();
 const date = ref({})
-const includedCourses = computed(() => store.state.availablecourses.filter(course => 
-    props.data.course_node_id.includes(course.course_node_id[0])
-  ).map(course => ({
-    fullname: course.fullname,
-    id: [course.course_node_id[0]]
-})));
+
+const cover_image = computed(() => get_cover_image(props.data));
+
+const get_cover_image = (data) => {
+  if (data.selected_course_image) {
+    return data.selected_course_image
+  } else if (data.selected_image) {
+    return data.selected_image
+  } else if (data.image_paths) {
+    return data.image_paths
+  }
+}
+
 const stageType = ref('parallel')
 const props = defineProps({
   data: {
@@ -60,6 +68,8 @@ const emit = defineEmits([
   'node-clicked',
 ]);
 const active = ref(false)
+let min_courses = 1
+let finishedCourses = {}
 
 onMounted(() => {
   const userpath = props.learningpath
@@ -80,6 +90,11 @@ onMounted(() => {
           if(completionnode.data.label == 'course_completed' &&
             completionnode.data.value.min_courses > 1){
               stageType.value = 'non_parallel'
+              min_courses = completionnode.data.value.min_courses
+              if (userpath.json.user_path_relation[node.id] &&
+                userpath.json.user_path_relation[node.id].completioncriteria) {
+                finishedCourses = userpath.json.user_path_relation[node.id].completioncriteria.course_completed
+              }
           }
         })
        }
@@ -137,17 +152,6 @@ const childStyle = {
   <div
     @click="emit('node-clicked', props.data)"
   >
-    <div 
-      v-if="isParentNode"
-      class="starting-node"
-    >
-      <i 
-        class="fa-solid fa-arrow-down mr-2"
-        :style="{color: store.state.strings.PUMPKIN}" 
-      />
-      {{ store.state.strings.nodes_potential_start }}
-    </div>
-
     <div
       class="card test"
       :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
@@ -161,16 +165,10 @@ const childStyle = {
           :learningpath="learningpath"
         />
         <div class="row">
-          <div class="col-10">
+          <div class="col-4">
             <h5>
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
-          </div>
-          <div 
-            v-if="data.completion.completionnode.valid"
-            class="col-2 d-flex justify-content-end"
-          >
-            <CourseRating :data="data" />
           </div>
         </div>
       </div>
@@ -179,6 +177,22 @@ const childStyle = {
         :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
+        <div v-if="min_courses > 1">
+          <CourseCompletion 
+            :min-courses="min_courses"
+            :finished-courses="finishedCourses"
+          />
+        </div>
+        <div 
+          v-if="cover_image"
+          class="card-img dashboard-card-img mb-2" 
+          :style="{ 
+            height: '10rem', 
+            backgroundImage: 'url(' + cover_image + ')',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }"
+        />
         <div v-if="store.state.learningpath && store.state.view=='student'">
           <div 
             class="row mb-2"
@@ -195,7 +209,7 @@ const childStyle = {
               <ProgressBar :progress="data.progress" />
             </div>
           </div>
-          <div v-if="includedCourses" class="row mb-2">
+          <!-- <div v-if="includedCourses" class="row mb-2">
             <div class="col-5 text-left">
               <b>
                 {{ store.state.strings.nodes_courses }}
@@ -219,7 +233,7 @@ const childStyle = {
           </div>
           <div v-if="date">
             <DateInfo :date="date" />
-          </div>
+          </div> -->
         </div>
         <div v-else>
           <div v-if="data.manualrestriction">
@@ -354,6 +368,7 @@ const childStyle = {
         class="card-footer"
       >
         <NodeFeedbackArea :data="data" />
+        <CourseCarousel :courses="props.data" />
       </div>
     </div>
     <Handle 

@@ -43,12 +43,21 @@ const props = defineProps({
   },
 });
 
-const courses = computed(() => store.state.availablecourses.filter(course => 
-    props.data.course_node_id.includes(course.course_node_id[0])
-  ).map(course => ({
-    fullname: course.fullname,
-    id: [course.course_node_id[0]]
-})));
+const courses = computed(() => {
+  if (
+    !store.state.availablecourses ||
+    !props.data.course_node_id ||
+    props.data.course_node_id.length === 0
+  ) {
+    return [];
+  }
+  return store.state.availablecourses.filter(course => 
+      props.data.course_node_id.includes(course.course_node_id[0])
+    ).map(course => ({
+      fullname: course.fullname,
+      id: [course.course_node_id[0]]
+  }))
+});
 const dataValue = ref('')
 const learningmodule = computed(() => {
   if (props.learningpath.json && props.learningpath.json.modules) {

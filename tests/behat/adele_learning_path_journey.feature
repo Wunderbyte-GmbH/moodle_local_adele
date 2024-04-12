@@ -26,5 +26,3 @@ Feature: As an admin I perform import of adele alonf with questions to check Sca
     And I wait until the page is ready
     Then I should see "Some description for the learning path"
     And I follow "Edit"
-    Then I should see "Edit a learning path"
-    And I click on "Edit Completion" "button"

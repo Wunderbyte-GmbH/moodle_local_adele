@@ -1,5 +1,6 @@
 <script setup>
     // Import needed libraries
+    import CourseRating from '../nodes_items/CourseRating.vue';
     import { computed, onMounted, ref } from 'vue';
     import { useStore } from 'vuex';
 
@@ -120,14 +121,13 @@ const toggleCards = () => {
           (node.completion.restrictionnode && node.completion.restrictionnode.valid) ||
           (node.completion.completionnode && node.completion.completionnode.valid)
         )"
-        
         @click="toggleCompletion('completion')"
       >
         <div 
           class="completion" 
           :style="{ color: completionColor }"
         >
-          <i class="fa-solid fa-check-to-slot" />
+          <CourseRating :data="props.node" />
         </div>
       </div>
       <div v-else>

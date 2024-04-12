@@ -159,6 +159,12 @@ class learning_paths {
         return (array) $learningpath;
     }
 
+    /**
+     * Get one specific learning path.
+     *
+     * @param object $learningpath
+     * @return object
+     */
     public static function get_image_paths($learningpath) {
         if ($learningpath) {
             $learningpathjson = json_decode($learningpath->json);
@@ -169,8 +175,10 @@ class learning_paths {
                     $fs = get_file_storage();
                     $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'itemid, filepath, filename', false);
                     if ($file = reset($files)) {
-                        $path = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                                                                $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                        $path = moodle_url::make_pluginfile_url(
+                          $file->get_contextid(), $file->get_component(), $file->get_filearea(),
+                          $file->get_itemid(), $file->get_filepath(), $file->get_filename()
+                        );
                         $imagepaths[$coursenodeid] = str_replace('/0/', '/', $path->out());
                     }
                 }
