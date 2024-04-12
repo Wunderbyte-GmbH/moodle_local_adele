@@ -81,7 +81,10 @@ class relation_update {
                                         . '_' . $currentcondition['id'];
                                 } else if ($currentcondition['data']['label'] == 'parent_node_completed') {
                                     foreach ($restrictioncriteria[$currentcondition['data']['label']] as $keynode => $parentnode) {
-                                        $parentcompletioncriteria = course_completion_status::get_condition_status($parentnode, $userpath->user_id);
+                                        $parentcompletioncriteria = course_completion_status::get_condition_status(
+                                          $parentnode,
+                                          $userpath->user_id
+                                        );
                                         $parentnode = self::validatenodecompletion(
                                             $parentnode,
                                             $parentcompletioncriteria,
