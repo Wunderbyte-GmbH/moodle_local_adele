@@ -27,7 +27,7 @@ declare(strict_types=1);
 
 namespace local_adele\external;
 
-use core\context;
+use context;
 use external_api;
 use external_function_parameters;
 use external_value;
