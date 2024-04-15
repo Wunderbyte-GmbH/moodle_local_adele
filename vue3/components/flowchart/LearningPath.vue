@@ -383,7 +383,8 @@ function onDrop(event) {
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
       intersectedNode.value.closestnode.childCourse.push(data.node_id)
-      position.y += + intersectedNode.value.dropzone.dimensions.height/2 + 300
+      const extraImageShift = intersectedNode.value.closestnode.data.selected_course_image ? 200 : 0
+      position.y += + intersectedNode.value.dropzone.dimensions.height/2 + 300 + extraImageShift
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
       const addConditions = addAndConditions(intersectedNode.value, getEdges, id)
       position.x += 200
