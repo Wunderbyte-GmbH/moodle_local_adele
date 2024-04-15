@@ -206,7 +206,6 @@ onMounted(() => {
         );
       });
     })
-    zoomLock.value = true
   }, 300)
 });
 
