@@ -22,7 +22,7 @@
       <button 
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
-        @click="goBackConfirmation"
+        @click="goBackConfirmation(true)"
       >
         {{ store.state.strings.flowchart_cancel_button }}
       </button>
@@ -116,7 +116,7 @@ import ConditionNode from '../nodes/ConditionNode.vue'
 import getNodeId from '../../composables/getNodeId'
 import { notify } from '@kyvg/vue3-notification';
 
-const { nodes, edges, addNodes, project, vueFlowRef, addEdges, findNode } = useVueFlow({
+const { nodes, edges, addNodes, project, vueFlowRef, addEdges, findNode, toObject } = useVueFlow({
   nodes: [],})
 
 // Load Store 
@@ -172,11 +172,34 @@ onMounted(async () => {
 
 // Function to go back
 const goBack = () => {
-  showBackConfirmation.value = !showBackConfirmation.value
+  const condition = toObject()
+  learningpathrestriction.value.json.tree.nodes.forEach(element_node => {
+    if (
+      store.state.node &&
+      element_node.id === store.state.node.node_id
+    ) {
+        if (
+          element_node.restriction == undefined &&
+          condition.nodes.length == 0
+        ) {
+          goBackConfirmation(false)
+        }
+        if (
+          element_node.restriction &&
+          JSON.stringify(condition.nodes) == JSON.stringify(element_node.restriction.nodes)
+        ) {
+          goBackConfirmation(false)
+        } else {
+          showBackConfirmation.value = !showBackConfirmation.value
+        }
+      }
+  });
 }
 
-const goBackConfirmation = () => {
-  goBack()
+const goBackConfirmation = (toggle) => {
+  if (toggle) {
+    goBack()
+  }
   store.state.editingadding = !store.state.editingadding
   store.state.editingrestriction = !store.state.editingrestriction
 }

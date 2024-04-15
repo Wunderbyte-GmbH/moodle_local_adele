@@ -322,7 +322,7 @@ function changeTab(index) {
 <style scoped>
 .learning-path-nodes-container {
   margin-top: 20px;
-  height: 80%;
+  max-height: 450px;
   overflow-y: auto;
 }
 .nav-item{

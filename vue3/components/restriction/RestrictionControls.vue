@@ -80,8 +80,7 @@ if (store.state.node != undefined && learningpathRestriction.value.json != '') {
 
 // Prepare and save learning path
 const onSave = async () => {
-  let restriction = toObject();
-  restriction = removeDropzones(restriction)
+  const restriction = perpareCompletion()
   const singleNodes = standaloneNodeCheck(restriction)
   if (singleNodes) {
     notify({
@@ -90,7 +89,6 @@ const onSave = async () => {
         type: 'error'
       });
   } else{
-    restriction = recalculateParentChild(restriction, 'parentCondition', 'childCondition', 'starting_condition')
     //save learning path
     learningpathRestriction.value.json.tree.nodes = learningpathRestriction.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
@@ -100,7 +98,7 @@ const onSave = async () => {
     });
     const learningpathID = await store.dispatch('saveLearningpath', learningpathRestriction.value)
     router.push('/learningpaths/edit/' + learningpathID);
-    onCancelConfirmation();
+    onCancelConfirmation(true);
     notify({
       title: store.state.strings.title_save,
       text: store.state.strings.description_save,
@@ -109,16 +107,43 @@ const onSave = async () => {
   }
 };
 
+const perpareCompletion = () => {
+  let restriction = toObject();
+  restriction = removeDropzones(restriction)
+  return recalculateParentChild(restriction, 'parentCondition', 'childCondition', 'starting_condition')
+}
+
 // Cancel learning path edition and return to overview
-const onCancelConfirmation = () => {
-  onCancel()
+const onCancelConfirmation = (toggle) => {
+  console.log('restriction.nodes')
+
+  if (toggle) {
+    onCancel()
+  }
   store.state.editingrestriction = false
   store.state.editingadding = true
   store.state.node = null
 };
 
+// Cancel learning path edition and return to overview
 const onCancel = () => {
-  showCancelConfirmation.value = !showCancelConfirmation.value
+  console.log('restriction.nodes')
+
+  const restriction = perpareCompletion()
+  learningpathRestriction.value.json.tree.nodes.forEach(element_node => {
+    if (
+      store.state.node &&
+      element_node.id === store.state.node.node_id
+    ) {
+        console.log(restriction.nodes)
+        console.log(element_node.restriction.nodes)
+        if (JSON.stringify(restriction.nodes) == JSON.stringify(element_node.restriction.nodes)) {
+          onCancelConfirmation(false)
+        } else {
+          showCancelConfirmation.value = !showCancelConfirmation.value
+        }
+      }
+  });
 };
 
 // Fit pane into view
@@ -157,7 +182,7 @@ onPaneReady(({ fitView,}) => {
       <button 
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
-        @click="onCancelConfirmation"
+        @click="onCancelConfirmation(true)"
       >
         {{ store.state.strings.flowchart_cancel_button }}
       </button>

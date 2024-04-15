@@ -52,17 +52,20 @@ const props = defineProps({
 });
 
 const learningpathCompletion = ref(null)
-
+const copieLearningpathCompletion = ref({})
 const showCancelConfirmation = ref(false)
 
 onMounted(() => {
   learningpathCompletion.value = props.learningpath
+  copieLearningpathCompletion.value = JSON.parse(JSON.stringify(props.learningpath))
 })
 
 const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
 
 // Emit to parent component
-const emit = defineEmits(['change-class']);
+const emit = defineEmits([
+  'change-class'
+]);
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
   emit('change-class');
@@ -86,8 +89,7 @@ watch(() => learningpathCompletion.value, async () => {
 
 // Prepare and save learning path
 const onSave = async () => {
-  let condition = toObject();
-  condition = removeDropzones(condition)
+  const condition = perpareCompletion()
   const singleNodes = standaloneNodeCheck(condition)
   if (singleNodes) {
     notify({
@@ -96,8 +98,6 @@ const onSave = async () => {
         type: 'error'
       });
   } else{
-    condition = recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
-
     //save learning path
     learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
@@ -107,7 +107,7 @@ const onSave = async () => {
     });
     const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
     router.push('/learningpaths/edit/' + learningpathID);
-    onCancelConfirmation();
+    onCancelConfirmation(true);
     notify({
       title: store.state.strings.title_save,
       text: store.state.strings.description_save,
@@ -116,13 +116,42 @@ const onSave = async () => {
   }
 };
 
+const perpareCompletion = () => {
+  let condition = toObject();
+  condition = removeDropzones(condition)
+  return recalculateParentChild(condition, 'parentCondition', 'childCondition', 'starting_condition')
+}
+
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-  showCancelConfirmation.value = !showCancelConfirmation.value
+  const condition = perpareCompletion()
+  learningpathCompletion.value.json.tree.nodes.forEach(element_node => {
+    if (
+      store.state.node &&
+      element_node.id === store.state.node.node_id
+    ) {
+        if (
+          element_node[props.condition] == undefined &&
+          condition.nodes.length == 0
+        ) {
+          onCancelConfirmation(false)
+        }
+        if (
+          element_node[props.condition] &&
+          JSON.stringify(condition.nodes) == JSON.stringify(element_node[props.condition].nodes)
+        ) {
+          onCancelConfirmation(false)
+        } else {
+          showCancelConfirmation.value = !showCancelConfirmation.value
+        }
+      }
+  });
 };
 
-const onCancelConfirmation = () => {
-  onCancel()
+const onCancelConfirmation = (toggle) => {
+  if (toggle) {
+    onCancel()
+  }
   store.state.editingpretest = false
   store.state.editingrestriction = false
   store.state.editingadding = true
@@ -166,7 +195,7 @@ onPaneReady(({ fitView,}) => {
       <button 
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
-        @click="onCancelConfirmation"
+        @click="onCancelConfirmation(true)"
       >
         {{ store.state.strings.flowchart_cancel_button }}
       </button>

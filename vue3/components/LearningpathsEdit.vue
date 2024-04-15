@@ -143,6 +143,7 @@ const router = useRouter()
 const goalname = ref('')
 const goaldescription = ref('')
 const learningpath = ref('')
+const copiedLearningpath = ref({})
 const showBackConfirmation = ref(false)
 
 const changeGoalName = (newGoalName) => {
@@ -184,6 +185,7 @@ const showForm = async (learningpathId = null) => {
     store.state.learningPathID = learningpathId;
   }
   learningpath.value = await store.dispatch('fetchLearningpath')
+  copiedLearningpath.value = JSON.parse(JSON.stringify(learningpath.value))
   store.state.editingadding = true
   window.scrollTo(0, 0)
 };
@@ -196,8 +198,40 @@ onBeforeRouteUpdate((to, from, next) => {
 
 // Function to go back
 const goBack = () => {
-  if (JSON.stringify(store.state.comparelearningpath) == JSON.stringify(learningpath.value)) {
-    goBackConfirmation(false)
+  copiedLearningpath.value
+  if (
+    learningpath.value.description == copiedLearningpath.value.description &&
+    learningpath.value.name == copiedLearningpath.value.name
+  ) {
+    let same = true
+    if (
+      (
+        copiedLearningpath.value.json.tree &&
+        learningpath.value.json.tree &&
+        copiedLearningpath.value.json.tree.nodes &&
+        learningpath.value.json.tree.nodes &&
+        copiedLearningpath.value.json.tree.nodes.length != learningpath.value.json.tree.nodes.length
+      ) ||
+      typeof(copiedLearningpath.value.json) != typeof(learningpath.value.json)
+    ) {
+      same = false
+    }
+    if (same && copiedLearningpath.value.json.tree) {
+      learningpath.value.json.tree.nodes.forEach((node, index) => {
+        if (
+          !copiedLearningpath.value.json.tree.nodes[index] ||
+          JSON.stringify(node.data) != JSON.stringify(copiedLearningpath.value.json.tree.nodes[index].data)
+        ) {
+          showBackConfirmation.value = !showBackConfirmation.value
+          same = false
+        }
+      })
+    }
+    if (same) {
+      goBackConfirmation(false)
+    } else {
+      showBackConfirmation.value = !showBackConfirmation.value
+    }
   } else {
     showBackConfirmation.value = !showBackConfirmation.value
   }

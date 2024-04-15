@@ -42,6 +42,7 @@ const store = useStore();
 const router = useRouter();
 const learningpathcontrol = ref({})
 const deepCopy = ref({})
+const deepCopyText = ref({})
 
 const { toObject, setNodes, setEdges, removeNodes,
   addNodes, nodes, findNode } = useVueFlow()
@@ -93,7 +94,6 @@ watch(() => learningpathcontrol.value, async() => {
 // Trigger web services on mount
 onMounted( async () => {
   learningpathcontrol.value = props.learningpath
-  deepCopy.value = JSON.parse(JSON.stringify(props.learningpath))
   if (learningpathcontrol.value.json.tree != undefined) {
     const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
     setNodes(flowchart.nodes)
@@ -106,6 +106,8 @@ onMounted( async () => {
     drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
   setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+  deepCopy.value = JSON.parse(JSON.stringify(toObject()))
+  deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath))
 });
 
 
@@ -155,7 +157,13 @@ const onSave = async () => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-  if (JSON.stringify(store.state.comparelearningpath) == JSON.stringify(props.learningpath)) {
+  let finalpath = toObject()
+  finalpath = finalpath.nodes.filter(object => object.id !== 'starting_node');
+  if (
+    deepCopyText.value.description == props.learningpath.description &&
+    deepCopyText.value.name == props.learningpath.name &&
+    JSON.stringify(finalpath) == JSON.stringify(deepCopy.value.nodes)
+  ) {
     onCancelConfirmation(false)
   } else {
     showCancelConfirmation.value = !showCancelConfirmation.value
