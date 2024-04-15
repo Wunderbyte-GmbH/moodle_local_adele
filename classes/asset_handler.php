@@ -45,7 +45,7 @@ class asset_handler {
         $filelist = glob($path);
         $filepath = [];
         foreach ($filelist as $file) {
-            $filepath[] = [ 'path' => str_replace('/var/www/html', '', $file)];
+            $filepath[] = [ 'path' => str_replace($CFG->dirroot, '', $file)];
         }
         return $filepath;
     }

@@ -152,7 +152,6 @@ const goBack = () => {
       store.state.node &&
       element_node.id === store.state.node.node_id
     ) {
-        console.log(element_node)
         if (
           element_node.completion == undefined &&
           condition.nodes.length == 0

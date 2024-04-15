@@ -115,8 +115,6 @@ const perpareCompletion = () => {
 
 // Cancel learning path edition and return to overview
 const onCancelConfirmation = (toggle) => {
-  console.log('restriction.nodes')
-
   if (toggle) {
     onCancel()
   }
@@ -127,16 +125,12 @@ const onCancelConfirmation = (toggle) => {
 
 // Cancel learning path edition and return to overview
 const onCancel = () => {
-  console.log('restriction.nodes')
-
   const restriction = perpareCompletion()
   learningpathRestriction.value.json.tree.nodes.forEach(element_node => {
     if (
       store.state.node &&
       element_node.id === store.state.node.node_id
     ) {
-        console.log(restriction.nodes)
-        console.log(element_node.restriction.nodes)
         if (JSON.stringify(restriction.nodes) == JSON.stringify(element_node.restriction.nodes)) {
           onCancelConfirmation(false)
         } else {

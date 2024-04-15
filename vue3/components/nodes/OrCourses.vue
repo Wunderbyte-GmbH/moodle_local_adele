@@ -199,7 +199,19 @@ const childStyle = {
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }"
-        />
+        >
+          <div class="overlay">
+            <a href="link-to-page-1" class="icon-link">
+              <i class="fa fa-link"></i> <!-- Example icon, replace with your actual icons -->
+            </a>
+            <a href="link-to-page-2" class="icon-link">
+              <i class="fa fa-lock" />
+            </a>
+            <a href="link-to-page-3" class="icon-link">
+              <i class="fa fa-envelope"></i> <!-- Example icon -->
+            </a>
+          </div>
+        </div>
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
             {{ store.state.strings.nodes_learning_module }}
@@ -297,6 +309,30 @@ const childStyle = {
   </div>
 </template>
 <style scoped>
+.overlay {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%; /* Adjust width as needed */
+  height: 50%; /* Adjust height as needed */
+  border-radius: 15px; /* Rounded edges */
+}
+
+.icon-link {
+  margin: 0 25px; /* Spacing between icons */
+  color: white; /* Icon color */
+  text-decoration: none; /* No underline */
+  font-size: 30px; /* Icon size */
+}
+
+.icon-link:hover {
+  color: lightgray; /* Hover effect */
+}
 .custom-node {
   position: relative;
   background-color: white;
