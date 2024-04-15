@@ -39,6 +39,7 @@
         :fit-view-on-init="true" 
         :max-zoom="1.5" 
         :min-zoom="0.2"
+        :zoom-on-scroll="zoomLock"
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
@@ -162,7 +163,7 @@ const shouldShowMiniMap = computed(() => {
 });
 
 const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
-let zooming = false;
+const zoomLock = ref(false)
 
 const finishEdit = () => {
   emit('finish-edit');
@@ -189,13 +190,14 @@ onMounted(() => {
   setTimeout(() => {
     nextTick().then(() => {
       fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        zoomLock.value = true
         watch(
-          () => viewport.value,
+          () => viewport.value.zoom,
           (newVal, oldVal) => {
-            if (newVal.zoom && oldVal.zoom && !zooming) {
-              if (newVal.zoom > oldVal.zoom) {
+            if (newVal && oldVal && zoomLock.value) {
+              if (newVal > oldVal) {
                 setZoomLevel('in', newVal)
-              } else if (newVal.zoom < oldVal.zoom) {
+              } else if (newVal < oldVal) {
                 setZoomLevel('out', newVal)
               }
             }
@@ -204,11 +206,12 @@ onMounted(() => {
         );
       });
     })
-  }, 100)
+    zoomLock.value = true
+  }, 300)
 });
 
 const setZoomLevel = async (action) => {
-  zooming = true;
+  zoomLock.value = false
   let newViewport = viewport.value.zoom
   let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
   if (currentStepIndex === -1) {
@@ -228,9 +231,10 @@ const setZoomLevel = async (action) => {
     }
   }
   if (newViewport != undefined) {
-    await zoomTo(newViewport, { duration: 500})
+    await zoomTo(newViewport, { duration: 500}).then(() => {
+      zoomLock.value = true
+    })
   }
-  zooming = false;
 }
 
 
@@ -282,13 +286,13 @@ const onDrag = ($event) => {
 }
 
 const onNodeClick = (event) => {
-  zooming = true;
+  zoomLock.value = false
   setCenter( 
     event.node.position.x + event.node.dimensions.width/2, 
     event.node.position.y + event.node.dimensions.height/2,
     { zoom: 1, duration: 500}
   ).then(() => {
-    zooming = false;
+    zoomLock.value = true
   })
 }
 
