@@ -169,21 +169,6 @@ const childStyle = {
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
           </div>
-          <div 
-            v-if="store.state.view!='teacher'" 
-            class="col-auto"
-          >
-            <button 
-              type="button" 
-              class="btn btn-primary" 
-              data-toggle="modal" 
-              data-target="#nodeModal"
-              @click="setNodeModal"
-            >
-              <i class="fa fa-edit" /> 
-              {{ store.state.strings.nodes_edit }}
-            </button>
-          </div>
         </div>
       </div>
 
@@ -191,25 +176,36 @@ const childStyle = {
         class="card-body"
       >
         <div 
-          v-if="cover_image"
           class="card-img dashboard-card-img" 
           :style="{ 
-            height: '10rem', 
-            backgroundImage: 'url(' + cover_image + ')',
+            height: '10rem',
+            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundColor: cover_image ? '' : '#cccccc'
           }"
         >
           <div class="overlay">
-            <a href="link-to-page-1" class="icon-link">
-              <i class="fa fa-link"></i> <!-- Example icon, replace with your actual icons -->
-            </a>
-            <a href="link-to-page-2" class="icon-link">
+            <button 
+              class="icon-link"
+              @click="setPretestView"
+            >
+              <i class="fa fa-bars-progress" />
+            </button>
+            <button 
+              class="icon-link"
+              @click="setRestrictionView"
+            >
               <i class="fa fa-lock" />
-            </a>
-            <a href="link-to-page-3" class="icon-link">
-              <i class="fa fa-envelope"></i> <!-- Example icon -->
-            </a>
+            </button>
+            <button 
+              class="icon-link"
+              data-toggle="modal" 
+              data-target="#nodeModal"
+              @click="setNodeModal"
+            >
+              <i class="fa fa-pen" />
+            </button>
           </div>
         </div>
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
@@ -257,33 +253,6 @@ const childStyle = {
             </button>
           </div>
         </div>
-        <div 
-          v-if="store.state.view!='teacher'"
-          class="row align-items-center"
-        >
-          <div class="col">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              :style="{backgroundColor: store.state.strings.LIGHT_STEEL_BLUE}"
-              @click="setRestrictionView"
-            >
-              <i class="fa-solid fa-key" /> 
-              {{ store.state.strings.nodes_edit_restriction }}
-            </button>
-          </div>
-          <div class="col-auto">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              :style="{backgroundColor: store.state.strings.DARK_ORANGE}"
-              @click="setPretestView"
-            >
-              <i class="fa-solid fa-check-to-slot" /> 
-              {{ store.state.strings.nodes_edit_completion }}
-            </button>
-          </div>
-        </div>
       </div>
       <div class="card-footer">
         <OverviewRestrictionCompletion 
@@ -324,10 +293,16 @@ const childStyle = {
 }
 
 .icon-link {
-  margin: 0 25px; /* Spacing between icons */
-  color: white; /* Icon color */
-  text-decoration: none; /* No underline */
-  font-size: 30px; /* Icon size */
+  border: none;
+  background: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .icon-link:hover {

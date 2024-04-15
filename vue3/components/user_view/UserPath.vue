@@ -85,6 +85,11 @@
             <template #node-module="{ data }">
               <ModuleNode :data="data" />
             </template>
+            <template #node-expandedcourses="{ data }">
+              <ExpandNodeEdit 
+                :data="data"
+              />
+            </template>
           </VueFlow>
         </div>
         <div 
@@ -106,6 +111,7 @@ import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
 import CustomStagNodeEdit from '../nodes/CustomStagNodeEdit.vue'
+import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'

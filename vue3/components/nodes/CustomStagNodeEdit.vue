@@ -34,7 +34,7 @@ import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import CourseCarousel from '../nodes_items/CourseCarousel.vue';
 import CourseCompletion from '../nodes_items/CourseCompletion.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
-import DateInfo from '../nodes_items/DateInfo.vue';
+import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
 
 // Load Store 
 const store = useStore();
@@ -127,6 +127,7 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
 const isCompletionVisible = ref(false);
 const isRestrictionVisible = ref(false);
 const isParentNode = ref(false);
+const courseExpanded = ref(false);
 
 const toggleTable = (condition) => {
   const otherCondition = condition == store.state.strings.nodes_completion ? store.state.strings.nodes_completion : store.state.strings.nodes_completion;
@@ -145,6 +146,10 @@ const childStyle = {
   borderColor: store.state.strings.GRAY,
   borderWidth: '2px',
 };
+
+const expandCourses = () => {
+  courseExpanded.value = !courseExpanded.value
+}
 
 </script>
 
@@ -184,15 +189,24 @@ const childStyle = {
           />
         </div>
         <div 
-          v-if="cover_image"
           class="card-img dashboard-card-img mb-2" 
           :style="{ 
-            height: '10rem', 
-            backgroundImage: 'url(' + cover_image + ')',
+            height: '10rem',
+            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundColor: cover_image ? '' : '#cccccc'
           }"
-        />
+        >
+          <div class="overlay">
+            <button 
+              class="icon-link"
+              @click="expandCourses"
+            >
+              <i :class="['fa', courseExpanded ? 'fa-circle-minus' : 'fa-circle-plus']" />
+            </button>
+          </div>
+        </div>
         <div v-if="store.state.learningpath && store.state.view=='student'">
           <div 
             class="row mb-2"
@@ -209,31 +223,6 @@ const childStyle = {
               <ProgressBar :progress="data.progress" />
             </div>
           </div>
-          <!-- <div v-if="includedCourses" class="row mb-2">
-            <div class="col-5 text-left">
-              <b>
-                {{ store.state.strings.nodes_courses }}
-              </b> 
-            </div>
-            <div class="col-7">
-              <ul 
-                v-for="(value, key) in includedCourses" 
-                :key="key"
-              >
-                <li>
-                  <a 
-                    :href="'/course/view.php?id=' + value.id"
-                    :target="active ? '_blank' : ''" 
-                  >
-                    {{ value.name }}
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div v-if="date">
-            <DateInfo :date="date" />
-          </div> -->
         </div>
         <div v-else>
           <div v-if="data.manualrestriction">
@@ -362,6 +351,9 @@ const childStyle = {
             </div>
           </div>
         </div>
+        <div v-if="courseExpanded">
+          <ExpandedCourses :data="data" /> 
+        </div>
       </div>
       <div 
         v-if="data"
@@ -389,7 +381,34 @@ const childStyle = {
 </template>
 
 <style scoped>
-
+.overlay {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%; /* Adjust width as needed */
+  height: 50%; /* Adjust height as needed */
+  border-radius: 15px; /* Rounded edges */
+}
+.icon-link {
+  border: none;
+  background: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.icon-link:hover {
+  color: lightgray; /* Hover effect */
+}
 .active-node{
   z-index: 100;
 }

@@ -153,30 +153,42 @@ const childStyle = {
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
           </div>
-          <div v-if="store.state.view!='teacher'" class="col-auto">
-            <button 
-              type="button" 
-              class="btn btn-primary" 
-              data-toggle="modal" 
-              data-target="#nodeModal"
-              @click="setNodeModal"
-            >
-              <i class="fa fa-edit" /> {{ store.state.strings.nodes_edit }}
-            </button>
-          </div>
         </div>
       </div>
       <div class="card-body">
         <div 
-          v-if="cover_image"
           class="card-img dashboard-card-img" 
           :style="{ 
-            height: '10rem', 
-            backgroundImage: 'url(' + cover_image + ')',
+            height: '10rem',
+            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundColor: cover_image ? '' : '#cccccc'
           }"
-        />
+        >
+          <div class="overlay">
+            <button 
+              class="icon-link"
+              @click="setPretestView"
+            >
+              <i class="fa fa-bars-progress" />
+            </button>
+            <button 
+              class="icon-link"
+              @click="setRestrictionView"
+            >
+              <i class="fa fa-lock" />
+            </button>
+            <button 
+              class="icon-link"
+              data-toggle="modal" 
+              data-target="#nodeModal"
+              @click="setNodeModal"
+            >
+              <i class="fa fa-pen" />
+            </button>
+          </div>
+        </div>
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
           <h5 class="card-title">
             {{ store.state.strings.nodes_learning_module }}
@@ -216,33 +228,6 @@ const childStyle = {
             {{ value.fullname }}
           </div>
         </div>
-        <div 
-          v-if="store.state.view!='teacher'"
-          class="row align-items-center"
-        >
-          <div class="col">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              :style="{backgroundColor: store.state.strings.LIGHT_STEEL_BLUE}"
-              @click="setRestrictionView"
-            >
-              <i class="fa-solid fa-key" /> 
-              {{ store.state.strings.nodes_edit_restriction }}
-            </button>
-          </div>
-          <div class="col-auto">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              :style="{backgroundColor: store.state.strings.DARK_ORANGE}"
-              @click="setPretestView"
-            >
-              <i class="fa-solid fa-check-to-slot" /> 
-              {{ store.state.strings.nodes_edit_completion }}
-            </button>
-          </div>
-        </div>
       </div>
       <div 
         v-if="dataValue"
@@ -269,6 +254,34 @@ const childStyle = {
 </template>
 
 <style scoped>
+.overlay {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%; /* Adjust width as needed */
+  height: 50%; /* Adjust height as needed */
+  border-radius: 15px; /* Rounded edges */
+}
+.icon-link {
+  border: none;
+  background: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.icon-link:hover {
+  color: lightgray; /* Hover effect */
+}
 .custom-node {
   position: relative;
   background-color: white;

@@ -92,6 +92,19 @@ onMounted(() => {
     active.value = true
   }
 })
+
+const cover_image = computed(() => get_cover_image(props.data));
+
+const get_cover_image = (data) => {
+  if (data.selected_course_image) {
+    return data.selected_course_image
+  } else if (data.selected_image) {
+    return data.selected_image
+  } else if (data.image_paths) {
+    return data.image_paths
+  }
+}
+
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
   if (props.data.completion.completionnode) {
@@ -128,6 +141,11 @@ const childStyle = {
   borderColor: store.state.strings.GRAY,
   borderWidth: '2px',
 };
+
+const goToCourse = () => {
+  let course_link = '/course/view.php?id=' + props.data.course_node_id
+  window.open(course_link, '_blank');
+}
 
 </script>
 
@@ -175,6 +193,25 @@ const childStyle = {
         :style="[nodeBackgroundColor]"
       >
         <div v-if="store.state.learningpath && store.state.view=='student'">
+          <div 
+            class="card-img dashboard-card-img mb-2" 
+            :style="{ 
+              height: '10rem',
+              backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: cover_image ? '' : '#cccccc'
+            }"
+          >
+            <div class="overlay">
+              <button 
+                class="icon-link"
+                @click="goToCourse"
+              >
+                <i class="fa fa-play" />
+              </button>
+            </div>
+          </div>
           <div 
             class="row mb-2"
           >
@@ -369,7 +406,34 @@ const childStyle = {
 </template>
 
 <style scoped>
-
+.overlay {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%; /* Adjust width as needed */
+  height: 50%; /* Adjust height as needed */
+  border-radius: 15px; /* Rounded edges */
+}
+.icon-link {
+  border: none;
+  background: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.icon-link:hover {
+  color: lightgray; /* Hover effect */
+}
 .active-node{
   z-index: 100;
 }
