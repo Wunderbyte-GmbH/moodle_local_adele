@@ -64,6 +64,9 @@
             :edges="edges" 
             :viewport="viewport" 
             :default-viewport="viewport" 
+            :max-zoom="1.5" 
+            :min-zoom="0.2"
+            :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
           >
             <template #node-custom="{ data }">
@@ -105,7 +108,7 @@
   
   <script setup>
   // Import needed libraries
-import { onMounted, ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
@@ -122,7 +125,7 @@ const route = useRoute()
 // Load Store 
 const store = useStore()
 
-const { fitView, addNodes, removeNodes, findNode } = useVueFlow()
+const { fitView, addNodes, removeNodes, findNode, zoomTo, viewport } = useVueFlow()
   
 // Function to go back
 const goBack = () => {
@@ -132,8 +135,10 @@ const goBack = () => {
 // Declare reactive variable for nodes
 const nodes = ref([]);
 const edges = ref([]);
-const viewport = ref({});
 const userLearningpath = ref(null)
+
+const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
+const zoomLock = ref(false)
 
 onMounted( async () => {
   let params = []
@@ -146,7 +151,54 @@ onMounted( async () => {
     params = route.params
   }
   userLearningpath.value = await store.dispatch('fetchUserPathRelation', params)
+  setTimeout(() => {
+    nextTick().then(() => {
+      fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        zoomLock.value = true
+        watch(
+          () => viewport.value.zoom,
+          (newVal, oldVal) => {
+            if (newVal && oldVal && zoomLock.value) {
+              if (newVal > oldVal) {
+                setZoomLevel('in', newVal)
+              } else if (newVal < oldVal) {
+                setZoomLevel('out', newVal)
+              }
+            }
+          },
+          { deep: true }
+        );
+      });
+    })
+  }, 300)
 })
+
+const setZoomLevel = async (action) => {
+  zoomLock.value = false
+  let newViewport = viewport.value.zoom
+  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
+  if (currentStepIndex === -1) {
+    currentStepIndex = zoomSteps.length;
+  }
+  if (action === 'in') {
+    if (currentStepIndex < zoomSteps.length) {
+      newViewport = zoomSteps[currentStepIndex];
+    } else {
+      newViewport = zoomSteps[currentStepIndex - 1]
+    }
+  } else if (action === 'out') {
+    if (currentStepIndex > 0) {
+      newViewport = zoomSteps[currentStepIndex - 1];
+    } else {
+      newViewport = zoomSteps[zoomSteps.length - 2]
+    }
+  }
+  if (newViewport != undefined) {
+    await zoomTo(newViewport, { duration: 500}).then(() => {
+      zoomLock.value = true
+    })
+  }
+}
 // Watch for changes in the nodes
 watch(() => userLearningpath.value, () => {
   const flowchart = userLearningpath.value.json
@@ -155,7 +207,6 @@ watch(() => userLearningpath.value, () => {
   edges.value.forEach((edge) => {
     edge.deletable = false
   })
-  viewport.value = flowchart.tree.viewport;
   setTimeout(() => {
     fitView({ duration: 1000, padding: 0.5 });
     drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
