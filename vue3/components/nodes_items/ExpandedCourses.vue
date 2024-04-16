@@ -32,6 +32,8 @@ onMounted(() => {
       id: `${props.data.node_id}_expanded_courses_${node_id}`,
       type: 'expandedcourses',
       data: nodeData,
+      draggable: false,
+      deletable: false,
       position,
     };
   });
@@ -42,6 +44,8 @@ onUnmounted(() => {
   let remove_nodes = []
   props.data.course_node_id.forEach((node_id) => {
     remove_nodes.push(props.data.node_id + '_expanded_courses_' + node_id)
+    let remove_node =findNode(props.data.node_id + '_expanded_courses_' + node_id)
+    remove_node.deletable = true
   })
   removeNodes(remove_nodes)
 })

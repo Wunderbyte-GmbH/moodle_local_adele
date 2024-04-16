@@ -51,6 +51,22 @@ const get_cover_image = (data) => {
   return null
 }
 
+const courses = computed(() => {
+  if (
+    !store.state.availablecourses ||
+    !props.data.course_id
+  ) {
+    return [];
+  }
+  return store.state.availablecourses.filter(course => 
+    props.data.course_id == course.course_node_id[0]
+    ).map(course => ({
+      fullname: course.fullname,
+      id: [course.course_node_id[0]]
+    })
+  )}
+);
+
 </script>
 
 <template>
@@ -63,7 +79,7 @@ const get_cover_image = (data) => {
         <div class="row">
           <div class="col-10">
             <h5>
-              {{ data.fullname || store.state.strings.nodes_collection }}
+              {{ courses[0].fullname }}
             </h5>
           </div>
         </div>
