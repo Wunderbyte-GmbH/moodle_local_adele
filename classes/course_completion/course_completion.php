@@ -81,4 +81,18 @@ interface course_completion {
      */
     public function get_completion_priority();
 
+    /**
+     * It returns a description before completion
+     *
+     * @return int Information array of importancy.
+     */
+    public function get_completion_description_before();
+
+    /**
+     * It returns a description after completion
+     *
+     * @return int Information array of importancy.
+     */
+    public function get_completion_description_after();
+
 }

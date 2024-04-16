@@ -1,6 +1,7 @@
 
 // generate a new id
 const  addAutoCompletions = (node, store) => {
+    console.log('sdrijge')
     node.completion = {
         "edges": [
           {
@@ -26,6 +27,8 @@ const  addAutoCompletions = (node, store) => {
             ],
             "data": {
               "description": store.state.strings.course_description_condition_course_completed,
+              "description_before": store.state.strings.course_description_before_condition_course_completed,
+              "description_after": store.state.strings.course_description_after_condition_course_completed,
               "id": 150,
               "label": "course_completed",
               "name": store.state.strings.course_name_condition_course_completed,

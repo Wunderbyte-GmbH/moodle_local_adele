@@ -72,6 +72,8 @@ class manual implements course_completion {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
+            'description_before' => self::get_completion_description_before(),
+            'description_after' => self::get_completion_description_after(),
             'label' => $label,
         ];
     }
@@ -84,6 +86,24 @@ class manual implements course_completion {
     private function get_description_string() {
         $description = get_string('course_description_condition_completion_manual', 'local_adele');
         return $description;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
+    public function get_completion_description_before() {
+        return get_string('course_description_before_completion_manual', 'local_adele');
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
+    public function get_completion_description_after() {
+        return get_string('course_description_after_completion_manual', 'local_adele');
     }
 
     /**
