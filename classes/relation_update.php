@@ -126,8 +126,8 @@ class relation_update {
                         1
                     );
                 }
-                $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths']);
-                $restrictionnode = self::getconditionnode($restrictionnodepaths);
+                $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
+                $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
                 $userpath->json['user_path_relation'][$node['id']] = [
                     'completioncriteria' => $completioncriteria,
                     'completionnode' => $completionnode,
@@ -184,9 +184,11 @@ class relation_update {
                             }
                         }
                         if (
-                          $completionnode['data']['value'] &&
-                          $completionnode['data']['value'] != null &&
-                          $completionnode['data']['value']['min_courses'] <= $completednodecourses) {
+                          isset($completionnode['data']) &&
+                          isset($completionnode['data']['value']) &&
+                          isset($completionnode['data']['value']['min_courses']) &&
+                          $completionnode['data']['value']['min_courses'] <= $completednodecourses
+                        ) {
                             $validationcondition = true;
                             $validationconditionstring[] = $label;
                         }
@@ -239,18 +241,23 @@ class relation_update {
      * Observer for course completed
      *
      * @param array $conditionnodepaths
+     * @param string $type
      * @return array
      */
-    public static function getconditionnode($conditionnodepaths) {
+    public static function getconditionnode($conditionnodepaths, $type) {
         // TODO sort the valid completion paths.
         $valid = count($conditionnodepaths) ? true : false;
         $priority = 0;
         if ($valid) {
-            $completionpriorities = course_completion_status::get_condition_priority();
-            foreach ($conditionnodepaths as $conditionnodepath) {
-                foreach ($conditionnodepath as $condition) {
-                    if ($priority == 0 || $completionpriorities[$condition] < $priority) {
-                        $priority = $completionpriorities[$condition];
+            if ($type == 'completion') {
+                $completionpriorities = course_completion_status::get_condition_priority();
+                foreach ($conditionnodepaths as $conditionnodepath) {
+                    foreach ($conditionnodepath as $condition) {
+                        if (
+                          $priority == 0 ||
+                          $completionpriorities[$condition] < $priority) {
+                            $priority = $completionpriorities[$condition];
+                        }
                     }
                 }
             }

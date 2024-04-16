@@ -68,7 +68,7 @@ class node_completion {
                     }
                     $instance = reset($instances); // Use the first manual enrolment plugin in the course.
 
-                    if (!$node->data->first_enrolled) {
+                    if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
                         $firstenrollededit = true;
                     }

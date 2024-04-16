@@ -136,7 +136,8 @@ class enrollment {
         FROM {local_adele_path_user} lpu
         WHERE lpu.learning_path_id = :learningpathid
         AND lpu.status = 'active'
-        AND lpu.user_id = :userid";
+        AND lpu.user_id = :userid
+        ORDER BY lpu.id DESC";
 
         // Providing the named parameter in the $params array.
         $params = [
