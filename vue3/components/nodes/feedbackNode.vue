@@ -74,6 +74,9 @@ const renderFeedback = (action, emitting) => {
       renderedFeedback += start_node.data['description_' + action]
     }
     if (start_node.childCondition) {
+      if (typeof(start_node.childCondition) == 'string') {
+        start_node.childCondition = [start_node.childCondition]
+      }
       start_node.childCondition.forEach((childCondition) => {
         if (!childCondition.includes('feedback')) {
           nextNode = childCondition

@@ -27,7 +27,7 @@
 import { Handle, Position } from '@vue-flow/core'
 import RestrictionItem from '../restriction/RestrictionItem.vue'
 import CompletionItem from '../completion/CompletionItem.vue'
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
@@ -47,8 +47,16 @@ const props = defineProps({
   }
 });
 
+const data_visibility = ref({});
+const emit = defineEmits(['updateVisibility'])
+
+onMounted(() => {
+  data_visibility.value = JSON.parse(JSON.stringify(props.data))
+})
+
 const toggleVisibility = () => {
-  props.data.visibility = !props.data.visibility;
+  data_visibility.value.visibility = !data_visibility.value.visibility;
+  emit('updateVisibility', data_visibility.value)
 };
 
 </script>
@@ -72,9 +80,9 @@ const toggleVisibility = () => {
               <i 
                 class="fa" 
                 :class="{ 
-                  'fa-eye': props.data.visibility, 
-                  'fa-eye-slash': !props.data.visibility, 
-                  'strikethrough': !props.data.visibility 
+                  'fa-eye': data_visibility.visibility, 
+                  'fa-eye-slash': !data_visibility.visibility, 
+                  'strikethrough': !data_visibility.visibility 
                 }"
               />
             </button>

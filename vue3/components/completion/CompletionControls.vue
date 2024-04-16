@@ -71,7 +71,7 @@ function toggleClass() {
   emit('change-class');
 }
 
-watch(() => learningpathCompletion.value, async () => {
+const stopWatcher = watch(() => learningpathCompletion.value, async () => {
   // Watch for changes of the learning path
   if (learningpathCompletion.value && learningpathCompletion.value.json.tree &&
     store.state.node != undefined && learningpathCompletion.value.json != '') {
@@ -85,6 +85,7 @@ watch(() => learningpathCompletion.value, async () => {
         setEdges(flowchart.edges)
       }
   }
+  stopWatcher()
 }, { deep: true } );
 
 // Prepare and save learning path

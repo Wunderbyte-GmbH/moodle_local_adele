@@ -66,6 +66,7 @@
                   :data="data" 
                   :type="'completion'"
                   :learningpath="props.learningpath"
+                  @update-visibility="handleVisibility"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -110,7 +111,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
@@ -178,6 +179,11 @@ const goBack = () => {
 const handleFeedback = (feedback) => {
   let feedbackNode = findNode(feedback.childCondition + '_feedback')
   feedbackNode.data = feedback
+}
+
+const handleVisibility = (visibility) => {
+  let visibilityNode = findNode(visibility.node_id)
+  visibilityNode.data.visibility = visibility.visibility
 }
 
 const goBackConfirmation = (toggle) => {
