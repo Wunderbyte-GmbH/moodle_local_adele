@@ -1,7 +1,6 @@
 
 // generate a new id
 const  addAutoCompletions = (node, store) => {
-    console.log('sdrijge')
     node.completion = {
         "edges": [
           {
@@ -52,7 +51,10 @@ const  addAutoCompletions = (node, store) => {
           {
             "data": {
               "childCondition": 'condition_1',
-              "feedback": ""
+              "feedback_before": "",
+              "feedback_after": "",
+              "feedback_before_checkmark": false,
+              "feedback_after_checkmark": false,
             },
             "draggable": false,
             "deletable": false,
@@ -61,7 +63,7 @@ const  addAutoCompletions = (node, store) => {
             "label": store.state.strings.composables_feedback_node,
             "position": {
               "x": 683,
-              "y": -5
+              "y": -250
             },
             "type": "feedback"
           }

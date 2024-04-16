@@ -72,7 +72,11 @@
                 <DropzoneNode :data="data" />
               </template>
               <template #node-feedback="{ data }">
-                <FeedbackNode :data="data" />
+                <FeedbackNode 
+                  :data="data"
+                  :learningpath="learningpathcompletion"
+                  @update-feedback="handleFeedback"
+                />
               </template>
               <template #edge-condition="props">
                 <CompletionLine v-bind="props" />
@@ -122,7 +126,8 @@ import FeedbackModal from '../modals/FeedbackModal.vue'
 import ChildNodes from '../charthelper/childNodes.vue'
 import ParentNodes from '../charthelper/parentNodes.vue'
 
-const { nodes, edges, addNodes, project, vueFlowRef, onConnect, addEdges, findNode, toObject } = useVueFlow({
+const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
+  addEdges, findNode, toObject } = useVueFlow({
   nodes: [],})
 
 // Load Store 
@@ -168,6 +173,11 @@ const goBack = () => {
         }
       }
   });
+}
+
+const handleFeedback = (feedback) => {
+  let feedbackNode = findNode(feedback.childCondition + '_feedback')
+  feedbackNode.data = feedback
 }
 
 const goBackConfirmation = (toggle) => {
@@ -309,7 +319,7 @@ function addFeedbackNode (node) {
   const newFeedback = {
     id: node.id + '_feedback',
     type: 'feedback',
-    position: { x: node.position.x , y: node.position.y-250 },
+    position: { x: node.position.x , y: node.position.y-495 },
     label: store.state.strings.completion_feedback_node,
     data: {
       feedback: '',
