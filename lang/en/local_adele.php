@@ -265,6 +265,8 @@ $string['modals_previous'] = 'Previous';
 $string['modals_next'] = 'Next';
 $string['modals_edit'] = 'Edit';
 $string['modals_longname'] = 'Longname:';
+$string['modals_description'] = 'Node description:';
+$string['modals_no_description'] = 'No node description given...';
 $string['modals_shortname'] = 'Shortname:';
 
 // Nodes strings.

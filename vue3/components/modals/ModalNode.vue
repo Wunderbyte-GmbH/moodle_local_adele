@@ -68,6 +68,20 @@
               >
             </div>
             <div class="form-group">
+              <label for="description">
+                <b>
+                  {{ store.state.strings.modals_description }}
+                </b>
+              </label>
+              <textarea
+                id="description"
+                v-model="description"
+                class="form-control"
+                :placeholder="store.state.strings.modals_no_description"
+                rows="5" 
+              />
+            </div>
+            <div class="form-group">
               <b>
                 {{ store.state.strings.modals_shortname }}
               </b>
@@ -191,6 +205,7 @@ import { onMounted, ref, watch } from 'vue';
 const store = useStore();
 const learningpathModal = ref(null);
 const fullname = ref('')
+const description = ref('')
 const shortname = ref('')
 const tags = ref('')
 const node_id = ref('')
@@ -234,6 +249,7 @@ const emit = defineEmits([
 const saveChanges = () => {
   store.commit('updatedNode', {
     fullname: fullname.value, 
+    description: description.value, 
     shortname: shortname.value,
     selected_image: selectedImagePath.value,
     selected_course_image: selectedCourseImagePath.value,
@@ -241,6 +257,7 @@ const saveChanges = () => {
   })
   emit('save-edit', {
     fullname: fullname.value,
+    description: description.value, 
     selected_image: selectedImagePath.value,
     selected_course_image: selectedCourseImagePath.value,
     node_id: node_id.value,
@@ -250,6 +267,7 @@ const saveChanges = () => {
 // watch values from selected node
 watch(() => store.state.node, (newValue) => {
   fullname.value = newValue.fullname
+  description.value = newValue.description
   shortname.value = newValue.shortname
   tags.value = newValue.tags
   selectedImagePath.value = newValue.selected_image
