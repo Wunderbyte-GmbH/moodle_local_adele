@@ -46,6 +46,7 @@ const emit = defineEmits([
 ]);
 
 const intersectingNode = ref(null);
+const closestNode = ref({})
 
 // Prev closest node
 const prevClosestNode = ref(null);
@@ -95,29 +96,55 @@ const filteredCourses = computed(() => {
 function onDrag(event) {
   //find closestNode node
   const startingNode = findNode('starting_node'); 
-  const closestNode = findClosestNode(event); 
+  const dz_check_node = findNode('dropzone_parent'); 
+  if (dz_check_node == undefined) {
+    closestNode.value = findClosestNode(event); 
+  } else if (!checkDistance(event, closestNode.value)) {
+    activeNode.value = null
+    closestNode.value = null
+  }
   
   //add drop zones to this node 
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
-  if(closestNode && startingNodeIntersecting){
+  if(closestNode.value && startingNodeIntersecting){
     if (dropzoneShown()) {
-      activeNode.value = closestNode
-      const newDrop = drawDropzone(closestNode, store)
+      activeNode.value = closestNode.value
+      const newDrop = drawDropzone(closestNode.value, store)
       addNodes(newDrop.nodes);
       addEdges(newDrop.edges);
     }
-    checkIntersetcion(event, closestNode)
+    checkIntersetcion(event, closestNode.value)
   }else{
     activeNode.value = null
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
   }
 
   // Check if the closest node has changed
-  if (closestNode !== prevClosestNode.value && (dropzoneShown() ||aboveDistance())) {
+  if (closestNode.value !== prevClosestNode.value && (dropzoneShown() ||aboveDistance())) {
     activeNode.value = null
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
-    prevClosestNode.value = closestNode;
+    prevClosestNode.value = closestNode.value;
   }
+}
+
+function checkDistance(event, closestNode) {
+  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  const position_mouse = project({
+    x: event.clientX - left,
+    y: event.clientY - top,
+  });
+  const position_node = {
+    x: closestNode.position.x + closestNode.dimensions.width/2,
+    y: closestNode.position.y + closestNode.dimensions.height/2,
+  };
+  if (Math.sqrt(
+    Math.pow(position_mouse.x - position_node.x, 2) +
+    Math.pow(position_mouse.y - position_node.y, 2)) 
+    < 550
+  ) {
+    return true
+  }
+  return false
 }
 
 function checkIntersetcion(event, closestNode) {
@@ -131,12 +158,12 @@ function checkIntersetcion(event, closestNode) {
         y: event.clientY - top,
       });
       const nodesIntersecting = areNodesIntersecting(position, node)
-      const nodeFormat = formatIntersetingNodes(nodesIntersecting, node, intersectingNode.value,
+      const nodeFormat = formatIntersetingNodes(
+        nodesIntersecting, node, intersectingNode.value,
         closestNode, insideStartingNode, store)
       node = nodeFormat.node
       intersectingNode.value = nodeFormat.intersectingNode
       insideStartingNode = nodeFormat.insideStartingNode
-
     }
   });
   emit('nodesIntersected', { intersecting: intersectingNode.value });
