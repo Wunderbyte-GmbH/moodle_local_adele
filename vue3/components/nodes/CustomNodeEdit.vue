@@ -34,11 +34,14 @@ import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
 import CourseRating from '../nodes_items/CourseRating.vue';
+import NodeInformation from '../nodes_items/NodeInformation.vue';
 
 // Load Store 
 const store = useStore();
 const date = ref({})
 const includedCourses = ref([])
+
+const parentnode = ref({})
 const props = defineProps({
   data: {
     type: Object,
@@ -59,16 +62,17 @@ onMounted(() => {
   const userpath = props.learningpath
   userpath.json.tree.nodes.forEach((node) => {
     if (props.data.node_id == node.id) {
-       if (node.restriction && node.restriction.nodes) {
-        node.restriction.nodes.forEach((restrictionnode) => {
-          if(restrictionnode.data.label == 'timed'){
-            date.value = restrictionnode.data.value
-          }
-        })
-       }
-       if (node.parentCourse.includes('starting_node')) {
-        isParentNode.value = true;
-       }
+      parentnode.value = node
+      if (node.restriction && node.restriction.nodes) {
+      node.restriction.nodes.forEach((restrictionnode) => {
+        if(restrictionnode.data.label == 'timed'){
+          date.value = restrictionnode.data.value
+        }
+      })
+      }
+      if (node.parentCourse.includes('starting_node')) {
+      isParentNode.value = true;
+      }
      }
   })
 
@@ -137,11 +141,6 @@ const parentStyle = {
   borderWidth: '3px',
 };
 
-const childStyle = {
-  borderColor: store.state.strings.GRAY,
-  borderWidth: '2px',
-};
-
 const goToCourse = () => {
   let course_link = '/course/view.php?id=' + props.data.course_node_id
   window.open(course_link, '_blank');
@@ -153,26 +152,19 @@ const goToCourse = () => {
   <div
     @click="emit('node-clicked', props.data)"
   >
-    <div 
-      v-if="isParentNode"
-      class="starting-node"
-    >
-      <i 
-        class="fa-solid fa-arrow-down mr-2"
-        :style="{color: store.state.strings.PUMPKIN}" 
-      />
-      {{ store.state.strings.nodes_potential_start }}
-    </div>
-
     <div
-      class="card test"
-      :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
       <div class="card-header text-center">
-        <OverviewRestrictionCompletion 
+        <!-- <OverviewRestrictionCompletion 
           :node="data" 
           :learningpath="learningpath"
-        />
+        /> -->
+        <NodeInformation 
+          :data
+          :parentnode
+        /> 
         <div class="row">
           <div class="col-10">
             <h5>
@@ -183,7 +175,7 @@ const goToCourse = () => {
             v-if="data.completion.completionnode.valid"
             class="col-2 d-flex justify-content-end"
           >
-            <CourseRating :data="data" />
+            <!-- <CourseRating :data="data" /> -->
           </div>
         </div>
       </div>

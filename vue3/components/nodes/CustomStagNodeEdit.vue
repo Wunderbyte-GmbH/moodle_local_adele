@@ -35,6 +35,7 @@ import CourseCarousel from '../nodes_items/CourseCarousel.vue';
 import CourseCompletion from '../nodes_items/CourseCompletion.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
+import NodeInformation from '../nodes_items/NodeInformation.vue';
 
 // Load Store 
 const store = useStore();
@@ -53,6 +54,7 @@ const get_cover_image = (data) => {
 }
 
 const stageType = ref('parallel')
+const parentnode = ref({})
 const props = defineProps({
   data: {
     type: Object,
@@ -75,6 +77,7 @@ onMounted(() => {
   const userpath = props.learningpath
   userpath.json.tree.nodes.forEach((node) => {
     if (props.data.node_id == node.id) {
+        parentnode.value = node
        if (node.restriction && node.restriction.nodes) {
         node.restriction.nodes.forEach((restrictionnode) => {
           if(restrictionnode.data.label == 'timed'){
@@ -142,11 +145,6 @@ const parentStyle = {
   borderWidth: '3px',
 };
 
-const childStyle = {
-  borderColor: store.state.strings.GRAY,
-  borderWidth: '2px',
-};
-
 const expandCourses = () => {
   courseExpanded.value = !courseExpanded.value
 }
@@ -158,17 +156,21 @@ const expandCourses = () => {
     @click="emit('node-clicked', props.data)"
   >
     <div
-      class="card test"
-      :style="[{ minHeight: '200px', width: '400px' }, isParentNode ? parentStyle : childStyle]"
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
       <div 
         :class="stageType=='parallel' ? 'parallel' : 'non_parallel'"
       />
       <div class="card-header text-center">
-        <OverviewRestrictionCompletion 
+        <!-- <OverviewRestrictionCompletion 
           :node="data" 
           :learningpath="learningpath"
-        />
+        /> -->
+        <NodeInformation 
+          :data
+          :parentnode
+        /> 
         <div class="row">
           <div class="col-4">
             <h5>

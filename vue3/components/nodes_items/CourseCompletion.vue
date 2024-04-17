@@ -27,7 +27,10 @@
   <div
     class="icon-container"
   >
-    <div class="row">
+    <div 
+      class="row"
+      style="margin-right: -5px !important;"
+    >
       <span 
         v-for="index in minCoursesArray"
         :key="index" 
