@@ -65,7 +65,6 @@ class learning_path_update {
             ]);
             $eventsingle->trigger();
         }
-        //self::trigger_user_subscription($event->other['learningpathid']);
     }
 
     /**
