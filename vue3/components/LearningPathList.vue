@@ -65,52 +65,68 @@
             <div class="card-header text-center">
               <h5>
                 {{ singlelearningpath.name }}
-                <a 
-                  href="" 
-                  data-toggle="tooltip" 
-                  data-placement="right" 
-                  title="Edit learning path."
-                  @click.prevent="editLearningpath(singlelearningpath.id)" 
-                >
-                  <i 
-                    class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
-                    :title="store.state.strings.edit" 
-                  />
-                </a>
               </h5>
             </div>
             <div 
               class="card-body"
               :style="[nodeBackgroundColor]"
             >
-              <b>
-                {{ store.state.strings.main_description }}
-              </b>
-              {{ singlelearningpath.description ||'No description was provided' }}
-            </div>
-            <div class="card-footer d-flex justify-content-between">
-              <a 
-                :title="store.state.strings.duplicate"
-                href="" 
-                @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
+              <div 
+                class="mb-2" 
+                :style="{ 
+                  height: '10rem',
+                  backgroundImage: 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundColor: '#cccccc',
+                  borderRadius: '1rem'
+                }"
               >
-                {{ store.state.strings.main_duplicate }}
-                <i 
-                  class="icon fa fa-copy fa-fw iconsmall m-r-0" 
-                  :title="store.state.strings.duplicate" 
-                />
-              </a>
-              <a 
-                :title="store.state.strings.delete"
-                href="" 
-                @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
-              >
-                {{ store.state.strings.main_delete }}
-                <i 
-                  class="icon fa fa-trash fa-fw iconsmall" 
-                  :title="store.state.strings.delete"
-                />
-              </a>
+                <div class="overlay">
+                  <a
+                    class="icon-link"
+                    href="" 
+                    data-toggle="tooltip" 
+                    data-placement="right" 
+                    :title="store.state.strings.duplicate"
+                    @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
+                  >
+                    <i 
+                      class="icon fa fa-copy fa-fw iconsmall m-r-0"
+                    />
+                  </a>
+                  <a 
+                    class="icon-link"
+                    href="" 
+                    data-toggle="tooltip" 
+                    data-placement="right"
+                    :title="store.state.strings.edit"
+                    @click.prevent="editLearningpath(singlelearningpath.id)" 
+                  >
+                    <i 
+                      class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
+                    />
+                  </a>
+                  <a
+                    class="icon-link"
+                    href="" 
+                    data-toggle="tooltip" 
+                    data-placement="right"
+                    :title="store.state.strings.delete"
+                    @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
+                  >
+                    <i 
+                      class="icon fa fa-trash fa-fw iconsmall" 
+                    />
+                  </a>
+                </div>
+              </div>
+              <div>
+                <b>
+                  {{ store.state.strings.main_description }}
+                </b>
+                {{ singlelearningpath.description }}
+              </div>
             </div>
           </div>
           <div 
@@ -220,3 +236,38 @@ const duplicateLearningpath = (learningpathid) => {
 };
 
 </script>
+
+<style scoped>
+  .overlay {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70%; /* Adjust width as needed */
+    height: 50%; /* Adjust height as needed */
+    border-radius: 15px; /* Rounded edges */
+  }
+
+  .icon-link {
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    margin: 0 15px;
+    display: inline-flex;
+  }
+
+  .fa-copy,
+  .fa-pencil,
+  .fa-trash {
+    font-size: 20px;
+  }
+
+  .icon-link:hover {
+    color: lightgray; /* Hover effect */
+  }
+
+</style>

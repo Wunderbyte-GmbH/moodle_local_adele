@@ -29,11 +29,9 @@ import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
-import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
-import CourseRating from '../nodes_items/CourseRating.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 
 // Load Store 
