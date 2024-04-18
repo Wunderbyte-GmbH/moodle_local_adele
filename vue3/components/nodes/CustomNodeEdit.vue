@@ -29,6 +29,7 @@ import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
+import UserInformation from '../nodes_items/UserInformation.vue';
 import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import DateInfo from '../nodes_items/DateInfo.vue';
@@ -209,31 +210,6 @@ const goToCourse = () => {
               <ProgressBar :progress="data.progress" />
             </div>
           </div>
-          <div v-if="includedCourses" class="row mb-2">
-            <div class="col-5 text-left">
-              <b>
-                {{ store.state.strings.nodes_courses }}
-              </b> 
-            </div>
-            <div class="col-7">
-              <ul 
-                v-for="(value, key) in includedCourses" 
-                :key="key"
-              >
-                <li>
-                  <a 
-                    :href="'/course/view.php?id=' + value.id"
-                    :target="active ? '_blank' : ''" 
-                  >
-                    {{ value.name }}
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div v-if="date">
-            <DateInfo :date="date" />
-          </div>
         </div>
         <div v-else>
           <div v-if="data.manualrestriction">
@@ -363,11 +339,14 @@ const goToCourse = () => {
           </div>
         </div>
       </div>
-      <div 
-        v-if="data"
+      <div
+        v-if="store.state.view=='student' && data"
         class="card-footer"
       >
-        <NodeFeedbackArea :data="data" />
+        <!-- <NodeFeedbackArea :data="data" /> -->
+        <UserInformation 
+          :data="data" 
+        />
       </div>
     </div>
     <Handle 

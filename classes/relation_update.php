@@ -135,6 +135,7 @@ class relation_update {
                     'restrictioncriteria' => $restrictioncriteria,
                     'restrictionnode' => $restrictionnode,
                     'singlerestrictionnode' => $singlerestrictionnode,
+                    'feedback' => $validatenodecompletion['feedback']
                 ];
             }
             $userpathrelationhelper = new user_path_relation();
@@ -155,6 +156,7 @@ class relation_update {
     public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
+        $feedback = self::getfeedback($node['completion']['nodes']);
         foreach ($node['completion']['nodes'] as $completionnode) {
             $failedcompletion = false;
             $validationconditionstring = [];
@@ -215,6 +217,7 @@ class relation_update {
                     } else if ($node['restriction'] == null ||count($restrictionnodepaths) ||
                     !count($node['restriction']['nodes'])) {
                         $completionnodepaths[] = $validationconditionstring;
+                        $feedback['after'][] = $feedback['after_all'][$completionnode['id']];
                         $nodefinished = node_finished::create([
                             'objectid' => $userpath->id,
                             'context' => context_system::instance(),
@@ -234,6 +237,7 @@ class relation_update {
         return [
             'completionnodepaths' => $completionnodepaths,
             'singlecompletionnode' => $singlecompletionnode,
+            'feedback' => $feedback,
         ];
     }
 
@@ -267,6 +271,28 @@ class relation_update {
             'priority' => $priority,
             'conditions' => $conditionnodepaths,
         ];
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param array $conditionnodepaths
+     * @return array
+     */
+    public static function getfeedback($conditionnodes) {
+        $feedbacks = [
+            'before' => null,
+            'after_all' => null,
+            'after' => null,
+        ];
+        foreach ($conditionnodes as $conditionnode) {
+            if (strpos($conditionnode['id'], '_feedback') !== false) {
+                $feedbacks['before'][] = $conditionnode['data']['feedback_before'];
+                $feedbacks['after_all'][str_replace('_feedback', '', $conditionnode['id'])] =
+                    $conditionnode['data']['feedback_after'];
+            }
+        }
+        return $feedbacks;
     }
 
     /**

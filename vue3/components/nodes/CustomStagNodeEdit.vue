@@ -25,17 +25,17 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, ref, onMounted } from 'vue';
-import { useStore } from 'vuex';
+import { computed, ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
-import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
-import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
-import CourseCarousel from '../nodes_items/CourseCarousel.vue';
-import CourseCompletion from '../nodes_items/CourseCompletion.vue';
-import ProgressBar from '../nodes_items/ProgressBar.vue';
-import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
-import NodeInformation from '../nodes_items/NodeInformation.vue';
+import UserInformation from '../nodes_items/UserInformation.vue';
+import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue'
+import CourseCarousel from '../nodes_items/CourseCarousel.vue'
+import CourseCompletion from '../nodes_items/CourseCompletion.vue'
+import ProgressBar from '../nodes_items/ProgressBar.vue'
+import ExpandedCourses from '../nodes_items/ExpandedCourses.vue'
+import NodeInformation from '../nodes_items/NodeInformation.vue'
 
 // Load Store 
 const store = useStore();
@@ -361,10 +361,13 @@ const expandCourses = () => {
         </div>
       </div>
       <div 
-        v-if="data"
+        v-if="store.state.view=='student' && data"
         class="card-footer"
       >
-        <NodeFeedbackArea :data="data" />
+        <!-- <NodeFeedbackArea :data="data" /> -->
+        <UserInformation 
+          :data="data"
+        />
         <CourseCarousel :courses="props.data" />
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { computed, onMounted, ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -26,7 +26,7 @@
 
   const description = ref({})
   const restriction = computed(() => getConditions(props.parentnode, 'restriction'))
-  const completion = computed(() => getConditions(props.parentnode, 'completion'))
+  const completion = computed(() => props.data.completion.feedback.before)
 
   const getConditions = (parentnode, type) => {
     let condition_strings = []
@@ -64,16 +64,27 @@
     return nextNode
   }
 
+  const closeOnOutsideClick = (event) => {
+    if (!event.target.closest('.' + props.data.node_id + '_node_info_listener')) {
+      showCard.value = false;
+    }
+  };
+
   onMounted(() => {
     description.value = props.data.description ||null
+    document.addEventListener('click', closeOnOutsideClick);
   })
+
+  onUnmounted(() => {
+    document.removeEventListener('click', closeOnOutsideClick);
+  });
 
 </script>
 
 <template>
   <div
-    class="icon-container"
-    :class="{ 'card-hover': showCard }"
+    class="icon-container "
+    :class="{ 'card-hover': showCard, [data.node_id + '_node_info_listener']: true}"
     @click="toggleCard()"
   >
     <div 
