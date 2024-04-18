@@ -71,6 +71,10 @@ const last_source_node = ref('')
 const width = 300
 const height = 600
 
+const emit = defineEmits([
+  'end-transition',
+]);
+
 const path = computed(() =>
   getBezierPath({
     sourceX: props.sourceX,
@@ -107,6 +111,7 @@ onEdgeClick(({ edge }) => {
           padding: 1,
           duration: 500,
         })
+        emit('end-transition');
       },
     })
     transform.value = curve.value.getPointAtLength(output.value)
@@ -134,7 +139,6 @@ onEdgeClick(({ edge }) => {
             totalLength = nextLength
             initialPos.value = targetisTarget ?? sourceisSource ? totalLength : 0
           }
-
           transform.value = curve.value.getPointAtLength(next)
           debouncedFitBounds({
             width: width,

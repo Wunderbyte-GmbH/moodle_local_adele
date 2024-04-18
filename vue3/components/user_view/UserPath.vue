@@ -69,12 +69,12 @@
             :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
             @edge-click="handleEdgeClicked"
+            @node-click="onNodeClick"
           >
             <template #node-custom="{ data }">
               <CustomNodeEdit 
                 :data="data" 
                 :learningpath="userLearningpath"
-                @nodeClicked="handleNodeClicked"
               />
             </template>
             <template 
@@ -83,7 +83,6 @@
               <CustomStagNodeEdit 
                 :data="data" 
                 :learningpath="userLearningpath"
-                @nodeClicked="handleNodeClicked"
               />
             </template>
             <template #node-module="{ data }">
@@ -95,7 +94,10 @@
               />
             </template>
             <template #edge-custom="props">
-              <TransitionEdge v-bind="props" />
+              <TransitionEdge 
+                v-bind="props" 
+                @end-transition="handleZoomLock"
+              />
             </template>
           </VueFlow>
         </div>
@@ -130,7 +132,7 @@ const route = useRoute()
 // Load Store 
 const store = useStore()
 
-const { fitView, addNodes, removeNodes, findNode, zoomTo, viewport } = useVueFlow()
+const { fitView, addNodes, removeNodes, findNode, zoomTo, viewport, setCenter } = useVueFlow()
   
 // Function to go back
 const goBack = () => {
@@ -178,6 +180,10 @@ onMounted( async () => {
   }, 300)
 })
 
+const handleZoomLock = () => {
+  zoomLock.value = true
+}
+
 const setZoomLevel = async (action) => {
   zoomLock.value = false
   let newViewport = viewport.value.zoom
@@ -220,10 +226,15 @@ watch(() => userLearningpath.value, () => {
 }, { deep: true } )
 
 // Zoom in node
-function handleNodeClicked(node) {
-  if (node.node_id) {
-    fitView({ duration: 1000, padding: 1, nodes: node.node_id });
-  }
+function onNodeClick(event) {
+  zoomLock.value = false
+  setCenter( 
+    event.node.position.x + event.node.dimensions.width/2, 
+    event.node.position.y + event.node.dimensions.height/2,
+    { zoom: 1, duration: 500}
+  ).then(() => {
+    zoomLock.value = true
+  })
 }
 
 </script>
