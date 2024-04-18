@@ -111,7 +111,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
@@ -328,7 +328,10 @@ function addFeedbackNode (node) {
     position: { x: node.position.x , y: node.position.y-495 },
     label: store.state.strings.completion_feedback_node,
     data: {
-      feedback: '',
+      feedback_before: "",
+      feedback_after: "",
+      feedback_before_checkmark: true,
+      feedback_after_checkmark: true,
       childCondition: node.id,
     },
     draggable: false,
