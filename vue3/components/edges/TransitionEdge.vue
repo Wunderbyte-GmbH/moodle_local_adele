@@ -68,9 +68,12 @@ const transform = ref({ x: 0, y: 0 })
 
 const showDot = ref(false)
 
-const { onNodeClick, fitBounds, fitView, onEdgeClick } = useVueFlow()
+const { fitBounds, fitView, onEdgeClick } = useVueFlow()
 
 const last_focused_node = ref('')
+
+const width = 300
+const height = 600
 
 const path = computed(() =>
   getBezierPath({
@@ -85,128 +88,61 @@ const path = computed(() =>
 
 const debouncedFitBounds = useDebounceFn(fitBounds, 1, { maxWait: 1 })
 
-onNodeClick(({ node }) => {
-  const isSource = props.source === node.id
-  const isTarget = props.target === node.id
-
-  if (!showDot.value && (isSource || isTarget)) {
-    console.log('NODEEEEEEE')
-
-  //   showDot.value = true
-  //   let totalLength = curve.value.getTotalLength()
-  //   const initialPos = ref(isSource ? 0 : totalLength)
-  //   let stopHandle
-
-  //   const output = useTransition(initialPos, {
-  //     duration: Math.floor(totalLength / 2 / 100) * 1000,
-  //     transition: TransitionPresets.easeOutCubic,
-  //     onFinished: () => {
-  //       stopHandle?.()
-  //       showDot.value = false
-  //       fitView({
-  //         nodes: [isSource ? props.target : props.source],
-  //         duration: 500,
-  //       })
-  //     },
-  //   })
-
-  //   transform.value = curve.value.getPointAtLength(output.value)
-
-  //   debouncedFitBounds(
-  //     {
-  //       width: 100,
-  //       height: 200,
-  //       x: transform.value.x - 100,
-  //       y: transform.value.y - 100,
-  //     },
-  //     { duration: 500 },
-  //   )
-
-  //   setTimeout(() => {
-  //     initialPos.value = isSource ? totalLength : 0
-
-  //     stopHandle = watchDebounced(
-  //       output,
-  //       (next) => {
-  //         if (!showDot.value) {
-  //           return
-  //         }
-
-  //         const nextLength = curve.value.getTotalLength()
-
-  //         if (totalLength !== nextLength) {
-  //           totalLength = nextLength
-  //           initialPos.value = isSource ? totalLength : 0
-  //         }
-
-  //         transform.value = curve.value.getPointAtLength(next)
-
-  //         debouncedFitBounds({
-  //           width: 100,
-  //           height: 200,
-  //           x: transform.value.x - 100,
-  //           y: transform.value.y - 100,
-  //         })
-  //       },
-  //       { debounce: 1 },
-  //     )
-  //   }, 500)
-  }
-})
-
 onEdgeClick(({ edge }) => {
   if (!showDot.value && edge.id == props.id) {
+    const targetisTarget = last_focused_node.value != props.target
     showDot.value = true
     let totalLength = curve.value.getTotalLength()
-    const initialPos = ref(0)
+    const initialPos = ref(targetisTarget ? 0 : totalLength)
     let stopHandle
-
+    const duration_calaculated = Math.floor(totalLength / 2 / 100) * 1000
+    const duration_maxed = duration_calaculated > 5000 ? 5000 : duration_calaculated
     const output = useTransition(initialPos, {
-      duration: Math.floor(totalLength / 2 / 100) * 1000,
+      duration: duration_maxed,
       transition: TransitionPresets.easeOutCubic,
       onFinished: () => {
         stopHandle?.()
         showDot.value = false
+        last_focused_node.value = targetisTarget ? props.target : props.source
         fitView({
-          nodes: [props.target],
+          nodes: [targetisTarget ? props.target : props.source],
+          padding: 1,
           duration: 500,
         })
       },
     })
-
     transform.value = curve.value.getPointAtLength(output.value)
-
     debouncedFitBounds(
       {
-        width: 100,
-        height: 200,
+        width: width,
+        height: height,
         x: transform.value.x - 100,
         y: transform.value.y - 100,
       },
-      { duration: 500 },
+      { 
+        duration: 500
+      },
     )
 
-    setTimeout(() => {
-      initialPos.value = totalLength
 
+    setTimeout(() => {
+      initialPos.value = targetisTarget ? totalLength : 0
       stopHandle = watchDebounced(
         output,
         (next) => {
           if (!showDot.value) {
             return
           }
-
           const nextLength = curve.value.getTotalLength()
           if (totalLength !== nextLength) {
             totalLength = nextLength
-            initialPos.value = totalLength
+            initialPos.value = targetisTarget ? totalLength : 0
           }
 
           transform.value = curve.value.getPointAtLength(next)
-
           debouncedFitBounds({
-            width: 100,
-            height: 200,
+            width: width,
+            height: height,
             x: transform.value.x - 100,
             y: transform.value.y - 100,
           })

@@ -226,12 +226,6 @@ function handleNodeClicked(node) {
   }
 }
 
-function handleEdgeClicked(edge) {
-  console.log(edge)
-}
-
-
-
 </script>
 
 <style>
