@@ -68,6 +68,7 @@
             :min-zoom="0.2"
             :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
+            @edge-click="handleEdgeClicked"
           >
             <template #node-custom="{ data }">
               <CustomNodeEdit 
@@ -93,6 +94,9 @@
                 :data="data"
               />
             </template>
+            <template #edge-custom="props">
+              <TransitionEdge v-bind="props" />
+            </template>
           </VueFlow>
         </div>
         <div 
@@ -112,6 +116,7 @@ import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
+import TransitionEdge from '../edges/TransitionEdge.vue'
 import CustomNodeEdit from '../nodes/CustomNodeEdit.vue'
 import CustomStagNodeEdit from '../nodes/CustomStagNodeEdit.vue'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
@@ -206,6 +211,7 @@ watch(() => userLearningpath.value, () => {
   edges.value = flowchart.tree.edges;
   edges.value.forEach((edge) => {
     edge.deletable = false
+    edge.type = 'custom'
   })
   setTimeout(() => {
     fitView({ duration: 1000, padding: 0.5 });
@@ -219,6 +225,12 @@ function handleNodeClicked(node) {
     fitView({ duration: 1000, padding: 1, nodes: node.node_id });
   }
 }
+
+function handleEdgeClicked(edge) {
+  console.log(edge)
+}
+
+
 
 </script>
 
