@@ -76,6 +76,7 @@
                 <FeedbackNode 
                   :data="data"
                   :learningpath="learningpathcompletion"
+                  :visibility="visibility_emitted"
                   @update-feedback="handleFeedback"
                 />
               </template>
@@ -135,6 +136,7 @@ const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
 const store = useStore();
 const learningpathcompletion= ref({})
 const showBackConfirmation = ref(false)
+const visibility_emitted = ref(false)
 
 const props = defineProps({
   learningpath: {
@@ -183,6 +185,7 @@ const handleFeedback = (feedback) => {
 
 const handleVisibility = (visibility) => {
   let visibilityNode = findNode(visibility.node_id)
+  visibility_emitted.value = !visibility_emitted.value
   visibilityNode.data.visibility = visibility.visibility
 }
 

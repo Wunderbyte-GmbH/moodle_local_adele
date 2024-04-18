@@ -40,9 +40,13 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  visibility: {
+    type: Object,
+    required: true,
+  },
 });
 
-watch(() => props.learningpath, () => {
+watch(() => props.visibility, () => {
   renderFeedback('before', true)
   renderFeedback('after', true)
 }, {deep: true})
