@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { TransitionPresets, useDebounceFn, useTransition, watchDebounced } from '@vueuse/core'
 import { getBezierPath, useVueFlow } from '@vue-flow/core'
 
@@ -55,11 +55,6 @@ const props = defineProps({
   },
 })
 
-onMounted(() => {
-  console.log('props')
-  console.log(props)
-})
-
 const curve = ref()
 
 const dot = ref()
@@ -70,7 +65,8 @@ const showDot = ref(false)
 
 const { fitBounds, fitView, onEdgeClick } = useVueFlow()
 
-const last_focused_node = ref('')
+const last_target_node = ref('')
+const last_source_node = ref('')
 
 const width = 300
 const height = 600
@@ -90,10 +86,11 @@ const debouncedFitBounds = useDebounceFn(fitBounds, 1, { maxWait: 1 })
 
 onEdgeClick(({ edge }) => {
   if (!showDot.value && edge.id == props.id) {
-    const targetisTarget = last_focused_node.value != props.target
+    const targetisTarget = last_target_node.value != props.target
+    const sourceisSource = last_source_node.value != props.source
     showDot.value = true
     let totalLength = curve.value.getTotalLength()
-    const initialPos = ref(targetisTarget ? 0 : totalLength)
+    const initialPos = ref(targetisTarget ?? sourceisSource ? 0 : totalLength)
     let stopHandle
     const duration_calaculated = Math.floor(totalLength / 2 / 100) * 1000
     const duration_maxed = duration_calaculated > 5000 ? 5000 : duration_calaculated
@@ -103,9 +100,10 @@ onEdgeClick(({ edge }) => {
       onFinished: () => {
         stopHandle?.()
         showDot.value = false
-        last_focused_node.value = targetisTarget ? props.target : props.source
+        last_target_node.value = targetisTarget ? props.target : props.source
+        last_source_node.value = sourceisSource ? props.source : props.target
         fitView({
-          nodes: [targetisTarget ? props.target : props.source],
+          nodes: [targetisTarget ?? sourceisSource ? props.target : props.source],
           padding: 1,
           duration: 500,
         })
@@ -123,10 +121,8 @@ onEdgeClick(({ edge }) => {
         duration: 500
       },
     )
-
-
     setTimeout(() => {
-      initialPos.value = targetisTarget ? totalLength : 0
+      initialPos.value = targetisTarget ?? sourceisSource ? totalLength : 0
       stopHandle = watchDebounced(
         output,
         (next) => {
@@ -136,7 +132,7 @@ onEdgeClick(({ edge }) => {
           const nextLength = curve.value.getTotalLength()
           if (totalLength !== nextLength) {
             totalLength = nextLength
-            initialPos.value = targetisTarget ? totalLength : 0
+            initialPos.value = targetisTarget ?? sourceisSource ? totalLength : 0
           }
 
           transform.value = curve.value.getPointAtLength(next)

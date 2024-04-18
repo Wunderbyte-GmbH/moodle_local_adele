@@ -163,10 +163,6 @@ const expandCourses = () => {
         :class="stageType=='parallel' ? 'parallel' : 'non_parallel'"
       />
       <div class="card-header text-center">
-        <!-- <OverviewRestrictionCompletion 
-          :node="data" 
-          :learningpath="learningpath"
-        /> -->
         <NodeInformation 
           :data
           :parentnode
@@ -202,10 +198,17 @@ const expandCourses = () => {
         >
           <div class="overlay">
             <button 
+              v-if="active"
               class="icon-link"
               @click="expandCourses"
             >
               <i :class="['fa', courseExpanded ? 'fa-circle-minus' : 'fa-circle-plus']" />
+            </button>
+            <button 
+              v-else
+              class="icon-link"
+            >
+              <i :class="'fa fa-lock'" />
             </button>
           </div>
         </div>

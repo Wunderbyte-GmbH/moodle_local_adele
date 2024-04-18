@@ -157,10 +157,6 @@ const goToCourse = () => {
       :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
       <div class="card-header text-center">
-        <!-- <OverviewRestrictionCompletion 
-          :node="data" 
-          :learningpath="learningpath"
-        /> -->
         <NodeInformation 
           :data
           :parentnode
@@ -170,12 +166,6 @@ const goToCourse = () => {
             <h5>
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
-          </div>
-          <div 
-            v-if="data.completion.completionnode.valid"
-            class="col-2 d-flex justify-content-end"
-          >
-            <!-- <CourseRating :data="data" /> -->
           </div>
         </div>
       </div>
@@ -200,7 +190,9 @@ const goToCourse = () => {
                 class="icon-link"
                 @click="goToCourse"
               >
-                <i class="fa fa-play" />
+                <i 
+                  :class="active ? 'fa fa-play' : 'fa fa-lock'"
+                />
               </button>
             </div>
           </div>
