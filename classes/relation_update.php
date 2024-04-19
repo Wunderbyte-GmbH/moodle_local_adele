@@ -287,9 +287,10 @@ class relation_update {
         ];
         foreach ($conditionnodes as $conditionnode) {
             if (strpos($conditionnode['id'], '_feedback') !== false) {
-                $feedbacks['before'][] = $conditionnode['data']['feedback_before'];
+                $feedbacks['before'][] =
+                  isset($conditionnode['data']['feedback_before']) ? $conditionnode['data']['feedback_before'] : '';
                 $feedbacks['after_all'][str_replace('_feedback', '', $conditionnode['id'])] =
-                    $conditionnode['data']['feedback_after'];
+                  isset($conditionnode['data']['feedback_after']) ? $conditionnode['data']['feedback_after'] : '';
             }
         }
         return $feedbacks;
@@ -340,7 +341,7 @@ class relation_update {
                         )) {
                         break; // No manual enrolment instance on this course.
                     }
-                    if (!$node['data']['first_enrolled']) {
+                    if (!isset($node['data']['first_enrolled'])) {
                         $node['data']['first_enrolled'] = time();
                         $firstenrollededit = true;
                     }
