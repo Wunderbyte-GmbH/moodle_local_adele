@@ -138,7 +138,7 @@ const toggleCards = () => {
             class="restriction" 
             :style="{ color: restrictionColor }"
           >
-            <i class="fa-solid fa-key" />
+            <i class="fa fa-key" />
           </div>
         </div>
       </div>
@@ -203,7 +203,7 @@ const toggleCards = () => {
           class="restriction" 
           :style="{ color: restrictionColor }"
         >
-          <i class="fa-solid fa-key" />
+          <i class="fa fa-key" />
           <span class="count">
             {{ computedTriggerGetConditions.restriction.count }}
           </span>
@@ -226,7 +226,7 @@ const toggleCards = () => {
         >
           <i 
             v-if="showCard" 
-            class="fa-solid fa-times cancel-icon" 
+            class="fa fa-times cancel-icon" 
             @click.stop="toggleCards" 
           />
         </button>
@@ -239,7 +239,7 @@ const toggleCards = () => {
         :style="{ backgroundColor: restrictionColor }"
       >
         <!-- Content for the left card -->
-        <i class="fa-solid fa-key" />
+        <i class="fa fa-key" />
         <b>
           {{ store.state.strings.nodes_items_restriction }}
         </b>
@@ -270,7 +270,7 @@ const toggleCards = () => {
         :style="{ backgroundColor: completionColor }"
       >
         <!-- Content for the left card -->
-        <i class="fa-solid fa-key" />
+        <i class="fa fa-key" />
         <b>
           {{ store.state.strings.nodes_items_completion }}
         </b>

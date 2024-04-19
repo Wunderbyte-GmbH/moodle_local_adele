@@ -104,7 +104,7 @@
             v-if="description"
             class="list-group-item"
           >
-            <i class="fa-solid fa-pencil" />
+            <i class="fa fa-pencil" />
             <b>
               Description
             </b>
@@ -116,7 +116,7 @@
             v-if="props.parentnode.restriction.nodes"
             class="list-group-item"
           >
-            <i class="fa-solid fa-lock" />
+            <i class="fa fa-lock" />
             <b>
               Restriction
             </b>
@@ -139,7 +139,7 @@
             class="list-group-item"
           >
             <i 
-              :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa-solid fa-tasks'" 
+              :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa fa-tasks'" 
             />
             <b>
               Completion

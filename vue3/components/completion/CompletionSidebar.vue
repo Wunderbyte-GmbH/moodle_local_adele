@@ -295,7 +295,7 @@ const filteredConditions = computed(() => {
             data-placement="left" 
             :title="condition.description"
           >
-            <i class="fa-solid fa-circle-info fa-lg" />
+            <i class="fa fa-circle-info fa-lg" />
           </div>
           {{ condition.name }}
         </div>

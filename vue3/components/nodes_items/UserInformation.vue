@@ -42,7 +42,7 @@
     @click="toggleFeedbackarea"
   >
     <div>
-      <i class="fa-solid fa-comment" />
+      <i class="fa fa-comment" />
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea">

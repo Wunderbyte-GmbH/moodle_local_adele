@@ -316,7 +316,7 @@ function changeTab(index) {
               data-placement="left" 
               :title="store.state.strings.flowchart_hover_darg_drop" 
             >
-              <i class="fa-solid fa-info-circle fa-lg" />
+              <i class="fa fa-info-circle fa-lg" />
             </div>
             {{ course.fullname }}
             <div 
