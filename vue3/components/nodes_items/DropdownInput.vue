@@ -101,6 +101,7 @@ const selectOption = (option) => {
 <style scoped>
 
 .dropdown {
+  z-index: 10;
   position: absolute;
   width: 90%;
   background-color: aliceblue;

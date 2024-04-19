@@ -122,12 +122,6 @@ const attempts = ref('');
 onMounted(async () => {
   // Get all tests
   tests.value = await store.dispatch('fetchCatquizTests')
-  tests.value.push({
-    id: '0',
-    componentid: '0',
-    coursename: store.state.strings.conditions_catquiz_warning_description,
-    name: store.state.strings.conditions_catquiz_warning_name
-  })
   if (props.completion.value !== undefined) {
     data.value = props.completion.value;
     if (props.completion.value.testid !== undefined) {

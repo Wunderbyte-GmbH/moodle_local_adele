@@ -135,7 +135,7 @@ class relation_update {
                     'restrictioncriteria' => $restrictioncriteria,
                     'restrictionnode' => $restrictionnode,
                     'singlerestrictionnode' => $singlerestrictionnode,
-                    'feedback' => $validatenodecompletion['feedback']
+                    'feedback' => $validatenodecompletion['feedback'],
                 ];
             }
             $userpathrelationhelper = new user_path_relation();
@@ -276,7 +276,7 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param array $conditionnodepaths
+     * @param array $conditionnodes
      * @return array
      */
     public static function getfeedback($conditionnodes) {

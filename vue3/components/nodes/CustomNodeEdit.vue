@@ -30,9 +30,7 @@ import { useStore } from 'vuex';
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import UserInformation from '../nodes_items/UserInformation.vue';
-import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
-import DateInfo from '../nodes_items/DateInfo.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 
 // Load Store 

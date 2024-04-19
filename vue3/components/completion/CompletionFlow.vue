@@ -246,6 +246,7 @@ function onDragOver(event) {
 
 // Adding setting up nodes and potentional edges
 function onDrop(event) {
+  visibility_emitted.value = !visibility_emitted.value
   if(nodes.value.length == 0 || intersectedNode.value){
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));

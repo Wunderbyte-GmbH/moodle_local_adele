@@ -112,8 +112,7 @@
               {{ description }}
             </div>
           </li>
-          <li 
-            v-if="props.parentnode.restriction.nodes"
+          <li
             class="list-group-item"
           >
             <i class="fa fa-lock" />
@@ -121,7 +120,7 @@
               Restriction
             </b>
             <div class="list-group-text">
-              <div v-if="restriction.length > 0">
+              <div v-if="props.parentnode.restriction && restriction.length > 0 && restriction != ''">
                 <div 
                   v-for="restriction_string in restriction"
                   :key="restriction_string"
@@ -134,23 +133,24 @@
               </div>
             </div>
           </li>
-          <li 
-            v-if="props.parentnode.completion.nodes"
+          <li
             class="list-group-item"
           >
-            <i 
+            <i
               :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa fa-tasks'" 
             />
             <b>
               Completion
             </b>
             <div class="list-group-text">
-              <div v-if="completion.length > 0">
+              <div v-if="props.parentnode.completion && completion.length > 0 && completion != ''">
                 <div 
                   v-for="completion_string in completion"
                   :key="completion_string"
                 >
-                  - {{ completion_string }}
+                  <div v-if="completion_string != ''">
+                    - {{ completion_string }}
+                  </div>
                 </div>
               </div>
               <div v-else>
@@ -209,6 +209,7 @@
   position: absolute;
   left: 40px;
   bottom: 40px;
+  z-index: 10;
 }
 
 /* Starting state for entering */
