@@ -69,7 +69,7 @@ function init() {
 }
 
 function canUseNewFaIconsnewVersion(usedVersion){
-  const oldVersion = '4.1'
+  const oldVersion = '4.2'
   const parts1 = oldVersion.split('.').map(Number);
   const parts2 = usedVersion.split('.').map(Number);
   const maxLength = Math.max(parts1.length, parts2.length);
