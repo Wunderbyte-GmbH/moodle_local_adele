@@ -96,7 +96,11 @@
               </p>
             </div>
             <div>
-              <b>Background image <i class="fa-solid fa-image" /> :</b>
+              <b>Background image 
+                <i 
+                  :class="store.state.version ? 'fa-solid fa-image' : 'fa fa-picture-o'" 
+                /> 
+                :</b>
               <p>
                 If no course image is available, the selected stock image will be choosen.
               </p>

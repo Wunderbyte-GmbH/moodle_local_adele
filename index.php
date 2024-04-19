@@ -52,9 +52,12 @@ $PAGE->navbar->ignore_active(true);
 $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/local/adele/index.php#/learningpaths'));
 
 $output = $PAGE->get_renderer('local_adele');
-
 echo $OUTPUT->header();
 
-echo $OUTPUT->render_from_template('local_adele/initview', ['userid' => $USER->id, 'contextid' => $context->id]);
+echo $OUTPUT->render_from_template('local_adele/initview', [
+  'userid' => $USER->id,
+  'contextid' => $context->id,
+  'version' => moodle_major_version(),
+]);
 
 echo $OUTPUT->footer();

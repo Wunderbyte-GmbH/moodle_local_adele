@@ -171,7 +171,9 @@ const childStyle = {
               class="icon-link"
               @click="setPretestView"
             >
-              <i class="fa fa-bars-progress" />
+              <i 
+                :class="store.state.version ? 'fa fa-bars-progress' : 'fa fa-tasks'" 
+              />
             </button>
             <button 
               class="icon-link"
@@ -185,7 +187,7 @@ const childStyle = {
               data-target="#nodeModal"
               @click="setNodeModal"
             >
-              <i class="fa fa-pen" />
+              <i class="fa fa-pencil" />
             </button>
           </div>
         </div>

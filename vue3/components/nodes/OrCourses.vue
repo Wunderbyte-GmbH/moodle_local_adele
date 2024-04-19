@@ -190,7 +190,10 @@ const childStyle = {
               class="icon-link"
               @click="setPretestView"
             >
-              <i class="fa fa-bars-progress" />
+              <i class="" />
+              <i 
+                :class="store.state.version ? 'fa fa-bars-progress' : 'fa fa-tasks'" 
+              />
             </button>
             <button 
               class="icon-link"
@@ -204,7 +207,7 @@ const childStyle = {
               data-target="#nodeModal"
               @click="setNodeModal"
             >
-              <i class="fa fa-pen" />
+              <i class="fa fa-pencil" />
             </button>
           </div>
         </div>
@@ -249,7 +252,9 @@ const childStyle = {
               class="btn btn-danger btn-sm trash-button" 
               @click="removeCourse(value.id)"
             >
-              <i class="fa fa-trash" />
+              <i 
+                :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'" 
+              />
             </button>
           </div>
         </div>

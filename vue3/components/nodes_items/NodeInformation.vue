@@ -91,7 +91,7 @@
       class="information" 
       :style="{ backgroundColor: backgroundColor }"
     >
-      <i class="fa-solid fa-info" />
+      <i class="fa fa-info" />
     </div>
     <transition name="unfold">
       <div 
@@ -104,7 +104,7 @@
             v-if="description"
             class="list-group-item"
           >
-            <i class="fa-solid fa-pen" />
+            <i class="fa-solid fa-pencil" />
             <b>
               Description
             </b>
@@ -138,7 +138,9 @@
             v-if="props.parentnode.completion.nodes"
             class="list-group-item"
           >
-            <i class="fa-solid fa-bars-progress" />
+            <i 
+              :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa-solid fa-tasks'" 
+            />
             <b>
               Completion
             </b>

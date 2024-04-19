@@ -41,7 +41,9 @@
         data-target="#helpingSlider"
       >
         {{ store.state.strings.main_intro_slider }}
-        <i class="fa-solid fa-book-open-reader" />
+        <i 
+          :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'" 
+        />
       </button>
     </div>
     <h2>
@@ -92,7 +94,7 @@
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
                   >
                     <i 
-                      class="icon fa fa-copy fa-fw iconsmall m-r-0"
+                      class="icon m-r-0 fa fa-copy fa-fw iconsmall" 
                     />
                   </a>
                   <a 
@@ -104,7 +106,7 @@
                     @click.prevent="editLearningpath(singlelearningpath.id)" 
                   >
                     <i 
-                      class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
+                      class="icon m-r-0 fa fa-pencil fa-fw iconsmall" 
                     />
                   </a>
                   <a
@@ -116,7 +118,8 @@
                     @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
                   >
                     <i 
-                      class="icon fa fa-trash fa-fw iconsmall" 
+                      class="icon fa-fw iconsmall fa"
+                      :class="store.state.version ? 'fa-trash' : 'fa-trash-o'" 
                     />
                   </a>
                 </div>
@@ -262,7 +265,8 @@ const duplicateLearningpath = (learningpathid) => {
 
   .fa-copy,
   .fa-pencil,
-  .fa-trash {
+  .fa-trash,
+  .fa-trash-o {
     font-size: 20px;
   }
 

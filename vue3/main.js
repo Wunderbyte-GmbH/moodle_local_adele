@@ -61,10 +61,25 @@ function init() {
             store.state.userlist = userListAttributeValue;
             const contextIdValue = localAdeleAppElement.getAttribute('contextid');
             store.state.contextid = contextIdValue;
+            store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.mount(localAdeleAppElement);
             router.push({ name: 'learningpaths-edit-overview' });
         }
     });
 }
+
+function canUseNewFaIconsnewVersion(usedVersion){
+  const oldVersion = '4.1'
+  const parts1 = oldVersion.split('.').map(Number);
+  const parts2 = usedVersion.split('.').map(Number);
+  const maxLength = Math.max(parts1.length, parts2.length);
+  for (let i = 0; i < maxLength; i++) {
+    const num1 = parts1[i] || 0;
+    const num2 = parts2[i] || 0;
+    if (num1 < num2) return 1;
+    if (num1 > num2) return 0;
+  }
+  return 0;
+} 
 
 export { init };

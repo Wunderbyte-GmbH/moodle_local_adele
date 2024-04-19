@@ -51,11 +51,14 @@
     @click="toggleFeedbackarea"
   >
     <div>
-      <i class="fa-solid fa-comment" />
+      <i class="fa fa-comment" />
     </div>
     <div>
       <transition name="fade">
-        <div v-if="showFeedbackarea" class="feedback-container">
+        <div 
+          v-if="showFeedbackarea" 
+          class="feedback-container"
+        >
           <textarea 
             v-if="store.state.view !== 'student' && store.state.view !== 'teacher'"
             v-model="dataFeedbackarea.feedback"

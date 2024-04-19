@@ -43,7 +43,10 @@
         <div v-if="userLearningpath && store.state.view!='student'">
           <div class="card-body">
             <h5 class="card-title">
-              <i class="fa fa-user-circle" /> {{ userLearningpath.username }}
+              <i
+                :class="store.state.version ? 'fa fa-user-circle' : 'fa fa-user'" 
+              /> 
+              {{ userLearningpath.username }}
             </h5>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">

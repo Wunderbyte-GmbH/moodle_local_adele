@@ -158,7 +158,7 @@ const toggleCards = () => {
                 {{ condition.name }}
                 <i 
                   v-if="condition.valid" 
-                  class="fas fa-check fa-xl"
+                  class="fa fa-check fa-xl"
                   style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
                 />
               </li>
@@ -175,7 +175,7 @@ const toggleCards = () => {
                 {{ condition.name }}
                 <i 
                   v-if="condition.valid" 
-                  class="fas fa-check fa-xl"
+                  class="fa fa-check fa-xl"
                   style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
                 />
               </li>
@@ -212,7 +212,9 @@ const toggleCards = () => {
           class="completion" 
           :style="{ color: completionColor }"
         >
-          <i class="fa-solid fa-check-to-slot" />
+          <i
+            :class="store.state.version ? 'fa-solid fa-check-to-slot' : 'fa fa-check-square'" 
+          />
           <span class="count">
             {{ computedTriggerGetConditions.completion.count }}
           </span>
@@ -342,7 +344,9 @@ const toggleCards = () => {
   box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* Larger shadow on hover for depth */
 }
 
-.fa-check-to-slot, .fa-key {
+.fa-check-to-slot,
+.fa-key,
+.fa-check-square {
   font-size: 20px; /* Adjust icon size as needed */
 }
 

@@ -38,7 +38,10 @@
         </h5>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <i class="fa fa-header" /> {{ store.state.strings.completion_course_title }} {{ store.state.node.fullname }}
+            <i 
+              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'" 
+            />
+            {{ store.state.strings.completion_course_title }} {{ store.state.node.fullname }}
           </li>
           <li class="list-group-item">
             <i class="fa fa-tag" /> {{ store.state.strings.completion_course_tags }} {{ store.state.node.tags }}

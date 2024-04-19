@@ -202,7 +202,7 @@ const expandCourses = () => {
               class="icon-link"
               @click="expandCourses"
             >
-              <i :class="['fa', courseExpanded ? 'fa-circle-minus' : 'fa-circle-plus']" />
+              <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
             </button>
             <button 
               v-else
