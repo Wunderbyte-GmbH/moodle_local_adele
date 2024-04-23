@@ -136,12 +136,9 @@
           <li
             class="list-group-item"
           >
-            <i 
-              class="fa fa-tasks" 
-            />
-            <!-- <i
+            <i
               :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa fa-tasks'" 
-            /> -->
+            />
             <b>
               Completion
             </b>

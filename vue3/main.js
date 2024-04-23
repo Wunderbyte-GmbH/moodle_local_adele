@@ -79,7 +79,7 @@ function canUseNewFaIconsnewVersion(usedVersion){
     if (num1 < num2) return 1;
     if (num1 > num2) return 0;
   }
-  return 0;
+  return 1;
 } 
 
 export { init };
