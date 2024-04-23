@@ -179,7 +179,7 @@ class relation_update {
                         foreach ($completioncriteria[$label] as $coursecompleted) {
                             if ($coursecompleted) {
                                 $completednodecourses += 1;
-                                if ($completionnode['data']['value'] == null) {
+                                if (!isset($completionnode['data']['value']) || $completionnode['data']['value'] == null) {
                                     $validationcondition = true;
                                     $validationconditionstring[] = $label;
                                 }

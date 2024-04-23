@@ -151,6 +151,8 @@ class modquiz implements course_completion {
                         }
                     }
                     $modquizzes[$completion['id']] = $validcatquiz;
+                } else {
+                    $modquizzes[$completion['id']] = false;
                 }
             }
         }

@@ -108,19 +108,19 @@ class timed_duration implements course_restriction {
                 if ($restrictionnode['data']['label'] == 'timed_duration') {
                     $iscurrenttimeinrange = false;
                     $starttime = $userpath->timecreated;
-
-                    if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
-                        $starttime->setTimestamp($node['data']['first_enrolled']);
-                    }
-
-                    $durationvalue = $restrictionnode['data']['value']['durationValue'];
-                    $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
-                    // Check if the duration type is valid and calculate the end time.
-                    if (isset($this->durationvaluearray[$durationvalue])) {
-                        $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
-                        $endtime = $starttime + $totalseconds;
-                        // Check if the current timestamp is between the start and end timestamps.
-                        $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
+                    if (isset($restrictionnode['data']['value']['selectedOption'])) {
+                        if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
+                            $starttime->setTimestamp($node['data']['first_enrolled']);
+                        }
+                        $durationvalue = $restrictionnode['data']['value']['durationValue'];
+                        $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
+                        // Check if the duration type is valid and calculate the end time.
+                        if (isset($this->durationvaluearray[$durationvalue])) {
+                            $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
+                            $endtime = $starttime + $totalseconds;
+                            // Check if the current timestamp is between the start and end timestamps.
+                            $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
+                        }
                     }
                     $timed[$restrictionnode['id']] = $iscurrenttimeinrange;
                 }

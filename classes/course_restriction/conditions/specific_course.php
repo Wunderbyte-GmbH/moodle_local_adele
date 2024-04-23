@@ -109,14 +109,14 @@ class specific_course implements course_restriction {
                 if ( $restriction['data']['label'] == 'specific_course') {
                     $coursecompleted = false;
                     // Get grade and check if valid.
-                    if ($restriction['data']['value'] && $restriction['data']['value']['courseid']) {
+                    if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         $course = get_course($restriction['data']['value']['courseid'][0]);
                         // Check if the course completion is enabled.
                         if ($course->enablecompletion) {
                             // Get the course completion instance.
                             $completion = new completion_info($course);
                             // Check if the user has completed the course.
-                            $coursecompleted = $completion->is_course_complete($userpath->userid);
+                            $coursecompleted = $completion->is_course_complete($userpath->user_id);
                             if ($coursecompleted) {
                                 $coursecompleted = true;
                             }
