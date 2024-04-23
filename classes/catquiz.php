@@ -58,6 +58,7 @@ class catquiz {
             $record['json'] = json_decode($record['json']);
             $record['name'] = $record['json']->name;
             $record['coursename'] = $record['fullname'];
+            $record['courseid'] = $record['courseid'];
             unset($record['json']);
             return $record;
         }, $records);

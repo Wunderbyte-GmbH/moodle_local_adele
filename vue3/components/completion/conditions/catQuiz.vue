@@ -113,6 +113,7 @@ const data = ref([])
 const tests = ref([])
 const parentscales = ref([])
 const selectedparentscale = ref('')
+const selectedparentscale_courseid = ref('')
 const scales = ref([])
 const selectedTest = ref(null)
 const emit = defineEmits(['update:modelValue'])
@@ -126,6 +127,9 @@ onMounted(async () => {
     data.value = props.completion.value;
     if (props.completion.value.testid !== undefined) {
       selectedTest.value = props.completion.value.testid;
+    }
+    if (props.completion.value.testid_courseid !== undefined) {
+      selectedparentscale_courseid.value = props.completion.value.testid_courseid;
     }
     if (props.completion.value.scales !== undefined) {
       scales.value = props.completion.value.scales;
@@ -142,12 +146,14 @@ onMounted(async () => {
       scales.value = []
       data.value = {
         testid: selectedTest.value,
+        testid_courseid: selectedparentscale_courseid.value,
       }
     }else{
       scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
       parentscales.value = []
       data.value = {
         testid: selectedTest.value,
+        testid_courseid: selectedparentscale_courseid.value,
         scales: scales.value,
       }
     }
@@ -158,6 +164,7 @@ const updateScales = async () => {
   scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
   data.value.scales = scales.value
   data.value.parentscales = selectedparentscale.value
+  data.value.selectedparentscale_courseid = selectedparentscale_courseid.value
 }
 
 // watch values from selected node
@@ -206,6 +213,7 @@ const setValues = (id) => {
 
 const updatedTest = (test) => {
   selectedTest.value = test.id;
+  selectedparentscale_courseid.value = test.courseid;
 }
 
 </script>

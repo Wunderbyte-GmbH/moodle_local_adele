@@ -89,6 +89,7 @@ class get_catquiz_tests extends external_api {
                     'componentid' => new external_value(PARAM_TEXT, 'componentid'),
                     'coursename' => new external_value(PARAM_TEXT, 'coursename'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
+                    'courseid' => new external_value(PARAM_TEXT, 'courseid'),
                 ]
             )
         );
