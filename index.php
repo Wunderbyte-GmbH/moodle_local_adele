@@ -57,7 +57,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_adele/initview', [
   'userid' => $USER->id,
   'contextid' => $context->id,
-  'version' => moodle_major_version(),
+  'version' => $CFG->version,
 ]);
 
 echo $OUTPUT->footer();
