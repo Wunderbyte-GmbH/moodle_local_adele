@@ -258,13 +258,6 @@ function updatePos() {
       </button>
     </div>
     <button 
-      id="update-learning-path-position"
-      class="btn btn-info m-2" 
-      @click="updatePos"
-    >
-      {{ store.state.strings.btnupdate_positions }}
-    </button>
-    <button 
       class="btn btn-warning m-2" 
       @click="toggleClass"
     >

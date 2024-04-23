@@ -189,7 +189,9 @@ const handleFeedback = (feedback) => {
 const handleVisibility = (visibility) => {
   let visibilityNode = findNode(visibility.node_id)
   visibility_emitted.value = !visibility_emitted.value
-  visibilityNode.data.visibility = visibility.visibility
+  if (visibilityNode) {
+    visibilityNode.data.visibility = visibility.visibility
+  }
 }
 
 const goBackConfirmation = (toggle) => {
@@ -283,6 +285,7 @@ function onDrop(event) {
       label: `${type} node`,
       data: data,
       draggable: false,
+      deletable: false,
       parentCondition: parentCondition,
       childCondition: '',
     };
@@ -342,6 +345,7 @@ function addFeedbackNode (node) {
       childCondition: node.id,
     },
     draggable: false,
+    deletable: false,
   };
   const newEdge = {
     id: node.id  + '-' + newFeedback.id,
@@ -349,6 +353,8 @@ function addFeedbackNode (node) {
     sourceHandle: 'target_and',
     target: newFeedback.id,
     targetHandle: 'source_feedback',
+    draggable: false,
+    deletable: false,
   };
   addNodes([newFeedback]);
   addEdges([newEdge]);

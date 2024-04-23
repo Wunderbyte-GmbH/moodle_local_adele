@@ -40,6 +40,7 @@ function createRestriction (node_id, parent_node_id, store) {
           "visibility": true
         },
         "draggable": false,
+        "deletable": false,
         "events": {},
         "id": 'condition_1',
         "label": "custom node",
