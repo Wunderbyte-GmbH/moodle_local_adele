@@ -183,8 +183,14 @@ onMounted( async () => {
   }, 300)
 })
 
-const handleZoomLock = () => {
-  zoomLock.value = true
+const handleZoomLock = (node) => {
+  nextTick(() => {
+    let event = {
+      node: null,
+    }
+    event.node = findNode(node)
+    onNodeClick(event)
+  })
 }
 
 const setZoomLevel = async (action) => {

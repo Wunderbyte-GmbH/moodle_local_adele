@@ -63,7 +63,7 @@ const transform = ref({ x: 0, y: 0 })
 
 const showDot = ref(false)
 
-const { fitBounds, fitView, onEdgeClick } = useVueFlow()
+const { fitBounds, fitView, onEdgeClick, findNode, setCenter } = useVueFlow()
 
 const last_target_node = ref('')
 const last_source_node = ref('')
@@ -92,6 +92,10 @@ onEdgeClick(({ edge }) => {
   if (!showDot.value && edge.id == props.id) {
     const targetisTarget = last_target_node.value != props.target
     const sourceisSource = last_source_node.value != props.source
+    last_target_node.value = targetisTarget ? props.target : props.source
+    last_source_node.value = sourceisSource ? props.source : props.target
+
+    emit('end-transition', last_source_node.value);
     showDot.value = true
     let totalLength = curve.value.getTotalLength()
     const initialPos = ref(targetisTarget ?? sourceisSource ? 0 : totalLength)
@@ -104,28 +108,10 @@ onEdgeClick(({ edge }) => {
       onFinished: () => {
         stopHandle?.()
         showDot.value = false
-        last_target_node.value = targetisTarget ? props.target : props.source
-        last_source_node.value = sourceisSource ? props.source : props.target
-        fitView({
-          nodes: [targetisTarget ?? sourceisSource ? props.target : props.source],
-          padding: 1,
-          duration: 500,
-        })
-        emit('end-transition');
+        emit('end-transition', last_target_node.value);
       },
     })
     transform.value = curve.value.getPointAtLength(output.value)
-    debouncedFitBounds(
-      {
-        width: width,
-        height: height,
-        x: transform.value.x - 100,
-        y: transform.value.y - 100,
-      },
-      { 
-        duration: 500
-      },
-    )
     setTimeout(() => {
       initialPos.value = targetisTarget ?? sourceisSource ? totalLength : 0
       stopHandle = watchDebounced(
