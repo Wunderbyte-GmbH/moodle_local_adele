@@ -28,6 +28,7 @@ namespace local_adele;
 use local_catquiz\catquiz as Local_catquizCatquiz;
 use local_catquiz\data\dataapi;
 use local_catquiz\testenvironment;
+use local_catquiz\catscale;
 
 /**
  * Class learning_paths
@@ -71,14 +72,26 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_scales($params) {
-        $records = testenvironment::get_environments('mod_adaptivequiz', $params['testid']);
-        if ($records) {
-            $records = dataapi::get_catscale_and_children($params['testid'], true);
-            $records = array_map(function ($record) {
-                return (array)$record;
-            }, $records);
+        global $DB;
+        $catquiz = $DB->get_record('local_catquiz_tests', ['id' => $params['testid']]);
+        $scales = [];
+        if ($catquiz) {
+            $scaleids = [$catquiz->catscaleid];
+            $catquiz->json = json_decode($catquiz->json);
+            foreach ($catquiz->json as $key => $subscale) {
+                if (strpos($key, 'catquiz_subscalecheckbox_') !== false && $subscale == '1') {
+                    $scaleids[] = str_replace('catquiz_subscalecheckbox_', '', $key);
+                }
+            }
+            if (!empty($scaleids)) {
+                list($insql, $params) = $DB->get_in_or_equal($scaleids);
+                $scales = $DB->get_records_select('local_catquiz_catscales', "id $insql", $params);
+                $scales = array_map(function ($scale) {
+                    return (array)$scale;
+                }, $scales);
+            }
         }
-        return $records;
+        return $scales;
     }
 
 

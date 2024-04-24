@@ -47,12 +47,23 @@
           <tbody>
             <tr 
               v-for="scale in scales" 
-              :key="scale.id" 
-              :class="{ 'dark-row': scale.showDetails, 'green-row': scale.scale > 0 || scale.attempts > 0 }"
+              :key="scale.id"
+              :class="[
+                (scale.scale > 0 || scale.attempts > 0) ? 'green-row' : 'empty-row'
+              ]"
             >
               <td class="position-relative">
-                <div @click="showDetails(scale.name)">
+                <div
+                  class="item-container"
+                  @click="showDetails(scale.name)"
+                >
                   {{ scale.name }}
+                  <div 
+                    v-if="scale.showDetails" 
+                    class="icon-container"
+                  >
+                    <i class="fa-solid fa-arrow-right" />
+                  </div>
                 </div>
                 <div 
                   v-if="scale.showDetails" 
@@ -94,7 +105,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import DropdownInput from '../../nodes_items/DropdownInput.vue'
 
@@ -204,6 +215,7 @@ const hideDetails = (name) => {
 }
 
 const setValues = (id) => {
+  hideDetails(null)
   const indexToUpdate = data.value.scales.findIndex((scale) => scale.id === id);
   if (indexToUpdate !== -1) {
     data.value.scales[indexToUpdate].scale = scalevalue.value;
@@ -233,11 +245,32 @@ const updatedTest = (test) => {
   z-index: 1;
 }
 
-.dark-row {
-  background-color: #dcdcdc !important; /* or any other darker color */
+.empty-row {
+  cursor: pointer;
+  background-color: #e6e5e5 !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+.empty-row:hover {
+  background-color: #b8b8b8 !important;
+}
+
 .green-row {
-  background-color: #d0f0c0 !important; /* or any other greenish color */
+  cursor: pointer;
+  background-color: #e0f7d5 !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.green-row:hover {
+  background-color: #b8e5a1 !important;
+}
+
+.icon-container {
+    margin-left: auto;
+    padding-left: 10px;
+}
+.item-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
 
 </style>

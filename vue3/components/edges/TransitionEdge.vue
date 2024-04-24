@@ -63,7 +63,7 @@ const transform = ref({ x: 0, y: 0 })
 
 const showDot = ref(false)
 
-const { fitBounds, fitView, onEdgeClick, findNode, setCenter } = useVueFlow()
+const { fitBounds, onEdgeClick } = useVueFlow()
 
 const last_target_node = ref('')
 const last_source_node = ref('')

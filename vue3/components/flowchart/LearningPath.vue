@@ -273,6 +273,7 @@ const onChangeModule = (data) => {
 onNodeDragStop(({node}) => {
   emit('move-node', node);
 })
+
 const onDrag = ($event) => {
   $event.nodes[0].position = {
     x: Math.round($event.nodes[0].position.x / 150) * 150,
