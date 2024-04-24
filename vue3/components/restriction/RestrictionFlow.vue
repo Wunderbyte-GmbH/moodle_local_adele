@@ -54,10 +54,15 @@
             @drop="onDrop" 
           >
             <VueFlow 
-              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
               class="completions" 
+              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
               :class="{ dark }"
+              :fit-view-on-init="true" 
+              :max-zoom="1.5" 
+              :min-zoom="0.2"
+              :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
+              @node-click="onNodeClickEvent"
             >
               <Background 
                 :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -105,7 +110,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useStore } from 'vuex';
 import ChildNodes from '../charthelper/childNodes.vue'
 import ParentNodes from '../charthelper/parentNodes.vue'
@@ -117,15 +122,21 @@ import Sidebar from '../completion/CompletionSidebar.vue'
 import Controls from '../completion/CompletionControls.vue'
 import ConditionNode from '../nodes/ConditionNode.vue'
 import getNodeId from '../../composables/getNodeId'
-import { notify } from '@kyvg/vue3-notification';
+import { notify } from '@kyvg/vue3-notification'
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
+import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
-const { nodes, edges, addNodes, project, vueFlowRef, addEdges, findNode, toObject } = useVueFlow({
+const { nodes, edges, addNodes, project, vueFlowRef, setCenter,
+  addEdges, findNode, toObject, fitView, viewport, zoomTo
+} = useVueFlow({
   nodes: [],})
 
 // Load Store 
 const store = useStore();
 const learningpathrestriction= ref({})
 const showBackConfirmation = ref(false)
+
+const zoomLock = ref(false)
 
 const props = defineProps({
   learningpath: {
@@ -155,22 +166,42 @@ const backgroundSidebar = store.state.strings.LIGHT_STEEL_BLUE
 
 onMounted(async () => {
   learningpathrestriction.value = props.learningpath
-    try {
-      restrictions.value = await store.dispatch('fetchRestrictions');
-    } catch (error) {
-        console.error('Error fetching conditions:', error);
-    }
-    if (learningpathrestriction.value.json && learningpathrestriction.value.json.tree &&
-      learningpathrestriction.value.json.tree.nodes &&
-      store.state.node) {
-        learningpathrestriction.value.json.tree.nodes.forEach((node) => {
-            if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {
-                parentNodes.value.push(node);
-            } else if (node.parentCourse && node.parentCourse.includes(store.state.node.node_id)) {
-                childNodes.value.push(node);
+  try {
+    restrictions.value = await store.dispatch('fetchRestrictions');
+  } catch (error) {
+      console.error('Error fetching conditions:', error);
+  }
+  if (learningpathrestriction.value.json && learningpathrestriction.value.json.tree &&
+    learningpathrestriction.value.json.tree.nodes &&
+    store.state.node) {
+      learningpathrestriction.value.json.tree.nodes.forEach((node) => {
+          if (node.childCourse && node.childCourse.includes(store.state.node.node_id)) {
+              parentNodes.value.push(node);
+          } else if (node.parentCourse && node.parentCourse.includes(store.state.node.node_id)) {
+              childNodes.value.push(node);
+          }
+      });
+  }
+  setTimeout(() => {
+    nextTick().then(() => {
+      fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        zoomLock.value = true
+        watch(
+          () => viewport.value.zoom,
+          (newVal, oldVal) => {
+            if (newVal && oldVal && zoomLock.value) {
+              if (newVal > oldVal) {
+                setZoomLevel('in', zoomLock, viewport, zoomTo)
+              } else if (newVal < oldVal) {
+                setZoomLevel('out', zoomLock, viewport, zoomTo)
+              }
             }
-        });
-    }
+          },
+          { deep: true }
+        );
+      });
+    })
+  }, 300)
 });
 
 // Function to go back
@@ -207,6 +238,9 @@ const goBackConfirmation = (toggle) => {
   store.state.editingrestriction = !store.state.editingrestriction
 }
 
+const onNodeClickEvent = (event) => {
+  onNodeClick(event, zoomLock, setCenter)
+}
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {

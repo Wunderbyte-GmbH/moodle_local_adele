@@ -196,9 +196,9 @@ onMounted(() => {
           (newVal, oldVal) => {
             if (newVal && oldVal && zoomLock.value) {
               if (newVal > oldVal) {
-                setZoomLevel('in', newVal)
+                setZoomLevel('in')
               } else if (newVal < oldVal) {
-                setZoomLevel('out', newVal)
+                setZoomLevel('out')
               }
             }
           },
@@ -235,7 +235,6 @@ const setZoomLevel = async (action) => {
     })
   }
 }
-
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
@@ -335,7 +334,6 @@ watch(
   },
   { deep: true }
 );
-
 
 // Adding setting up nodes and potentional edges
 function onDrop(event) {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col 12 mt-2">
     <div 
       v-for="output_item in output_items"
       :key="output_item"

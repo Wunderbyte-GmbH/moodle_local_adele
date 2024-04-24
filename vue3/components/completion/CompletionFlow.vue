@@ -55,10 +55,15 @@
           >
             <FeedbackModal :learningpath="learningpathcompletion" />
             <VueFlow 
-              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
               class="completions" 
-              :class="{ dark }" 
+              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
+              :class="{ dark }"
+              :fit-view-on-init="true" 
+              :max-zoom="1.5" 
+              :min-zoom="0.2"
+              :zoom-on-scroll="zoomLock" 
               @dragover="onDragOver"
+              @node-click="onNodeClickEvent"
             >
               <Background 
                 :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -115,7 +120,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
@@ -130,16 +135,22 @@ import FeedbackNode from '../nodes/feedbackNode.vue'
 import FeedbackModal from '../modals/FeedbackModal.vue'
 import ChildNodes from '../charthelper/childNodes.vue'
 import ParentNodes from '../charthelper/parentNodes.vue'
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
+import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
 const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
-  addEdges, findNode, toObject } = useVueFlow({
-  nodes: [],})
+  addEdges, findNode, toObject, fitView, viewport, zoomTo, setCenter
+} = useVueFlow({
+  nodes: [],
+})
 
 // Load Store 
 const store = useStore();
 const learningpathcompletion= ref({})
 const showBackConfirmation = ref(false)
 const visibility_emitted = ref(false)
+
+const zoomLock = ref(false)
 
 const props = defineProps({
   learningpath: {
@@ -184,6 +195,10 @@ const goBack = () => {
 const handleFeedback = (feedback) => {
   let feedbackNode = findNode(feedback.childCondition + '_feedback')
   feedbackNode.data = feedback
+}
+
+const onNodeClickEvent = (event) => {
+  onNodeClick(event, zoomLock, setCenter)
 }
 
 const handleVisibility = (visibility) => {
@@ -231,6 +246,26 @@ onMounted(async () => {
             }
         });
     }
+    setTimeout(() => {
+    nextTick().then(() => {
+      fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        zoomLock.value = true
+        watch(
+          () => viewport.value.zoom,
+          (newVal, oldVal) => {
+            if (newVal && oldVal && zoomLock.value) {
+              if (newVal > oldVal) {
+                setZoomLevel('in', zoomLock, viewport, zoomTo)
+              } else if (newVal < oldVal) {
+                setZoomLevel('out', zoomLock, viewport, zoomTo)
+              }
+            }
+          },
+          { deep: true }
+        );
+      });
+    })
+  }, 300)
 });
 
 // Prevent default event if node has been dropped

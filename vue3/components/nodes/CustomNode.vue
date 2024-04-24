@@ -28,7 +28,6 @@ import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
-import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue';
 
 // Load Store 
 const store = useStore();
@@ -230,12 +229,6 @@ const childStyle = {
             {{ value.fullname }}
           </div>
         </div>
-      </div>
-      <div 
-        v-if="dataValue"
-        class="card-footer"
-      >
-        <NodeFeedbackArea :data="dataValue" />
       </div>
     </div>
     <Handle 

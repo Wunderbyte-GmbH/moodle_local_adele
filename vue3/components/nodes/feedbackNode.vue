@@ -58,7 +58,7 @@ const { findNode } = useVueFlow()
 onMounted(async () => {
   feedback.value = JSON.parse(JSON.stringify(props.data))
   if (feedback.value.feedback_before_checkmark) {
-    renderFeedback('before', false)
+    renderFeedback('before', true)
   }
   if (feedback.value.feedback_after_checkmark) {
     renderFeedback('after', false)
