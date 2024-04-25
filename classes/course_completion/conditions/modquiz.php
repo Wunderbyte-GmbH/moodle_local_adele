@@ -125,29 +125,26 @@ class modquiz implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        global $DB;
         $modquizzes = [];
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             $completions = $node['completion']['nodes'];
             foreach ($completions as $completion) {
-                if ( isset($complitionnode['data']) && isset($complitionnode['data']['label'])
+                if ( isset($completion['data']) && isset($completion['data']['label'])
                   && $completion['data']['label'] == 'modquiz') {
                     $validcatquiz = false;
                     // Get grade and check if valid.
-                    $data = $DB->get_records('quiz_grades',
-                        [
-                            'quiz' => $completion['data']['value']['quizid'],
-                            'userid' => $userid,
-                        ],
-                        'timemodified DESC',
-                        'grade',
-                        0,
-                        1);
-                    if ( !empty($data)) {
-                        foreach ($data as $lastgrade) {
-                            if ((float)$lastgrade->grade >= (float)$completion['data']['value']['grade']) {
+                    $start = 0;
+                    $steps = 5;
+                    while (!$validcatquiz && $data = $this->get_modquiz_records($completion, $userid, $start, $steps)) {
+                        foreach ($data as $key => $lastgrade) {
+                            if ((float)$key >= (float)$completion['data']['value']['grade']) {
                                 $validcatquiz = true;
+                                break;
                             }
+                        }
+                        $start += $steps;
+                        if ($validcatquiz) {
+                            break;
                         }
                     }
                     $modquizzes[$completion['id']] = $validcatquiz;
@@ -165,5 +162,25 @@ class modquiz implements course_completion {
      */
     public function get_completion_priority() {
         return $this->priority;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     * @param int $completion
+     * @param int $userid
+     * @param int $start
+     * @return object
+     */
+    private function get_modquiz_records($completion, $userid, $start, $steps) {
+        global $DB;
+        return $DB->get_records_select(
+            'quiz_grades',
+            'quiz = :quiz AND userid = :userid',
+            ['quiz' => $completion['data']['value']['quizid'], 'userid' => $userid],
+            'timemodified DESC',
+            'grade',
+            $start,
+            $steps
+        );
     }
 }

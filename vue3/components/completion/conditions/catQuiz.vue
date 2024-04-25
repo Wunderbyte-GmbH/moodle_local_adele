@@ -49,7 +49,7 @@
               v-for="scale in scales" 
               :key="scale.id"
               :class="[
-                (scale.scale > 0 || scale.attempts > 0) ? 'green-row' : 'empty-row'
+                (scale.scale || scale.attempts > 0) ? 'green-row' : 'empty-row'
               ]"
             >
               <td class="position-relative">
@@ -105,7 +105,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import DropdownInput from '../../nodes_items/DropdownInput.vue'
 
@@ -125,6 +125,7 @@ const tests = ref([])
 const parentscales = ref([])
 const selectedparentscale = ref('')
 const selectedparentscale_courseid = ref('')
+const selectedtest_component_id = ref('')
 const scales = ref([])
 const selectedTest = ref(null)
 const emit = defineEmits(['update:modelValue'])
@@ -142,6 +143,9 @@ onMounted(async () => {
     if (props.completion.value.testid_courseid !== undefined) {
       selectedparentscale_courseid.value = props.completion.value.testid_courseid;
     }
+    if (props.completion.value.componentid !== undefined) {
+      selectedtest_component_id.value = props.completion.value.componentid;
+    }
     if (props.completion.value.scales !== undefined) {
       scales.value = props.completion.value.scales;
     }
@@ -158,6 +162,7 @@ onMounted(async () => {
       data.value = {
         testid: selectedTest.value,
         testid_courseid: selectedparentscale_courseid.value,
+        componentid: selectedtest_component_id.value,
       }
     }else{
       scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
@@ -165,6 +170,7 @@ onMounted(async () => {
       data.value = {
         testid: selectedTest.value,
         testid_courseid: selectedparentscale_courseid.value,
+        componentid: selectedtest_component_id.value,
         scales: scales.value,
       }
     }
@@ -176,6 +182,7 @@ const updateScales = async () => {
   data.value.scales = scales.value
   data.value.parentscales = selectedparentscale.value
   data.value.selectedparentscale_courseid = selectedparentscale_courseid.value
+  data.value.componentid = selectedtest_component_id.value
 }
 
 // watch values from selected node
@@ -226,6 +233,7 @@ const setValues = (id) => {
 const updatedTest = (test) => {
   selectedTest.value = test.id;
   selectedparentscale_courseid.value = test.courseid;
+  selectedtest_component_id.value = test.componentid;
 }
 
 </script>
