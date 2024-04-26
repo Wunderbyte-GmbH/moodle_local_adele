@@ -126,11 +126,12 @@ onEdgeClick(({ edge }) => {
             initialPos.value = targetisTarget ?? sourceisSource ? totalLength : 0
           }
           transform.value = curve.value.getPointAtLength(next)
+          const y_offset = targetisTarget ? 450 : 150
           debouncedFitBounds({
             width: width,
             height: height,
-            x: transform.value.x - 100,
-            y: transform.value.y - 100,
+            x: transform.value.x - 150,
+            y: transform.value.y - y_offset,
           })
         },
         { debounce: 1 },
