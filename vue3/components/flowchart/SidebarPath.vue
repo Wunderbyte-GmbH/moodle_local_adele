@@ -253,7 +253,7 @@ function changeTab(index) {
 </script>
 
 <template>
-  <aside 
+  <aside
     class="col-md-2" 
     style="max-width: 20% !important;"
   >
@@ -283,20 +283,30 @@ function changeTab(index) {
     </div>
     <div 
       v-if="!activeTab"
-      style="height: -webkit-fill-available;"
     >
-      <div type="text">
+      <div 
+        class="col long-text"
+        type="text"
+      >
         {{ strings.fromavailablecourses }}
       </div>
-      <div type="text">
+      <div 
+        class="col long-text"
+        type="text"
+      >
         {{ strings.tagsearch_description }}
       </div>
-      <input 
-        id="searchTerm" 
-        v-model="searchTerm" 
-        class="form-control" 
-        :placeholder="strings.placeholder_search" 
+      <div 
+        class="row ml-2 long-text"
+        type="text"
       >
+        <input 
+          id="searchTerm" 
+          v-model="searchTerm" 
+          class="form-control" 
+          :placeholder="strings.placeholder_search" 
+        >
+      </div>
       <div class="learning-path-nodes-container">
         <div class="nodes">
           <div 
@@ -305,7 +315,7 @@ function changeTab(index) {
             class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
             :draggable="true" 
             :data="course" 
-            style="width: 95%; padding-left: 1rem; margin-left: 0.025rem;"
+            style="width: 95%; padding-left: 1rem; margin-left: 0.025rem; height: 3rem"
             @dragstart="onDragStart($event, course)" 
             @drag="onDrag($event)"
             @dragend="onDragEnd()"
@@ -318,7 +328,9 @@ function changeTab(index) {
             >
               <i class="fa fa-info-circle fa-lg" />
             </div>
-            {{ course.fullname }}
+            <div class="col long-text">
+              {{ course.fullname }}
+            </div>
             <div 
               class="col-auto"
               data-toggle="tooltip" 
@@ -347,13 +359,23 @@ function changeTab(index) {
 </template>
 
 <style scoped>
+.long-text {
+  padding-left: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.form-control{
+  width: 90%;
+}
 .learning-path-nodes-container {
   margin-top: 20px;
-  max-height: 450px;
+  max-height: 440px;
   overflow-y: auto;
 }
 .nav-item{
   margin-right: 2px;
+  max-width: 50%; 
 }
 .nav-tabs {
   display: flex !important;
@@ -361,8 +383,12 @@ function changeTab(index) {
   border-bottom: 1px solid #e0e0e0; /* Light gray bottom border */
 }
 .nav-link {
-  padding: 0.5rem 1rem;
-  color: #555555c7; /* Dark gray text color */
+  display: block;
+  white-space: nowrap; /* Keeps the text on a single line */
+  overflow: hidden; /* Hides text that overflows the element's box */
+  text-overflow: ellipsis; /* Adds an ellipsis to signify hidden text */
+  padding: 0.5rem 1rem; /* Adjust padding as needed */
+  color: #555555c7;
 }
 
 .nav-link.active {

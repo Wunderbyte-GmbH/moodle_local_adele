@@ -286,7 +286,7 @@ class relation_update {
             'after' => null,
         ];
         foreach ($conditionnodes as $conditionnode) {
-            if (strpos($conditionnode['id'], '_feedback') !== false) {
+            if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
                 $feedbacks['before'][] =
                   isset($conditionnode['data']['feedback_before']) ? $conditionnode['data']['feedback_before'] : '';
                 $feedbacks['after_all'][str_replace('_feedback', '', $conditionnode['id'])] =
