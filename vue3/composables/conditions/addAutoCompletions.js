@@ -51,6 +51,7 @@ const  addAutoCompletions = (node, store) => {
           {
             "data": {
               "childCondition": 'condition_1',
+              "visibility": true,
               "feedback_before": "",
               "feedback_after": "",
               "feedback_before_checkmark": true,

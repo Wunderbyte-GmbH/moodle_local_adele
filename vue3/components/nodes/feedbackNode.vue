@@ -65,8 +65,17 @@ onMounted(async () => {
   }
 });
 
+const toggleVisibility = () => {
+  feedback.value.visibility = !feedback.value.visibility;
+};
+
 // Connection handles
-const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+const handleStyle = computed(() => ({ 
+  backgroundColor: props.data.color, 
+  filter: 'invert(100%)', 
+  width: '10px', 
+  height: '10px'
+}))
 
 const renderFeedback = (action, emitting) => {
   const checked = action == 'before' ? feedback.value.feedback_before_checkmark : feedback.value.feedback_after_checkmark
@@ -118,10 +127,23 @@ const renderFeedback = (action, emitting) => {
 
 <template>
   <div
-    :class="{ 'custom-node': true, 'has-text': true}"
-    class="custom-node rounded p-3"
+    :class="{ 'visibility': feedback.visibility}"
+    class="custom-node rounded p-3 has-text"
     style="width: 350px; min-height: 200px;"
   >
+    <button 
+      style="position: absolute; top: 5px; left: 5px; background: none; border: none; z-index: 100;"
+      @click="toggleVisibility" 
+    >
+      <i 
+        class="fa" 
+        :class="{ 
+          'fa-eye': feedback.visibility, 
+          'fa-eye-slash': !feedback.visibility, 
+          'strikethrough': !feedback.visibility 
+        }"
+      />
+    </button>
     <div class="text-center">
       <div class="container">
         <div class="row justify-content-center">
@@ -147,6 +169,7 @@ const renderFeedback = (action, emitting) => {
                 v-model="feedback.feedback_before_checkmark" 
                 class="form-check-input"
                 type="checkbox"
+                :disabled="!feedback.visibility"
                 @change="renderFeedback('before', true)"
               >
               <label for="feedback_before">
@@ -158,7 +181,7 @@ const renderFeedback = (action, emitting) => {
                 class="form-control"
                 :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5" 
-                :disabled="feedback.feedback_before_checkmark"
+                :disabled="feedback.feedback_before_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
               <div>
@@ -169,6 +192,7 @@ const renderFeedback = (action, emitting) => {
                 v-model="feedback.feedback_after_checkmark" 
                 class="form-check-input"
                 type="checkbox"
+                :disabled="!feedback.visibility"
                 @change="renderFeedback('after', true)"
               >
               <label for="feedback_after">
@@ -180,7 +204,7 @@ const renderFeedback = (action, emitting) => {
                 class="form-control"
                 :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5" 
-                :disabled="feedback.feedback_after_checkmark"
+                :disabled="feedback.feedback_after_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
             </div>
@@ -200,10 +224,16 @@ const renderFeedback = (action, emitting) => {
 
 <style scoped>
 .custom-node {
-  background-color: #6495ED;
+  background-color: #e0e4ec;
   padding: 10px;
   border: 1px solid #ccc;
   opacity: 0.5;
+  transition: background-color 0.3s ease;
+}
+
+.visibility {
+  background-color: #6495ED !important;
+  opacity: 1;
 }
 
 .has-text {

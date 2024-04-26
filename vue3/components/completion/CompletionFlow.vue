@@ -367,6 +367,7 @@ function addFeedbackNode (node) {
     position: { x: node.position.x , y: node.position.y-495 },
     label: store.state.strings.completion_feedback_node,
     data: {
+      visibility: true,
       feedback_before: "",
       feedback_after: "",
       feedback_before_checkmark: true,
