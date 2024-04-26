@@ -25,6 +25,8 @@
   const backgroundColorInfo = computed(() => store.state.strings.LIGHT_GRAY)
 
   const description = ref({})
+  const estimate_duration = ref({})
+
   const restriction = computed(() => getConditions(props.parentnode, 'restriction'))
   const completion = computed(() => props.data.completion.feedback.before)
 
@@ -72,6 +74,7 @@
 
   onMounted(() => {
     description.value = props.data.description ||null
+    estimate_duration.value = props.data.estimate_duration ||null
     document.addEventListener('click', closeOnOutsideClick);
   })
 
@@ -110,6 +113,18 @@
             </b>
             <div class="list-group-text">
               {{ description }}
+            </div>
+          </li>
+          <li 
+            v-if="estimate_duration"
+            class="list-group-item"
+          >
+            <i class="fa fa-spinner" />
+            <b>
+              Estimated Duration
+            </b>
+            <div class="list-group-text">
+              {{ estimate_duration }}
             </div>
           </li>
           <li

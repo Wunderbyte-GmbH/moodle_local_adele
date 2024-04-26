@@ -23,10 +23,13 @@ const setZoomLevel = async (action, zoomLock, viewport, zoomTo) => {
     }
   }
   if (newViewport != undefined) {
-    await zoomTo(newViewport, { duration: 500}).then(() => {
+    zoomTo(newViewport, { duration: 500}).then(() => {
       zoomLock.value = true
     })
   }
+  setTimeout(() => {
+    zoomLock.value = true
+  },800)
 }
 
 export default setZoomLevel;

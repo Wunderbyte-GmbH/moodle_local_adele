@@ -82,6 +82,21 @@
               />
             </div>
             <div class="form-group">
+              <label for="estimate_duration">
+                <b>
+                  {{ store.state.strings.estimate_duration }}
+                  <i class="fa fa-spinner" /> 
+                  :
+                </b> 
+              </label>
+              <input
+                id="estimate_duration"
+                v-model="estimate_duration"
+                class="form-control"
+                type="text"
+              >
+            </div>
+            <div class="form-group">
               <b>
                 {{ store.state.strings.modals_shortname }}
               </b>
@@ -210,6 +225,7 @@ const store = useStore();
 const learningpathModal = ref(null);
 const fullname = ref('')
 const description = ref('')
+const estimate_duration = ref('')
 const shortname = ref('')
 const tags = ref('')
 const node_id = ref('')
@@ -254,6 +270,7 @@ const saveChanges = () => {
   store.commit('updatedNode', {
     fullname: fullname.value, 
     description: description.value, 
+    estimate_duration: estimate_duration.value,
     shortname: shortname.value,
     selected_image: selectedImagePath.value,
     selected_course_image: selectedCourseImagePath.value,
@@ -261,7 +278,8 @@ const saveChanges = () => {
   })
   emit('save-edit', {
     fullname: fullname.value,
-    description: description.value, 
+    description: description.value,
+    estimate_duration: estimate_duration.value,
     selected_image: selectedImagePath.value,
     selected_course_image: selectedCourseImagePath.value,
     node_id: node_id.value,
@@ -272,6 +290,7 @@ const saveChanges = () => {
 watch(() => store.state.node, (newValue) => {
   fullname.value = newValue.fullname
   description.value = newValue.description
+  estimate_duration.value = newValue.estimate_duration
   shortname.value = newValue.shortname
   tags.value = newValue.tags
   selectedImagePath.value = newValue.selected_image

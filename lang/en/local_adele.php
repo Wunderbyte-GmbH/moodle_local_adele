@@ -266,6 +266,7 @@ $string['modals_next'] = 'Next';
 $string['modals_edit'] = 'Edit';
 $string['modals_longname'] = 'Longname:';
 $string['modals_description'] = 'Node description:';
+$string['estimate_duration'] = 'Estimated duration ';
 $string['modals_no_description'] = 'No node description given...';
 $string['modals_shortname'] = 'Shortname:';
 

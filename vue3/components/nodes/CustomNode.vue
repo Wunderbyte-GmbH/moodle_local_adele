@@ -165,7 +165,10 @@ const childStyle = {
             backgroundColor: cover_image ? '' : '#cccccc'
           }"
         >
-          <div class="overlay">
+          <div 
+            v-if="store.state.view!='teacher'" 
+            class="overlay"
+          >
             <button 
               class="icon-link"
               @click="setPretestView"

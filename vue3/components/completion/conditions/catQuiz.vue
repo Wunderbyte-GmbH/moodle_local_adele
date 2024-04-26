@@ -206,7 +206,7 @@ const showDetails = (name) => {
   }else{
     scalevalue.value = '';
   }
-  if (scale.scale) {
+  if (scale.attempts) {
     attempts.value = scale.attempts;
   }else{
     attempts.value = '';

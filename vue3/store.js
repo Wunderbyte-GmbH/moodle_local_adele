@@ -82,6 +82,7 @@ export function createAppStore() {
             updatedNode(state, data) {
                 state.node.fullname = data.fullname;
                 state.node.description = data.description;
+                state.node.estimate_duration = data.estimate_duration;
                 state.node.selected_course_image = data.selected_course_image;
                 state.node.selected_image = data.selected_image;
                 state.learningpath.json.tree.nodes = state.learningpath.json.tree.nodes.map(element_node => {

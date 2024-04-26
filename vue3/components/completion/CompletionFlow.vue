@@ -63,7 +63,6 @@
               :min-zoom="0.2"
               :zoom-on-scroll="zoomLock" 
               @dragover="onDragOver"
-              @node-click="onNodeClickEvent"
             >
               <Background 
                 :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -136,7 +135,6 @@ import FeedbackModal from '../modals/FeedbackModal.vue'
 import ChildNodes from '../charthelper/childNodes.vue'
 import ParentNodes from '../charthelper/parentNodes.vue'
 import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
-import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
 const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
   addEdges, findNode, toObject, fitView, viewport, zoomTo, setCenter
@@ -195,10 +193,6 @@ const goBack = () => {
 const handleFeedback = (feedback) => {
   let feedbackNode = findNode(feedback.childCondition + '_feedback')
   feedbackNode.data = feedback
-}
-
-const onNodeClickEvent = (event) => {
-  onNodeClick(event, zoomLock, setCenter)
 }
 
 const handleVisibility = (visibility) => {

@@ -62,7 +62,6 @@
               :min-zoom="0.2"
               :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
-              @node-click="onNodeClickEvent"
             >
               <Background 
                 :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
@@ -124,7 +123,6 @@ import ConditionNode from '../nodes/ConditionNode.vue'
 import getNodeId from '../../composables/getNodeId'
 import { notify } from '@kyvg/vue3-notification'
 import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
-import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
 const { nodes, edges, addNodes, project, vueFlowRef, setCenter,
   addEdges, findNode, toObject, fitView, viewport, zoomTo
@@ -236,10 +234,6 @@ const goBackConfirmation = (toggle) => {
   }
   store.state.editingadding = !store.state.editingadding
   store.state.editingrestriction = !store.state.editingrestriction
-}
-
-const onNodeClickEvent = (event) => {
-  onNodeClick(event, zoomLock, setCenter)
 }
 
 // Prevent default event if node has been dropped
