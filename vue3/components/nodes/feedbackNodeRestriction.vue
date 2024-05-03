@@ -48,7 +48,6 @@ const props = defineProps({
 
 watch(() => props.visibility, () => {
   renderFeedback('before', true)
-  renderFeedback('after', true)
 }, {deep: true})
 
 const feedback = ref([])
@@ -59,9 +58,6 @@ onMounted(async () => {
   feedback.value = JSON.parse(JSON.stringify(props.data))
   if (feedback.value.feedback_before_checkmark) {
     renderFeedback('before', true)
-  }
-  if (feedback.value.feedback_after_checkmark) {
-    renderFeedback('after', false)
   }
 });
 
@@ -161,9 +157,6 @@ const renderFeedback = (action, emitting) => {
                   </h5>
                 </label>
               </div>
-              <div>
-                Before
-              </div>
               <input
                 id="feedback_before"
                 v-model="feedback.feedback_before_checkmark" 
@@ -179,33 +172,10 @@ const renderFeedback = (action, emitting) => {
                 id="exampleFormControlTextarea1" 
                 v-model="feedback.feedback_before" 
                 class="form-control"
-                :placeholder="store.state.strings.nodes_no_feedback"
-                rows="5" 
-                :disabled="feedback.feedback_before_checkmark ||!feedback.visibility"
-                @change="emit('updateFeedback', feedback)"
-              />
-              <div>
-                After
-              </div>
-              <input
-                id="feedback_after"
-                v-model="feedback.feedback_after_checkmark" 
-                class="form-check-input"
-                type="checkbox"
-                :disabled="!feedback.visibility"
-                @change="renderFeedback('after', true)"
-              >
-              <label for="feedback_after">
-                Use default feedback
-              </label>
-              <textarea 
-                id="exampleFormControlTextarea1" 
-                v-model="feedback.feedback_after" 
-                class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5" 
-                :disabled="feedback.feedback_after_checkmark ||!feedback.visibility"
+                :disabled="feedback.feedback_before_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
             </div>

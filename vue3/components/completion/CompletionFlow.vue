@@ -137,7 +137,7 @@ import ParentNodes from '../charthelper/parentNodes.vue'
 import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
 
 const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
-  addEdges, findNode, toObject, fitView, viewport, zoomTo, setCenter
+  addEdges, findNode, toObject, fitView, viewport, zoomTo
 } = useVueFlow({
   nodes: [],
 })

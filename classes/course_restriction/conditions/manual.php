@@ -69,6 +69,7 @@ class manual implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
+            'description_before' => self::get_restriction_description_before(),
             'label' => $label,
         ];
     }
@@ -81,6 +82,15 @@ class manual implements course_restriction {
     private function get_description_string() {
         $description = get_string('course_description_condition_restriction_manual', 'local_adele');
         return $description;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
+    public function get_restriction_description_before() {
+        return get_string('course_restricition_before_condition_manual', 'local_adele');
     }
 
     /**

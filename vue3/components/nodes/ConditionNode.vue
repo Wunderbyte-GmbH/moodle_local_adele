@@ -111,16 +111,18 @@ const replaceNode = () => {
           currentNode = nextNode
           nextNode = findNode(currentNode.childCondition[0])
         }
-        currentNode.deletable = true
-        removeNodes([currentNode.id])
-        if (prevNode.childCondition.length > 0) {
-            let new_children = []
-            prevNode.childCondition.forEach((childNode) => {
-              if (findNode(childNode)) {
-                new_children.push(childNode)
-              }
-            })
-            prevNode.childCondition = new_children
+        if (currentNode != undefined) {
+          currentNode.deletable = true
+          removeNodes([currentNode.id])
+          if (prevNode.childCondition.length > 0) {
+              let new_children = []
+              prevNode.childCondition.forEach((childNode) => {
+                if (findNode(childNode)) {
+                  new_children.push(childNode)
+                }
+              })
+              prevNode.childCondition = new_children
+          }
         }
       } else if (
         edge.sourceHandle == 'target_and' &&

@@ -27,8 +27,8 @@
   const description = ref({})
   const estimate_duration = ref({})
 
-  const restriction = computed(() => getConditions(props.parentnode, 'restriction'))
-  const completion = computed(() => props.data.completion.feedback.before)
+  const restriction = computed(() => props.data.completion.feedback.restriction.before)
+  const completion = computed(() => props.data.completion.feedback.completion.before)
 
   const getConditions = (parentnode, type) => {
     let condition_strings = []

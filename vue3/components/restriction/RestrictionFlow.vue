@@ -72,6 +72,7 @@
                   :data="data" 
                   :type="'Restriction'" 
                   :learningpath="learningpathrestriction"
+                  @update-visibility="handleVisibility"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -79,6 +80,14 @@
               </template>
               <template #edge-condition="props">
                 <ConditionLine v-bind="props" />
+              </template>
+              <template #node-feedback="{ data }">
+                <FeedbackNode 
+                  :data="data"
+                  :learningpath="learningpathcompletion"
+                  :visibility="visibility_emitted"
+                  @update-feedback="handleFeedback"
+                />
               </template>
             </VueFlow>
             <Sidebar 
@@ -123,8 +132,9 @@ import ConditionNode from '../nodes/ConditionNode.vue'
 import getNodeId from '../../composables/getNodeId'
 import { notify } from '@kyvg/vue3-notification'
 import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
+import FeedbackNode from '../nodes/feedbackNodeRestriction.vue'
 
-const { nodes, edges, addNodes, project, vueFlowRef, setCenter,
+const { nodes, edges, addNodes, project, vueFlowRef,
   addEdges, findNode, toObject, fitView, viewport, zoomTo
 } = useVueFlow({
   nodes: [],})
@@ -152,6 +162,7 @@ function toggleClass() {
 
 // Get all available restrictions
 const restrictions = ref(null);
+const visibility_emitted = ref(false)
 
 // Intersected node
 const intersectedNode = ref(null);
@@ -249,8 +260,22 @@ function handleNodesIntersected({ intersecting }) {
   intersectedNode.value = intersecting
 }
 
+const handleVisibility = (visibility) => {
+  let visibilityNode = findNode(visibility.node_id)
+  visibility_emitted.value = !visibility_emitted.value
+  if (visibilityNode) {
+    visibilityNode.data.visibility = visibility.visibility
+  }
+}
+
+const handleFeedback = (feedback) => {
+  let feedbackNode = findNode(feedback.childCondition + '_feedback')
+  feedbackNode.data = feedback
+}
+
 // Adding setting up nodes and potentional edges
 function onDrop(event) {
+  visibility_emitted.value = !visibility_emitted.value
   if(nodes.value.length == 0 || intersectedNode.value){
     const type = event.dataTransfer?.getData('application/vueflow')
     const data = JSON.parse(event.dataTransfer?.getData('application/data'));
@@ -293,6 +318,9 @@ function onDrop(event) {
     };
 
     addNodes([newNode]);
+    if(nodes.value.length == 1){
+      addFeedbackNode(newNode)
+    }
     if(intersectedNode.value){
       // Create an edge connecting the new drop zone node to the closest node
       let edgeData = {
@@ -306,6 +334,8 @@ function onDrop(event) {
           type: 'additional',
           text: 'AND',
         }
+      }else{
+        addFeedbackNode(newNode)
       }
       const newEdge = {
         id: intersectedNode.value.closestnode.id  + '-' + newNode.id,
@@ -328,6 +358,34 @@ function onDrop(event) {
       type: 'warn'
     });
   }
+}
+
+function addFeedbackNode (node) {
+  const newFeedback = {
+    id: node.id + '_feedback',
+    type: 'feedback',
+    position: { x: node.position.x , y: node.position.y-345 },
+    label: store.state.strings.completion_feedback_node,
+    data: {
+      visibility: true,
+      feedback_before: "",
+      feedback_before_checkmark: true,
+      childCondition: node.id,
+    },
+    draggable: false,
+    deletable: false,
+  };
+  const newEdge = {
+    id: node.id  + '-' + newFeedback.id,
+    source: node.id,
+    sourceHandle: 'target_and',
+    target: newFeedback.id,
+    targetHandle: 'source_feedback',
+    draggable: false,
+    deletable: false,
+  };
+  addNodes([newFeedback]);
+  addEdges([newEdge]);
 }
 
 </script>

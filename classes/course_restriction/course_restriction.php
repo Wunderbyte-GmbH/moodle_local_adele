@@ -73,4 +73,11 @@ interface course_restriction {
      */
     public function get_restriction_status($node, $userpath);
 
+    /**
+     * It returns a description before completion
+     *
+     * @return int Information array of importancy.
+     */
+    public function get_restriction_description_before();
+
 }
