@@ -276,7 +276,7 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param array $conditionnodes
+     * @param array $node
      * @return array
      */
     public static function getfeedback($node) {

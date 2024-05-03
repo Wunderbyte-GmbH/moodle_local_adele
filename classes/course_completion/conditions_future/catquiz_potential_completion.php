@@ -131,9 +131,8 @@ class catquiz_potential_completion implements course_completion {
             foreach ($node['completion']['nodes'] as $complitionnode) {
                 if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
                   && $complitionnode['data']['label'] == 'catquiz') {
-                    $testid = $complitionnode['data']['value']['testid']; //test id check 
+                    $testid = $complitionnode['data']['value']['testid'];
                     $scales = $complitionnode['data']['value']['scales'];
-                    // ToDo: testid testtable get courseid; parentScale id; userid; get attempts
                     foreach ($scales as $scale) {
                         $validcatquiz = false;
                         if (!isset($scale['type'])) {
