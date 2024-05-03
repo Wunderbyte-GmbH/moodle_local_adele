@@ -134,14 +134,16 @@ class catquiz implements course_completion {
                 ) {
                     $componentid = $complitionnode['data']['value']['componentid'];
                     $testidcourseid = $complitionnode['data']['value']['testid_courseid'];
-                    $scales = isset($complitionnode['data']['value']['scales']) ? $complitionnode['data']['value']['scales'] : null;
+                    $scales =
+                      isset($complitionnode['data']['value']['scales']) ? $complitionnode['data']['value']['scales'] : null;
                     $scaleids = array_map(fn($a) => $a['id'], $scales);
 
                     $passcatquiz = false;
                     $start = 0;
                     $steps = 5;
 
-                    while (!$passcatquiz && $records = $this->get_modquiz_records($componentid, $testidcourseid, $userid, $start, $steps)) {
+                    while (!$passcatquiz && $records =
+                      $this->get_modquiz_records($componentid, $testidcourseid, $userid, $start, $steps)) {
                         foreach ($records as $record) {
                             $recordpass = true;
                             $attemptpass = true;
@@ -156,7 +158,7 @@ class catquiz implements course_completion {
                                 }
                                 if (isset($scale['attemps'])) {
                                     if (!(isset($attempt[$scale['id']]) && $attempt[$scale['id']] >= $scale['attemps'])) {
-                                        $recordpass = false;
+                                        $attemptpass = false;
                                         break;
                                     }
                                 }
@@ -202,6 +204,7 @@ class catquiz implements course_completion {
      * @param int $courseid
      * @param int $userid
      * @param int $start
+     * @param int $steps
      * @return object
      */
     private function get_modquiz_records($instanceid, $courseid, $userid, $start, $steps) {

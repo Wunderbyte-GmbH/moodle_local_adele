@@ -169,6 +169,7 @@ class modquiz implements course_completion {
      * @param int $completion
      * @param int $userid
      * @param int $start
+     * @param int $steps
      * @return object
      */
     private function get_modquiz_records($completion, $userid, $start, $steps) {
