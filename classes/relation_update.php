@@ -277,6 +277,7 @@ class relation_update {
      * Observer for course completed
      *
      * @param array $node
+     * @param array $completioncriteria
      * @return array
      */
     public static function getfeedback($node, $completioncriteria) {
@@ -301,7 +302,7 @@ class relation_update {
                     $feedbacks['completion']['inbetween'][] = str_replace([
                       '{course progress}',
                       '{best catquiz}',
-                      '{best quiz}'
+                      '{best quiz}',
                     ], [
                       $completioncriteria['course_completed']['inbetween_info'] ?? '0',
                       $completioncriteria['catquiz']['inbetween_info'] ?? '0',
