@@ -118,26 +118,29 @@ class timed implements course_restriction {
                 if ($restrictionnode['data']['label'] == 'timed') {
                     $validstart = true;
                     $validtime = false;
-                    if (self::isvaliddate($restrictionnode['data']['value']['start'])) {
-                        $datetimestamp = strtotime($restrictionnode['data']['value']['start']);
-                        $currenttimestamp = strtotime(date('Y-m-d'));
-                        if ($datetimestamp <= $currenttimestamp) {
+                    $currenttimestamp = new DateTime();
+                    $startdate = self::isvaliddate($restrictionnode['data']['value']['start']);
+                    if ($startdate) {
+                        if ($startdate <= $currenttimestamp) {
                             $validtime = true;
                         } else {
                             $validstart = false;
                         }
                     }
-                    if (self::isvaliddate($restrictionnode['data']['value']['end'])) {
-                        $datetimestamp = strtotime($restrictionnode['data']['value']['end']);
-                        $currenttimestamp = strtotime(date('Y-m-d'));
-                        if ($datetimestamp >= $currenttimestamp &&
+                    $enddate = self::isvaliddate($restrictionnode['data']['value']['end']);
+                    if ($enddate) {
+                        if ($enddate >= $currenttimestamp &&
                             $validstart) {
                             $validtime = true;
                         } else {
                             $validtime = false;
                         }
                     }
-                    $timed[$restrictionnode['id']] = $validtime;
+                    $timed[$restrictionnode['id']]['completed'] = $validtime;
+                    $timed[$restrictionnode['id']]['inbetween_info'] = [
+                      'starttime' => $startdate ?? null,
+                      'endtime' => $enddate ?? null,
+                    ];
                 }
             }
         }
@@ -152,6 +155,10 @@ class timed implements course_restriction {
      */
     public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
         $datetime = DateTime::createFromFormat($format, $datestring);
-        return $datetime && $datetime->format($format) === $datestring;
+        if ($datetime && $datetime->format($format) === $datestring) {
+            $datetime->format('Y-m-d H:i:s');
+            return $datetime;
+        }
+        return false;
     }
 }

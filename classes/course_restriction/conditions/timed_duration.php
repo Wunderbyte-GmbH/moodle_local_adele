@@ -28,6 +28,7 @@
  namespace local_adele\course_restriction\conditions;
 
 use DateInterval;
+use DateTime;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -112,12 +113,13 @@ class timed_duration implements course_restriction {
      */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
-        $currenttime = time();
+        $currenttime = new DateTime();
+        $currenttime->setTimestamp(time());
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if ($restrictionnode['data']['label'] == 'timed_duration') {
                     $iscurrenttimeinrange = false;
-                    $starttime = $userpath->timecreated;
+                    $starttime = new DateTime();
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
                         if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
                             $starttime->setTimestamp($node['data']['first_enrolled']);
@@ -127,12 +129,17 @@ class timed_duration implements course_restriction {
                         // Check if the duration type is valid and calculate the end time.
                         if (isset($this->durationvaluearray[$durationvalue])) {
                             $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
-                            $endtime = $starttime + $totalseconds;
+                            $endtime = clone $starttime;
+                            $endtime->modify("+{$totalseconds} seconds");
                             // Check if the current timestamp is between the start and end timestamps.
                             $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
                         }
                     }
-                    $timed[$restrictionnode['id']] = $iscurrenttimeinrange;
+                    $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
+                    $timed[$restrictionnode['id']]['inbetween_info'] = [
+                      'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
+                      'endtime' => $endtime->format('Y-m-d H:i:s') ?? null,
+                    ];
                 }
             }
         }

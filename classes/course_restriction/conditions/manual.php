@@ -110,18 +110,15 @@ class manual implements course_restriction {
      * @return boolean
      */
     public function get_restriction_status($node, $userpath) {
-        $containsmanual = false;
-        if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
-            foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if ($restrictionnode['data']['label'] == 'manual') {
-                    $containsmanual = true;
-                }
-            }
-            if (isset($node['data']['manualrestriction'] ) && $node['data']['manualrestriction']
-                && $node['data']['manualrestrictionvalue'] && $containsmanual) {
-                return true;
-            }
+        $coursecompletion = [
+          'completed' => false,
+          'inbetween_info' => 'unchecked',
+        ];
+        if (isset($node['data']['manualrestriction'] ) && $node['data']['manualrestriction']
+            && $node['data']['manualrestrictionvalue']) {
+            $coursecompletion['completed'] = true;
+            $coursecompletion['inbetween_info'] = 'checked';
         }
-        return false;
+        return $coursecompletion;
     }
 }

@@ -67,7 +67,6 @@ class learning_paths {
         $data->timemodified = time();
         $data->json = $params['json'];
         $id = 0;
-
         if ($params['learningpathid'] == 0) {
             $data->timecreated = time();
             $data->createdby = $params['userid'] ?? 0;

@@ -138,7 +138,8 @@ class parent_courses implements course_restriction {
                             $coursescompleted = true;
                         }
                     }
-                    $parentcourses[$restriction['id']] = $coursescompleted;
+                    $parentcourses[$restriction['id']]['completed'] = $coursescompleted;
+                    $parentcourses[$restriction['id']]['inbetween_info'] = null;
                 }
             }
         }

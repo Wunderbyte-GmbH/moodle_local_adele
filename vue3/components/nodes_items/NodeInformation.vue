@@ -1,6 +1,7 @@
 <script setup>
   // Import needed libraries
-  import { computed, onMounted, onUnmounted, ref } from 'vue';
+  import { includes } from '@egjs/vue3-flicking';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -29,9 +30,56 @@
 
   const restriction = computed(() => props.data.completion.feedback.restriction.before)
   const completion = computed(() => props.data.completion.feedback.completion.before)
+
+  const ending_date = computed(() => {
+    let return_date = {
+      start_date: null,
+      end_date: null,
+    }
+    Object.entries(props.data.completion.restrictioncriteria).forEach(([key, value]) => {
+      if (key.includes('timed')) {
+        Object.entries(value).forEach(([condition, times]) => {
+          Object.entries(times.inbetween_info).forEach(([start_end, time]) => {
+            if (
+              start_end == 'starttime' &&
+              (return_date.start_date == null ||return_date.start_date > time)
+              ) {
+                return_date.start_date = time
+            } else if (
+              start_end == 'endtime' &&
+              (return_date.end_date == null ||return_date.end_date > time)
+            ) {
+              return_date.end_date = time
+            }
+          });
+        });
+      }
+    });
+    return_date = format_dates(return_date)
+    return return_date;
+  })
+
   const completion_inbetween = computed(() => {
     return props.data.completion.feedback.completion.inbetween
   })
+
+  const format_dates = (return_date) => {
+    const options = {
+      weekday: 'long', // "Monday"
+      year: 'numeric', // "2024"
+      month: 'long', // "April"
+      day: 'numeric', // "29"
+      hour: '2-digit', // "13"
+      minute: '2-digit', // "28"
+      second: '2-digit', // "12"
+      hour12: false
+    };
+    Object.entries(return_date).forEach(([type, dateString]) => {
+      const date = new Date(dateString);
+      return_date[type] = date.toLocaleDateString('en-US', options);
+    })
+    return return_date;
+  }
 
   const getConditions = (parentnode, type) => {
     let condition_strings = []
@@ -124,10 +172,31 @@
           >
             <i class="fa fa-spinner" />
             <b>
-              Estimated Duration
+              Dates and Duration
             </b>
             <div class="list-group-text">
+              <b>
+                Estimated Duration: 
+              </b>
               {{ estimate_duration }}
+            </div>
+            <div 
+              v-if="ending_date.start_date"
+              class="list-group-text"
+            >
+              <b>
+                Start Date:
+              </b>
+              {{ ending_date.start_date }}
+            </div>
+            <div 
+              v-if="ending_date.end_date"
+              class="list-group-text"
+            >
+              <b>
+                End Date:
+              </b>
+              {{ ending_date.end_date }}
             </div>
           </li>
           <li
@@ -138,7 +207,7 @@
               Restriction
             </b>
             <div class="list-group-text">
-              <div v-if="props.parentnode.restriction && restriction.length > 0 && restriction != ''">
+              <div v-if="props.parentnode.restriction && restriction">
                 <div 
                   v-for="restriction_string in restriction"
                   :key="restriction_string"
@@ -161,7 +230,7 @@
               Completion
             </b>
             <div class="list-group-text">
-              <div v-if="props.parentnode.completion && completion.length > 0 && completion != ''">
+              <div v-if="props.parentnode.completion && completion">
                 <div 
                   v-for="completion_string in completion"
                   :key="completion_string"

@@ -30,6 +30,7 @@ namespace local_adele;
 use local_adele\event\user_path_updated;
 use local_adele\helper\user_path_relation;
 use context_system;
+use core_completion\progress;
 use mod_adele_observer;
 
 defined('MOODLE_INTERNAL') || die();
@@ -55,7 +56,7 @@ class learning_path_update {
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_user_path_relations($event->other['learningpathid']);
         foreach ($records as $userpath) {
-            $userpath->json = self::passnodevalues($event->other['json'], $userpath->json);
+            $userpath->json = self::passnodevalues($event->other['json'], $userpath->json, $userpath->user_id);
             $eventsingle = user_path_updated::create([
                 'objectid' => $userpath->id,
                 'context' => context_system::instance(),
@@ -74,7 +75,7 @@ class learning_path_update {
      * @param string $oldtree
      * @return array
      */
-    public static function passnodevalues($newtree, $oldtree) {
+    public static function passnodevalues($newtree, $oldtree, $userid) {
         $oldpath = json_decode($oldtree, true);
         $userpathjson = json_decode($newtree, true);
         $oldvalues = [];
@@ -111,8 +112,29 @@ class learning_path_update {
                     $node['data']['manualcompletionvalue'] = $oldvalues[$node['id']]['manualcompletionvalue'];
                 }
             }
+            $node = self::checknodeprogression($node, $userid);
         }
         return $userpathjson;
+    }
+
+    /**
+     * Get user path relation.
+     *
+     * @param object $node
+     * @param String $userid
+     * @return array
+     */
+    public static function checknodeprogression($node, $userid) {
+        $progress = 0;
+        foreach ($node['data']['course_node_id'] as $coursenodeid) {
+            $course = get_course($coursenodeid);
+            $tmpprogress = (int) progress::get_course_progress_percentage($course, $userid);
+            if ($tmpprogress > $progress) {
+                $progress = $tmpprogress;
+            }
+        }
+        $node['data']['progress'] = $progress;
+        return $node;
     }
 
     /**

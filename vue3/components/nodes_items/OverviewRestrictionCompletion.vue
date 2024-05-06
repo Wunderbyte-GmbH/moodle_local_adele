@@ -72,7 +72,7 @@ function getConditions(completion_nodes, type) {
               if (type == 'completion') {
                 valid = getValidStatus(props.node.completion.completioncriteria.completed[node_completion.data.label])
               } else {
-                valid = getValidStatus(props.node.completion.restrictioncriteria[node_completion.data.label])
+                valid = getValidStatus(props.node.completion.restrictioncriteria.completed[node_completion.data.label])
               }
             }
             count ++

@@ -52,7 +52,6 @@ class course_restriction_info {
      * @return array
      */
     public static function get_restrictions(): array {
-
         global $CFG;
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_restriction/conditions/*.php';
@@ -69,6 +68,7 @@ class course_restriction_info {
                 $conditions[] = $conditionclass->get_description();
             }
         }
+        $conditions = array_reverse($conditions);
         return $conditions;
     }
 }

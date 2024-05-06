@@ -69,18 +69,20 @@ class relation_update {
                             $currentcondition = $restrictionnodepath;
                             $validationcondition = false;
                             while ( $currentcondition ) {
+                                $currlabel = $currentcondition['data']['label'];
                                 if ($currentcondition['data']['label'] == 'timed' ||
                                     $currentcondition['data']['label'] == 'timed_duration' ||
                                     $currentcondition['data']['label'] == 'specific_course' ||
                                     $currentcondition['data']['label'] == 'parent_courses') {
+                                    $currcondi = $currentcondition['id'];
                                     $validationcondition =
-                                        $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']];
+                                        $restrictioncriteria[$currlabel]['completed'][$currcondi];
                                     $singlerestrictionnode[$currentcondition['data']['label']
                                         . '_' . $currentcondition['id']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label']
                                         . '_' . $currentcondition['id'];
                                 } else if ($currentcondition['data']['label'] == 'parent_node_completed') {
-                                    foreach ($restrictioncriteria[$currentcondition['data']['label']] as $keynode => $parentnode) {
+                                    foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
                                         $parentcompletioncriteria = course_completion_status::get_condition_status(
                                           $parentnode,
                                           $userpath->user_id
@@ -99,7 +101,7 @@ class relation_update {
                                     $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label'];
                                 } else {
-                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']];
+                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']]['completed'];
                                     $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label'];
                                 }

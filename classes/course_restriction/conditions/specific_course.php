@@ -132,7 +132,8 @@ class specific_course implements course_restriction {
                             }
                         }
                     }
-                    $specificcourses[$restriction['id']] = $coursecompleted;
+                    $specificcourses[$restriction['id']]['completed'] = $coursecompleted;
+                    $specificcourses[$restriction['id']]['inbetween_info'] = null;
                 }
             }
         }
