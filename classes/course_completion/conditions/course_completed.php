@@ -75,6 +75,7 @@ class course_completed implements course_completion {
             'description' => $description,
             'description_before' => self::get_completion_description_before(),
             'description_after' => self::get_completion_description_after(),
+            'description_inbetween' => self::get_completion_description_inbetween(),
             'label' => $label,
         ];
     }
@@ -112,6 +113,15 @@ class course_completed implements course_completion {
      *
      * @return string
      */
+    public function get_completion_description_inbetween() {
+        return get_string('course_description_inbetween_condition_course_completed', 'local_adele');
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
     private function get_name_string() {
         $description = get_string('course_name_condition_course_completed', 'local_adele');
         return $description;
@@ -139,8 +149,9 @@ class course_completed implements course_completion {
                     $completed = true;
                 }
             }
-            $coursecompletion[$courseid] = $completed;
+            $coursecompletion['completed'][$courseid] = $completed;
         }
+        $coursecompletion['inbetween_info'] = $node['data']['progress'];
         return $coursecompletion;
     }
 

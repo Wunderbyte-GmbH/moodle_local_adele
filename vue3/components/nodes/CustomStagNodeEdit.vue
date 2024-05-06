@@ -96,7 +96,7 @@ onMounted(() => {
               min_courses = completionnode.data.value.min_courses
               if (userpath.json.user_path_relation[node.id] &&
                 userpath.json.user_path_relation[node.id].completioncriteria) {
-                finishedCourses = userpath.json.user_path_relation[node.id].completioncriteria.course_completed
+                finishedCourses = userpath.json.user_path_relation[node.id].completioncriteria.completed.course_completed
               }
           }
         })

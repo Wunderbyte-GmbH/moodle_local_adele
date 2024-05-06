@@ -364,14 +364,16 @@ function addFeedbackNode (node) {
   const newFeedback = {
     id: node.id + '_feedback',
     type: 'feedback',
-    position: { x: node.position.x , y: node.position.y-495 },
+    position: { x: node.position.x , y: node.position.y-695 },
     label: store.state.strings.completion_feedback_node,
     data: {
       visibility: true,
       feedback_before: "",
       feedback_after: "",
+      feedback_inbetween: "",
       feedback_before_checkmark: true,
       feedback_after_checkmark: true,
+      feedback_inbetween_checkmark: true,
       childCondition: node.id,
     },
     draggable: false,

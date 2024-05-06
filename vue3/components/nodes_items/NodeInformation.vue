@@ -29,6 +29,9 @@
 
   const restriction = computed(() => props.data.completion.feedback.restriction.before)
   const completion = computed(() => props.data.completion.feedback.completion.before)
+  const completion_inbetween = computed(() => {
+    return props.data.completion.feedback.completion.inbetween
+  })
 
   const getConditions = (parentnode, type) => {
     let condition_strings = []
@@ -161,6 +164,31 @@
               <div v-if="props.parentnode.completion && completion.length > 0 && completion != ''">
                 <div 
                   v-for="completion_string in completion"
+                  :key="completion_string"
+                >
+                  <div v-if="completion_string != ''">
+                    - {{ completion_string }}
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                Nothing is defined
+              </div>
+            </div>
+          </li>
+          <li
+            class="list-group-item"
+          >
+            <i
+              class="fa-solid fa-play-circle" 
+            />
+            <b>
+              Completion Inbetween
+            </b>
+            <div class="list-group-text">
+              <div v-if="completion_inbetween.length > 0 && completion_inbetween != ''">
+                <div 
+                  v-for="completion_string in completion_inbetween"
                   :key="completion_string"
                 >
                   <div v-if="completion_string != ''">

@@ -156,7 +156,7 @@ class relation_update {
     public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
-        $feedback = self::getfeedback($node);
+        $feedback = self::getfeedback($node, $completioncriteria);
         foreach ($node['completion']['nodes'] as $completionnode) {
             $failedcompletion = false;
             $validationconditionstring = [];
@@ -169,14 +169,14 @@ class relation_update {
                     if ($label == 'catquiz' ||
                     $label == 'modquiz') {
                         $validationcondition =
-                            $completioncriteria[$label][$currentcondition['id']];
+                            $completioncriteria['completed'][$label][$currentcondition['id']];
                         $singlecompletionnode[$label
                             . '_' . $currentcondition['id']] = $validationcondition;
                         $validationconditionstring[] = $label
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
-                        foreach ($completioncriteria[$label] as $coursecompleted) {
+                        foreach ($completioncriteria['completed'][$label] as $coursecompleted) {
                             if ($coursecompleted) {
                                 $completednodecourses += 1;
                                 if (!isset($completionnode['data']['value']) || $completionnode['data']['value'] == null) {
@@ -199,7 +199,7 @@ class relation_update {
                         if (!$mode) {
                             $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                         }
-                        $validationcondition = $completioncriteria[$label];
+                        $validationcondition = $completioncriteria['completed'][$label];
                         $singlecompletionnode[$label] = $validationcondition;
                         $validationconditionstring[] = $label;
                     }
@@ -279,12 +279,13 @@ class relation_update {
      * @param array $node
      * @return array
      */
-    public static function getfeedback($node) {
+    public static function getfeedback($node, $completioncriteria) {
         $feedbacks = [
           'completion' => [
             'before' => null,
             'after_all' => null,
             'after' => null,
+            'inbetween' => null,
           ],
           'restriction' => [
             'before' => null,
@@ -296,6 +297,20 @@ class relation_update {
                   isset($conditionnode['data']['feedback_before']) ? $conditionnode['data']['feedback_before'] : '';
                 $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] =
                   isset($conditionnode['data']['feedback_after']) ? $conditionnode['data']['feedback_after'] : '';
+                if ($conditionnode['data']['feedback_inbetween_checkmark']) {
+                    $feedbacks['completion']['inbetween'][] = str_replace([
+                      '{course progress}',
+                      '{best catquiz}',
+                      '{best quiz}'
+                    ], [
+                      $completioncriteria['course_completed']['inbetween_info'] ?? '0',
+                      $completioncriteria['catquiz']['inbetween_info'] ?? '0',
+                      $completioncriteria['modquiz']['inbetween_info'] ?? '0',
+                    ], $conditionnode['data']['feedback_inbetween']);
+                } else {
+                    $feedbacks['completion']['inbetween'][] =
+                      isset($conditionnode['data']['feedback_inbetween']) ? $conditionnode['data']['feedback_inbetween'] : '';
+                }
             }
         }
         foreach ($node['restriction']['nodes'] as $restrictionnode) {

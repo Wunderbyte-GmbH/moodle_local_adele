@@ -75,6 +75,7 @@ class modquiz implements course_completion {
             'description' => $description,
             'description_before' => self::get_completion_description_before(),
             'description_after' => self::get_completion_description_after(),
+            'description_inbetween' => self::get_completion_description_inbetween(),
             'label' => $label,
         ];
     }
@@ -112,6 +113,15 @@ class modquiz implements course_completion {
      *
      * @return string
      */
+    public function get_completion_description_inbetween() {
+        return get_string('course_description_inbetween_condition_modquiz', 'local_adele');
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
     private function get_name_string() {
         $description = get_string('course_name_condition_modquiz', 'local_adele');
         return $description;
@@ -125,7 +135,12 @@ class modquiz implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        $modquizzes = [];
+        $modquizzes = [
+          'completed' => [],
+          'inbetween_info' => '',
+        ];
+        $bestgrade = null;
+        $maxgrade = null;
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             $completions = $node['completion']['nodes'];
             foreach ($completions as $completion) {
@@ -133,26 +148,23 @@ class modquiz implements course_completion {
                   && $completion['data']['label'] == 'modquiz') {
                     $validcatquiz = false;
                     // Get grade and check if valid.
-                    $start = 0;
-                    $steps = 5;
-                    while (!$validcatquiz && $data = $this->get_modquiz_records($completion, $userid, $start, $steps)) {
-                        foreach ($data as $key => $lastgrade) {
-                            if ((float)$key >= (float)$completion['data']['value']['grade']) {
-                                $validcatquiz = true;
-                                break;
-                            }
+                    $data = $this->get_modquiz_records($completion, $userid);
+                    foreach ($data as $key => $lastgrade) {
+                        if ((float)$key >= $bestgrade) {
+                            $bestgrade = (float)$key;
+                            $maxgrade = $completion['data']['value']['grade'];
                         }
-                        $start += $steps;
-                        if ($validcatquiz) {
-                            break;
+                        if ((float)$key >= (float)$completion['data']['value']['grade']) {
+                            $validcatquiz = true;
                         }
                     }
-                    $modquizzes[$completion['id']] = $validcatquiz;
+                    $modquizzes['completed'][$completion['id']] = $validcatquiz;
                 } else {
-                    $modquizzes[$completion['id']] = false;
+                    $modquizzes['completed'][$completion['id']] = false;
                 }
             }
         }
+        $modquizzes['inbetween_info'] = $bestgrade . '/' . $maxgrade;
         return $modquizzes;
     }
 
@@ -168,20 +180,16 @@ class modquiz implements course_completion {
      * Helper function to return localized description strings.
      * @param int $completion
      * @param int $userid
-     * @param int $start
-     * @param int $steps
      * @return object
      */
-    private function get_modquiz_records($completion, $userid, $start, $steps) {
+    private function get_modquiz_records($completion, $userid) {
         global $DB;
         return $DB->get_records_select(
             'quiz_grades',
             'quiz = :quiz AND userid = :userid',
             ['quiz' => $completion['data']['value']['quizid'], 'userid' => $userid],
             'timemodified DESC',
-            'grade',
-            $start,
-            $steps
+            'grade'
         );
     }
 }

@@ -48,6 +48,7 @@ const props = defineProps({
 
 watch(() => props.visibility, () => {
   renderFeedback('before', true)
+  renderFeedback('inbetween', true)
   renderFeedback('after', true)
 }, {deep: true})
 
@@ -62,6 +63,9 @@ onMounted(async () => {
   }
   if (feedback.value.feedback_after_checkmark) {
     renderFeedback('after', false)
+  }
+  if (feedback.value.feedback_inbetween_checkmark) {
+    renderFeedback('inbetween', false)
   }
 });
 
@@ -78,7 +82,18 @@ const handleStyle = computed(() => ({
 }))
 
 const renderFeedback = (action, emitting) => {
-  const checked = action == 'before' ? feedback.value.feedback_before_checkmark : feedback.value.feedback_after_checkmark
+  let checked = false
+  switch (action) {
+    case 'before':
+      checked = feedback.value.feedback_before_checkmark
+      break
+    case 'after':
+      checked = feedback.value.feedback_after_checkmark
+      break
+    case 'inbetween':
+      checked = feedback.value.feedback_inbetween_checkmark
+      break
+  }
   if (checked) {
     let renderedFeedback = ''
     const start_node = findNode(feedback.value.childCondition)
@@ -179,9 +194,33 @@ const renderFeedback = (action, emitting) => {
                 id="exampleFormControlTextarea1" 
                 v-model="feedback.feedback_before" 
                 class="form-control"
+                style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5" 
                 :disabled="feedback.feedback_before_checkmark ||!feedback.visibility"
+                @change="emit('updateFeedback', feedback)"
+              />
+              <div>
+                Inbetween
+              </div>
+              <input
+                id="feedback_inbetween"
+                v-model="feedback.feedback_inbetween_checkmark" 
+                class="form-check-input"
+                type="checkbox"
+                :disabled="!feedback.visibility"
+                @change="renderFeedback('inbetween', true)"
+              >
+              <label for="feedback_inbetween">
+                Use default feedback
+              </label>
+              <textarea 
+                id="exampleFormControlTextarea1" 
+                v-model="feedback.feedback_inbetween" 
+                class="form-control"
+                :placeholder="store.state.strings.nodes_no_feedback"
+                rows="5" 
+                :disabled="feedback.feedback_inbetween_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
               <div>

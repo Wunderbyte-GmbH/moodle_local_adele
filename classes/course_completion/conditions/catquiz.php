@@ -75,6 +75,7 @@ class catquiz implements course_completion {
             'description' => $description,
             'description_before' => self::get_completion_description_before(),
             'description_after' => self::get_completion_description_after(),
+            'description_inbetween' => self::get_completion_description_inbetween(),
             'label' => $label,
         ];
     }
@@ -112,6 +113,15 @@ class catquiz implements course_completion {
      *
      * @return string
      */
+    public function get_completion_description_inbetween() {
+        return get_string('course_description_inbetween_condition_catquiz', 'local_adele');
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
     private function get_name_string() {
         $description = get_string('course_name_condition_catquiz', 'local_adele');
         return $description;
@@ -126,7 +136,10 @@ class catquiz implements course_completion {
      */
     public function get_completion_status($node, $userid) {
         global $DB;
-        $catquizzes = [];
+        $catquizzes = [
+          'completed' => [],
+          'inbetween_info' => 'testing ifno',
+        ];
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             foreach ($node['completion']['nodes'] as $complitionnode) {
                 if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
@@ -139,40 +152,34 @@ class catquiz implements course_completion {
                     $scaleids = array_map(fn($a) => $a['id'], $scales);
 
                     $passcatquiz = false;
-                    $start = 0;
-                    $steps = 5;
 
-                    while (!$passcatquiz && $records =
-                      $this->get_modquiz_records($componentid, $testidcourseid, $userid, $start, $steps)) {
-                        foreach ($records as $record) {
-                            $recordpass = true;
-                            $attemptpass = true;
-                            $testing = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
-                            $attempt = Local_catquizCatquiz::get_number_of_right_answers_by_scale($scaleids, $record);
-                            foreach ($scales as $scale) {
-                                if (isset($scale['scale']) && $scale['scale']) {
-                                    if (!(isset($testing->{$scale['id']}) && $testing->{$scale['id']} >= $scale['scale'])) {
-                                        $recordpass = false;
-                                        break;
-                                    }
-                                }
-                                if (isset($scale['attemps'])) {
-                                    if (!(isset($attempt[$scale['id']]) && $attempt[$scale['id']] >= $scale['attemps'])) {
-                                        $attemptpass = false;
-                                        break;
-                                    }
+                    $records = $this->get_modquiz_records($componentid, $testidcourseid, $userid);
+                    foreach ($records as $record) {
+                        $recordpass = true;
+                        $attemptpass = true;
+                        $testing = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
+                        $rightanswerspercentage =
+                          Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
+                        foreach ($scales as $scale) {
+                            if (isset($scale['scale']) && $scale['scale']) {
+                                if (!(isset($testing->{$scale['id']}) && $testing->{$scale['id']} >= $scale['scale'])) {
+                                    $recordpass = false;
                                 }
                             }
-                            if ($recordpass && $attemptpass) {
-                                $passcatquiz = true;
-                                break;
+                            if (isset($scale['attemps'])) {
+                                if (!(isset($attempt[$scale['id']]) && $attempt[$scale['id']] >= $scale['attemps'])) {
+                                    $attemptpass = false;
+                                }
                             }
                         }
-                        $start += $steps;
+                        if ($recordpass && $attemptpass) {
+                            $passcatquiz = true;
+                            break;
+                        }
                     }
-                    $catquizzes[$complitionnode['id']] = $passcatquiz;
+                    $catquizzes['completed'][$complitionnode['id']] = $passcatquiz;
                 } else {
-                    $catquizzes[$complitionnode['id']] = false;
+                    $catquizzes['completed'][$complitionnode['id']] = false;
                 }
             }
         }
@@ -203,20 +210,16 @@ class catquiz implements course_completion {
      * @param int $instanceid
      * @param int $courseid
      * @param int $userid
-     * @param int $start
-     * @param int $steps
      * @return object
      */
-    private function get_modquiz_records($instanceid, $courseid, $userid, $start, $steps) {
+    private function get_modquiz_records($instanceid, $courseid, $userid) {
         global $DB;
         return $DB->get_records_select(
             'local_catquiz_attempts',
             'instanceid = :instanceid AND courseid = :courseid AND userid = :userid',
             ['instanceid' => $instanceid, 'courseid' => $courseid, 'userid' => $userid],
             'timemodified DESC',
-            'attemptid, contextid, userid, endtime, timemodified, json',
-            $start,
-            $steps
+            'attemptid, contextid, userid, endtime, timemodified, json'
         );
     }
 

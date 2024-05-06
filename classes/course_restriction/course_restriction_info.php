@@ -57,7 +57,6 @@ class course_restriction_info {
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_restriction/conditions/*.php';
         $filelist = glob($path);
-
         $conditions = [];
 
         // We just want filenames, as they are also the classnames.

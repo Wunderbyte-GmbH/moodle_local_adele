@@ -27,6 +27,7 @@ const  addAutoCompletions = (node, store) => {
             "data": {
               "description": store.state.strings.course_description_condition_course_completed,
               "description_before": store.state.strings.course_description_before_condition_course_completed,
+              "description_inbetween": store.state.strings.course_description_inbetween_condition_course_completed,
               "description_after": store.state.strings.course_description_after_condition_course_completed,
               "id": 150,
               "label": "course_completed",
@@ -44,7 +45,7 @@ const  addAutoCompletions = (node, store) => {
             ],
             "position": {
               "x": 683,
-              "y": 245
+              "y": 445
             },
             "type": "custom"
           },
@@ -54,8 +55,10 @@ const  addAutoCompletions = (node, store) => {
               "visibility": true,
               "feedback_before": "",
               "feedback_after": "",
+              "feedback_inbetween": "",
               "feedback_before_checkmark": true,
               "feedback_after_checkmark": true,
+              "feedback_inbetween_checkmark": true,
             },
             "draggable": false,
             "deletable": false,

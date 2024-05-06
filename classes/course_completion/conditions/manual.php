@@ -74,6 +74,7 @@ class manual implements course_completion {
             'description' => $description,
             'description_before' => self::get_completion_description_before(),
             'description_after' => self::get_completion_description_after(),
+            'description_inbetween' => self::get_completion_description_inbetween(),
             'label' => $label,
         ];
     }
@@ -111,6 +112,15 @@ class manual implements course_completion {
      *
      * @return string
      */
+    public function get_completion_description_inbetween() {
+        return get_string('course_description_inbetween_completion_manual', 'local_adele');
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     *
+     * @return string
+     */
     private function get_name_string() {
         $description = get_string('course_name_condition_completion_manual', 'local_adele');
         return $description;
@@ -123,11 +133,16 @@ class manual implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
+        $coursecompletion = [
+          'completed' => false,
+          'inbetween_info' => 'unchecked',
+        ];
         if (isset($node['data']['manualcompletion'] ) && $node['data']['manualcompletion']
             && $node['data']['manualcompletionvalue']) {
-            return true;
+            $coursecompletion['completed'] = true;
+            $coursecompletion['inbetween_info'] = 'checked';
         }
-        return false;
+        return $coursecompletion;
     }
 
     /**

@@ -95,4 +95,10 @@ interface course_completion {
      */
     public function get_completion_description_after();
 
+    /**
+     * It returns a description after completion
+     *
+     * @return int Information array of importancy.
+     */
+    public function get_completion_description_inbetween();
 }
