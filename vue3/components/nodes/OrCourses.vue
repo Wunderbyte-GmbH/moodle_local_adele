@@ -190,9 +190,8 @@ const childStyle = {
               class="icon-link"
               @click="setPretestView"
             >
-              <i class="" />
               <i 
-                :class="store.state.version ? 'fa fa-bars-progress' : 'fa fa-tasks'" 
+                class="fa fa-tasks'" 
               />
             </button>
             <button 

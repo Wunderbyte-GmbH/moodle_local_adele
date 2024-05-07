@@ -224,7 +224,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
             class="list-group-item"
           >
             <i
-              :class="store.state.version ? 'fa-solid fa-bars-progress' : 'fa fa-tasks'" 
+              class="fa fa-tasks" 
             />
             <b>
               Completion

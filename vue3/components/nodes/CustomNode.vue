@@ -174,7 +174,7 @@ const childStyle = {
               @click="setPretestView"
             >
               <i 
-                :class="store.state.version ? 'fa fa-bars-progress' : 'fa fa-tasks'" 
+                class="fa fa-tasks" 
               />
             </button>
             <button 
