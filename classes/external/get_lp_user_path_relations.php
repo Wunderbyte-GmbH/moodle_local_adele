@@ -72,6 +72,7 @@ class get_lp_user_path_relations extends external_api {
      * @return array
      */
     public static function execute($userid, $learningpathid, $contextid): array {
+        echo("here");
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
