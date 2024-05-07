@@ -308,8 +308,6 @@ class learning_paths {
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
         echo("records");
-        echo($records);
-
         foreach ($records as $record) {
             $record->json = json_decode($record->json);
             $progress = self::getnodeprogress($record->json);
@@ -322,7 +320,6 @@ class learning_paths {
             ];
         }
         echo("userpathlist");
-        echo($userpathlist);
         return $userpathlist;
     }
 
