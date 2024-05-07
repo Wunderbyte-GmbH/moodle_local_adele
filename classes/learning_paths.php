@@ -34,6 +34,7 @@ use local_adele\event\learnpath_deleted;
 use local_adele\event\user_path_updated;
 use local_adele\helper\user_path_relation;
 use core_completion\progress;
+use Exception;
 use moodle_url;
 
 /**
@@ -308,6 +309,7 @@ class learning_paths {
         foreach ($records as $record) {
             $record->json = json_decode($record->json);
             $progress = self::getnodeprogress($record->json);
+            echo('a');
             $userpathlist[] = [
                 'id' => (int)$record->user_id ?? null,
                 'username' => $record->username ?? null,
@@ -326,56 +328,64 @@ class learning_paths {
      * @return array
      */
     public static function getnodeprogress($relationnodes) {
-        $validnodes = 0;
-        $totalnodes = 0;
-        if (isset($relationnodes->user_path_relation)) {
-            foreach ($relationnodes->user_path_relation as $key => $node) {
-                if (strstr($key , '_module') == false) {
-                    if ($node->completionnode->valid) {
-                        $validnodes++;
+        try {
+            $validnodes = 0;
+            $totalnodes = 0;
+            if (isset($relationnodes->user_path_relation)) {
+                foreach ($relationnodes->user_path_relation as $key => $node) {
+                    if (strstr($key , '_module') == false) {
+                        if ($node->completionnode->valid) {
+                            $validnodes++;
+                        }
+                        $totalnodes++;
                     }
-                    $totalnodes++;
                 }
             }
-        }
-        $pathnodes = $relationnodes->tree->nodes ?? null;
-        $startingcondition = "starting_node";
-        $paths = [];
-        if ($pathnodes) {
-            foreach ($pathnodes as $node) {
-                $node = (array)$node;
-                if (
-                    isset($node['parentCourse']) &&
-                    is_array($node['parentCourse']) &&
-                    in_array($startingcondition, $node['parentCourse'])
-                  ) {
-                    self::findpaths($node, [], $paths, $pathnodes);
+            $pathnodes = $relationnodes->tree->nodes ?? null;
+            $startingcondition = "starting_node";
+            $paths = [];
+            if ($pathnodes) {
+                foreach ($pathnodes as $node) {
+                    $node = (array)$node;
+                    if (
+                        isset($node['parentCourse']) &&
+                        is_array($node['parentCourse']) &&
+                        in_array($startingcondition, $node['parentCourse'])
+                      ) {
+                        self::findpaths($node, [], $paths, $pathnodes);
+                    }
                 }
             }
-        }
+            // Filter paths ending with childCondition null.
+            $filteredpaths = array_filter($paths, function ($path) use ($pathnodes) {
+                $lastnode = self::findNodeById(end($path), $pathnodes);
+                return isset($lastnode['childCourse']) && empty($lastnode['childCourse']);
+            });
+            $progress = 0;
+            foreach ($filteredpaths as $filteredpath) {
+                $completednodes = 0;
+                foreach ($filteredpath as $node) {
+                    if ($relationnodes->user_path_relation->{$node}->completionnode->valid) {
+                        $completednodes++;
+                    }
+                }
+                $pathprogression = $completednodes / count($filteredpath);
+                if ($pathprogression > $progress) {
+                    $progress = $pathprogression;
+                }
+            }
+            return [
+                'completed_nodes' => $validnodes . '/' . $totalnodes,
+                'progress' => round(100 * $progress, 2),
+            ];
 
-        // Filter paths ending with childCondition null.
-        $filteredpaths = array_filter($paths, function ($path) use ($pathnodes) {
-            $lastnode = self::findNodeById(end($path), $pathnodes);
-            return isset($lastnode['childCourse']) && empty($lastnode['childCourse']);
-        });
-        $progress = 0;
-        foreach ($filteredpaths as $filteredpath) {
-            $completednodes = 0;
-            foreach ($filteredpath as $node) {
-                if ($relationnodes->user_path_relation->{$node}->completionnode->valid) {
-                    $completednodes++;
-                }
-            }
-            $pathprogression = $completednodes / count($filteredpath);
-            if ($pathprogression > $progress) {
-                $progress = $pathprogression;
-            }
+        } catch (Exception $e) {
+            debugging('Error in getnodeprogress: ' . $e->getMessage());
+            return [
+                'error' => 'An error occurred while calculating node progress',
+                'message' => $e->getMessage()
+            ];
         }
-        return [
-            'completed_nodes' => $validnodes . '/' . $totalnodes,
-            'progress' => round(100 * $progress, 2),
-        ];
     }
 
     /**
