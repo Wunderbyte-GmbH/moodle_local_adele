@@ -306,19 +306,26 @@ class learning_paths {
 
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
-        foreach ($records as $record) {
-            $record->json = json_decode($record->json);
-            $progress = self::getnodeprogress($record->json);
-            echo('a');
-            $userpathlist[] = [
-                'id' => (int)$record->user_id ?? null,
-                'username' => $record->username ?? null,
-                'firstname' => $record->firstname ?? null,
-                'lastname' => $record->lastname ?? null,
-                'progress' => $progress ?? null,
+        try {
+            foreach ($records as $record) {
+                $record->json = json_decode($record->json);
+                $progress = self::getnodeprogress($record->json);
+                $userpathlist[] = [
+                    'id' => (int)$record->user_id ?? null,
+                    'username' => $record->username ?? null,
+                    'firstname' => $record->firstname ?? null,
+                    'lastname' => $record->lastname ?? null,
+                    'progress' => $progress ?? null,
+                ];
+            }
+            return $userpathlist;
+        } catch (Exception $e) {
+            debugging('Error in getnodeprogress: ' . $e->getMessage());
+            return [
+                'error' => 'An error occurred while calculating node progress',
+                'message' => $e->getMessage()
             ];
         }
-        return $userpathlist;
     }
 
     /**
