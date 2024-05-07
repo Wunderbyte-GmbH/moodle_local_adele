@@ -305,19 +305,20 @@ class learning_paths {
 
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
-        var_dump($records);
         foreach ($records as $record) {
             $record->json = json_decode($record->json);
+            echo("userpathlist");
+
             $progress = self::getnodeprogress($record->json);
+            echo("after progress");
             $userpathlist[] = [
-                'id' => (int)$record->user_id,
-                'username' => $record->username,
-                'firstname' => $record->firstname,
-                'lastname' => $record->lastname,
-                'progress' => $progress,
+                'id' => (int)$record->user_id ?? null,
+                'username' => $record->username ?? null,
+                'firstname' => $record->firstname ?? null,
+                'lastname' => $record->lastname ?? null,
+                'progress' => $progress ?? null,
             ];
         }
-        echo("userpathlist");
         return $userpathlist;
     }
 
