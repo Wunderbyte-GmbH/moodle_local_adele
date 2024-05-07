@@ -307,10 +307,7 @@ class learning_paths {
         $records = $DB->get_records_sql($sql, $params);
         foreach ($records as $record) {
             $record->json = json_decode($record->json);
-            echo("userpathlist");
-
             $progress = self::getnodeprogress($record->json);
-            echo("after progress");
             $userpathlist[] = [
                 'id' => (int)$record->user_id ?? null,
                 'username' => $record->username ?? null,
@@ -331,26 +328,29 @@ class learning_paths {
     public static function getnodeprogress($relationnodes) {
         $validnodes = 0;
         $totalnodes = 0;
-        foreach ($relationnodes->user_path_relation as $key => $node) {
-            if (strstr($key , '_module') == false) {
-                if ($node->completionnode->valid) {
-                    $validnodes++;
+        if (isset($relationnodes->user_path_relation)) {
+            foreach ($relationnodes->user_path_relation as $key => $node) {
+                if (strstr($key , '_module') == false) {
+                    if ($node->completionnode->valid) {
+                        $validnodes++;
+                    }
+                    $totalnodes++;
                 }
-                $totalnodes++;
             }
         }
-        $pathnodes = $relationnodes->tree->nodes;
+        $pathnodes = $relationnodes->tree->nodes ?? null;
         $startingcondition = "starting_node";
         $paths = [];
-
-        foreach ($pathnodes as $node) {
-            $node = (array)$node;
-            if (
-                isset($node['parentCourse']) &&
-                is_array($node['parentCourse']) &&
-                in_array($startingcondition, $node['parentCourse'])
-              ) {
-                self::findpaths($node, [], $paths, $pathnodes);
+        if ($pathnodes) {
+            foreach ($pathnodes as $node) {
+                $node = (array)$node;
+                if (
+                    isset($node['parentCourse']) &&
+                    is_array($node['parentCourse']) &&
+                    in_array($startingcondition, $node['parentCourse'])
+                  ) {
+                    self::findpaths($node, [], $paths, $pathnodes);
+                }
             }
         }
 
