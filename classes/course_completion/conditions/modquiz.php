@@ -187,7 +187,7 @@ class modquiz implements course_completion {
         return $DB->get_records_select(
             'quiz_grades',
             'quiz = :quiz AND userid = :userid',
-            ['quiz' => $completion['data']['value']['quizid'], 'userid' => $userid],
+            ['quiz' => $completion['data']['value']['quizid'] ?? 0, 'userid' => $userid],
             'timemodified DESC',
             'grade'
         );

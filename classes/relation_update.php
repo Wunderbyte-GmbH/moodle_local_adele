@@ -166,8 +166,11 @@ class relation_update {
         foreach ($node['completion']['nodes'] as $completionnode) {
             $failedcompletion = false;
             $validationconditionstring = [];
-            if (isset($completionnode['parentCondition']) &&
-                $completionnode['parentCondition'][0] == 'starting_condition') {
+            if (
+                isset($completionnode['parentCondition']) &&
+                isset($completioncriteria['completed']) &&
+                $completionnode['parentCondition'][0] == 'starting_condition'
+                ) {
                 $currentcondition = $completionnode;
                 $validationcondition = false;
                 while ( $currentcondition ) {
@@ -322,10 +325,12 @@ class relation_update {
                 }
             }
         }
-        foreach ($node['restriction']['nodes'] as $restrictionnode) {
-            if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
-                $feedbacks['restriction']['before'][] =
-                  isset($restrictionnode['data']['feedback_before']) ? $restrictionnode['data']['feedback_before'] : '';
+        if (isset($node['restriction'])) {
+            foreach ($node['restriction']['nodes'] as $restrictionnode) {
+                if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
+                    $feedbacks['restriction']['before'][] =
+                      isset($restrictionnode['data']['feedback_before']) ? $restrictionnode['data']['feedback_before'] : '';
+                }
             }
         }
         return $feedbacks;
