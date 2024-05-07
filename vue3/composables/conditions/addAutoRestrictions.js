@@ -50,7 +50,7 @@ function createRestriction (node_id, parent_node_id, store) {
           "id": 150,
           "label": "parent_node_completed",
           "name": store.state.strings.course_name_condition_parent_node_completed,
-          "node_id": node_id,
+          "node_id": 'condition_1',
           "value": {
             "node_id": parent_node_id
           },
