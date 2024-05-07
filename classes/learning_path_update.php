@@ -73,6 +73,7 @@ class learning_path_update {
      *
      * @param string $newtree
      * @param string $oldtree
+     * @param string $userid
      * @return array
      */
     public static function passnodevalues($newtree, $oldtree, $userid) {
