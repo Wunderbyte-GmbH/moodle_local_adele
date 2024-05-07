@@ -115,7 +115,7 @@ class timed implements course_restriction {
         $timed = [];
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if ($restrictionnode['data']['label'] == 'timed') {
+                if (isset($restriction['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
                     $validstart = true;
                     $validtime = false;
                     $currenttimestamp = new DateTime();
@@ -140,6 +140,11 @@ class timed implements course_restriction {
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
                       'starttime' => $startdate ?? null,
                       'endtime' => $enddate ?? null,
+                    ];
+                } else {
+                    $timed[$restrictionnode['id']] = [
+                      'completed' => false,
+                      'inbetween_info' => null,
                     ];
                 }
             }

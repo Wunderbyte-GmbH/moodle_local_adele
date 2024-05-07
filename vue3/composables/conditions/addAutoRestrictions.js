@@ -24,12 +24,29 @@ const  addAutoRestrictions = (newNode, oldNode, relation, store) => {
 function createRestriction (node_id, parent_node_id, store) {
 
   return {
-    "edges": [],
+    "edges": [
+      {
+        "data": {},
+        "deletable": false,
+        "events": {},
+        "id": "condition_1-condition_feedback",
+        "source": "condition_1",
+        "sourceHandle": "target_and",
+        "sourceX": 858,
+        "sourceY": 241,
+        "target": "condition_1_feedback",
+        "targetHandle": "source_feedback",
+        "targetX": 858,
+        "targetY": 199,
+        "type": "default"
+      }
+    ],
     "nodes": [
       {
         "childCondition": [],
         "data": {
           "description": store.state.strings.course_description_condition_parent_node_completed,
+          "description_before": store.state.strings.course_restricition_before_condition_parent_node_completed,
           "id": 150,
           "label": "parent_node_completed",
           "name": store.state.strings.course_name_condition_parent_node_completed,
@@ -48,10 +65,28 @@ function createRestriction (node_id, parent_node_id, store) {
           "starting_condition"
         ],
         "position": {
-          "x": 735,
+          "x": 683,
           "y": 247.5
         },
         "type": "custom"
+      },
+      {
+        "data": {
+          "childCondition": 'condition_1',
+          "visibility": true,
+          "feedback_before": "",
+          "feedback_before_checkmark": true,
+        },
+        "draggable": false,
+        "deletable": false,
+        "events": {},
+        "id": "condition_1_feedback",
+        "label": store.state.strings.composables_feedback_node,
+        "position": {
+          "x": 683,
+          "y": -100
+        },
+        "type": "feedback"
       }
     ],
     "position": [

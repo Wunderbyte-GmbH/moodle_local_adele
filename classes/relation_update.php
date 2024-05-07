@@ -65,7 +65,7 @@ class relation_update {
                     foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
                         $failedrestriction = false;
                         $validationconditionstring = [];
-                        if ($restrictionnodepath['parentCondition'][0] == 'starting_condition') {
+                        if (isset($restrictionnodepath['parentCondition']) && $restrictionnodepath['parentCondition'][0] == 'starting_condition') {
                             $currentcondition = $restrictionnodepath;
                             $validationcondition = false;
                             while ( $currentcondition ) {
@@ -76,12 +76,15 @@ class relation_update {
                                     $currentcondition['data']['label'] == 'parent_courses') {
                                     $currcondi = $currentcondition['id'];
                                     $validationcondition =
-                                        $restrictioncriteria[$currlabel]['completed'][$currcondi];
+                                        $restrictioncriteria[$currlabel]['completed'][$currcondi] ?? false;
                                     $singlerestrictionnode[$currentcondition['data']['label']
                                         . '_' . $currentcondition['id']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label']
                                         . '_' . $currentcondition['id'];
-                                } else if ($currentcondition['data']['label'] == 'parent_node_completed') {
+                                } else if (
+                                  isset($restrictioncriteria[$currlabel]['completed']) &&
+                                  $currentcondition['data']['label'] == 'parent_node_completed'
+                                  ) {
                                     foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
                                         $parentcompletioncriteria = course_completion_status::get_condition_status(
                                           $parentnode,
@@ -101,7 +104,8 @@ class relation_update {
                                     $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label'];
                                 } else {
-                                    $validationcondition = $restrictioncriteria[$currentcondition['data']['label']]['completed'];
+                                    $validationcondition =
+                                      $restrictioncriteria[$currentcondition['data']['label']]['completed'] ?? false;
                                     $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                     $validationconditionstring[] = $currentcondition['data']['label'];
                                 }
@@ -178,12 +182,14 @@ class relation_update {
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
-                        foreach ($completioncriteria['completed'][$label] as $coursecompleted) {
-                            if ($coursecompleted) {
-                                $completednodecourses += 1;
-                                if (!isset($completionnode['data']['value']) || $completionnode['data']['value'] == null) {
-                                    $validationcondition = true;
-                                    $validationconditionstring[] = $label;
+                        if (isset($completioncriteria['completed'])) {
+                            foreach ($completioncriteria['completed'][$label] as $coursecompleted) {
+                                if ($coursecompleted) {
+                                    $completednodecourses += 1;
+                                    if (!isset($completionnode['data']['value']) || $completionnode['data']['value'] == null) {
+                                        $validationcondition = true;
+                                        $validationconditionstring[] = $label;
+                                    }
                                 }
                             }
                         }
@@ -201,7 +207,7 @@ class relation_update {
                         if (!$mode) {
                             $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                         }
-                        $validationcondition = $completioncriteria['completed'][$label];
+                        $validationcondition = $completioncriteria['completed'][$label] ?? false;
                         $singlecompletionnode[$label] = $validationcondition;
                         $validationconditionstring[] = $label;
                     }

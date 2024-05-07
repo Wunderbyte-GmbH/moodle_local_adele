@@ -151,7 +151,7 @@ class course_completed implements course_completion {
             }
             $coursecompletion['completed'][$courseid] = $completed;
         }
-        $coursecompletion['inbetween_info'] = $node['data']['progress'];
+        $coursecompletion['inbetween_info'] = $node['data']['progress'] ?? '0';
         return $coursecompletion;
     }
 
