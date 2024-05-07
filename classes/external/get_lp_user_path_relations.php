@@ -80,8 +80,7 @@ class get_lp_user_path_relations extends external_api {
 
         require_login();
 
-        $context = context::instance_by_id($contextid);
-        require_capability('local/adele:view', $context);
+
 
         return learning_paths::get_learning_user_relations($params);
     }
