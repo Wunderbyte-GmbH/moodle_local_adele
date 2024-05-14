@@ -117,7 +117,7 @@ class timed_duration implements course_restriction {
         $currenttime->setTimestamp(time());
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if (isset($restriction['data']['label']) && $restrictionnode['data']['label'] == 'timed_duration') {
+                if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed_duration') {
                     $iscurrenttimeinrange = false;
                     $starttime = new DateTime();
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {

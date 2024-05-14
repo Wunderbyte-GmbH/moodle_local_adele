@@ -115,7 +115,7 @@ class timed implements course_restriction {
         $timed = [];
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if (isset($restriction['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
+                if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
                     $validstart = true;
                     $validtime = false;
                     $currenttimestamp = new DateTime();
@@ -138,8 +138,8 @@ class timed implements course_restriction {
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
-                      'starttime' => $startdate ?? null,
-                      'endtime' => $enddate ?? null,
+                      'starttime' => $startdate->format('Y-m-d H:i:s') ?? null,
+                      'endtime' => $enddate->format('Y-m-d H:i:s') ?? null,
                     ];
                 } else {
                     $timed[$restrictionnode['id']] = [
@@ -156,7 +156,7 @@ class timed implements course_restriction {
      * Helper function to return localized description strings.
      * @param string $datestring
      * @param string $format
-     * @return boolean
+     * @return object
      */
     public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
         $datetime = DateTime::createFromFormat($format, $datestring);

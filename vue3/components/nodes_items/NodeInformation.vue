@@ -1,7 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { includes } from '@egjs/vue3-flicking';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -11,7 +10,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
     },
     parentnode: {
       type: Object,
-      required: true,
+      required: true, 
     },
   });
   const store = useStore();
@@ -39,19 +38,21 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
     Object.entries(props.data.completion.restrictioncriteria).forEach(([key, value]) => {
       if (key.includes('timed')) {
         Object.entries(value).forEach(([condition, times]) => {
-          Object.entries(times.inbetween_info).forEach(([start_end, time]) => {
-            if (
-              start_end == 'starttime' &&
-              (return_date.start_date == null ||return_date.start_date > time)
+          if (times.inbetween_info != undefined) {
+            Object.entries(times.inbetween_info).forEach(([start_end, time]) => {
+              if (
+                start_end == 'starttime' &&
+                (return_date.start_date == null ||return_date.start_date > time)
+                ) {
+                  return_date.start_date = time
+              } else if (
+                start_end == 'endtime' &&
+                (return_date.end_date == null ||return_date.end_date > time)
               ) {
-                return_date.start_date = time
-            } else if (
-              start_end == 'endtime' &&
-              (return_date.end_date == null ||return_date.end_date > time)
-            ) {
-              return_date.end_date = time
-            }
-          });
+                return_date.end_date = time
+              }
+            });
+          }
         });
       }
     });
@@ -75,8 +76,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
       hour12: false
     };
     Object.entries(return_date).forEach(([type, dateString]) => {
-      const date = new Date(dateString);
-      return_date[type] = date.toLocaleDateString('en-US', options);
+      if (dateString != undefined) {
+        const date = new Date(dateString);
+        return_date[type] = date.toLocaleDateString('en-US', options);
+      }
     })
     return return_date;
   }

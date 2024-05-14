@@ -32,6 +32,7 @@ use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
+use local_adele\helper\node_times_subscription;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -134,19 +135,40 @@ class relation_update {
                 }
                 $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
                 $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
-                $userpath->json['user_path_relation'][$node['id']] = [
-                    'completioncriteria' => $completioncriteria,
-                    'completionnode' => $completionnode,
-                    'singlecompletionnode' => $validatenodecompletion['singlecompletionnode'],
-                    'restrictioncriteria' => $restrictioncriteria,
-                    'restrictionnode' => $restrictionnode,
-                    'singlerestrictionnode' => $singlerestrictionnode,
-                    'feedback' => $validatenodecompletion['feedback'],
-                ];
+                $getoldcompletion =
+                  self::checkcondition($completionnode, $userpath->json['user_path_relation'][$node['id']]['completionnode']);
+                $getoldrestriction =
+                  self::checkcondition($restrictionnode, $userpath->json['user_path_relation'][$node['id']]['restrictionnode']);
+
+                if (!$getoldrestriction) {
+                    $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
+                    $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;
+                    $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
+                }
+                if (!$getoldcompletion) {
+                    $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
+                    $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
+                    $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] = $validatenodecompletion['singlecompletionnode'];
+                    $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
+                }
             }
             $userpathrelationhelper = new user_path_relation();
             $userpathrelationhelper->revision_user_path_relation($userpath);
         }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param  Array $newcompletion
+     * @param  Array $oldcompletion
+     * @return bool
+     */
+    public static function checkcondition($newcompletion, $oldcompletion) {
+        if (!$newcompletion['valid'] && $oldcompletion['valid']) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -168,7 +190,6 @@ class relation_update {
             $validationconditionstring = [];
             if (
                 isset($completionnode['parentCondition']) &&
-                isset($completioncriteria['completed']) &&
                 $completionnode['parentCondition'][0] == 'starting_condition'
                 ) {
                 $currentcondition = $completionnode;
@@ -210,7 +231,7 @@ class relation_update {
                         if (!$mode) {
                             $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                         }
-                        $validationcondition = $completioncriteria['completed'][$label] ?? false;
+                        $validationcondition = $completioncriteria[$label]['completed'] ?? false;
                         $singlecompletionnode[$label] = $validationcondition;
                         $validationconditionstring[] = $label;
                     }
@@ -379,14 +400,15 @@ class relation_update {
                             ['enrol' => 'manual', 'courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED],
                             'sortorder,id ASC'
                         )) {
-                        break; // No manual enrolment instance on this course.
+                        //break; // No manual enrolment instance on this course.
                     }
                     if (!isset($node['data']['first_enrolled'])) {
                         $node['data']['first_enrolled'] = time();
                         $firstenrollededit = true;
                     }
                     $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                    $enrol->enrol_user($instance, $userpath->user_id);
+                    $times = node_times_subscription::get_node_times_subscription($node);
+                    $enrol->enrol_user($instance, $userpath->user_id, null);
                 }
             }
         }

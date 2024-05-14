@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use local_adele\helper\node_times_subscription;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
@@ -72,7 +74,8 @@ class node_completion {
                         $node->data->first_enrolled = time();
                         $firstenrollededit = true;
                     }
-                    $enrol->enrol_user($instance, $event->other['userpath']->user_id);
+                    $times = node_times_subscription::get_node_times_subscription($node);
+                    $enrol->enrol_user($instance, $event->other['userpath']->user_id, null);
                 }
             }
         }
