@@ -32,7 +32,6 @@ use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
-use local_adele\helper\node_times_subscription;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,107 +56,109 @@ class relation_update {
         $userpath = $event->other['userpath'];
         if ($userpath) {
             self::subscribe_user_starting_node($userpath);
-            foreach ($userpath->json['tree']['nodes'] as $node) {
-                $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
-                $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
-                $restrictionnodepaths = [];
-                $singlerestrictionnode = [];
-                if (isset($node['restriction'])) {
-                    foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
-                        $failedrestriction = false;
-                        $validationconditionstring = [];
-                        if (
-                          isset($restrictionnodepath['parentCondition']) &&
-                          $restrictionnodepath['parentCondition'][0] == 'starting_condition'
-                        ) {
-                            $currentcondition = $restrictionnodepath;
-                            $validationcondition = false;
-                            while ( $currentcondition ) {
-                                $currlabel = $currentcondition['data']['label'];
-                                if ($currentcondition['data']['label'] == 'timed' ||
-                                    $currentcondition['data']['label'] == 'timed_duration' ||
-                                    $currentcondition['data']['label'] == 'specific_course' ||
-                                    $currentcondition['data']['label'] == 'parent_courses') {
-                                    $currcondi = $currentcondition['id'];
-                                    $validationcondition =
-                                        $restrictioncriteria[$currlabel]['completed'][$currcondi] ?? false;
-                                    $singlerestrictionnode[$currentcondition['data']['label']
-                                        . '_' . $currentcondition['id']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label']
-                                        . '_' . $currentcondition['id'];
-                                } else if (
-                                  isset($restrictioncriteria[$currlabel]['completed']) &&
-                                  $currentcondition['data']['label'] == 'parent_node_completed'
-                                  ) {
-                                    foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
-                                        $parentcompletioncriteria = course_completion_status::get_condition_status(
-                                          $parentnode,
-                                          $userpath->user_id
-                                        );
-                                        $parentnode = self::validatenodecompletion(
-                                            $parentnode,
-                                            $parentcompletioncriteria,
-                                            $userpath,
-                                            $restrictionnodepaths,
-                                            0
-                                        );
-                                        if ($parentnode) {
-                                            $validationcondition = true;
+            if (!empty($userpath->json['tree']['nodes'])) {
+                foreach ($userpath->json['tree']['nodes'] as $node) {
+                    $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
+                    $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
+                    $restrictionnodepaths = [];
+                    $singlerestrictionnode = [];
+                    if (isset($node['restriction'])) {
+                        foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
+                            $failedrestriction = false;
+                            $validationconditionstring = [];
+                            if (
+                              isset($restrictionnodepath['parentCondition']) &&
+                              $restrictionnodepath['parentCondition'][0] == 'starting_condition'
+                            ) {
+                                $currentcondition = $restrictionnodepath;
+                                $validationcondition = false;
+                                while ( $currentcondition ) {
+                                    $currlabel = $currentcondition['data']['label'];
+                                    if ($currentcondition['data']['label'] == 'timed' ||
+                                        $currentcondition['data']['label'] == 'timed_duration' ||
+                                        $currentcondition['data']['label'] == 'specific_course' ||
+                                        $currentcondition['data']['label'] == 'parent_courses') {
+                                        $currcondi = $currentcondition['id'];
+                                        $validationcondition =
+                                            $restrictioncriteria[$currlabel]['completed'][$currcondi] ?? false;
+                                        $singlerestrictionnode[$currentcondition['data']['label']
+                                            . '_' . $currentcondition['id']] = $validationcondition;
+                                        $validationconditionstring[] = $currentcondition['data']['label']
+                                            . '_' . $currentcondition['id'];
+                                    } else if (
+                                      isset($restrictioncriteria[$currlabel]['completed']) &&
+                                      $currentcondition['data']['label'] == 'parent_node_completed'
+                                      ) {
+                                        foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
+                                            $parentcompletioncriteria = course_completion_status::get_condition_status(
+                                              $parentnode,
+                                              $userpath->user_id
+                                            );
+                                            $parentnode = self::validatenodecompletion(
+                                                $parentnode,
+                                                $parentcompletioncriteria,
+                                                $userpath,
+                                                $restrictionnodepaths,
+                                                0
+                                            );
+                                            if ($parentnode) {
+                                                $validationcondition = true;
+                                            }
                                         }
+                                        $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                                        $validationconditionstring[] = $currentcondition['data']['label'];
+                                    } else {
+                                        $validationcondition =
+                                          $restrictioncriteria[$currentcondition['data']['label']]['completed'] ?? false;
+                                        $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                                        $validationconditionstring[] = $currentcondition['data']['label'];
                                     }
-                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label'];
-                                } else {
-                                    $validationcondition =
-                                      $restrictioncriteria[$currentcondition['data']['label']]['completed'] ?? false;
-                                    $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
-                                    $validationconditionstring[] = $currentcondition['data']['label'];
+                                    // Check if the conditon is true and break if one condition is not met.
+                                    if (!$validationcondition) {
+                                        $failedrestriction = true;
+                                    }
+                                    // Get next Condition and return null if no child node exsists.
+                                    $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
+                                        $currentcondition['childCondition'], 'id');
                                 }
-                                // Check if the conditon is true and break if one condition is not met.
-                                if (!$validationcondition) {
-                                    $failedrestriction = true;
+                                if ($validationcondition && !$failedrestriction) {
+                                    $restrictionnodepaths[] = $validationconditionstring;
                                 }
-                                // Get next Condition and return null if no child node exsists.
-                                $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
-                                    $currentcondition['childCondition'], 'id');
-                            }
-                            if ($validationcondition && !$failedrestriction) {
-                                $restrictionnodepaths[] = $validationconditionstring;
                             }
                         }
                     }
+                    if (isset($node['completion'])) {
+                        $validatenodecompletion = self::validatenodecompletion(
+                            $node,
+                            $completioncriteria,
+                            $userpath,
+                            $restrictionnodepaths,
+                            1
+                        );
+                    }
+                    $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
+                    $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
+                    $getoldcompletion =
+                      self::checkcondition($completionnode, $userpath->json['user_path_relation'][$node['id']]['completionnode']);
+                    $getoldrestriction =
+                      self::checkcondition($restrictionnode, $userpath->json['user_path_relation'][$node['id']]['restrictionnode']);
+    
+                    if (!$getoldrestriction) {
+                        $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
+                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;
+                        $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
+                    }
+                    if (!$getoldcompletion) {
+                        $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
+                        $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
+                        $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
+                          $validatenodecompletion['singlecompletionnode'];
+                        $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
+                    }
                 }
-                if (isset($node['completion'])) {
-                    $validatenodecompletion = self::validatenodecompletion(
-                        $node,
-                        $completioncriteria,
-                        $userpath,
-                        $restrictionnodepaths,
-                        1
-                    );
-                }
-                $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
-                $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
-                $getoldcompletion =
-                  self::checkcondition($completionnode, $userpath->json['user_path_relation'][$node['id']]['completionnode']);
-                $getoldrestriction =
-                  self::checkcondition($restrictionnode, $userpath->json['user_path_relation'][$node['id']]['restrictionnode']);
-
-                if (!$getoldrestriction) {
-                    $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
-                    $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;
-                    $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
-                }
-                if (!$getoldcompletion) {
-                    $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
-                    $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
-                    $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
-                      $validatenodecompletion['singlecompletionnode'];
-                    $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
-                }
+                $userpathrelationhelper = new user_path_relation();
+                $userpathrelationhelper->revision_user_path_relation($userpath);
             }
-            $userpathrelationhelper = new user_path_relation();
-            $userpathrelationhelper->revision_user_path_relation($userpath);
         }
     }
 
@@ -203,15 +204,15 @@ class relation_update {
                     if ($label == 'catquiz' ||
                     $label == 'modquiz') {
                         $validationcondition =
-                            $completioncriteria['completed'][$label][$currentcondition['id']];
+                            $completioncriteria[$label]['completed'][$currentcondition['id']];
                         $singlecompletionnode[$label
                             . '_' . $currentcondition['id']] = $validationcondition;
                         $validationconditionstring[] = $label
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
-                        if (isset($completioncriteria['completed'])) {
-                            foreach ($completioncriteria['completed'][$label] as $coursecompleted) {
+                        if (isset($completioncriteria[$label])) {
+                            foreach ($completioncriteria[$label]['completed'] as $coursecompleted) {
                                 if ($coursecompleted) {
                                     $completednodecourses += 1;
                                     if (!isset($completionnode['data']['value']) || $completionnode['data']['value'] == null) {
@@ -390,31 +391,39 @@ class relation_update {
     public static function subscribe_user_starting_node($userpath) {
         global $DB;
         $firstenrollededit = false;
-        foreach ($userpath->json['tree']['nodes'] as &$node) {
-            if (in_array('starting_node', $node['parentCourse'])) {
-                foreach ($node['data']['course_node_id'] as $courseid) {
-                    if (!enrol_is_enabled('manual')) {
-                        break; // Manual enrolment not enabled.
+        if (!empty($userpath->json['tree']['nodes'])) {
+            foreach ($userpath->json['tree']['nodes'] as &$node) {
+                if (in_array('starting_node', $node['parentCourse'])) {
+                    foreach ($node['data']['course_node_id'] as $courseid) {
+                        if (!enrol_is_enabled('manual')) {
+                            break; // Manual enrolment not enabled.
+                        }
+                        if (!$enrol = enrol_get_plugin('manual')) {
+                            break; // No manual enrolment plugin.
+                        }
+                        if (!isset($node['data']['first_enrolled'])) {
+                            $node['data']['first_enrolled'] = time();
+                            $firstenrollededit = true;
+                        }
+                        $instances = $DB->get_records('enrol', [
+                          'courseid' => $courseid,
+                          'enrol' => 'manual',
+                        ]);
+                        if (!$instances) {
+                            break;
+                        }
+                        $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                        $enrol->enrol_user($instance, $userpath->user_id, null);
                     }
-                    if (!$enrol = enrol_get_plugin('manual')) {
-                        break; // No manual enrolment plugin.
-                    }
-                    if (!isset($node['data']['first_enrolled'])) {
-                        $node['data']['first_enrolled'] = time();
-                        $firstenrollededit = true;
-                    }
-                    $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                    $times = node_times_subscription::get_node_times_subscription($node);
-                    $enrol->enrol_user($instance, $userpath->user_id, null);
                 }
             }
-        }
-        if ($firstenrollededit) {
-            $data = [
-                'id' => $userpath->id,
-                'json' => json_encode($userpath->json),
-            ];
-            $DB->update_record('local_adele_path_user', $data);
+            if ($firstenrollededit) {
+                $data = [
+                    'id' => $userpath->id,
+                    'json' => json_encode($userpath->json),
+                ];
+                $DB->update_record('local_adele_path_user', $data);
+            }
         }
     }
 }

@@ -347,6 +347,8 @@ function onDrop(event) {
         targetHandle: targetHandle,
         type: 'condition',
         data: edgeData,
+        draggable: false,
+        deletable: false,
       };
       // Add the new edge
       addEdges([newEdge]);

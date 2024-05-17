@@ -30,7 +30,6 @@ import { useStore } from 'vuex'
 import CompletionOutPutItem from '../completion/CompletionOutPutItem.vue'
 import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import UserInformation from '../nodes_items/UserInformation.vue';
-import NodeFeedbackArea from '../nodes_items/NodeFeedbackArea.vue'
 import CourseCarousel from '../nodes_items/CourseCarousel.vue'
 import CourseCompletion from '../nodes_items/CourseCompletion.vue'
 import ProgressBar from '../nodes_items/ProgressBar.vue'

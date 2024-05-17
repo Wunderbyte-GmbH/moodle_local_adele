@@ -60,6 +60,22 @@
     return return_date;
   })
 
+  const subscribbed_date = computed(() => {
+    let subscribbed_date = null
+    if (props.data.first_enrolled) {
+      const date = new Date(props.data.first_enrolled * 1000); 
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    }
+    return subscribbed_date;
+  })
+
   const completion_inbetween = computed(() => {
     return props.data.completion.feedback.completion.inbetween
   })
@@ -200,6 +216,15 @@
                 End Date:
               </b>
               {{ ending_date.end_date }}
+            </div>
+            <div 
+              v-if="subscribbed_date"
+              class="list-group-text"
+            >
+              <b>
+                First subscribbed to node:
+              </b>
+              {{ subscribbed_date }}
             </div>
           </li>
           <li

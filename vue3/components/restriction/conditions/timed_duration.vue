@@ -53,7 +53,6 @@
         </option>
       </select>
     </div>
-
     {{ store.state.strings.nodes_warning_time_heading }}
     <TimeWarning />
   </div>
