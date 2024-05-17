@@ -1,7 +1,10 @@
 <template>
   <div class="form-check">
     <div class="input-group mb-3 d-flex flex-column align-items-center">
-      <span class="input-group-text rounded-end-0">{{ descriptions.start }}</span>
+      <span class="input-group-text rounded-end-0">
+        {{ descriptions.start }}
+        <TimeWarning />
+      </span>
       <input
         type="datetime-local"
         class="form-control"
@@ -14,7 +17,10 @@
       >
     </div>
     <div class="input-group mb-3 d-flex flex-column align-items-center">
-      <span class="input-group-text rounded-end-0">{{ descriptions.end }}</span>
+      <span class="input-group-text rounded-end-0">
+        {{ descriptions.end }}
+        <TimeWarning />
+      </span>
       <input
         type="datetime-local"
         class="form-control"
@@ -31,6 +37,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
+import TimeWarning from '../../nodes_items/TimeWarning.vue'
 
 const props = defineProps({
   modelValue: {

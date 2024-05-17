@@ -66,7 +66,10 @@ class relation_update {
                     foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
                         $failedrestriction = false;
                         $validationconditionstring = [];
-                        if (isset($restrictionnodepath['parentCondition']) && $restrictionnodepath['parentCondition'][0] == 'starting_condition') {
+                        if (
+                          isset($restrictionnodepath['parentCondition']) &&
+                          $restrictionnodepath['parentCondition'][0] == 'starting_condition'
+                        ) {
                             $currentcondition = $restrictionnodepath;
                             $validationcondition = false;
                             while ( $currentcondition ) {
@@ -148,7 +151,8 @@ class relation_update {
                 if (!$getoldcompletion) {
                     $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
                     $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
-                    $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] = $validatenodecompletion['singlecompletionnode'];
+                    $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
+                      $validatenodecompletion['singlecompletionnode'];
                     $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
                 }
             }
@@ -394,13 +398,6 @@ class relation_update {
                     }
                     if (!$enrol = enrol_get_plugin('manual')) {
                         break; // No manual enrolment plugin.
-                    }
-                    if (!$instances = $DB->get_records(
-                            'enrol',
-                            ['enrol' => 'manual', 'courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED],
-                            'sortorder,id ASC'
-                        )) {
-                        //break; // No manual enrolment instance on this course.
                     }
                     if (!isset($node['data']['first_enrolled'])) {
                         $node['data']['first_enrolled'] = time();

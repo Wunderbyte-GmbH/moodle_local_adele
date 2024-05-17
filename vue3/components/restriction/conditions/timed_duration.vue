@@ -53,12 +53,16 @@
         </option>
       </select>
     </div>
+
+    {{ store.state.strings.nodes_warning_time_heading }}
+    <TimeWarning />
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import TimeWarning from '../../nodes_items/TimeWarning.vue'
 
 const store = useStore()
 

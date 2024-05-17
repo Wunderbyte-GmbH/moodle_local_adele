@@ -301,6 +301,8 @@ $string['nodes_hide_completion'] = 'Hide Completion';
 $string['nodes_show_completion'] = 'Show Completion';
 $string['nodes_feedback'] = 'Feedback';
 $string['nodes_no_feedback'] = 'No feedback set...';
+$string['nodes_warning_time_restriction'] = 'This restriction does not overwrite the general course accessebility times. Make sure your dates do not conflict with the course dates.';
+$string['nodes_warning_time_heading'] = 'Warning!';
 
 // Nodes Items strings.
 $string['nodes_items_start'] = 'Start:';

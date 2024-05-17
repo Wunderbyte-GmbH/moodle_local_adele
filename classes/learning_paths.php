@@ -323,7 +323,7 @@ class learning_paths {
             debugging('Error in getnodeprogress: ' . $e->getMessage());
             return [
                 'error' => 'An error occurred while calculating node progress',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ];
         }
     }
@@ -390,7 +390,7 @@ class learning_paths {
             debugging('Error in getnodeprogress: ' . $e->getMessage());
             return [
                 'error' => 'An error occurred while calculating node progress',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ];
         }
     }
