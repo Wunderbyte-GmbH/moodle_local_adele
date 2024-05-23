@@ -130,6 +130,7 @@ class enrollment {
      *
      * @param int $learningpathid
      * @param int $userid
+     * @param int $courseid
      * @return array
      */
     public static function buildsqlqueryuserpath($learningpathid, $userid, $courseid) {
@@ -147,7 +148,7 @@ class enrollment {
         $params = [
             'learningpathid' => (int)$learningpathid,
             'userid' => (int)$userid,
-            'courseid' => (int)$userid,
+            'courseid' => (int)$courseid,
         ];
 
         // Using get_records_sql function to execute the query with parameters.

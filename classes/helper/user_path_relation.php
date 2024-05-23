@@ -63,22 +63,19 @@ class user_path_relation {
      * Get active user path relation.
      *
      * @param int $learningpathid
-     * @param int $courseid
      * @return object
      *
      */
-    public function get_user_path_relations($learningpathid, $courseid) {
+    public function get_user_path_relations($learningpathid) {
         global $DB;
         $sql = "SELECT *
             FROM {local_adele_path_user} lpu
             WHERE lpu.learning_path_id = :learningpathid
-            AND lpu.course_id = :courseid
             AND lpu.status = 'active'";
 
         // Providing the named parameter in the $params array.
         $params = [
             'learningpathid' => (int)$learningpathid,
-            'courseid' => (int)$courseid,
         ];
         // Using get_records_sql function to execute the query with parameters.
         $records = $DB->get_records_sql($sql, $params);

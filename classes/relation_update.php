@@ -166,6 +166,8 @@ class relation_update {
      *
      * @param  Array $newcompletion
      * @param  Array $oldcompletion
+     * @param  int $nodeid
+     * @param  int $condition
      * @return bool
      */
     public static function checkcondition($newcompletion, $oldcompletion, $nodeid, $condition) {

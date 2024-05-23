@@ -157,7 +157,7 @@ class catquiz implements course_completion {
                       $testidcourseid,
                       $userid
                     );
-                    // Get all records that pass at least one subscale
+                    // Get all records that pass at least one subscale.
                     $allpassedrecords = [];
                     foreach ($records as $record) {
                         $recordpass = false;
