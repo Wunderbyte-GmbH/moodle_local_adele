@@ -27,7 +27,6 @@
  // Import needed libraries
 import { Panel, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
-import { notify } from "@kyvg/vue3-notification";
 import { useRoute, useRouter } from 'vue-router';
 import removeModules from '../../composables/nodesHelper/removeModules';
 import { ref } from 'vue';
@@ -45,14 +44,14 @@ const showCancelConfirmation = ref(false)
     let completion = toObject();
     const route_params = route.params;
     completion = await removeModules(completion, null)
-    store.dispatch('saveUserPathRelation', { 
+    await store.dispatch('saveUserPathRelation', { 
         nodes: completion.nodes, 
         route: route_params});
-    notify({
-        title: store.state.strings.title_save,
-        text: store.state.strings.description_save,
-        type: 'success'
-    });
+
+    router.push({
+      path: '/learningpaths/edit/',
+      query: {notify: true}
+    })
  };
 
  // Cancel learning path edition and return to overview

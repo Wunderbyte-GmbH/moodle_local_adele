@@ -24,6 +24,7 @@
 
 <template>
   <div>
+    <notifications width="100%" />
     <div v-if="store.state.view=='teacher'">
       <TeacherView />
     </div>
@@ -31,7 +32,6 @@
       <StudentView />
     </div>
     <div v-else>
-      <notifications width="100%" />
       <div 
         v-if="store.state.editingadding == false &&
           store.state.editingpretest == false &&
@@ -123,7 +123,7 @@
 <script setup>
 // Import needed libraries
 import { ref, onMounted, nextTick } from 'vue'
-import { onBeforeRouteUpdate } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Completion from './completion/CompletionFlow.vue'
@@ -138,6 +138,7 @@ import { notify } from "@kyvg/vue3-notification";
 const store = useStore()
 // Load Store and Router
 const router = useRouter()
+const route = useRoute()
 
 // Define constants that will be referenced
 const goalname = ref('')
@@ -168,8 +169,20 @@ const checkRoute = (currentRoute) => {
   }
 };
 
+
 // Trigger web services on mount
 onMounted(() => {
+  if (route.query.notify) {
+    notify({
+      title: store.state.strings.title_save,
+      text: store.state.strings.description_save,
+      type: 'success',
+    });
+    router.replace({
+      path: route.path,
+      query: {}
+    });
+  }
   store.dispatch('fetchAvailablecourses');
   if(store.state.view!='student'){
     store.dispatch('fetchLearningpaths');
