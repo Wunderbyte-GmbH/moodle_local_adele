@@ -100,7 +100,8 @@ onEdgeClick(({ edge }) => {
     let totalLength = curve.value.getTotalLength()
     const initialPos = ref(targetisTarget ?? sourceisSource ? 0 : totalLength)
     let stopHandle
-    const duration_calaculated = Math.floor(totalLength / 2 / 100) * 1000
+    const duration_calaculated = totalLength  * 5
+
     const duration_maxed = duration_calaculated > 5000 ? 5000 : duration_calaculated
     const output = useTransition(initialPos, {
       duration: duration_maxed,

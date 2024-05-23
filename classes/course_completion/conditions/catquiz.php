@@ -147,16 +147,21 @@ class catquiz implements course_completion {
                 ) {
                     $componentid = $complitionnode['data']['value']['componentid'];
                     $testidcourseid = $complitionnode['data']['value']['testid_courseid'];
-                    $scales =
-                      isset($complitionnode['data']['value']['scales']) ? $complitionnode['data']['value']['scales'] : null;
+                    $scales = $complitionnode['data']['value']['scales'] ?? null;
                     $scaleids = array_map(fn($a) => $a['id'], $scales);
-
                     $passcatquiz = false;
 
-                    $records = $this->get_modquiz_records($componentid, $testidcourseid, $userid);
+                    $records = Local_catquizCatquiz::return_data_from_attemptstable(
+                      100,
+                      $componentid,
+                      $testidcourseid,
+                      $userid
+                    );
+                    // Get all records that pass at least one subscale
+                    $allpassedrecords = [];
                     foreach ($records as $record) {
-                        $recordpass = true;
-                        $attemptpass = true;
+                        $recordpass = false;
+                        $attemptpass = false;
                         $testing = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
                         $rightanswerspercentage =
                           Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
