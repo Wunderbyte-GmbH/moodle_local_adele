@@ -142,7 +142,6 @@ class relation_update {
                       self::checkcondition($completionnode, $userpath->json['user_path_relation'][$node['id']]['completionnode']);
                     $getoldrestriction =
                       self::checkcondition($restrictionnode, $userpath->json['user_path_relation'][$node['id']]['restrictionnode']);
-    
                     if (!$getoldrestriction) {
                         $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
                         $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;

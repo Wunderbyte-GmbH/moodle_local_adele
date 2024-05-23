@@ -118,8 +118,6 @@ const nodeBackgroundColor = computed(() => {
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
-const isCompletionVisible = ref(false);
-const isRestrictionVisible = ref(false);
 const isParentNode = ref(false);
 
 const parentStyle = {

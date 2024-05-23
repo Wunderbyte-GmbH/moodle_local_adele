@@ -191,7 +191,7 @@ const childStyle = {
               @click="setPretestView"
             >
               <i 
-                class="fa fa-tasks'" 
+                class="fa fa-tasks" 
               />
             </button>
             <button 
