@@ -139,9 +139,9 @@ class relation_update {
                     $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
                     $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
                     $getoldcompletion =
-                      self::checkcondition($completionnode, $userpath->json['user_path_relation'][$node['id']]['completionnode']);
+                      self::checkcondition($completionnode, $userpath->json, $node['id'], 'completionnode');
                     $getoldrestriction =
-                      self::checkcondition($restrictionnode, $userpath->json['user_path_relation'][$node['id']]['restrictionnode']);
+                      self::checkcondition($restrictionnode, $userpath->json, $node['id'], 'restrictionnode');
                     if (!$getoldrestriction) {
                         $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
                         $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;
@@ -168,8 +168,11 @@ class relation_update {
      * @param  Array $oldcompletion
      * @return bool
      */
-    public static function checkcondition($newcompletion, $oldcompletion) {
-        if (!$newcompletion['valid'] && $oldcompletion['valid']) {
+    public static function checkcondition($newcompletion, $oldcompletion, $nodeid, $condition) {
+        if (
+          isset($oldcompletion['user_path_relation'][$nodeid][$condition]) &&
+          !$newcompletion['valid'] && $oldcompletion['user_path_relation'][$nodeid][$condition]['valid']
+        ) {
             return true;
         }
         return false;

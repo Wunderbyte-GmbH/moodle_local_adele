@@ -84,6 +84,12 @@ class save_lp_user_path_relation extends external_api {
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            $params['courseid'] = $context->instanceid;
+        } else {
+            $coursecontext = $context->get_course_context();
+            $params['courseid'] = $coursecontext->instanceid;
+        }
         return learning_paths::save_learning_user_relation($params);
     }
 
@@ -94,7 +100,7 @@ class save_lp_user_path_relation extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-                'success' => new external_value(PARAM_INT, 'Item id'),
+                'success' => new external_value(PARAM_BOOL, 'Item id'),
             ]
         );
     }

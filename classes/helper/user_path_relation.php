@@ -63,19 +63,22 @@ class user_path_relation {
      * Get active user path relation.
      *
      * @param int $learningpathid
+     * @param int $courseid
      * @return object
      *
      */
-    public function get_user_path_relations($learningpathid) {
+    public function get_user_path_relations($learningpathid, $courseid) {
         global $DB;
         $sql = "SELECT *
             FROM {local_adele_path_user} lpu
             WHERE lpu.learning_path_id = :learningpathid
+            AND lpu.course_id = :courseid
             AND lpu.status = 'active'";
 
         // Providing the named parameter in the $params array.
         $params = [
             'learningpathid' => (int)$learningpathid,
+            'courseid' => (int)$courseid,
         ];
         // Using get_records_sql function to execute the query with parameters.
         $records = $DB->get_records_sql($sql, $params);
@@ -88,22 +91,25 @@ class user_path_relation {
      *
      * @param int $learningpathid
      * @param int $userid
+     * @param int $courseid
      * @return object
      *
      */
-    public function get_user_path_relation($learningpathid, $userid) {
+    public function get_user_path_relation($learningpathid, $userid, $courseid) {
         global $DB;
 
         $sql = "SELECT *
             FROM {local_adele_path_user} lpu
             WHERE lpu.learning_path_id = :learningpathid
             AND lpu.status = 'active'
+            AND lpu.course_id = :courseid
             AND lpu.user_id = :userid";
 
         // Providing the named parameter in the $params array.
         $params = [
             'learningpathid' => (int)$learningpathid,
             'userid' => (int)$userid,
+            'courseid' => (int)$courseid,
         ];
         // Using get_records_sql function to execute the query with parameters.
         $record = $DB->get_record_sql($sql, $params);
@@ -131,6 +137,7 @@ class user_path_relation {
 
         return $DB->insert_record('local_adele_path_user', [
             'user_id' => $userpath->user_id,
+            'course_id' => $userpath->course_id,
             'learning_path_id' => $userpath->learning_path_id,
             'status' => 'active',
             'timecreated' => $userpath->timecreated,

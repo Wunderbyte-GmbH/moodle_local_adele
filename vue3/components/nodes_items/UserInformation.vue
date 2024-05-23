@@ -36,7 +36,7 @@
 
 <template>
   <div
-    v-if="data.completion.feedback.after"
+    v-if="data.completion.feedback && data.completion.feedback.after"
     class="card-container"
     :class="{ 'card-hover': showCard, [data.node_id + '_user_info_listener']: true}"
     @click="toggleFeedbackarea"

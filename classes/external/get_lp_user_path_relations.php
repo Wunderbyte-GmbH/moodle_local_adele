@@ -83,6 +83,13 @@ class get_lp_user_path_relations extends external_api {
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:view', $context);
 
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            $params['courseid'] = $context->instanceid;
+        } else {
+            $coursecontext = $context->get_course_context();
+            $params['courseid'] = $coursecontext->instanceid;
+        }
+
         return learning_paths::get_learning_user_relations($params);
     }
 
