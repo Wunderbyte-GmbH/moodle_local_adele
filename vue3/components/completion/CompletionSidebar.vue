@@ -71,6 +71,7 @@ function onDrag(event ) {
     const freeEdges = arrayDifference(availableEdges, takenEdges)
     
     if(freeEdges.length > 0){
+
       drawDropZones(freeEdges, closestNode)  
       //change color of drop zone if drag position is above 
       checkIntersetcion(event, closestNode)
@@ -207,8 +208,6 @@ function findClosestNode(event) {
   });
   let closestNode = null;
   let closestDistance = Infinity;
-
-
   props.nodes.forEach((node) => {
     if(node.type != 'dropzone' && node.type != 'selected'  && node.type != 'feedback'){
       const distance = Math.sqrt(

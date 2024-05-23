@@ -29,7 +29,7 @@ import RestrictionItem from '../restriction/RestrictionItem.vue'
 import CompletionItem from '../completion/CompletionItem.vue'
 import { computed, onMounted, ref } from 'vue';
 
-const { nodes, edges, removeNodes, findNode, addEdges } = useVueFlow()
+const { nodes, edges, removeNodes, findNode, addEdges, removeEdges, findEdge } = useVueFlow()
 
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
@@ -114,6 +114,7 @@ const replaceNode = () => {
         if (currentNode != undefined) {
           currentNode.deletable = true
           removeNodes([currentNode.id])
+          removeEdgesFromDeletedNode([currentNode.id])
           if (prevNode.childCondition.length > 0) {
               let new_children = []
               prevNode.childCondition.forEach((childNode) => {
@@ -140,6 +141,7 @@ const replaceNode = () => {
         let feedbackNode = findNode(edge.target)
         feedbackNode.deletable = true
         removeNodes([currentNode.id, feedbackNode.id])
+        removeEdgesFromDeletedNode([currentNode.id, feedbackNode.id])
         shiftLeft(deletedNode, copieEdges)
       } else if (
         edge.targetHandle == 'target_and' &&
@@ -149,12 +151,30 @@ const replaceNode = () => {
         let currentNode = findNode(props.data.node_id)
         currentNode.deletable = true
         removeNodes([currentNode.id])
+        removeEdgesFromDeletedNode([currentNode.id])
         let parentNode = findNode(edge.source)
         parentNode.childCondition = []
       }
     })
   }
   emit('updateVisibility', data_visibility.value)
+};
+
+const removeEdgesFromDeletedNode = (nodeids) => {
+  nodeids.forEach(nodeid => {
+    let removeEdgesIds = []
+    edges.value.forEach(edge => {
+      if (
+        edge.source == nodeid ||
+        edge.target == nodeid
+      ) {
+          let removeEdge = findEdge(edge.id)
+          removeEdge.deletable = true
+          removeEdgesIds.push(edge.id)
+        }
+    })
+    removeEdges(removeEdgesIds)
+  })
 };
 
 const shiftLeft = (deletedNode, edges) => {
