@@ -62,7 +62,6 @@ function init() {
             store.state.contextid = contextIdValue;
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.mount(localAdeleAppElement);
-            router.push({ name: 'learningpaths-edit-overview' });
         }
     });
 }

@@ -91,11 +91,13 @@ const get_cover_image = (data) => {
 
 // Set node data for the modal
 const setNodeModal = () => {
+  removeTooltips()
   store.state.node = props.data
 };
 
 // Set node data for the modal
 const setPretestView = () => {  
+  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -104,6 +106,7 @@ const setPretestView = () => {
 
 // Set node data for the modal
 const setRestrictionView = () => {
+  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false
@@ -116,6 +119,13 @@ const setStartNode = (node_id) => {
     startnode: node_id, 
   });
 };
+
+const removeTooltips = () => {
+  const tooltips = document.querySelectorAll('.tooltip');
+  tooltips.forEach(tooltip => {
+      tooltip.style.display = 'none';
+  });
+}
 
 const emit = defineEmits([
   'change-module',
@@ -168,29 +178,45 @@ const childStyle = {
           <div 
             v-if="store.state.view!='teacher'" 
             class="overlay"
-          >
-            <button 
-              class="icon-link"
-              @click="setPretestView"
+          > 
+            <span  
+              :title="store.state.strings.nodes_edit_completion"
+              data-toggle="tooltip"
             >
-              <i 
-                class="fa fa-tasks" 
-              />
-            </button>
-            <button 
-              class="icon-link"
-              @click="setRestrictionView"
+              <button 
+                class="icon-link"
+                @click="setPretestView"
+              >
+                <i 
+                  class="fa fa-tasks" 
+                />
+              </button>
+            </span>
+            <span  
+              :title="store.state.strings.nodes_edit_restriction"
+              data-toggle="tooltip"
             >
-              <i class="fa fa-lock" />
-            </button>
-            <button 
-              class="icon-link"
-              data-toggle="modal" 
-              data-target="#nodeModal"
-              @click="setNodeModal"
+              <button 
+                class="icon-link"
+                @click="setRestrictionView"
+              >
+                <i class="fa fa-lock" />
+              </button>
+            </span>
+            <span  
+              :title="store.state.strings.edit"
+              data-toggle="tooltip"
             >
-              <i class="fa fa-pencil" />
-            </button>
+              <button 
+                class="icon-link"
+                data-toggle="modal" 
+                data-target="#nodeModal"
+                data-placement="right" 
+                @click="setNodeModal"
+              >
+                <i class="fa fa-pencil" />
+              </button>
+            </span>
           </div>
         </div>
         <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">

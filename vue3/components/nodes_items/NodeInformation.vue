@@ -318,7 +318,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 1;
+  z-index: 101;
 }
 
 .information {
@@ -347,27 +347,29 @@
   text-align: center;
   border-radius: 8px;
   position: absolute;
-  left: 40px;
-  bottom: 40px;
-  z-index: 10;
+  z-index: 11;
+  left: -472px;
+  bottom: -200px;
+  text-align: start;
 }
 
 /* Starting state for entering */
 .unfold-enter-from, .unfold-leave-to {
   transform: scaleX(0);
   opacity: 0;
-  transform-origin: left; /* Ensures scaling happens left to right */
+  transform-origin: right; /* Ensures scaling happens left to right */
 }
 
 /* Ending state for entering and starting state for leaving */
 .unfold-enter-to, .unfold-leave-from {
   transform: scaleX(1);
   opacity: 1;
+  transform-origin: right;
 }
 
 /* Active state for entering and leaving */
 .unfold-enter-active, .unfold-leave-active {
-  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   visibility: visible;
 }
 

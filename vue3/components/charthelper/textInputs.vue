@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, inject } from 'vue';
+import router from '../../router/router';
 
 const props = defineProps({
   goal: {
@@ -100,21 +101,20 @@ const editLearningpath = async (singlelearningpathid) => {
           </h5>
         </div>
         <div class="card-body">
-          <div v-if="goalname">
-            {{ goalname }}
-            <a 
-              target="_blank"
-              data-toggle="tooltip" 
-              data-placement="right" 
+          <h4>{{ goalname }}</h4>
+          <span v-if="goalname">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary btn-sm"
               :title="store.state.strings.charthelper_go_to_learningpath"
               @click.prevent="editLearningpath(props.goal.id)" 
             >
-              <i class="fa fa-link" />
-            </a>
-          </div>
-          <div v-else>
+              {{ store.state.strings.modals_edit}}
+            </button>
+          </span>
+          <span v-else>
             {{ store.state.strings.charthelper_no_name }}
-          </div>
+          </span>
         </div>
       </div>
       <div class="card border-secondary">

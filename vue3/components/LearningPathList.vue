@@ -26,17 +26,17 @@
   <div>
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
-    <div class="d-flex justify-content-between">
+    <diV class="col-lg-2">
       <button 
         type="button" 
-        class="btn btn-primary mt-4 mb-4"
+        class="btn btn-primary mt-4 mb-4 btn-block"
         @click.prevent="addNewLearningpath()" 
       >
         {{ store.state.strings.learningpath_form_title_add }}
       </button>
       <button 
         type="button" 
-        class="btn btn-secondary  mt-4 mb-4"
+        class="btn btn-secondary  mt-4 mb-4 btn-block" 
         data-toggle="modal" 
         data-target="#helpingSlider"
       >
@@ -45,7 +45,8 @@
           :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'" 
         />
       </button>
-    </div>
+    </diV>
+    
     <h2>
       {{ store.state.strings.overviewlearningpaths }}
     </h2>
@@ -53,18 +54,23 @@
     <span v-if="store.state.learningpaths == ''">
       {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
     </span>
-    <span v-else>
-      <div 
+    <span 
+      v-else
+      class="learningcardcont">
+      <div
         v-for="singlelearningpath in store.state.learningpaths" 
         :key="singlelearningpath.id" 
-        style="margin-bottom: 10px"
+        class="learningcard"
       >
-        <div v-if="singlelearningpath.name !== 'not found'">
+        <div 
+          v-if="singlelearningpath.name !== 'not found'" 
+          class="wrap"
+        >
           <div 
-            class="card shadow mt-4"
-            style="max-width: 20%; min-width: 450px;"
+            class="card shadow"
+            style="width: 450px;"
           >
-            <div class="card-header text-center">
+            <div class="card-header text-center bg-primary text-white">
               <h5>
                 {{ singlelearningpath.name }}
               </h5>
@@ -134,8 +140,8 @@
           </div>
           <div 
             v-show="clicked[singlelearningpath.id]"
-            class="alert-danger p-3 m-t-1 m-b-1 rounded"
-            style="max-width: 20%;"
+            class="alert-danger p-3 m-t-1 m-b-1 rounded deletealert"
+            style="max-width: 100%;"
           >
             <div>{{ store.state.strings.deletepromptpre }}{{ singlelearningpath.name }}{{ store.state.strings.deletepromptpost }}</div>
 
@@ -241,6 +247,37 @@ const duplicateLearningpath = (learningpathid) => {
 </script>
 
 <style scoped>
+
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+  .learningcardcont {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .learningcard {
+    display: flex;
+    flex-flow: column;
+    margin: 20px;
+  }
+
+  .card-header {
+    min-height: 56px;
+  }
+
+  .deletealert {
+    display: block;
+    max-width: 100%;
+    position: absolute;
+    left: 8%;
+    top: 30%;
+    margin: 0 auto;
+  }
   .overlay {
     position: relative;
     top: 50%;
@@ -253,6 +290,11 @@ const duplicateLearningpath = (learningpathid) => {
     width: 70%; /* Adjust width as needed */
     height: 50%; /* Adjust height as needed */
     border-radius: 15px; /* Rounded edges */
+  }
+
+  .card {
+    height: 100%;
+    display: flex;
   }
 
   .icon-link {
@@ -273,5 +315,20 @@ const duplicateLearningpath = (learningpathid) => {
   .icon-link:hover {
     color: lightgray; /* Hover effect */
   }
+
+  @media (max-width: 767px) { 
+    .card {
+      width: 100% !important;
+    }
+
+    .learningcardcont {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .learningcard {
+      width: 100%;
+    }
+   }
 
 </style>

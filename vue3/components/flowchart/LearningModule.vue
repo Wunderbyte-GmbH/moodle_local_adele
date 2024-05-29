@@ -66,7 +66,7 @@
             class="btn btn-secondary me-2"
             @click="toggleAddForm" 
           >
-            {{ store.state.strings.flowchart_cancel }}
+            {{ store.state.strings.cancel }}
           </button>
           <button 
             type="button" 

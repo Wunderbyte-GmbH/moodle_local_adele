@@ -122,7 +122,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onBeforeMount } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
@@ -157,10 +157,13 @@ const changeGoalDescription = (newGoalDescription) => {
 
 // Checking routes 
 const checkRoute = (currentRoute) => {
-    if(currentRoute == undefined){
+  if(currentRoute == undefined && !route.path.includes('/learningpaths/edit')){
         router.push({ name: 'learningpaths-edit-overview' });
-    }
-  else if (currentRoute.name === 'learningpath-edit') {
+  } else if (currentRoute == undefined && route.path.includes('/learningpaths/edit') && route.params.learningpathId) {
+      store.state.editingadding = true;
+      nextTick(() => showForm(route.params.learningpathId));
+  }
+  else if (currentRoute.name === 'learningpath-edit' ) {
     store.state.editingadding = true;
     nextTick(() => showForm(currentRoute.params.learningpathId));
   } else if (currentRoute.name === 'learningpath-new') {
@@ -187,7 +190,11 @@ onMounted(() => {
   if(store.state.view!='student'){
     store.dispatch('fetchLearningpaths');
   }
-  checkRoute(router.value);
+
+  router.isReady().then(() => {
+    console.log('route', route.fullPath, route.params);
+    checkRoute(router.value);
+  }).catch((err) => console.log(err));
 });
 
 // Showing form to generate or edit learning path
@@ -205,9 +212,11 @@ const showForm = async (learningpathId = null) => {
 
 // Trigger the checking route function
 onBeforeRouteUpdate((to, from, next) => {
+  console.log('router to', to);
   checkRoute(to);
   next();
 });
+
 
 // Function to go back
 const goBack = () => {
