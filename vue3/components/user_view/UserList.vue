@@ -26,12 +26,12 @@
   <table class="table table-margin-top">
     <thead>
       <tr>
-        <th>{{ store.state.strings.user_view_id}}</th>
-        <th>{{ store.state.strings.user_view_username}}</th>
-        <th>{{ store.state.strings.user_view_firstname}}</th>
-        <th>{{ store.state.strings.user_view_lastname}}</th>
-        <th>{{ store.state.strings.user_view_progress}}</th>
-        <th>{{ store.state.strings.user_view_nodes}}</th>
+        <th>{{ store.state.strings.user_view_id }}</th>
+        <th>{{ store.state.strings.user_view_username }}</th>
+        <th>{{ store.state.strings.user_view_firstname }}</th>
+        <th>{{ store.state.strings.user_view_lastname }}</th>
+        <th>{{ store.state.strings.user_view_progress }}</th>
+        <th>{{ store.state.strings.user_view_nodes }}</th>
       </tr>
     </thead>
     <tbody>

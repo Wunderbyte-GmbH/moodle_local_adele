@@ -162,7 +162,9 @@ const checkRoute = (currentRoute) => {
   } else if (currentRoute == undefined && route.path.includes('/learningpaths/edit') && route.params.learningpathId) {
       store.state.editingadding = true;
       nextTick(() => showForm(route.params.learningpathId));
-  }
+  } else if (currentRoute == undefined){
+        router.push({ name: 'learningpaths-edit-overview' });
+    }
   else if (currentRoute.name === 'learningpath-edit' ) {
     store.state.editingadding = true;
     nextTick(() => showForm(currentRoute.params.learningpathId));

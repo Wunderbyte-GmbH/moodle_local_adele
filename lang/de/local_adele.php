@@ -23,27 +23,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['modulename'] = 'adele';
-$string['modulenameplural'] = 'adeles';
-$string['modulename_help'] = 'adele';
-$string['pluginadministration'] = 'Adele-Verwaltung';
-$string['pluginname'] = 'Adele';
+$string['modulename'] = 'Lernpfad';
+$string['modulenameplural'] = 'Lernpfade';
+$string['modulename_help'] = 'Lernpfad';
+$string['pluginadministration'] = 'Lernpfad-Verwaltung';
+$string['pluginname'] = 'Lernpfad';
 $string['not_found'] = 'Learning path wurde nicht gefunden! Bitte kontaktiere die verantwortliche Person für diesen Lernpfad!';
 
 // Fähigkeiten.
-$string['adele:edit'] = 'Adele bearbeiten';
-$string['adele:view'] = 'Adele anzeigen';
-$string['adele:canmanage'] = 'Darf Adele-Plugins verwalten';
+$string['adele:edit'] = 'Lernpfad bearbeiten';
+$string['adele:view'] = 'Lernpfad anzeigen';
+$string['adele:canmanage'] = 'Darf Lernpfad-Plugins verwalten';
 
 // Rolle.
-$string['adeleroledescription'] = 'Adele-Manager';
+$string['adeleroledescription'] = 'Lernpfad-Manager';
 
 // Vue-Komponentenroute nicht gefunden.
 $string['route_not_found_site_name'] = 'Fehler: Seite (Route) nicht gefunden!';
 $string['route_not_found'] = 'Seite wurde nicht gefunden. Bitte gehen Sie zurück und versuchen Sie es erneut.';
 
 // Vue-Komponente Lernziel bearbeiten.
-$string['learningpaths_edit_site_name'] = 'Adele Lernziele';
+$string['learningpaths_edit_site_name'] = 'Lernpfad Ziele';
 $string['learningpaths_edit_site_description'] = 'Sie können einen neuen Lernpfad hinzufügen oder vorhandene Pfade bearbeiten.';
 $string['learningpaths_edit_site_no_learningpaths'] = 'Noch keine Lernpfade vorhanden.';
 $string['learningpaths_edit_no_learningpaths'] = 'Es gibt keine Ziele zum Anzeigen.';
@@ -88,6 +88,7 @@ $string['tagsearch_description'] = 'Für Tag-Suche mit # beginnen';
 $string['fromlearningtitelplaceholder'] = 'Bitte geben Sie einen Titel an';
 $string['fromlearningdescriptionplaceholder'] = 'Bitte geben Sie eine kurze Beschreibung an';
 $string['placeholder_search'] = 'Kurse suchen';
+$string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['edit_course_node'] = 'Kursknoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
 

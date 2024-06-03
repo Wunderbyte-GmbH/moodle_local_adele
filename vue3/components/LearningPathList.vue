@@ -50,7 +50,11 @@
     <h2>
       {{ store.state.strings.overviewlearningpaths }}
     </h2>
-
+    <input 
+      v-model="search"
+      class="form-control search" 
+      :placeholder="store.state.strings.placeholder_lp_search"
+    >
     <span v-if="store.state.learningpaths == ''">
       {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
     </span>
@@ -58,7 +62,7 @@
       v-else
       class="learningcardcont">
       <div
-        v-for="singlelearningpath in store.state.learningpaths" 
+        v-for="singlelearningpath in filteredLpItem" 
         :key="singlelearningpath.id" 
         class="learningcard"
       >
@@ -169,11 +173,36 @@
 
 <script setup>
 // Import needed libraries
-import { ref } from 'vue'
+import { computed, ref, watch, onMounted, } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router';
 import { notify } from "@kyvg/vue3-notification"
 import HelpingSlider from '../components/modals/HelpingSlider.vue'
+
+const filteredLpItem = computed(() => {
+  if (search.value != '' && ' ') {
+    filteredLp = store.state.learningpaths.filter((lp) => lp.name.toLowerCase().includes(search.value.toLowerCase()));
+    } else {
+    filteredLp = store.state.learningpaths;
+    }
+    return filteredLp;
+})
+
+const search = ref('');
+let learningPaths = [];
+let filteredLp = [];
+
+onMounted(() => {
+  watch(() => store.state.learningpaths, async () => {
+    if (store.state.learningpaths) {
+    learningPaths = store.state.learningpaths;
+    filteredLp = [...learningPaths];
+    }
+  }, {
+       deep: true
+      });
+});
+
 
 // Load Store and Router
 const store = useStore()
@@ -248,6 +277,9 @@ const duplicateLearningpath = (learningpathid) => {
 
 <style scoped>
 
+  .search {
+    max-width: 500px;
+  }
   .wrap {
     display: flex;
     flex-direction: column;
@@ -315,6 +347,7 @@ const duplicateLearningpath = (learningpathid) => {
   .icon-link:hover {
     color: lightgray; /* Hover effect */
   }
+
 
   @media (max-width: 767px) { 
     .card {

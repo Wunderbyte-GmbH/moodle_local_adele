@@ -26,27 +26,27 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Required strings.
-$string['modulename'] = 'adele';
-$string['modulenameplural'] = 'adeles';
-$string['modulename_help'] = 'adele';
-$string['pluginadministration'] = 'adele Administration';
-$string['pluginname'] = 'Adele';
+$string['modulename'] = 'learning path';
+$string['modulenameplural'] = 'learning paths';
+$string['modulename_help'] = 'learning path';
+$string['pluginadministration'] = 'learning path Administration';
+$string['pluginname'] = 'Learning path';
 $string['not_found'] = 'Learning path not found! Please contact person in charge!';
 
 // Capabilities.
-$string['adele:edit'] = 'Edit adele';
-$string['adele:view'] = 'View adele';
-$string['adele:canmanage'] = 'Is allowed to manage Adele Plugins';
+$string['adele:edit'] = 'Edit learning path';
+$string['adele:view'] = 'View learning path';
+$string['adele:canmanage'] = 'Is allowed to manage Learning path Plugins';
 
 // Role.
-$string['adeleroledescription'] = 'Adele Manager';
+$string['adeleroledescription'] = 'Learning path Manager';
 
 // Vue component route not found.
 $string['route_not_found_site_name'] = 'Error: Page (route) not found!';
 $string['route_not_found'] = 'Page was not found. Please consider going back and trying it again.';
 
 // Vue component learning goal edit.
-$string['learningpaths_edit_site_name'] = 'adele learning goals';
+$string['learningpaths_edit_site_name'] = 'Learning path goals';
 $string['learningpaths_edit_site_description'] = 'You may add a new learning path or edit existing paths.';
 $string['learningpaths_edit_site_no_learningpaths'] = 'No learning paths to show yet.';
 $string['learningpaths_edit_no_learningpaths'] = 'There are no goals to show.';
@@ -91,6 +91,7 @@ $string['tagsearch_description'] = 'For tag-search, start with #';
 $string['fromlearningtitelplaceholder'] = 'Please provide a titel';
 $string['fromlearningdescriptionplaceholder'] = 'Please provide a short description';
 $string['placeholder_search'] = 'Search courses';
+$string['placeholder_lp_search'] = 'Search learning path';
 $string['edit_course_node'] = 'Edit course node';
 $string['edit_node_pretest'] = 'Edit completion criteria';
 $string['from_default_node_image'] = 'Default node image:';
