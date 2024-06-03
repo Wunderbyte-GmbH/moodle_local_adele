@@ -28,7 +28,7 @@ Feature: As an admin I perform several drag and drop actions.
     And I follow "Site administration"
     And I wait until the page is ready
     And I follow "Plugins"
-    And I follow "Adele"
+    And I follow "Learning path"
     And I select "All courses meeting the other criteria." from the "Activate filter" singleselect
     And I press "Save changes"
     Then I should see "Changes saved"
