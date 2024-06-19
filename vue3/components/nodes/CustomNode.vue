@@ -133,6 +133,9 @@ const emit = defineEmits([
 ]);
 
 const changeModule = (data) => {
+  if(typeof data.module == "string") {
+    delete data.module
+  }
   emit('changeModule', data);
 }
 
@@ -233,7 +236,6 @@ const childStyle = {
               <option
                 value=""
                 selected
-                disabled
               >
                 {{ store.state.strings.nodes_select_module }}
               </option>

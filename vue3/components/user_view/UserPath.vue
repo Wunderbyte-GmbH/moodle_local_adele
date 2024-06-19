@@ -151,6 +151,10 @@ const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
 const zoomLock = ref(false)
 
 onMounted( async () => {
+  // Check if available courses are set
+  if (!store.state.availablecourses) {
+    store.dispatch('fetchAvailablecourses');
+  }
   let params = []
   if (store.state.view == 'student') {
     params = {

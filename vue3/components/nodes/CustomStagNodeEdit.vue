@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
@@ -36,7 +36,7 @@ import ProgressBar from '../nodes_items/ProgressBar.vue'
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue'
 import NodeInformation from '../nodes_items/NodeInformation.vue'
 
-// Load Store 
+// Load Store
 const store = useStore();
 const date = ref({})
 
@@ -89,13 +89,14 @@ onMounted(() => {
        }
        if (node.completion && node.completion.nodes) {
         node.completion.nodes.forEach((completionnode) => {
+
           if(completionnode.data.label == 'course_completed' &&
             completionnode.data.value.min_courses > 1){
               stageType.value = 'non_parallel'
               min_courses = completionnode.data.value.min_courses
               if (userpath.json.user_path_relation[node.id] &&
                 userpath.json.user_path_relation[node.id].completioncriteria) {
-                finishedCourses = userpath.json.user_path_relation[node.id].completioncriteria.completed.course_completed
+                finishedCourses = userpath.json.user_path_relation[node.id].completioncriteria.course_completed.completed
               }
           }
         })
@@ -158,14 +159,14 @@ const expandCourses = () => {
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
-      <div 
-        :class="stageType=='parallel' ? 'parallel' : 'non_parallel'"
+      <div
+        :class="'non_parallel'"
       />
       <div class="card-header text-center">
-        <NodeInformation 
+        <NodeInformation
           :data
           :parentnode
-        /> 
+        />
         <div class="row">
           <div class="col-4">
             <h5>
@@ -174,20 +175,20 @@ const expandCourses = () => {
           </div>
         </div>
       </div>
-      <div 
+      <div
         class="card-body"
         :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
         <div v-if="min_courses > 1">
-          <CourseCompletion 
+          <CourseCompletion
             :min-courses="min_courses"
             :finished-courses="finishedCourses"
           />
         </div>
-        <div 
-          class="card-img dashboard-card-img mb-2" 
-          :style="{ 
+        <div
+          class="card-img dashboard-card-img mb-2"
+          :style="{
             height: '10rem',
             backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
@@ -196,14 +197,14 @@ const expandCourses = () => {
           }"
         >
           <div class="overlay">
-            <button 
+            <button
               v-if="active"
               class="icon-link"
               @click="expandCourses"
             >
               <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
             </button>
-            <button 
+            <button
               v-else
               class="icon-link"
             >
@@ -212,7 +213,7 @@ const expandCourses = () => {
           </div>
         </div>
         <div v-if="store.state.learningpath && store.state.view=='student'">
-          <div 
+          <div
             class="row mb-2"
           >
             <div class="col-4 text-left">
@@ -220,8 +221,8 @@ const expandCourses = () => {
                 {{ store.state.strings.nodes_progress }}
               </b>
             </div>
-            <div 
-              class="col-8" 
+            <div
+              class="col-8"
               style="display: flex; justify-content: end;"
             >
               <ProgressBar :progress="data.progress" />
@@ -230,7 +231,7 @@ const expandCourses = () => {
         </div>
         <div v-else>
           <div v-if="data.manualrestriction">
-            <RestrictionOutPutItem 
+            <RestrictionOutPutItem
               :data="data"
             />
           </div>
@@ -240,22 +241,22 @@ const expandCourses = () => {
           <div class="row">
             <div class="col-md-6">
               <div v-if="data.completion.singlerestrictionnode">
-                <button 
-                  class="btn btn-link" 
-                  aria-expanded="false" 
+                <button
+                  class="btn btn-link"
+                  aria-expanded="false"
                   aria-controls="collapseTable"
                   :disabled="!active"
                   @click="toggleTable('Restriction')"
                 >
                   {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
                 </button>
-                <div 
-                  v-show="isRestrictionVisible" 
+                <div
+                  v-show="isRestrictionVisible"
                   class="table-container table-container-left"
                 >
                   <div v-if="Object.keys(data.completion.singlerestrictionnode).length > 0">
-                    <table 
-                      class="table table-bordered table-hover fancy-table" 
+                    <table
+                      class="table table-bordered table-hover fancy-table"
                       style="right: -150%;"
                     >
                       <thead class="thead-light">
@@ -269,15 +270,15 @@ const expandCourses = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr 
-                          v-for="(value, key) in data.completion.singlerestrictionnode" 
+                        <tr
+                          v-for="(value, key) in data.completion.singlerestrictionnode"
                           :key="key"
                         >
                           <td>{{ key }}</td>
                           <td>
                             {{ value }}
-                            <span 
-                              v-if="value" 
+                            <span
+                              v-if="value"
                               class="text-success"
                             >
                               &#10004;
@@ -299,9 +300,9 @@ const expandCourses = () => {
             </div>
             <div class="col-md-6">
               <div v-if="data.completion.singlecompletionnode">
-                <button 
-                  class="btn btn-link" 
-                  aria-expanded="false" 
+                <button
+                  class="btn btn-link"
+                  aria-expanded="false"
                   aria-controls="collapseTable"
                   :disabled="!active"
                   @click="toggleTable('Completion')"
@@ -309,7 +310,7 @@ const expandCourses = () => {
                   {{ isCompletionVisible ? store.state.strings.nodes_hide_completion : store.state.strings.nodes_show_completion }}
                 </button>
                 <div
-                  v-show="isCompletionVisible" 
+                  v-show="isCompletionVisible"
                   class="table-container"
                 >
                   <div v-if="Object.keys(data.completion.singlecompletionnode).length > 0">
@@ -325,15 +326,15 @@ const expandCourses = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr 
-                          v-for="(value, key) in data.completion.singlecompletionnode" 
+                        <tr
+                          v-for="(value, key) in data.completion.singlecompletionnode"
                           :key="key"
                         >
                           <td>{{ key }}</td>
                           <td>
                             {{ value }}
-                            <span 
-                              v-if="value" 
+                            <span
+                              v-if="value"
                               class="text-success"
                             >
                               &#10004;
@@ -356,33 +357,32 @@ const expandCourses = () => {
           </div>
         </div>
         <div v-if="courseExpanded">
-          <ExpandedCourses :data="data" /> 
+          <ExpandedCourses :data="data" />
         </div>
       </div>
-      <div 
+      <div
         v-if="store.state.view=='student' && data"
         class="card-footer"
       >
-        <!-- <NodeFeedbackArea :data="data" /> -->
-        <UserInformation 
+        <CourseCarousel :courses="props.data" />
+        <UserInformation
           :data="data"
         />
-        <CourseCarousel :courses="props.data" />
       </div>
     </div>
-    <Handle 
+    <Handle
       v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="target" 
-      type="target" 
-      :position="Position.Top" 
-      :style="handleStyle" 
+      id="target"
+      type="target"
+      :position="Position.Top"
+      :style="handleStyle"
     />
-    <Handle 
+    <Handle
       v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="source" 
-      type="source" 
-      :position="Position.Bottom" 
-      :style="handleStyle" 
+      id="source"
+      type="source"
+      :position="Position.Bottom"
+      :style="handleStyle"
     />
   </div>
 </template>
@@ -426,7 +426,7 @@ const expandCourses = () => {
 
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;
-  
+
 }
 .table-container {
   width: 300px;

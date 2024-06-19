@@ -21,13 +21,13 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
-// Load Store 
+// Load Store
 const store = useStore();
 
 const props = defineProps({
@@ -45,7 +45,8 @@ const goToCourse = () => {
 const cover_image = computed(() => get_cover_image(props.data));
 
 const get_cover_image = (data) => {
-  if (data.imagepaths[props.data.course_id]) {
+
+  if (data.imagepaths && data.imagepaths[props.data.course_id]) {
     return data.imagepaths[props.data.course_id]
   }
   return null
@@ -58,7 +59,7 @@ const courses = computed(() => {
   ) {
     return [];
   }
-  return store.state.availablecourses.filter(course => 
+  return store.state.availablecourses.filter(course =>
     props.data.course_id == course.course_node_id[0]
     ).map(course => ({
       fullname: course.fullname,
@@ -78,20 +79,23 @@ const courses = computed(() => {
       <div class="card-header text-center">
         <div class="row">
           <div class="col-10">
-            <h5>
+            <h5 v-if="courses[0]">
               {{ courses[0].fullname }}
+            </h5>
+            <h5 v-else>
+              Subcourse
             </h5>
           </div>
         </div>
       </div>
-      <div 
+      <div
         class="card-body"
         :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
-        <div 
-          class="card-img dashboard-card-img mb-2" 
-          :style="{ 
+        <div
+          class="card-img dashboard-card-img mb-2"
+          :style="{
             height: '10rem',
             backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
@@ -100,7 +104,7 @@ const courses = computed(() => {
           }"
         >
           <div class="overlay">
-            <button 
+            <button
               class="icon-link"
               @click="goToCourse"
             >

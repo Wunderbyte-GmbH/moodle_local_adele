@@ -2,7 +2,7 @@
   // Import needed libraries
   import { onMounted, onUnmounted, ref } from 'vue';
 
-  // Load Store 
+  // Load Store
   const showFeedbackarea = ref(false);
 
   const props = defineProps({
@@ -25,6 +25,7 @@
 
   // Setup and cleanup event listeners
   onMounted(() => {
+    console.log(props.data)
     document.addEventListener('click', closeOnOutsideClick);
   });
 
@@ -36,7 +37,7 @@
 
 <template>
   <div
-    v-if="data.completion.feedback && data.completion.feedback.after"
+    v-if="data.completion.feedback && data.completion.feedback.completion.inbetween"
     class="card-container"
     :class="{ 'card-hover': showCard, [data.node_id + '_user_info_listener']: true}"
     @click="toggleFeedbackarea"
@@ -46,8 +47,8 @@
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea">
-        <div 
-          v-for="feedback_after in data.completion.feedback.after" 
+        <div
+          v-for="feedback_after in data.completion.feedback.completion.inbetween"
           :key="feedback_after"
         >
           {{ feedback_after }}
@@ -66,7 +67,7 @@
   border-radius: 8px;
   background-color: #EAEAEA;
   font-weight: bold; /* Make the text bold */
-  text-align: center; 
+  text-align: center;
 }
 
 .fa-comment {
@@ -88,10 +89,10 @@
 textarea {
   width: 100%;
   padding: 10px;
-  border-radius: 5px; 
-  border: 1px solid #ced4da; 
+  border-radius: 5px;
+  border: 1px solid #ced4da;
   resize: none;
-  font-family: inherit; 
+  font-family: inherit;
   font-size: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: border-color 0.2s, box-shadow 0.2s;

@@ -3,9 +3,9 @@
     {{ restriction.description }}
     <div v-if="parentNodes">
       {{ store.state.strings.restriction_parents_found }}
-      <div 
-        v-for="(value, key) in parentNodes" 
-        :key="key" 
+      <div
+        v-for="(value, key) in parentNodes"
+        :key="key"
         class="card-text"
       >
         <div class="fullname-container">
@@ -26,7 +26,7 @@ const props = defineProps({
   modelValue: {
     type: Object,
     default: null,
-  }, 
+  },
   restriction: {
     type: Object,
     required: true,
@@ -41,10 +41,16 @@ const parentNodes = ref([])
 
 onMounted(() => {
   props.learningpath.json.tree.nodes.forEach(node => {
+
     if (node.childCourse.includes(store.state.node.node_id)) {
+      let fullname = node.data.fullname
+      if (fullname == '') {
+        fullname = store.state.strings.nodes_collection
+      }
+
       parentNodes.value.push({
         id: node.id,
-        name: node.data.fullname
+        name: fullname
       });
     }
   })
