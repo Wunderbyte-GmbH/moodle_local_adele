@@ -21,9 +21,10 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
  <script setup>
 import { onMounted, ref } from 'vue';
+import darkenColor from '../../composables/nodesHelper/darkenColor';
 
 const props = defineProps({
   data: {
@@ -35,60 +36,60 @@ const props = defineProps({
 const darkerColor = ref('#1047033')
 
 onMounted(() => {
-  darkerColor.value = darkenColor(props.data.color)
+  darkerColor.value = darkenColor(props.data.color_inactive ?? props.data.color)
 })
 
-const darkenColor = (color) => {
-  let rgb = hexToRgb(color);
-  rgb.r *= 0.6;
-  rgb.g *= 0.6;
-  rgb.b *= 0.6;
-  return rgbToHex(rgb.r, rgb.g, rgb.b);
-}
-
-const hexToRgb = (hex) => {
-  let bigint = parseInt(hex.slice(1), 16);
-  let r = (bigint >> 16) & 255;
-  let g = (bigint >> 8) & 255;
-  let b = bigint & 255;
-  return { r, g, b };
-}
-
-const rgbToHex = (r, g, b) => {
-  let colorString = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  const index = colorString.indexOf('.'); // Get the index of the comma character
-  colorString = colorString.substring(0, index); 
-  return colorString;
-}
- 
 </script>
 <template>
   <div>
     <div class="module-name">
       <span class="bold">{{ data.name }}</span>
     </div>
-    <div 
-      class="custom-node text-center rounded p-3"
-      :style="{ 
-        'background-color': data.color, 
+    <div
+      class="custom-node text-center p-3"
+      :style="{
+        'background-color': data.color_inactive ?? data.color,
         'opacity' : data.opacity,
-        'height': data.height, 
-        'width': data.width ? data.width : '400px',
-        'border': '5px solid ' + darkerColor
+        'height': data.height,
+        'width': data.width ? data.width : '400px'
       }"
-    />
+    >
+      <div
+        class="module-name"
+        :style="{
+          'background-color': data.color_inactive ?? data.color,
+          'border': '5px solid ' + darkerColor,
+          'border-bottom': '5px solid ' + darkerColor,
+          'border-radius': '8px 8px 0 0'
+        }"
+      >
+        <span class="bold">{{ data.name }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.module-name {
-  position: absolute;
-  top: 95%;
-  transform: rotate(-90deg) translate(50%);
-  left: -110px;
-}
-.bold {
-  font-weight: bold;
-  font-size: 30px
-}
+
+  .custom-node {
+    position: relative;
+    border-radius: 8px;
+    border-bottom-left-radius: 0;
+  }
+
+  .module-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: rotate(-90deg);
+    transform-origin: bottom left;
+    padding: 2px 5px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .bold {
+    font-weight: bold;
+    font-size: 30px;
+    padding: 10px;
+  }
 </style>

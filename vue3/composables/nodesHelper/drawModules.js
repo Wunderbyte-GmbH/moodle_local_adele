@@ -1,12 +1,13 @@
 import removeModules from './removeModules'
 import findNodeDimensions from './findNodeDimensions'
+import darkenColor from './darkenColor'
 
 const drawModules = async (learningpath, addNodes, removeNodes, findNode, draggedNode = null, deletedNodeId = null) => {
   if (learningpath.json.modules) {
-
     await removeModules(learningpath.json.tree, removeNodes)
     let allModules = []
     let userpath = false
+
     learningpath.json.modules.forEach( async module => {
       let newModule = {
         type: 'module',
@@ -57,26 +58,31 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
           }
         }
       })
+
       if (insertModule) {
+
         // Check if rightestNode and lowestNode are assigned values
         if (rightestNode && lowestNode) {
           if (userpath && !active) {
+            newModule.data.color_inactive = darkenColor(newModule.data.color, 0.5)
             newModule.data.opacity = '0.6'
             newModule.zIndex = 1
           } else {
             newModule.data.opacity = '0.2'
             newModule.zIndex = -10
           }
-          let lowestNodeHeight = findNodeDimensions(lowestNode, findNode)
-          if (lowestNode.dimensions) {
-            lowestNodeHeight = lowestNode.dimensions.height
+
+          const lowestNodeDimensions = findNode(lowestNode.id)
+          let lowestNodeHeight = 0
+          if (lowestNodeDimensions.dimensions) {
+            lowestNodeHeight = lowestNodeDimensions.dimensions.height
           }
-          const height = Math.abs(newModule.position.y - lowestNode.position.y) + lowestNodeHeight + 40
-          const width = Math.abs(newModule.position.x - rightestNode.position.x) + 440
+          const height = Math.abs(newModule.position.y - lowestNode.position.y) + lowestNodeHeight + 80
+          const width = Math.abs(newModule.position.x - rightestNode.position.x) + 500
           newModule.data.height = height + 'px'
           newModule.data.width = width + 'px'
-          newModule.position.y -= 20
-          newModule.position.x -= 20
+          newModule.position.y -= 40
+          newModule.position.x -= 50
         }
         allModules.push(newModule)
       } else {
