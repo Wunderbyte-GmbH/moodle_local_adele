@@ -244,7 +244,7 @@ function onNodeClick(event) {
   setCenter(
     event.node.position.x + event.node.dimensions.width/2,
     event.node.position.y + event.node.dimensions.height/2,
-    { zoom: 1, duration: 500}
+    { zoom: 0.5, duration: 500}
   ).then(() => {
     zoomLock.value = true
   })

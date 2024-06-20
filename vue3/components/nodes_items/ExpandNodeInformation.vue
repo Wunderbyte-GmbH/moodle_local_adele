@@ -27,42 +27,63 @@
     :class="{ 'card-hover': showCard, [courses.id + '_node_info_listener']: true}"
     @click="toggleCard()"
   >
-    <div
-      class="information"
-      :style="{ backgroundColor: backgroundColor }"
-    >
-      <i class="fa fa-info" />
-    </div>
-    <transition name="unfold">
+    <div>
       <div
-        v-if="showCard"
-        class="additional-card"
-        :style="{ backgroundColor: backgroundColor}"
+        class="information"
+        :style="{ backgroundColor: backgroundColor }"
       >
-        <ul class="list-group">
-          <li
-            class="list-group-item"
-          >
-            <i class="fa fa-pencil" />
-            <b>
-              Description
-            </b>
-            <div class="list-group-text">
-              <div v-if="courses[0].description">
-                <div v-html="courses[0].description"/>
-              </div>
-              <div v-else>
-                {{store.state.strings.nodes_no_description}}
-              </div>
-            </div>
-          </li>
-        </ul>
+        <i class="fa fa-info" />
       </div>
-    </transition>
+      <transition name="unfold">
+        <div
+          v-if="showCard"
+          class="additional-card"
+          :style="{ backgroundColor: backgroundColor}"
+        >
+          <ul class="list-group">
+            <li
+              class="list-group-item"
+            >
+              <i class="fa fa-pencil" />
+              <b>
+                Description
+              </b>
+              <div class="list-group-text">
+                <div v-if="courses[0].description">
+                  <div v-html="courses[0].description"/>
+                </div>
+                <div v-else>
+                  {{store.state.strings.nodes_no_description}}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
 <style scoped>
+
+/* Starting state for entering */
+.unfold-enter-from, .unfold-leave-to {
+  transform: scaleX(0);
+  opacity: 0;
+  transform-origin: right; /* Ensures scaling happens left to right */
+}
+
+/* Ending state for entering and starting state for leaving */
+.unfold-enter-to, .unfold-leave-from {
+  transform: scaleX(1);
+  opacity: 1;
+  transform-origin: right;
+}
+
+/* Active state for entering and leaving */
+.unfold-enter-active, .unfold-leave-active {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
 
 .list-group-text{
   text-align: left;
@@ -109,26 +130,6 @@
   left: -472px;
   top: 50px;
   text-align: start;
-}
-
-/* Starting state for entering */
-.unfold-enter-from, .unfold-leave-to {
-  transform: scaleX(0);
-  opacity: 0;
-  transform-origin: right; /* Ensures scaling happens left to right */
-}
-
-/* Ending state for entering and starting state for leaving */
-.unfold-enter-to, .unfold-leave-from {
-  transform: scaleX(1);
-  opacity: 1;
-  transform-origin: right;
-}
-
-/* Active state for entering and leaving */
-.unfold-enter-active, .unfold-leave-active {
-  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-  visibility: visible;
 }
 
 </style>

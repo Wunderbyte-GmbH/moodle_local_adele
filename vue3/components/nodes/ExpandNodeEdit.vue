@@ -24,7 +24,7 @@
 
 <script setup>
 // Import needed libraries
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import ExpandNodeInformation from '../nodes_items/ExpandNodeInformation.vue';
 
@@ -46,7 +46,6 @@ const goToCourse = () => {
 const cover_image = computed(() => get_cover_image(props.data));
 
 const get_cover_image = (data) => {
-
   if (data.imagepaths && data.imagepaths[props.data.course_id]) {
     return data.imagepaths[props.data.course_id]
   }
@@ -69,59 +68,84 @@ const courses = computed(() => {
     })
   )}
 );
+onMounted(() => {
+  setTimeout(() => {
+    props.data.showCard = true
+  }, 200)
+})
 
 </script>
 
 <template>
-  <div>
-    <div
-      class="card test"
-      :style="[{ minHeight: '200px', width: '400px' }]"
-    >
-      <div class="card-header text-center">
-        <ExpandNodeInformation
-          :courses
-        />
-        <div class="row">
-          <div class="col-10">
-            <h5 v-if="courses[0]">
-              {{ courses[0].fullname }}
-            </h5>
-            <h5 v-else>
-              Subcourse
-            </h5>
+  <transition name="unfold">
+    <div v-if="data.showCard">
+      <div
+        class="card test"
+        :style="[{ minHeight: '200px', width: '400px' }]"
+      >
+        <div class="card-header text-center">
+          <ExpandNodeInformation
+            :courses
+          />
+          <div class="row">
+            <div class="col-10">
+              <h5 v-if="courses[0]">
+                {{ courses[0].fullname }}
+              </h5>
+              <h5 v-else>
+                Subcourse
+              </h5>
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        class="card-body"
-        :class="active ? 'active-node' : 'inactive-node'"
-        :style="[nodeBackgroundColor]"
-      >
         <div
-          class="card-img dashboard-card-img mb-2"
-          :style="{
-            height: '10rem',
-            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundColor: cover_image ? '' : '#cccccc'
-          }"
+          class="card-body"
+          :class="active ? 'active-node' : 'inactive-node'"
+          :style="[nodeBackgroundColor]"
         >
-          <div class="overlay">
-            <button
-              class="icon-link"
-              @click="goToCourse"
-            >
-              <i class="fa fa-play" />
-            </button>
+          <div
+            class="card-img dashboard-card-img mb-2"
+            :style="{
+              height: '10rem',
+              backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: cover_image ? '' : '#cccccc'
+            }"
+          >
+            <div class="overlay">
+              <button
+                class="icon-link"
+                @click="goToCourse"
+              >
+                <i class="fa fa-play" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+</transition>
 </template>
 <style scoped>
+/* Starting state for entering */
+.unfold-enter-active, .unfold-leave-active {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  visibility: visible;
+}
+
+.unfold-enter-from, .unfold-leave-to {
+  transform: scaleX(0);
+  opacity: 0;
+  transform-origin: left;
+}
+
+.unfold-enter-to, .unfold-leave-from {
+  transform: scaleX(1);
+  opacity: 1;
+  transform-origin: left;
+}
+
 .overlay {
   position: relative;
   top: 50%;
