@@ -270,6 +270,9 @@ $string['nodes_hide_completion'] = 'Abschluss ausblenden';
 $string['nodes_show_completion'] = 'Abschluss anzeigen';
 $string['nodes_feedback'] = 'Feedback';
 $string['nodes_no_feedback'] = 'Kein Feedback festgelegt...';
+$string['nodes_warning_time_restriction'] = 'Diese Einschränkung überschreibt nicht die allgemeinen Kurszugangszeiten. Stellen Sie sicher, dass Ihre Daten nicht mit den Kursdaten in Konflikt stehen.';
+$string['nodes_warning_time_heading'] = 'Warnung!';
+$string['nodes_no_description'] = 'Es wurde keine Kursbeschreibung bereitgestellt';
 
 // Knoten-Elemente-Strings.
 $string['nodes_items_start'] = 'Start:';

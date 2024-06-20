@@ -81,7 +81,7 @@ class learning_path_courses {
         }
         $select = "SELECT s1.*
         FROM (
-            SELECT DISTINCT c.id AS course_node_id, c.fullname, c.shortname, c.category, " . $selectagg . "
+            SELECT DISTINCT c.id AS course_node_id, c.fullname, c.shortname, c.category, c.summary, " . $selectagg . "
             FROM {course} c
             LEFT JOIN {tag_instance} ti ON ti.itemid = c.id AND ti.itemtype = 'course'
             LEFT JOIN {tag} tag ON ti.tagid = tag.id " .

@@ -26,6 +26,7 @@
 // Import needed libraries
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import ExpandNodeInformation from '../nodes_items/ExpandNodeInformation.vue';
 
 // Load Store
 const store = useStore();
@@ -63,6 +64,7 @@ const courses = computed(() => {
     props.data.course_id == course.course_node_id[0]
     ).map(course => ({
       fullname: course.fullname,
+      description: course.summary,
       id: [course.course_node_id[0]]
     })
   )}
@@ -77,6 +79,9 @@ const courses = computed(() => {
       :style="[{ minHeight: '200px', width: '400px' }]"
     >
       <div class="card-header text-center">
+        <ExpandNodeInformation
+          :courses
+        />
         <div class="row">
           <div class="col-10">
             <h5 v-if="courses[0]">
