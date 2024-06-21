@@ -1,9 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
 import { useVueFlow } from '@vue-flow/core'
 
-const store = useStore();
 
 // load useVueFlow properties / functions
 const { findNode, removeNodes, addNodes } = useVueFlow()
@@ -50,13 +48,15 @@ onUnmounted(() => {
   reversed_course_node_id.forEach((node_id, index) => {
     remove_nodes.push(props.data.node_id + '_expanded_courses_' + node_id)
     let remove_node =findNode(props.data.node_id + '_expanded_courses_' + node_id)
-    remove_node.deletable = true
-    setTimeout(() => {
-      remove_node.data.showCard = false
-    }, index * 300)
-    setTimeout(() => {
-      removeNodes([remove_node])
-    }, (index+1) * 300)
+    if (remove_node) {
+      remove_node.deletable = true
+      setTimeout(() => {
+        remove_node.data.showCard = false
+      }, index * 300)
+      setTimeout(() => {
+        removeNodes([remove_node])
+      }, (index+1) * 300)
+    }
   })
 })
 </script>

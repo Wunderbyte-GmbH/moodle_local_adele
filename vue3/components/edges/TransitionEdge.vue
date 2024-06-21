@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { TransitionPresets, useDebounceFn, useTransition, watchDebounced } from '@vueuse/core'
 import { getBezierPath, useVueFlow } from '@vue-flow/core'
 
@@ -43,15 +43,20 @@ const props = defineProps({
   },
   data: {
     type: Object,
-    required: false,
+    required: true,
   },
   markerEnd: {
     type: String,
-    required: false,
+    required: true,
   },
   style: {
     type: Object,
+    required: true,
+  },
+  hidden: {
+    type: Boolean,
     required: false,
+    default: false,
   },
 })
 
@@ -141,6 +146,10 @@ onEdgeClick(({ edge }) => {
   }
 
 })
+const hiddenStyle = computed(() => {
+  return props.hidden ? { display: 'none' } : {}
+})
+
 </script>
 
 <script>
@@ -150,7 +159,14 @@ export default {
 </script>
 
 <template>
-  <path :id="id" ref="curve" :style="style" class="vue-flow__edge-path" :d="path[0]" :marker-end="markerEnd" />
+  <path
+    :id="id"
+    ref="curve"
+    :style="[style, hiddenStyle]"
+    class="vue-flow__edge-path"
+    :d="path[0]"
+    :marker-end="markerEnd"
+  />
   <Transition name="fade">
     <circle
       v-if="showDot"

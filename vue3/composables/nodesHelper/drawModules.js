@@ -1,5 +1,4 @@
 import removeModules from './removeModules'
-import findNodeDimensions from './findNodeDimensions'
 import darkenColor from './darkenColor'
 
 const drawModules = async (learningpath, addNodes, removeNodes, findNode, draggedNode = null, deletedNodeId = null) => {

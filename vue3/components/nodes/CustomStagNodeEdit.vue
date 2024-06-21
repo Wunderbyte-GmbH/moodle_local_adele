@@ -63,6 +63,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  zoomstep: {
+    type: String,
+    required: true,
+  },
 });
 
 const emit = defineEmits([
@@ -156,6 +160,7 @@ const expandCourses = () => {
     @click="emit('node-clicked', props.data)"
   >
     <div
+      v-if="zoomstep != '0.2'"
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
@@ -370,6 +375,30 @@ const expandCourses = () => {
         />
       </div>
     </div>
+    <div
+      v-else
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
+    >
+      <div
+        :class="'non_parallel'"
+      />
+      <div class="card-header text-center">
+        <div class="row">
+          <div class="col-12">
+            <h1>
+              {{ store.state.strings.nodes_course_node }}
+            </h1>
+          </div>
+        </div>
+      </div>
+      <div
+        class="card-body card-body-outer"
+        :style="[nodeBackgroundColor]"
+      >
+        {{ data.fullname || store.state.strings.nodes_collection }}
+      </div>
+    </div>
     <Handle
       v-if="store.state.view!='teacher' && store.state.view!='student'"
       id="target"
@@ -388,6 +417,20 @@ const expandCourses = () => {
 </template>
 
 <style scoped>
+
+.card-body-outer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+  min-height: 200px;
+  padding: 1rem; /* Add some padding for better spacing */
+  font-size: clamp(34px, 2.8vw, 64px); /* Responsive font size */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis to overflow text */
+  font-weight: bold;
+}
 .overlay {
   position: relative;
   top: 50%;

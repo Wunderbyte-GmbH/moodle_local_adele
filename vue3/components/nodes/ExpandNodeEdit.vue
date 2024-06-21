@@ -36,6 +36,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  zoomstep: {
+    type: String,
+    required: true,
+  },
 });
 
 const goToCourse = () => {
@@ -125,7 +129,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
-</transition>
+  </transition>
 </template>
 <style scoped>
 /* Starting state for entering */

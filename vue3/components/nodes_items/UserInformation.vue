@@ -25,7 +25,6 @@
 
   // Setup and cleanup event listeners
   onMounted(() => {
-    console.log(props.data)
     document.addEventListener('click', closeOnOutsideClick);
   });
 

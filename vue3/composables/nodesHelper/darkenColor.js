@@ -1,6 +1,6 @@
 // darken node color
 const  darkenColor = (color, darken) => {
-    let intensity = 0.5;
+    let intensity = 0.2;
     let rgb = hexToRgb(color);
     rgb.r = Math.floor(rgb.r * intensity + 128 * darken);
     rgb.g = Math.floor(rgb.g * intensity + 128 * darken);

@@ -23,49 +23,86 @@
  */ -->
 
  <script setup>
-import { onMounted, ref } from 'vue';
-import darkenColor from '../../composables/nodesHelper/darkenColor';
+import { Handle, Position } from '@vue-flow/core'
+import { computed, onMounted, ref } from 'vue';
+import darkenColor from '../../composables/nodesHelper/darkenColor'
 
 const props = defineProps({
   data: {
     type: Object,
     required: true,
   },
+  zoomstep: {
+    type: String,
+    required: true,
+  },
 });
 
 const darkerColor = ref('#1047033')
+const backgroundColor = ref('#1047033')
 
 onMounted(() => {
   darkerColor.value = darkenColor(props.data.color_inactive ?? props.data.color)
+  backgroundColor.value = addOpacity(props.data)
 })
+
+const addOpacity = (data) => {
+  let color = data.color_inactive ?? data.color
+  color = color.replace('#', '');
+
+  // Parse the r, g, b values
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+
+  // Return the RGBA color
+  return `rgba(${r}, ${g}, ${b}, ${data.opacity})`;
+}
+
+// Connection handles
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+
 
 </script>
 <template>
   <div>
-    <div class="module-name">
-      <span class="bold">{{ data.name }}</span>
-    </div>
     <div
       class="custom-node text-center p-3"
       :style="{
-        'background-color': data.color_inactive ?? data.color,
-        'opacity' : data.opacity,
+        'background-color': backgroundColor,
         'height': data.height,
         'width': data.width ? data.width : '400px'
       }"
+    />
+    <div
+      class="module-name"
+      :style="{
+        'background-color': backgroundColor,
+        'border': '5px solid ' + darkerColor,
+        'border-bottom': '5px solid ' + darkerColor,
+        'border-radius': '8px 8px 0 0'
+      }"
     >
-      <div
-        class="module-name"
-        :style="{
-          'background-color': data.color_inactive ?? data.color,
-          'border': '5px solid ' + darkerColor,
-          'border-bottom': '5px solid ' + darkerColor,
-          'border-radius': '8px 8px 0 0'
-        }"
+      <span
+        :class="zoomstep == '0.2' ? 'bold-outer' : 'bold'"
       >
-        <span class="bold">{{ data.name }}</span>
-      </div>
+        {{ data.name }}
+      </span>
     </div>
+    <Handle
+      v-if="zoomstep == '0.2'"
+      id="target"
+      type="target"
+      :position="Position.Top"
+      :style="handleStyle"
+    />
+    <Handle
+      v-if="zoomstep == '0.2'"
+      id="source"
+      type="source"
+      :position="Position.Bottom"
+      :style="handleStyle"
+    />
   </div>
 </template>
 
@@ -91,5 +128,12 @@ onMounted(() => {
     font-weight: bold;
     font-size: 30px;
     padding: 10px;
+    color: black;
+  }
+  .bold-outer {
+    font-weight: bold;
+    font-size: clamp(34px, 3.5vw, 64px);
+    padding: 10px;
+    color: black;
   }
 </style>
