@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
@@ -33,7 +33,7 @@ import UserInformation from '../nodes_items/UserInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 
-// Load Store 
+// Load Store
 const store = useStore();
 const date = ref({})
 const includedCourses = ref([])
@@ -46,6 +46,10 @@ const props = defineProps({
   },
   learningpath: {
     type: Object,
+    required: true,
+  },
+  zoomstep: {
+    type: String,
     required: true,
   },
 });
@@ -137,14 +141,15 @@ const goToCourse = () => {
     @click="emit('node-clicked', props.data)"
   >
     <div
+      v-if="zoomstep != '0.2'"
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
     >
       <div class="card-header text-center">
-        <NodeInformation 
+        <NodeInformation
           :data
           :parentnode
-        /> 
+        />
         <div class="row">
           <div class="col-10">
             <h5>
@@ -153,15 +158,15 @@ const goToCourse = () => {
           </div>
         </div>
       </div>
-      <div 
+      <div
         class="card-body"
         :class="(active || store.state.view == 'teacher') ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
         <div v-if="store.state.learningpath">
-          <div 
-            class="card-img dashboard-card-img mb-2" 
-            :style="{ 
+          <div
+            class="card-img dashboard-card-img mb-2"
+            :style="{
               height: '10rem',
               backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
               backgroundSize: 'cover',
@@ -170,17 +175,17 @@ const goToCourse = () => {
             }"
           >
             <div class="overlay">
-              <button 
+              <button
                 class="icon-link"
                 @click="goToCourse"
               >
-                <i 
+                <i
                   :class="active ? 'fa fa-play' : 'fa fa-lock'"
                 />
               </button>
             </div>
           </div>
-          <div 
+          <div
             class="row mb-2"
           >
             <div class="col-4 text-left">
@@ -188,14 +193,14 @@ const goToCourse = () => {
                 {{ store.state.strings.nodes_progress }}
               </b>
             </div>
-            <div 
-              class="col-8" 
+            <div
+              class="col-8"
               style="display: flex; justify-content: end;"
             >
               <ProgressBar :progress="data.progress" />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualrestriction">
-              <RestrictionOutPutItem 
+              <RestrictionOutPutItem
                 :data="data"
               />
             </div>
@@ -209,29 +214,63 @@ const goToCourse = () => {
         v-if="data"
         class="card-footer"
       >
-        <UserInformation 
-          :data="data" 
+        <UserInformation
+          :data="data"
         />
       </div>
     </div>
-    <Handle 
+    <div
+      v-else
+      class="card"
+      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
+    >
+      <div class="card-header text-center">
+        <div class="row">
+          <div class="col-12">
+            <h1>
+              {{ store.state.strings.nodes_course_node }}
+            </h1>
+          </div>
+        </div>
+      </div>
+      <div
+        class="card-body card-body-outer"
+        :style="[nodeBackgroundColor]"
+      >
+        {{ data.fullname || store.state.strings.nodes_collection }}
+      </div>
+    </div>
+    <Handle
       v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="target" 
-      type="target" 
-      :position="Position.Top" 
-      :style="handleStyle" 
+      id="target"
+      type="target"
+      :position="Position.Top"
+      :style="handleStyle"
     />
-    <Handle 
+    <Handle
       v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="source" 
-      type="source" 
-      :position="Position.Bottom" 
-      :style="handleStyle" 
+      id="source"
+      type="source"
+      :position="Position.Bottom"
+      :style="handleStyle"
     />
   </div>
 </template>
 
 <style scoped>
+.card-body-outer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+  min-height: 200px;
+  padding: 1rem;
+  font-size: clamp(34px, 2.8vw, 64px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+}
 .overlay {
   position: relative;
   top: 50%;
@@ -270,7 +309,7 @@ const goToCourse = () => {
 
 .table-hover tbody tr:hover {
   background-color: #f5f5f5;
-  
+
 }
 .table-container {
   width: 300px;

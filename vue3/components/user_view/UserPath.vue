@@ -78,6 +78,7 @@
               <CustomNodeEdit
                 :data="data"
                 :learningpath="userLearningpath"
+                :zoomstep="zoomstep"
               />
             </template>
             <template
@@ -86,19 +87,25 @@
               <CustomStagNodeEdit
                 :data="data"
                 :learningpath="userLearningpath"
+                :zoomstep="zoomstep"
               />
             </template>
             <template #node-module="{ data }">
-              <ModuleNode :data="data" />
+              <ModuleNode
+                :data="data"
+                :zoomstep="zoomstep"
+              />
             </template>
             <template #node-expandedcourses="{ data }">
               <ExpandNodeEdit
                 :data="data"
+                :zoomstep="zoomstep"
               />
             </template>
             <template #edge-custom="props">
               <TransitionEdge
                 v-bind="props"
+                :hidden="props.data.hidden"
                 @end-transition="handleZoomLock"
               />
             </template>
@@ -128,6 +135,8 @@ import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
+import outerGraphDisplay from '../../composables/flowHelper/outerGraphDisplay'
+import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
 
 // Load Router
 const router = useRouter()
@@ -135,7 +144,8 @@ const route = useRoute()
 // Load Store
 const store = useStore()
 
-const { fitView, addNodes, removeNodes, findNode, zoomTo, viewport, setCenter } = useVueFlow()
+const { fitView, addNodes, addEdges, removeNodes, removeEdges,
+  findNode, zoomTo, viewport, setCenter } = useVueFlow()
 
 // Function to go back
 const goBack = () => {
@@ -149,6 +159,7 @@ const userLearningpath = ref(null)
 
 const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
 const zoomLock = ref(false)
+const zoomstep = ref(0)
 
 onMounted( async () => {
   // Check if available courses are set
@@ -199,8 +210,9 @@ const handleZoomLock = (node) => {
 
 const setZoomLevel = async (action) => {
   zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
+  const oldViewport = viewport.value.zoom
+  let newViewport = null
+  let currentStepIndex = zoomSteps.findIndex(step => oldViewport < step);
   if (currentStepIndex === -1) {
     currentStepIndex = zoomSteps.length;
   }
@@ -217,7 +229,20 @@ const setZoomLevel = async (action) => {
       newViewport = zoomSteps[zoomSteps.length - 2]
     }
   }
+  if (newViewport == 0.2) {
+    edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
+    setTimeout(() => {
+      drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
+    }, 50);
+  } else if (oldViewport < 0.25) {
+    edges.value = innerGraphDisplay(edges.value, removeEdges)
+    setTimeout(() => {
+      drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
+    }, 50);
+  }
   if (newViewport != undefined) {
+    zoomstep.value = newViewport
+
     await zoomTo(newViewport, { duration: 500}).then(() => {
       zoomLock.value = true
     })
@@ -227,13 +252,12 @@ const setZoomLevel = async (action) => {
 watch(() => userLearningpath.value, () => {
   const flowchart = userLearningpath.value.json
   nodes.value = flowchart.tree.nodes;
-  edges.value = flowchart.tree.edges;
+  edges.value = innerGraphDisplay(flowchart.tree.edges);
   edges.value.forEach((edge) => {
     edge.deletable = false
     edge.type = 'custom'
   })
   setTimeout(() => {
-    fitView({ duration: 1000, padding: 0.5 });
     drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
   }, 100);
 }, { deep: true } )

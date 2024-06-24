@@ -305,6 +305,7 @@ $string['nodes_no_feedback'] = 'No feedback set...';
 $string['nodes_warning_time_restriction'] = 'This restriction does not overwrite the general course accessebility times. Make sure your dates do not conflict with the course dates.';
 $string['nodes_warning_time_heading'] = 'Warning!';
 $string['nodes_no_description'] = 'No course description was provided';
+$string['nodes_course_node'] = 'Course Node';
 
 // Nodes Items strings.
 $string['nodes_items_start'] = 'Start:';
