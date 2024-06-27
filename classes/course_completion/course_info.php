@@ -69,6 +69,9 @@ class course_info {
                 $conditions[] = $conditionclass->get_description();
             }
         }
+        usort($conditions, function($a, $b) {
+            return $b['id'] <=> $a['id'];
+        });
         return $conditions;
     }
 }

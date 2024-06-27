@@ -46,7 +46,7 @@ require_once("{$CFG->libdir}/completionlib.php");
 class course_completed implements course_completion {
 
     /** @var int $id Standard Conditions have hardcoded ids. */
-    public $id = COURSES_COND_MANUALLY;
+    public $id = COURSES_COND_NODE_FINISHED;
     /** @var string $label of the redered condition in frontend. */
     public $label = 'course_completed';
     /** @var int $id Standard Conditions have hardcoded ids. */

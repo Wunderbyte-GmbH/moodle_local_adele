@@ -13,6 +13,10 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits([
+  'done-folding'
+]);
+
 onMounted(() => {
   const expandedNode = findNode(props.data.node_id)
   if (!expandedNode) return
@@ -37,6 +41,9 @@ onMounted(() => {
     }
     setTimeout(() => {
       addNodes([newnode])
+      if (index === props.data.course_node_id.length - 1) {
+        emit('done-folding');
+      }
     }, index * 300)
   })
 })
@@ -56,6 +63,9 @@ onUnmounted(() => {
       setTimeout(() => {
         removeNodes([remove_node])
       }, (index+1) * 300)
+      if (index === props.data.course_node_id.length - 1) {
+          emit('done-folding');
+        }
     }
   })
 })

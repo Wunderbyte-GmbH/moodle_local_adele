@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('COURSES_COND_NODE_FINISHED', 190);
 define('COURSES_COND_PARENT_NODE', 180);
 define('COURSES_COND_CATQUIZ', 170);
 define('COURSES_COND_MODQUIZ', 160);

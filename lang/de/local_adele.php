@@ -89,7 +89,7 @@ $string['fromlearningtitelplaceholder'] = 'Bitte geben Sie einen Titel an';
 $string['fromlearningdescriptionplaceholder'] = 'Bitte geben Sie eine kurze Beschreibung an';
 $string['placeholder_search'] = 'Kurse suchen';
 $string['placeholder_lp_search'] = 'Lernpfad suchen';
-$string['edit_course_node'] = 'Kursknoten bearbeiten';
+$string['edit_course_node'] = 'Knoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
 
 // Uebersichtszeichenfolge.
@@ -122,19 +122,19 @@ $string['description_save'] = 'Sie haben den Lernpfad gespeichert/aktualisiert!'
 
 // Knotenzeichenfolgen.
 $string['node_coursefullname'] = 'Knotenname:';
-$string['node_courseshortname'] = 'Kurzbezeichnung des Kurses:';
+$string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
 // Bedingungsbeschreibung.
-$string['course_description_condition_completion_manual'] = 'Kurs wird manuell abgeschlossen';
-$string['course_name_condition_completion_manual'] = 'Kursabschluss-Checkbox';
-$string['course_description_condition_parent_courses'] = 'Kurs wird zugänglich, wenn eine bestimmte Anzahl von übergeordneten Kursen abgeschlossen ist';
+$string['course_description_condition_completion_manual'] = 'Knoten wird manuell abgeschlossen';
+$string['course_name_condition_completion_manual'] = 'Knotenabschluss-Checkbox';
+$string['course_description_condition_parent_courses'] = 'Knoten wird zugänglich, wenn eine bestimmte Anzahl von übergeordneten Knoten abgeschlossen ist';
 $string['course_name_condition_parent_courses'] = 'Gemäß übergeordneter Knoten';
 $string['course_description_condition_restriction_manual'] = 'Zugriff wird manuell gewährt';
-$string['course_name_condition_restriction_manual'] = 'Kursbeschränkungs-Checkbox';
-$string['course_description_condition_restriction_specific_course'] = 'Nur wenn ein bestimmter Kurs dieses Lernpfads abgeschlossen ist';
-$string['course_name_condition_restriction_specific_course'] = 'Bestimmter Kurs abgeschlossen';
-$string['course_description_condition_timed'] = 'Kursstartdatum; Kursenddatum';
-$string['course_name_condition_timed'] = 'Kursstart-/Enddatum';
+$string['course_name_condition_restriction_manual'] = 'Knotenbeschränkungs-Checkbox';
+$string['course_description_condition_restriction_specific_course'] = 'Nur wenn ein bestimmter Knoten dieses Lernpfads abgeschlossen ist';
+$string['course_name_condition_restriction_specific_course'] = 'Bestimmter Knoten abgeschlossen';
+$string['course_description_condition_timed'] = 'Knotenstartdatum; Knotenddatum';
+$string['course_name_condition_timed'] = 'Knotenstart-/Enddatum';
 $string['course_description_condition_course_completed'] = 'Ein Kurs innerhalb dieses Knotens muss vom Studenten abgeschlossen sein';
 $string['course_name_condition_course_completed'] = 'Kurs(e) abgeschlossen';
 $string['course_description_condition_catquiz'] = 'Gemäß catquiz Ergebnissen/Versuchen';
@@ -192,7 +192,7 @@ $string['conditions_set_values'] = 'Werte setzen';
 $string['conditions_catquiz_warning_description'] = 'Das Catquiz befindet sich im selben Kurs wie der Lernpfad';
 $string['conditions_catquiz_warning_name'] = 'Catquiz im Kurs';
 $string['conditions_min_grad'] = 'Min. Note:';
-$string['conditions_finish_course'] = 'Kurs manuell abschließen';
+$string['conditions_finish_course'] = 'Knoten manuell abschließen';
 
 // Abschlusszeichenfolgen.
 $string['completion_invalid_path_title'] = 'Ungültiger Pfad';
@@ -200,7 +200,7 @@ $string['completion_invalid_path_text'] = 'Eigenständige Knoten gefunden. Jeder
 $string['completion_go_back_learningpath'] = 'Zurück zum Lernpfad';
 $string['completion_edit_completion'] = 'Abschlusskriterien des Kursknotens bearbeiten';
 $string['completion_completion_for'] = 'Abschlusskriterien für:';
-$string['completion_course_title'] = 'Kurstitel:';
+$string['completion_course_title'] = 'Knotentitel:';
 $string['completion_course_tags'] = 'Tags:';
 $string['completion_node_refused_title'] = 'Knotenabwurf abgelehnt';
 $string['completion_node_refused_text'] = 'Bitte lassen Sie den Knoten in den Ablagezonen fallen, die angezeigt werden, wenn Sie einen Knoten zu einem vorhandenen Knoten ziehen.';
@@ -300,13 +300,13 @@ $string['restriction_select_number'] = 'Eine Zahl auswählen:';
 $string['restriction_select_course'] = 'Einen Kurs auswählen:';
 $string['restriction_choose_number'] = 'Eine Zahl wählen';
 $string['restriction_parents_found'] = 'Folgende übergeordnete Knoten gefunden:';
-$string['restriction_access_manually'] = 'Zugriff auf Kurs manuell gewähren';
+$string['restriction_access_manually'] = 'Zugriff auf Knoten manuell gewähren';
 $string['restriction_invalid_path_title'] = 'Ungültiger Pfad';
 $string['restriction_invalid_path_text'] = 'Eigenständige Knoten gefunden. Jeder Knoten muss mit dem Pfad verbunden sein.';
 $string['restriction_go_back_learningpath'] = 'Zurück zum Lernpfad';
 $string['restriction_edit_restrictions'] = 'Einschränkungen bearbeiten, um Knotenkurs zu betreten';
 $string['restriction_restrictions_for'] = 'Einschränkungen für:';
-$string['restriction_course_title'] = 'Kurstitel:';
+$string['restriction_course_title'] = 'Knotentitel:';
 $string['restriction_tags'] = 'Tags:';
 $string['restriction_loading_restrictions'] = 'Lade Einschränkungen...';
 $string['restriction_node_drop_refused_title'] = 'Knotenabwurf abgelehnt';

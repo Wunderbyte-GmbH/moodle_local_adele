@@ -135,6 +135,7 @@ const isCompletionVisible = ref(false);
 const isRestrictionVisible = ref(false);
 const isParentNode = ref(false);
 const courseExpanded = ref(false);
+const isBlocked = ref(false);
 
 const toggleTable = (condition) => {
   const otherCondition = condition == store.state.strings.nodes_completion ? store.state.strings.nodes_completion : store.state.strings.nodes_completion;
@@ -144,6 +145,11 @@ const toggleTable = (condition) => {
   otherconditionRef.value = false;
 };
 
+const enableButton = () => {
+  isBlocked.value = false
+};
+
+
 const parentStyle = {
   borderColor: store.state.strings.DEEP_SKY_BLUE,
   borderWidth: '3px',
@@ -151,6 +157,7 @@ const parentStyle = {
 
 const expandCourses = () => {
   courseExpanded.value = !courseExpanded.value
+  isBlocked.value = true
 }
 
 </script>
@@ -205,6 +212,7 @@ const expandCourses = () => {
             <button
               v-if="active"
               class="icon-link"
+              :disabled="isBlocked"
               @click="expandCourses"
             >
               <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
@@ -362,7 +370,10 @@ const expandCourses = () => {
           </div>
         </div>
         <div v-if="courseExpanded">
-          <ExpandedCourses :data="data" />
+          <ExpandedCourses
+            :data="data"
+            @doneFolding="enableButton"
+          />
         </div>
       </div>
       <div
