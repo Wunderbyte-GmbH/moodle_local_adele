@@ -9,6 +9,17 @@
     >
     <div v-if="showDropdown" class="dropdown">
       <ul class="dropdown-list">
+          <li
+            @mousedown.prevent="selectOption(null)"
+          >
+          <div class="test-info">
+            <div>
+              <b>
+                {{ store.state.strings.nodes_items_none }}
+              </b>
+            </div>
+          </div>
+        </li>
         <li
           v-for="option in filteredTests"
           :key="option.id"
@@ -92,7 +103,11 @@ const filteredTests = computed(() => {
 
 const selectOption = (option) => {
   selectedTest.value = option;
-  testSearch.value = option.name;
+  if (option) {
+    testSearch.value = option.name;
+  } else {
+    testSearch.value = null;
+  }
   showDropdown.value = false;
 }
 

@@ -2,24 +2,24 @@
   <div class="form-check">
     {{ completion.description }}
     <div class="form-group">
-      <DropdownInput 
+      <DropdownInput
         :selected-test-id="selectedQuiz"
-        :tests="quizzes" 
+        :tests="quizzes"
         @update:value="updatedTest"
       />
     </div>
     <div v-if="selectedQuiz">
       <div class="form-group">
-        <label 
-          class="form-label" 
+        <label
+          class="form-label"
           for="grade"
         >
           {{ store.state.strings.conditions_min_grad }}
         </label>
-        <input 
-          id="grade" 
-          v-model="grade" 
-          class="form-control" 
+        <input
+          id="grade"
+          v-model="grade"
+          class="form-control"
         >
       </div>
     </div>
@@ -31,13 +31,13 @@ import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import DropdownInput from '../../nodes_items/DropdownInput.vue'
 
-// Load Store 
+// Load Store
 const store = useStore();
 const props = defineProps({
   modelValue: {
     type: Object,
     default: null,
-  }, 
+  },
   completion: {
     type: Object,
     default: null,
@@ -82,7 +82,11 @@ watch(() => data.value, () => {
 }, { deep: true } );
 
 const updatedTest = (test) => {
-  selectedQuiz.value = test.id;
+  if (test) {
+    selectedQuiz.value = test.id;
+  } else {
+    selectedQuiz.value = test;
+  }
 }
 
 </script>

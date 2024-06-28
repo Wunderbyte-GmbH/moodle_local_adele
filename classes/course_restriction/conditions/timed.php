@@ -129,17 +129,25 @@ class timed implements course_restriction {
                     }
                     $enddate = self::isvaliddate($restrictionnode['data']['value']['end']);
                     if ($enddate) {
-                        if ($enddate >= $currenttimestamp &&
-                            $validstart) {
+                        if (
+                            $enddate >= $currenttimestamp &&
+                            $validstart
+                        ) {
                             $validtime = true;
                         } else {
                             $validtime = false;
                         }
                     }
+                    if ($startdate) {
+                        $startdate = $startdate->format('Y-m-d H:i:s');
+                    }
+                    if ($endtime) {
+                        $endtime = $endtime->format('Y-m-d H:i:s');
+                    }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
-                      'starttime' => $startdate->format('Y-m-d H:i:s') ?? null,
-                      'endtime' => $enddate->format('Y-m-d H:i:s') ?? null,
+                      'starttime' => $startdate,
+                      'endtime' => $enddate,
                     ];
                 } else {
                     $timed[$restrictionnode['id']] = [

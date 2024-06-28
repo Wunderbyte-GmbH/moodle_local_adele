@@ -279,6 +279,7 @@ $string['nodes_course_node'] = 'Kursknoten';
 $string['nodes_items_start'] = 'Start:';
 $string['nodes_items_end'] = 'Ende:';
 $string['nodes_items_testname'] = 'Testname:';
+$string['nodes_items_none'] = 'Keines';
 $string['nodes_items_coursename'] = 'Kursname:';
 $string['nodes_items_restrictions'] = 'Einschränkungen';
 $string['nodes_items_no_conditions'] = 'Keine Bedingungen definiert';

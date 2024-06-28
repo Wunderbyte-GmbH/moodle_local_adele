@@ -311,6 +311,7 @@ $string['nodes_course_node'] = 'Course Node';
 $string['nodes_items_start'] = 'Start:';
 $string['nodes_items_end'] = 'End:';
 $string['nodes_items_testname'] = 'Testname:';
+$string['nodes_items_none'] = 'None';
 $string['nodes_items_coursename'] = 'Coursename:';
 $string['nodes_items_restrictions'] = 'Restrictions';
 $string['nodes_items_no_conditions'] = 'No conditions are defined';
