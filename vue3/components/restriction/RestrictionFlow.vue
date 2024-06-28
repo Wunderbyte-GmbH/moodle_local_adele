@@ -1,25 +1,25 @@
 <template>
   <div>
-    <button 
+    <button
       class="btn btn-outline-primary"
       :disabled="showBackConfirmation"
       @click="goBack"
     >
       <i class="fa fa-arrow-left" /> {{ store.state.strings.restriction_go_back_learningpath }}
     </button>
-    <div 
+    <div
       v-if="showBackConfirmation"
       class="cancelConfi"
     >
       {{ store.state.strings.flowchart_cancel_confirmation }}
-      <button 
+      <button
         id="cancel-learning-path"
-        class="btn btn-primary m-2" 
+        class="btn btn-primary m-2"
         @click="goBack"
       >
         {{ store.state.strings.flowchart_back_button }}
       </button>
-      <button 
+      <button
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="goBackConfirmation(true)"
@@ -38,9 +38,9 @@
         </h5>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <i 
-              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'" 
-            /> 
+            <i
+              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'"
+            />
             {{ store.state.strings.restriction_course_title }} {{ store.state.node.fullname }}
           </li>
           <li class="list-group-item">
@@ -49,28 +49,28 @@
         </ul>
         <div v-if="restrictions !== null">
           <ParentNodes :parent-nodes="parentNodes" />
-          <div 
-            class="dndflowcompletion" 
-            @drop="onDrop" 
+          <div
+            class="dndflowcompletion"
+            @drop="onDrop"
           >
-            <VueFlow 
-              class="completions" 
-              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
+            <VueFlow
+              class="completions"
+              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
               :class="{ dark }"
-              :fit-view-on-init="true" 
-              :max-zoom="1.5" 
+              :fit-view-on-init="true"
+              :max-zoom="1.5"
               :min-zoom="0.2"
               :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
             >
-              <Background 
-                :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
-                gap="8" 
+              <Background
+                :pattern-color="dark ? '#FFFFFB' : '#aaa'"
+                gap="8"
               />
               <template #node-custom="{ data }">
-                <ConditionNode 
-                  :data="data" 
-                  :type="'Restriction'" 
+                <ConditionNode
+                  :data="data"
+                  :type="'Restriction'"
                   :learningpath="learningpathrestriction"
                   @update-visibility="handleVisibility"
                 />
@@ -82,7 +82,7 @@
                 <ConditionLine v-bind="props" />
               </template>
               <template #node-feedback="{ data }">
-                <FeedbackNode 
+                <FeedbackNode
                   :data="data"
                   :learningpath="learningpathcompletion"
                   :visibility="visibility_emitted"
@@ -90,22 +90,22 @@
                 />
               </template>
             </VueFlow>
-            <Sidebar 
-              :conditions="restrictions" 
-              :strings="store.state.strings" 
+            <Sidebar
+              :conditions="restrictions"
+              :strings="store.state.strings"
               :nodes="nodes"
               :edges="edges"
               :type="'restriction'"
               :style="{ backgroundColor: backgroundSidebar }"
-              @nodesIntersected="handleNodesIntersected" 
+              @nodesIntersected="handleNodesIntersected"
             />
           </div>
           <ChildNodes :child-nodes="childNodes" />
           <div class="d-flex justify-content-center">
-            <Controls 
+            <Controls
               :condition="'restriction'"
               :learningpath="learningpathrestriction"
-              @change-class="toggleClass" 
+              @change-class="toggleClass"
             />
           </div>
         </div>
@@ -139,7 +139,7 @@ const { nodes, edges, addNodes, project, vueFlowRef,
 } = useVueFlow({
   nodes: [],})
 
-// Load Store 
+// Load Store
 const store = useStore();
 const learningpathrestriction= ref({})
 const showBackConfirmation = ref(false)
@@ -395,7 +395,7 @@ function addFeedbackNode (node) {
   flex-direction:column;
   display:flex;
   height:600px}
-.dndflowcompletion 
+.dndflowcompletion
 aside{
   color:#fff;
   font-weight:700;
@@ -407,7 +407,7 @@ aside{
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1em;
 }
-.dndflowcompletion aside 
+.dndflowcompletion aside
 .nodes>*
 {
   margin-bottom:10px;
@@ -416,11 +416,11 @@ aside{
   -webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);
   box-shadow:5px 5px 10px 2px #00000040
 }
-.dndflowcompletion aside 
+.dndflowcompletion aside
 .description{
   margin-bottom:10px
 }
-.dndflowcompletion 
+.dndflowcompletion
 .vue-flow-wrapper
 {
   flex-grow:1;
@@ -430,7 +430,7 @@ aside{
   .dndflowcompletion{flex-direction:row}
   .dndflowcompletion aside{min-width:20%}}
   @media screen and (max-width: 639px)
-  {.dndflowcompletion aside 
+  {.dndflowcompletion aside
     .nodes{
       display:flex;
       flex-direction:row;
@@ -446,10 +446,12 @@ aside{
 .cancelConfi{
   z-index: 1;
   position: absolute;
-  background-color: lightgray;
+  background-color: #f3eeee;
   border-radius: 0.5rem;
   padding: 0.25rem;
   margin: 0.25rem;
+  box-shadow:0 5px 10px #0000004d;
+  width: max-content;
 }
 
 </style>

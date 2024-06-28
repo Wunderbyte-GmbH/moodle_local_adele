@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 
  <script setup>
  // Import needed libraries
@@ -30,7 +30,7 @@ import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import removeModules from '../../composables/nodesHelper/removeModules';
 import { ref } from 'vue';
- 
+
 // Load Store and Router
 const store = useStore();
 const router = useRouter()
@@ -38,14 +38,14 @@ const route = useRoute()
 const { toObject } = useVueFlow()
 
 const showCancelConfirmation = ref(false)
-   
+
  // Prepare and save learning path
  const onSave = async () => {
     let completion = toObject();
     const route_params = route.params;
     completion = await removeModules(completion, null)
-    await store.dispatch('saveUserPathRelation', { 
-        nodes: completion.nodes, 
+    await store.dispatch('saveUserPathRelation', {
+        nodes: completion.nodes,
         route: route_params});
 
     router.push({
@@ -62,36 +62,36 @@ const onCancel = () => {
 const onCancelConfirmation = () => {
   router.go(-1)
 };
- 
+
  </script>
- 
+
 <template>
   <Panel class="save-restore-controls">
-    <button 
-      class="btn btn-primary m-2" 
+    <button
+      class="btn btn-primary m-2"
       @click="onSave"
     >
       {{ store.state.strings.save }}
     </button>
-    <button 
-      class="btn btn-secondary m-2" 
+    <button
+      class="btn btn-secondary m-2"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
-    <div 
+    <div
       v-if="showCancelConfirmation"
       class="cancelConfi"
     >
       {{ store.state.strings.flowchart_cancel_confirmation }}
-      <button 
+      <button
         id="cancel-learning-path"
-        class="btn btn-primary m-2" 
+        class="btn btn-primary m-2"
         @click="onCancel"
       >
         {{ store.state.strings.flowchart_back_button }}
       </button>
-      <button 
+      <button
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="onCancelConfirmation"
@@ -101,14 +101,16 @@ const onCancelConfirmation = () => {
     </div>
   </Panel>
 </template>
- 
+
 <style scoped>
 .cancelConfi{
+  z-index: 1;
   position: absolute;
-  background-color: lightgray;
+  background-color: #f3eeee;
   border-radius: 0.5rem;
   padding: 0.25rem;
   margin: 0.25rem;
+  box-shadow:0 5px 10px #0000004d;
   width: max-content;
 }
 </style>

@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
  <script setup>
  // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
@@ -37,7 +37,7 @@ const courses = computed(() => {
   ) {
     return [];
   }
-  return store.state.availablecourses.filter(course => 
+  return store.state.availablecourses.filter(course =>
     props.data.course_node_id.includes(course.course_node_id[0])
     ).map(course => ({
       fullname: course.fullname,
@@ -65,7 +65,7 @@ const props = defineProps({
     required: true,
   },
 });
-// Load Store 
+// Load Store
 const store = useStore();
 const emit = defineEmits([
   'typeChange',
@@ -142,7 +142,7 @@ const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, f
 // Set the node that handle has been clicked
 const setStartNode = (node_id) => {
   store.commit('setstartNode', {
-    startnode: node_id, 
+    startnode: node_id,
   });
 };
 
@@ -158,7 +158,7 @@ const childStyle = {
 </script>
 <template>
   <div>
-    <div 
+    <div
       class="card"
       :style="[{ minHeight: cardHeight + 'px', width: '400px' }, childStyle]"
     >
@@ -172,12 +172,12 @@ const childStyle = {
         </div>
       </div>
 
-      <div 
+      <div
         class="card-body"
       >
-        <div 
-          class="card-img dashboard-card-img" 
-          :style="{ 
+        <div
+          class="card-img dashboard-card-img"
+          :style="{
             height: '10rem',
             backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
@@ -185,24 +185,27 @@ const childStyle = {
             backgroundColor: cover_image ? '' : '#cccccc'
           }"
         >
-          <div class="overlay">
-            <button 
-              class="icon-link"
-              @click="setPretestView"
-            >
-              <i 
-                class="fa fa-tasks" 
-              />
-            </button>
-            <button 
+          <div
+            v-if="store.state.view!='teacher'"
+            class="overlay"
+          >
+            <button
               class="icon-link"
               @click="setRestrictionView"
             >
               <i class="fa fa-lock" />
             </button>
-            <button 
+            <button
               class="icon-link"
-              data-toggle="modal" 
+              @click="setPretestView"
+            >
+              <i
+                class="fa fa-tasks"
+              />
+            </button>
+            <button
+              class="icon-link"
+              data-toggle="modal"
               data-target="#nodeModal"
               @click="setNodeModal"
             >
@@ -214,21 +217,21 @@ const childStyle = {
           <h5 class="card-title">
             {{ store.state.strings.nodes_learning_module }}
           </h5>
-          <select 
+          <select
             v-model="dataValue.module"
             class="form-select form-control"
             @change="changeModule(dataValue)"
           >
-            <option 
-              value="" 
-              selected 
+            <option
+              value=""
+              selected
               disabled
             >
               {{ store.state.strings.nodes_select_module }}
             </option>
-            <option 
-              v-for="module in learningmodule" 
-              :key="module.id" 
+            <option
+              v-for="module in learningmodule"
+              :key="module.id"
               :value="module.id"
             >
               {{ module.name }}
@@ -238,45 +241,45 @@ const childStyle = {
         <h5 class="card-title">
           {{ store.state.strings.nodes_included_courses }}
         </h5>
-        <div 
-          v-for="(value, key) in courses" 
-          :key="key" 
+        <div
+          v-for="(value, key) in courses"
+          :key="key"
           class="card-text"
         >
           <div class="fullname-container">
             {{ value.fullname }}
-            <button 
+            <button
               v-if="store.state.view != 'teacher'"
-              type="button" 
-              class="btn btn-danger btn-sm trash-button" 
+              type="button"
+              class="btn btn-danger btn-sm trash-button"
               @click="removeCourse(value.id)"
             >
-              <i 
-                :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'" 
+              <i
+                :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
               />
             </button>
           </div>
         </div>
       </div>
       <div class="card-footer">
-        <OverviewRestrictionCompletion 
-          :node="data" 
+        <OverviewRestrictionCompletion
+          :node="data"
           :learningpath="learningpath"
         />
       </div>
     </div>
-    <Handle 
-      id="target" 
-      type="target" 
-      :position="Position.Top" 
-      :style="targetHandleStyle" 
+    <Handle
+      id="target"
+      type="target"
+      :position="Position.Top"
+      :style="targetHandleStyle"
       @mousedown="() => setStartNode(data.node_id)"
     />
-    <Handle 
-      id="source" 
-      type="source" 
-      :position="Position.Bottom" 
-      :style="targetHandleStyle" 
+    <Handle
+      id="source"
+      type="source"
+      :position="Position.Bottom"
+      :style="targetHandleStyle"
       @mousedown="() => setStartNode(data.node_id)"
     />
   </div>

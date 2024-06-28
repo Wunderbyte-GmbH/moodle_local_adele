@@ -26,14 +26,14 @@
   <div>
     <notifications width="100%" />
     <div>
-      <button 
+      <button
         v-if="store.state.view!='student'"
         class="btn btn-outline-primary"
-        @click="goBack" 
+        @click="goBack"
       >
         <i class="fa fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
       </button>
-      <h2 
+      <h2
         v-if="store.state.view!='student'"
         class="mt-3"
       >
@@ -44,8 +44,8 @@
           <div class="card-body">
             <h5 class="card-title">
               <i
-                :class="store.state.version ? 'fa fa-user-circle' : 'fa fa-user'" 
-              /> 
+                :class="store.state.version ? 'fa fa-user-circle' : 'fa fa-user'"
+              />
               {{ userLearningpath.username }}
             </h5>
             <ul class="list-group list-group-flush">
@@ -62,12 +62,12 @@
           </div>
         </div>
         <div style="width: 100%; height: 600px;">
-          <VueFlow 
-            :nodes="nodes" 
-            :edges="edges" 
-            :viewport="viewport" 
-            :default-viewport="viewport" 
-            :max-zoom="1.5" 
+          <VueFlow
+            :nodes="nodes"
+            :edges="edges"
+            :viewport="viewport"
+            :default-viewport="viewport"
+            :max-zoom="1.5"
             :min-zoom="0.2"
             :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
@@ -75,16 +75,16 @@
             @node-click="onNodeClick"
           >
             <template #node-custom="{ data }">
-              <CustomNodeEdit 
-                :data="data" 
+              <CustomNodeEdit
+                :data="data"
                 :learningpath="userLearningpath"
               />
             </template>
-            <template 
+            <template
               #node-orcourses="{ data }"
             >
-              <CustomStagNodeEdit 
-                :data="data" 
+              <CustomStagNodeEdit
+                :data="data"
                 :learningpath="userLearningpath"
               />
             </template>
@@ -92,21 +92,21 @@
               <ModuleNode :data="data" />
             </template>
             <template #node-expandedcourses="{ data }">
-              <ExpandNodeEdit 
+              <ExpandNodeEdit
                 :data="data"
               />
             </template>
             <template #edge-custom="props">
-              <TransitionEdge 
-                v-bind="props" 
+              <TransitionEdge
+                v-bind="props"
                 @end-transition="handleZoomLock"
               />
             </template>
           </VueFlow>
         </div>
-        <div 
+        <div
           v-if="store.state.view != 'student'"
-          class="d-flex justify-content-center"
+          class="d-flex justify-content-center control-btns"
         >
           <Controls />
         </div>
@@ -114,7 +114,7 @@
     </div>
   </div>
 </template>
-  
+
   <script setup>
   // Import needed libraries
 import { nextTick, onMounted, ref, watch } from 'vue';
@@ -132,11 +132,11 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 // Load Router
 const router = useRouter()
 const route = useRoute()
-// Load Store 
+// Load Store
 const store = useStore()
 
 const { fitView, addNodes, removeNodes, findNode, zoomTo, viewport, setCenter } = useVueFlow()
-  
+
 // Function to go back
 const goBack = () => {
   router.go(-1) // Go back one step in the history
@@ -231,14 +231,14 @@ watch(() => userLearningpath.value, () => {
   setTimeout(() => {
     fitView({ duration: 1000, padding: 0.5 });
     drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
-  }, 100);   
+  }, 100);
 }, { deep: true } )
 
 // Zoom in node
 function onNodeClick(event) {
   zoomLock.value = false
-  setCenter( 
-    event.node.position.x + event.node.dimensions.width/2, 
+  setCenter(
+    event.node.position.x + event.node.dimensions.width/2,
     event.node.position.y + event.node.dimensions.height/2,
     { zoom: 1, duration: 500}
   ).then(() => {
@@ -251,5 +251,8 @@ function onNodeClick(event) {
 <style>
 .vue-flow__edges {
   z-index: 2 !important;
+}
+.control-btns {
+  height: 100px;
 }
 </style>

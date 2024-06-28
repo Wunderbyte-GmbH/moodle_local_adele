@@ -1,25 +1,25 @@
 <template>
   <div>
-    <button 
+    <button
       class="btn btn-outline-primary"
       :disabled="showBackConfirmation"
-      @click="goBack" 
+      @click="goBack"
     >
       <i class="fa fa-arrow-left" /> {{ store.state.strings.completion_go_back_learningpath }}
     </button>
-    <div 
+    <div
       v-if="showBackConfirmation"
       class="cancelConfi"
     >
       {{ store.state.strings.flowchart_cancel_confirmation }}
-      <button 
+      <button
         id="cancel-learning-path"
-        class="btn btn-primary m-2" 
+        class="btn btn-primary m-2"
         @click="goBack"
       >
         {{ store.state.strings.flowchart_back_button }}
       </button>
-      <button 
+      <button
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="goBackConfirmation(true)"
@@ -33,13 +33,13 @@
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">
-          <i class="fa fa-check-circle" /> 
+          <i class="fa fa-check-circle" />
           {{ store.state.strings.completion_completion_for }}
         </h5>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            <i 
-              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'" 
+            <i
+              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'"
             />
             {{ store.state.strings.completion_course_title }} {{ store.state.node.fullname }}
           </li>
@@ -49,28 +49,28 @@
         </ul>
         <div v-if="completions !== null">
           <ParentNodes :parent-nodes="parentNodes" />
-          <div 
-            class="dndflowcompletion" 
+          <div
+            class="dndflowcompletion"
             @drop="onDrop"
           >
             <FeedbackModal :learningpath="learningpathcompletion" />
-            <VueFlow 
-              class="completions" 
-              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
+            <VueFlow
+              class="completions"
+              :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
               :class="{ dark }"
-              :fit-view-on-init="true" 
-              :max-zoom="1.5" 
+              :fit-view-on-init="true"
+              :max-zoom="1.5"
               :min-zoom="0.2"
-              :zoom-on-scroll="zoomLock" 
+              :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
             >
-              <Background 
-                :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
-                gap="8" 
+              <Background
+                :pattern-color="dark ? '#FFFFFB' : '#aaa'"
+                gap="8"
               />
               <template #node-custom="{ data }">
-                <ConditionNode 
-                  :data="data" 
+                <ConditionNode
+                  :data="data"
                   :type="'completion'"
                   :learningpath="props.learningpath"
                   @update-visibility="handleVisibility"
@@ -80,7 +80,7 @@
                 <DropzoneNode :data="data" />
               </template>
               <template #node-feedback="{ data }">
-                <FeedbackNode 
+                <FeedbackNode
                   :data="data"
                   :learningpath="learningpathcompletion"
                   :visibility="visibility_emitted"
@@ -91,22 +91,22 @@
                 <CompletionLine v-bind="props" />
               </template>
             </VueFlow>
-            <Sidebar 
-              :conditions="completions" 
-              :strings="store.state.strings" 
+            <Sidebar
+              :conditions="completions"
+              :strings="store.state.strings"
               :nodes="nodes"
               :edges="edges"
               :type="'Completion'"
               :style="{ backgroundColor: backgroundSidebar }"
-              @nodesIntersected="handleNodesIntersected" 
+              @nodesIntersected="handleNodesIntersected"
             />
           </div>
           <ChildNodes :child-nodes="childNodes" />
           <div class="d-flex justify-content-center">
-            <Controls 
+            <Controls
               :condition="'completion'"
               :learningpath="learningpathcompletion"
-              @change-class="toggleClass" 
+              @change-class="toggleClass"
             />
           </div>
         </div>
@@ -142,7 +142,7 @@ const { nodes, edges, addNodes, project, vueFlowRef, onConnect,
   nodes: [],
 })
 
-// Load Store 
+// Load Store
 const store = useStore();
 const learningpathcompletion= ref({})
 const showBackConfirmation = ref(false)
@@ -400,7 +400,7 @@ function handleConnection(params) {
   addEdges(params);
 }
 
-// Triggers handle connect 
+// Triggers handle connect
 onConnect(handleConnection);
 
 </script>
@@ -429,7 +429,7 @@ onConnect(handleConnection);
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1em;
 }
-.dndflowcompletion aside 
+.dndflowcompletion aside
 .nodes>*
 {
   margin-bottom:10px;
@@ -437,11 +437,11 @@ onConnect(handleConnection);
   -webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);
   box-shadow:5px 5px 10px 2px #00000040
 }
-.dndflowcompletion aside 
+.dndflowcompletion aside
 .description{
   margin-bottom:10px
 }
-.dndflowcompletion 
+.dndflowcompletion
 .vue-flow-wrapper
 {
   flex-grow:1;
@@ -451,7 +451,7 @@ onConnect(handleConnection);
   .dndflowcompletion aside{min-width:20%}
 }
 @media screen and (max-width: 639px){
-  .dndflowcompletion aside 
+  .dndflowcompletion aside
   .nodes{
     display:flex;
     flex-direction:row;gap:5px
@@ -466,10 +466,12 @@ onConnect(handleConnection);
 .cancelConfi{
   z-index: 1;
   position: absolute;
-  background-color: lightgray;
+  background-color: #f3eeee;
   border-radius: 0.5rem;
   padding: 0.25rem;
   margin: 0.25rem;
+  box-shadow:0 5px 10px #0000004d;
+  width: max-content;
 }
 
 </style>

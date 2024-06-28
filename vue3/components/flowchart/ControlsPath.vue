@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { Panel, useVueFlow } from '@vue-flow/core'
@@ -53,7 +53,7 @@ const props = defineProps({
     type: Object,
     default: null,
   }
-}); 
+});
 
 const showCancelConfirmation = ref(false)
 
@@ -134,7 +134,7 @@ const onSave = async () => {
         learningpathcontrol.value.json.tree = await removeModules(learningpathcontrol.value.json.tree, null)
         learningpathcontrol.value.json.tree = removeDropzones(learningpathcontrol.value.json.tree)
         singleNodes = standaloneNodeCheck(learningpathcontrol.value.json.tree)
-        learningpathcontrol.value.json.tree = 
+        learningpathcontrol.value.json.tree =
           recalculateParentChild(learningpathcontrol.value.json.tree, 'parentCourse', 'childCourse', 'starting_node')
       }
       if (singleNodes) {
@@ -218,38 +218,38 @@ function updatePos() {
 </script>
 
 <template>
-  <Panel 
+  <Panel
     v-if="store.state.view != 'teacher'"
     class="save-restore-controls"
   >
-    <button 
+    <button
       id="save-learning-path"
-      class="btn btn-primary m-2" 
+      class="btn btn-primary m-2"
       @click="onSave"
     >
       {{ store.state.strings.save }}
     </button>
-    <button 
+    <button
       id="cancel-learning-path"
-      class="btn btn-secondary m-2" 
+      class="btn btn-secondary m-2"
       :disabled="showCancelConfirmation"
       @click="onCancel"
     >
       {{ store.state.strings.btncancel }}
     </button>
-    <div 
+    <div
       v-if="showCancelConfirmation"
       class="cancelConfi"
     >
       {{ store.state.strings.flowchart_cancel_confirmation }}
-      <button 
+      <button
         id="cancel-learning-path"
-        class="btn btn-primary m-2" 
+        class="btn btn-primary m-2"
         @click="onCancel"
       >
         {{ store.state.strings.flowchart_back_button }}
       </button>
-      <button 
+      <button
         id="confim-cancel-learning-path"
         class="btn btn-warning m-2"
         @click="onCancelConfirmation(true)"
@@ -257,19 +257,19 @@ function updatePos() {
         {{ store.state.strings.flowchart_cancel_button }}
       </button>
     </div>
-    <button 
-      class="btn btn-warning m-2" 
+    <button
+      class="btn btn-warning m-2"
       @click="toggleClass"
     >
       {{ store.state.strings.btntoggle }}
     </button>
-    <a 
-      href="/backup/restorefile.php?contextid=1" 
-      target="_blank" 
+    <a
+      href="/backup/restorefile.php?contextid=1"
+      target="_blank"
       rel="noreferrer noopener"
     >
-      <button 
-        class="btn btn-link" 
+      <button
+        class="btn btn-link"
         :title="store.state.strings.btncreatecourse"
       >
         {{ store.state.strings.btncreatecourse }}
@@ -280,10 +280,13 @@ function updatePos() {
 
 <style scoped>
 .cancelConfi{
+  z-index: 1;
   position: absolute;
-  background-color: lightgray;
+  background-color: #f3eeee;
   border-radius: 0.5rem;
   padding: 0.25rem;
   margin: 0.25rem;
+  box-shadow:0 5px 10px #0000004d;
+  width: max-content;
 }
 </style>

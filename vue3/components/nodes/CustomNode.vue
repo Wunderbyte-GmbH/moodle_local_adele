@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
@@ -29,7 +29,7 @@ import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 
-// Load Store 
+// Load Store
 const store = useStore();
 const props = defineProps({
   data: {
@@ -50,7 +50,7 @@ const courses = computed(() => {
   ) {
     return [];
   }
-  return store.state.availablecourses.filter(course => 
+  return store.state.availablecourses.filter(course =>
       props.data.course_node_id.includes(course.course_node_id[0])
     ).map(course => ({
       fullname: course.fullname,
@@ -67,6 +67,7 @@ const learningmodule = computed(() => {
 const cover_image = computed(() => get_cover_image(props.data));
 
 onMounted(() => {
+
   dataValue.value = props.data
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
@@ -96,7 +97,7 @@ const setNodeModal = () => {
 };
 
 // Set node data for the modal
-const setPretestView = () => {  
+const setPretestView = () => {
   removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = true
@@ -116,7 +117,7 @@ const setRestrictionView = () => {
 // Set the node that handle has been clicked
 const setStartNode = (node_id) => {
   store.commit('setstartNode', {
-    startnode: node_id, 
+    startnode: node_id,
   });
 };
 
@@ -151,8 +152,8 @@ const childStyle = {
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
-      <OverviewRestrictionCompletion 
-        :node="data" 
+      <OverviewRestrictionCompletion
+        :node="data"
         :learningpath="props.learningpath"
       />
       <div class="card-header text-center">
@@ -165,9 +166,9 @@ const childStyle = {
         </div>
       </div>
       <div class="card-body">
-        <div 
-          class="card-img dashboard-card-img" 
-          :style="{ 
+        <div
+          class="card-img dashboard-card-img"
+          :style="{
             height: '10rem',
             backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
             backgroundSize: 'cover',
@@ -175,43 +176,43 @@ const childStyle = {
             backgroundColor: cover_image ? '' : '#cccccc'
           }"
         >
-          <div 
-            v-if="store.state.view!='teacher'" 
+          <div
+            v-if="store.state.view!='teacher'"
             class="overlay"
-          > 
-            <span  
-              :title="store.state.strings.nodes_edit_completion"
-              data-toggle="tooltip"
-            >
-              <button 
-                class="icon-link"
-                @click="setPretestView"
-              >
-                <i 
-                  class="fa fa-tasks" 
-                />
-              </button>
-            </span>
-            <span  
+          >
+            <span
               :title="store.state.strings.nodes_edit_restriction"
               data-toggle="tooltip"
             >
-              <button 
+              <button
                 class="icon-link"
                 @click="setRestrictionView"
               >
                 <i class="fa fa-lock" />
               </button>
             </span>
-            <span  
+            <span
+              :title="store.state.strings.nodes_edit_completion"
+              data-toggle="tooltip"
+            >
+              <button
+                class="icon-link"
+                @click="setPretestView"
+              >
+                <i
+                  class="fa fa-tasks"
+                />
+              </button>
+            </span>
+            <span
               :title="store.state.strings.edit"
               data-toggle="tooltip"
             >
-              <button 
+              <button
                 class="icon-link"
-                data-toggle="modal" 
+                data-toggle="modal"
                 data-target="#nodeModal"
-                data-placement="right" 
+                data-placement="right"
                 @click="setNodeModal"
               >
                 <i class="fa fa-pencil" />
@@ -224,21 +225,21 @@ const childStyle = {
             {{ store.state.strings.nodes_learning_module }}
           </h5>
           <div v-if="dataValue">
-            <select 
+            <select
               v-model="dataValue.module"
               class="form-select form-control"
               @change="changeModule(dataValue)"
             >
-              <option 
-                value="" 
-                selected 
+              <option
+                value=""
+                selected
                 disabled
               >
                 {{ store.state.strings.nodes_select_module }}
               </option>
-              <option 
-                v-for="module in learningmodule" 
-                :key="module.id" 
+              <option
+                v-for="module in learningmodule"
+                :key="module.id"
                 :value="module.id"
               >
                 {{ module.name }}
@@ -249,9 +250,9 @@ const childStyle = {
         <h5 class="card-title">
           {{ store.state.strings.nodes_included_courses }}
         </h5>
-        <div 
-          v-for="(value, key) in courses" 
-          :key="key" 
+        <div
+          v-for="(value, key) in courses"
+          :key="key"
           class="card-text"
         >
           <div class="fullname-container">
@@ -260,19 +261,19 @@ const childStyle = {
         </div>
       </div>
     </div>
-    <Handle 
-      id="target" 
-      type="target" 
-      :position="Position.Top" 
-      :style="handleStyle" 
-      @mousedown="() => setStartNode(data.node_id)" 
+    <Handle
+      id="target"
+      type="target"
+      :position="Position.Top"
+      :style="handleStyle"
+      @mousedown="() => setStartNode(data.node_id)"
     />
-    <Handle 
-      id="source" 
-      type="source" 
-      :position="Position.Bottom" 
-      :style="handleStyle" 
-      @mousedown="() => setStartNode(data.node_id)" 
+    <Handle
+      id="source"
+      type="source"
+      :position="Position.Bottom"
+      :style="handleStyle"
+      @mousedown="() => setStartNode(data.node_id)"
     />
   </div>
 </template>

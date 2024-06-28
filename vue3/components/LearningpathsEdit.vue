@@ -32,40 +32,40 @@
       <StudentView />
     </div>
     <div v-else>
-      <div 
+      <div
         v-if="store.state.editingadding == false &&
           store.state.editingpretest == false &&
-          store.state.editingrestriction == false" 
+          store.state.editingrestriction == false"
         class="fade-in"
       >
         <LearningPathList />
       </div>
-      <div 
-        v-else-if="store.state.editingadding == true" 
+      <div
+        v-else-if="store.state.editingadding == true"
         class="fade-in"
       >
-        <button 
-          :to="{ name: 'learningpaths-edit-overview' }" 
-          tag="button" 
+        <button
+          :to="{ name: 'learningpaths-edit-overview' }"
+          tag="button"
           class="btn btn-outline-primary mb-2"
           :disabled="showBackConfirmation"
-          @click="goBack" 
+          @click="goBack"
         >
           <i class="fa fa-arrow-left" /> Go Back to Overview
         </button>
-        <div 
+        <div
           v-if="showBackConfirmation"
           class="cancelConfi"
         >
           {{ store.state.strings.flowchart_cancel_confirmation }}
-          <button 
+          <button
             id="cancel-learning-path"
-            class="btn btn-primary m-2" 
+            class="btn btn-primary m-2"
             @click="goBack"
           >
             {{ store.state.strings.flowchart_back_button }}
           </button>
-          <button 
+          <button
             id="confim-cancel-learning-path"
             class="btn btn-warning m-2"
             @click="goBackConfirmation(true)"
@@ -73,8 +73,8 @@
             {{ store.state.strings.flowchart_cancel_button }}
           </button>
         </div>
-        <div 
-          class="card p-4" 
+        <div
+          class="card p-4"
           style="padding: 2.5rem !important;"
         >
           <h2 class="mt-3">
@@ -82,14 +82,14 @@
           </h2>
           <div class="card-body">
             <div v-if="store.state.learningpath">
-              <TextInputs 
-                :goal="store.state.learningpath" 
-                @change-GoalName="changeGoalName" 
+              <TextInputs
+                :goal="store.state.learningpath"
+                @change-GoalName="changeGoalName"
                 @change-GoalDescription="changeGoalDescription"
               />
               <div v-if="learningpath">
-                <LearingPath 
-                  :learningpath="learningpath" 
+                <LearingPath
+                  :learningpath="learningpath"
                   @finish-edit="finishEdit"
                   @removeNode="handleRemoveNode"
                   @addEdge="handleAddEdge"
@@ -104,14 +104,14 @@
           </div>
         </div>
       </div>
-      <div 
-        v-else-if="$store.state.editingpretest == true" 
+      <div
+        v-else-if="$store.state.editingpretest == true"
         class="fade-in"
       >
         <Completion :learningpath="learningpath" />
       </div>
-      <div 
-        v-else-if="$store.state.editingrestriction == true" 
+      <div
+        v-else-if="$store.state.editingrestriction == true"
         class="fade-in"
       >
         <Restriction :learningpath="learningpath" />
@@ -155,7 +155,7 @@ const changeGoalDescription = (newGoalDescription) => {
   store.state.learningpath.description = newGoalDescription;
 }
 
-// Checking routes 
+// Checking routes
 const checkRoute = (currentRoute) => {
   if(currentRoute == undefined && !route.path.includes('/learningpaths/edit')){
         router.push({ name: 'learningpaths-edit-overview' });
@@ -280,7 +280,7 @@ const finishEdit = () => {
 const handleRemoveNode = (nodeId) => {
   if (nodeId) {
     const nodesArray = learningpath.value.json.tree.nodes;
-    const edgesArray = learningpath.value.json.tree.edges; 
+    const edgesArray = learningpath.value.json.tree.edges;
     const nodeIndex = nodesArray.findIndex(node => node.id === nodeId);
 
     if (nodeIndex !== -1) {
@@ -377,10 +377,12 @@ const handleMoveNode = (params) => {
 .cancelConfi{
   z-index: 1;
   position: absolute;
-  background-color: lightgray;
+  background-color: #f3eeee;
   border-radius: 0.5rem;
   padding: 0.25rem;
   margin: 0.25rem;
+  box-shadow:0 5px 10px #0000004d;
+  width: max-content;
 }
 
 </style>

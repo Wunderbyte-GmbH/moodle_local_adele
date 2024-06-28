@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { ref, computed } from 'vue';
@@ -54,12 +54,12 @@ function onDragStart(event, data) {
 // Function sets up data for nodes
 function onDrag(event ) {
   //find closestNode node
-  const closestNode = findClosestNode(event); 
-  //add drop zones to this node 
+  const closestNode = findClosestNode(event);
+  //add drop zones to this node
   if(closestNode){
     let takenEdges = []
     props.edges.forEach((edge) => {
-      if ((edge.source == closestNode.id || edge.target == closestNode.id) && !edge.id.includes('source_') 
+      if ((edge.source == closestNode.id || edge.target == closestNode.id) && !edge.id.includes('source_')
         && edge.type != 'default') {
         if(edge.source == closestNode.id ){
           takenEdges.push(edge.sourceHandle)
@@ -69,11 +69,11 @@ function onDrag(event ) {
       }
     })
     const freeEdges = arrayDifference(availableEdges, takenEdges)
-    
+
     if(freeEdges.length > 0){
 
-      drawDropZones(freeEdges, closestNode)  
-      //change color of drop zone if drag position is above 
+      drawDropZones(freeEdges, closestNode)
+      //change color of drop zone if drag position is above
       checkIntersetcion(event, closestNode)
     }
   }
@@ -125,14 +125,14 @@ function areNodesIntersecting(position, node) {
     position.x < node.position.x + node.dimensions.width &&
     position.x > node.position.x &&
     position.y < node.position.y + node.dimensions.height &&
-    position.y > node.position.y 
+    position.y > node.position.y
   );
 }
 
 function drawDropZones(freeEdges, closestNode) {
   freeEdges.forEach((freeEdge) => {
     let position = {
-      x: closestNode.position.x, 
+      x: closestNode.position.x,
       y: closestNode.position.y
     }
     //draw some drop zones
@@ -190,7 +190,7 @@ function drawDropZones(freeEdges, closestNode) {
     // Add the new edge
     addEdges([newEdge]);
     }
-    
+
   });
 }
 
@@ -262,36 +262,36 @@ const filteredConditions = computed(() => {
 </script>
 
 <template>
-  <aside 
+  <aside
     class="col-md-4"
     style="max-width: 20% !important;"
   >
     <div type="text">
       {{ store.state.strings.completion_list_of_criteria }} {{ type }} {{ store.state.strings.completion_criteria }}
     </div>
-    <input 
-      id="searchTerm" 
-      v-model="searchTerm" 
-      class="form-control" 
-      :placeholder="strings.placeholder_search" 
+    <input
+      id="searchTerm"
+      v-model="searchTerm"
+      class="form-control"
+      :placeholder="strings.placeholder_search"
     >
     <div class="learning-path-nodes-container">
       <div class="nodes">
-        <div 
-          v-for="condition in filteredConditions" 
+        <div
+          v-for="condition in filteredConditions"
           :key="condition.description"
-          class="vue-flow__node-input mt-1 row align-items-center justify-content-center" 
-          :draggable="true" 
-          :data="condition" 
+          class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
+          :draggable="true"
+          :data="condition"
           style="width: 95%; margin-left: 0.025rem;"
-          @dragstart="onDragStart($event, condition, this)" 
+          @dragstart="onDragStart($event, condition, this)"
           @drag="onDrag($event, condition)"
           @dragend="onDragEnd()"
         >
-          <div 
-            class="col-auto"
-            data-toggle="tooltip" 
-            data-placement="left" 
+          <div
+            class="col-auto info-circle"
+            data-toggle="tooltip"
+            data-placement="left"
             :title="condition.description"
           >
             <i class="fa fa-circle-info fa-lg" />
@@ -308,5 +308,8 @@ const filteredConditions = computed(() => {
   margin-top: 20px;
   height: 80%;
   overflow-y: auto;
+}
+.info-circle {
+  padding: 2px;
 }
 </style>
