@@ -73,6 +73,7 @@ class save_learningpath extends external_api {
      * @param int $learningpathid
      * @param string $name
      * @param string $description
+     * @param string $image
      * @param string $json
      * @param int $contextid
      * @return bool

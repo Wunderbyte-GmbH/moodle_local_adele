@@ -24,6 +24,7 @@
 
 namespace local_adele;
 use context_system;
+use moodle_exception;
 use moodle_url;
 
 /**
@@ -128,9 +129,9 @@ class asset_handler {
             'author'    => $USER->firstname . ' ' . $USER->lastname,
         ];
 
-        // Save the file to Moodle file storage
+        // Save the file to Moodle file storage.
         $storedfile = $fs->create_file_from_pathname($filerecord, $tempfile);
-        // Clean up the temporary file
+        // Clean up the temporary file.
         unlink($tempfile);
         if ($storedfile) {
             $url = moodle_url::make_pluginfile_url(
