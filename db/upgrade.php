@@ -83,7 +83,7 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024052300, 'local', 'adele');
     }
 
-    if ($oldversion < 2024052302) {
+    if ($oldversion < 2024060304) {
 
         // Define field course_id to be added to local_adele_path_user.
         $table = new xmldb_table('local_adele_learning_paths');
@@ -95,7 +95,7 @@ function xmldb_local_adele_upgrade($oldversion) {
         }
 
         // Adele savepoint reached.
-        upgrade_plugin_savepoint(true, 2024052302, 'local', 'adele');
+        upgrade_plugin_savepoint(true, 2024060304, 'local', 'adele');
     }
     return true;
 }

@@ -153,7 +153,7 @@
 
 <script setup>
 // import dependancies
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 // Load Store
@@ -161,12 +161,11 @@ const store = useStore();
 
 const imagepaths = ref([])
 
-onMounted(async () => {
-  if (store.state.lpimages.helpingslider) {
-    imagepaths.value = store.state.lpimages.helpingslider;
+watch(() => store.state.lpimages.helpingslider, (newVal) => {
+  if (newVal) {
+    imagepaths.value = newVal;
   }
 });
-
 
 </script>
 

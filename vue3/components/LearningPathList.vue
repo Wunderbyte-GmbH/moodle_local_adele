@@ -87,7 +87,7 @@
                 class="mb-2"
                 :style="{
                   height: '10rem',
-                  backgroundImage: `url(${singlelearningpath.image})`,
+                  backgroundImage: singlelearningpath.image ? `url(${singlelearningpath.image})` : '',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundColor: '#cccccc',
@@ -192,8 +192,8 @@ const search = ref('');
 let learningPaths = [];
 let filteredLp = [];
 
-onMounted(() => {
-  store.dispatch('fetchImagePaths')
+onMounted(async () => {
+  await store.dispatch('fetchImagePaths')
   watch(() => store.state.learningpaths, async () => {
     if (store.state.learningpaths) {
     learningPaths = store.state.learningpaths;

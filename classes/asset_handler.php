@@ -56,11 +56,11 @@ class asset_handler {
             'helpingslider' => [],
             'node_background_image' => [],
         ];
-        foreach (self::$paths as $path) {
-            $path = $CFG->dirroot . '/local/adele/public/' . $path . '/*';
+        foreach (self::$paths as $pathorigin) {
+            $path = $CFG->dirroot . '/local/adele/public/' . $pathorigin . '/*';
             $filelist = glob($path);
             foreach ($filelist as $file) {
-                $filepath[$path][] = [ 'path' => str_replace($CFG->dirroot, '', $file)];
+                $filepath[$pathorigin][] = [ 'path' => str_replace($CFG->dirroot, '', $file)];
             }
         }
         // Get uploaded images from mdl_files.
@@ -112,7 +112,7 @@ class asset_handler {
         $filepath = '/';
 
         // Check if a file already exists and delete it.
-        if ($existingfile = $fs->get_file($contextid, 'local_adele', 'lp_images', 0, $filepath, $filename)) {
+        if ($existingfile = $fs->get_file($contextid, 'local_adele', 'lp_images', $learningpathid, $filepath, $filename)) {
             $existingfile->delete();
         }
 
@@ -133,7 +133,15 @@ class asset_handler {
         // Clean up the temporary file
         unlink($tempfile);
         if ($storedfile) {
-            return ['status' => 'success', 'filename' => $storedfile->get_filename()];
+            $url = moodle_url::make_pluginfile_url(
+                $storedfile->get_contextid(),
+                $storedfile->get_component(),
+                $storedfile->get_filearea(),
+                $storedfile->get_itemid(),
+                $storedfile->get_filepath(),
+                $storedfile->get_filename()
+            )->out(false);
+            return ['status' => 'success', 'filename' => $url];
         } else {
             throw new moodle_exception('File upload failed');
         }

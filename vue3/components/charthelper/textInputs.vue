@@ -61,6 +61,7 @@ const uploadNewImage = async () => {
         text: store.state.strings.image_description_save,
         type: 'success'
       })
+      selectCourseImage(response.filename)
     } catch (error) {
       console.error('Error uploading image:', error);
     }
@@ -72,14 +73,16 @@ onMounted(() => {
   goalname.value = props.goal.name
   goaldescription.value = props.goal.description
   selectedCourseImagePath.value = props.goal.image
-  store.state.lpimages.forEach((lpimage) => {
-    if (
-      lpimage.path.includes('/local/adele') ||
-      lpimage.path.includes('/uploaded_file_lp_' + store.state.learningPathID + '.')
-    ) {
-      selectionImages.value.push(lpimage.path)
-    }
-  })
+  if (store.state.lpimages.node_background_image) {
+    store.state.lpimages.node_background_image.forEach((lpimage) => {
+      if (
+        lpimage.path.includes('/local/adele') ||
+        lpimage.path.includes('/uploaded_file_lp_' + store.state.learningPathID + '.')
+      ) {
+        selectionImages.value.push(lpimage.path)
+      }
+    })
+  }
 })
 
 // Watch changes on goalname
