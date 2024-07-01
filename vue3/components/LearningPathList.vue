@@ -27,50 +27,50 @@
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
     <diV class="col-lg-2">
-      <button 
-        type="button" 
+      <button
+        type="button"
         class="btn btn-primary mt-4 mb-4 btn-block"
-        @click.prevent="addNewLearningpath()" 
+        @click.prevent="addNewLearningpath()"
       >
         {{ store.state.strings.learningpath_form_title_add }}
       </button>
-      <button 
-        type="button" 
-        class="btn btn-secondary  mt-4 mb-4 btn-block" 
-        data-toggle="modal" 
+      <button
+        type="button"
+        class="btn btn-secondary  mt-4 mb-4 btn-block"
+        data-toggle="modal"
         data-target="#helpingSlider"
       >
         {{ store.state.strings.main_intro_slider }}
-        <i 
-          :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'" 
+        <i
+          :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'"
         />
       </button>
     </diV>
-    
+
     <h2>
       {{ store.state.strings.overviewlearningpaths }}
     </h2>
-    <input 
+    <input
       v-model="search"
-      class="form-control search" 
+      class="form-control search"
       :placeholder="store.state.strings.placeholder_lp_search"
     >
     <span v-if="store.state.learningpaths == ''">
       {{ store.state.strings.learningpaths_edit_site_no_learningpaths }}
     </span>
-    <span 
+    <span
       v-else
       class="learningcardcont">
       <div
-        v-for="singlelearningpath in filteredLpItem" 
-        :key="singlelearningpath.id" 
+        v-for="singlelearningpath in filteredLpItem"
+        :key="singlelearningpath.id"
         class="learningcard"
       >
-        <div 
-          v-if="singlelearningpath.name !== 'not found'" 
+        <div
+          v-if="singlelearningpath.name !== 'not found'"
           class="wrap"
         >
-          <div 
+          <div
             class="card shadow"
             style="width: 450px;"
           >
@@ -79,15 +79,15 @@
                 {{ singlelearningpath.name }}
               </h5>
             </div>
-            <div 
+            <div
               class="card-body"
               :style="[nodeBackgroundColor]"
             >
-              <div 
-                class="mb-2" 
-                :style="{ 
+              <div
+                class="mb-2"
+                :style="{
                   height: '10rem',
-                  backgroundImage: 'none',
+                  backgroundImage: `url(${singlelearningpath.image})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundColor: '#cccccc',
@@ -97,39 +97,39 @@
                 <div class="overlay">
                   <a
                     class="icon-link"
-                    href="" 
-                    data-toggle="tooltip" 
-                    data-placement="right" 
-                    :title="store.state.strings.duplicate"
-                    @click.prevent="duplicateLearningpath(singlelearningpath.id)" 
-                  >
-                    <i 
-                      class="icon m-r-0 fa fa-copy fa-fw iconsmall" 
-                    />
-                  </a>
-                  <a 
-                    class="icon-link"
-                    href="" 
-                    data-toggle="tooltip" 
+                    href=""
+                    data-toggle="tooltip"
                     data-placement="right"
-                    :title="store.state.strings.edit"
-                    @click.prevent="editLearningpath(singlelearningpath.id)" 
+                    :title="store.state.strings.duplicate"
+                    @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
-                    <i 
-                      class="icon m-r-0 fa fa-pencil fa-fw iconsmall" 
+                    <i
+                      class="icon m-r-0 fa fa-copy fa-fw iconsmall"
                     />
                   </a>
                   <a
                     class="icon-link"
-                    href="" 
-                    data-toggle="tooltip" 
+                    href=""
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    :title="store.state.strings.edit"
+                    @click.prevent="editLearningpath(singlelearningpath.id)"
+                  >
+                    <i
+                      class="icon m-r-0 fa fa-pencil fa-fw iconsmall"
+                    />
+                  </a>
+                  <a
+                    class="icon-link"
+                    href=""
+                    data-toggle="tooltip"
                     data-placement="right"
                     :title="store.state.strings.delete"
-                    @click.prevent="showDeleteConfirm(singlelearningpath.id)" 
+                    @click.prevent="showDeleteConfirm(singlelearningpath.id)"
                   >
-                    <i 
+                    <i
                       class="icon fa-fw iconsmall fa"
-                      :class="store.state.version ? 'fa-trash' : 'fa-trash-o'" 
+                      :class="store.state.version ? 'fa-trash' : 'fa-trash-o'"
                     />
                   </a>
                 </div>
@@ -142,7 +142,7 @@
               </div>
             </div>
           </div>
-          <div 
+          <div
             v-show="clicked[singlelearningpath.id]"
             class="alert-danger p-3 m-t-1 m-b-1 rounded deletealert"
             style="max-width: 100%;"
@@ -150,16 +150,16 @@
             <div>{{ store.state.strings.deletepromptpre }}{{ singlelearningpath.name }}{{ store.state.strings.deletepromptpost }}</div>
 
             <div class="mt-4 d-flex justify-content-between">
-              <button 
-                class="btn btn-danger mr-2" 
+              <button
+                class="btn btn-danger mr-2"
                 :title="store.state.strings.btnconfirmdelete"
-                @click="deleteLearningpathConfirm(singlelearningpath.id)" 
+                @click="deleteLearningpathConfirm(singlelearningpath.id)"
               >
                 {{ store.state.strings.btnconfirmdelete }}</button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="btn btn-secondary"
-                @click="cancelDeleteConfirm(singlelearningpath.id)" 
+                @click="cancelDeleteConfirm(singlelearningpath.id)"
               >
                 {{ store.state.strings.cancel }}
               </button>
@@ -193,6 +193,7 @@ let learningPaths = [];
 let filteredLp = [];
 
 onMounted(() => {
+  store.dispatch('fetchImagePaths')
   watch(() => store.state.learningpaths, async () => {
     if (store.state.learningpaths) {
     learningPaths = store.state.learningpaths;
@@ -349,7 +350,7 @@ const duplicateLearningpath = (learningpathid) => {
   }
 
 
-  @media (max-width: 767px) { 
+  @media (max-width: 767px) {
     .card {
       width: 100% !important;
     }

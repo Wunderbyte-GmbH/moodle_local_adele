@@ -123,6 +123,9 @@ $string['title_delete'] = 'Learning Path deleted';
 $string['description_delete'] = 'You have deleted the Learning Path!';
 $string['title_save'] = 'Learning Path saved/updated';
 $string['description_save'] = 'You have saved/updated the Learning Path!';
+$string['image_title_save'] = 'Learning Path image has been saved/updated';
+$string['image_description_save'] = 'You have saved/updated the Learning Path image!';
+
 
 // Node Strings.
 $string['node_coursefullname'] = 'Nodename:';

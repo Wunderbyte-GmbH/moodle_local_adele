@@ -144,6 +144,9 @@ const onSave = async () => {
           type: 'error'
         });
       } else {
+        if (!learningpathcontrol.value.image) {
+          learningpathcontrol.value.image = '';
+        }
         await store.dispatch('saveLearningpath', learningpathcontrol.value);
         onCancelConfirmation(true)
         notify({

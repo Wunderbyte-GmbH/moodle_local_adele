@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, inject } from 'vue';
-import router from '../../router/router';
+import { notify } from "@kyvg/vue3-notification";
 
 const props = defineProps({
   goal: {
@@ -8,22 +8,78 @@ const props = defineProps({
       default: null,
     },
 });
- 
+
 // Load Store and Router
 const store = inject('store');
 
 const emit = defineEmits([
     'change-GoalName',
     'change-GoalDescription',
+    'change-LpImage',
 ]);
 
 // Define constants that will be referenced
 const goalname = ref('')
 const goaldescription = ref('')
+const showCourseImageSelection = ref(false)
+const selectionImages = ref([])
+const selectedCourseImagePath = ref('')
+
+const newImageFile = ref(null);
+const newImagePreview = ref(null);
+
+const selectCourseImage = (path) => {
+  selectedCourseImagePath.value = path;
+  showCourseImageSelection.value = false;
+  emit('change-LpImage', selectedCourseImagePath.value);
+};
+
+const onFileChange = (event) => {
+  const file = event.target.files[0];
+  newImageFile.value = file;
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      newImagePreview.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    newImagePreview.value = null;
+  }
+
+};
+
+const uploadNewImage = async () => {
+  if (!newImageFile.value) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64File = e.target.result.split(',')[1]; // Get the Base64 part of the file
+    try {
+      const response = await store.dispatch('uploadNewLpImage', base64File);
+      notify({
+        title: store.state.strings.image_title_save,
+        text: store.state.strings.image_description_save,
+        type: 'success'
+      })
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+  reader.readAsDataURL(newImageFile.value);
+};
 
 onMounted(() => {
   goalname.value = props.goal.name
   goaldescription.value = props.goal.description
+  selectedCourseImagePath.value = props.goal.image
+  store.state.lpimages.forEach((lpimage) => {
+    if (
+      lpimage.path.includes('/local/adele') ||
+      lpimage.path.includes('/uploaded_file_lp_' + store.state.learningPathID + '.')
+    ) {
+      selectionImages.value.push(lpimage.path)
+    }
+  })
 })
 
 // Watch changes on goalname
@@ -42,11 +98,12 @@ watch(goaldescription, (newGoalDescription) => {
 watch(() => store.state.learningpath, async () => {
   goalname.value = store.state.learningpath.name
   goaldescription.value = store.state.learningpath.description
+  selectedCourseImagePath.value = store.state.learningpath.image
 }, { deep: true } );
 
 // Edit learning path deletion
 const editLearningpath = async (singlelearningpathid) => {
-  // '/local/adele/index.php#/learningpaths/edit/' + 
+  // '/local/adele/index.php#/learningpaths/edit/' +
   const tooltips = document.querySelectorAll('.tooltip');
   tooltips.forEach(tooltip => {
     tooltip.remove()
@@ -91,6 +148,71 @@ const editLearningpath = async (singlelearningpathid) => {
       </h4>
       <div class="mb-2">
         Upload your default node image
+        <div
+          v-if="store.state.lpimages && Object.keys(store.state.lpimages).length > 0"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            class="btn btn-info"
+            @click="showCourseImageSelection = !showCourseImageSelection"
+          >
+            Select learning path image
+          </button>
+          <div
+            v-if="selectedCourseImagePath"
+            class="image-preview-container"
+          >
+            <img
+              :src="selectedCourseImagePath"
+              alt="Selected Image"
+              class="image-preview"
+            >
+            <button
+              class="deselect-btn"
+              @click="selectCourseImage()"
+            >
+              Deselect
+            </button>
+          </div>
+          <div
+            v-if="showCourseImageSelection"
+            class="image-selection-container"
+          >
+            <div
+              v-for="path in selectionImages"
+              :key="path"
+              class="image-option"
+              @click="selectCourseImage(path)"
+            >
+              <img
+                :src="path"
+                alt="Image"
+                class="image-option-img"
+              >
+            </div>
+          </div>
+        </div>
+        <div>
+          <label for="newImage">Or upload a new image:</label>
+          <input type="file" id="newImage" @change="onFileChange">
+          <div
+            v-if="newImagePreview"
+          >
+            <img
+              :src="newImagePreview"
+              alt="Selected Image"
+              class="image-preview"
+            >
+            <button
+              type="button"
+              class="btn btn-info"
+              @click="uploadNewImage()"
+            >
+              Upload and use image
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -103,11 +225,11 @@ const editLearningpath = async (singlelearningpathid) => {
         <div class="card-body">
           <h4>{{ goalname }}</h4>
           <span v-if="goalname">
-            <button 
-              type="button" 
+            <button
+              type="button"
               class="btn btn-outline-primary btn-sm"
               :title="store.state.strings.charthelper_go_to_learningpath"
-              @click.prevent="editLearningpath(props.goal.id)" 
+              @click.prevent="editLearningpath(props.goal.id)"
             >
               {{ store.state.strings.modals_edit}}
             </button>
@@ -132,3 +254,56 @@ const editLearningpath = async (singlelearningpathid) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+
+.image-option-img {
+  height: 5rem;
+  margin: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-option {
+  margin: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-preview:hover, .image-option:hover {
+  transform: scale(1.05);
+}
+
+.image-selection-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  padding-top: 10px;
+}
+
+.image-preview {
+  height: 7rem;
+  margin: 5px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* Style for the deselect button next to the preview image */
+.deselect-btn {
+  margin-left: 10px;
+  cursor: pointer;
+  color: #007bff;
+  border: none;
+  background: none;
+}
+
+.form-group img {
+  height: 50px; /* Adjust the size of images in the form group */
+}
+
+</style>

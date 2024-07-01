@@ -24,30 +24,30 @@
 
 <template>
   <div>
-    <div 
-      id="nodeModal" 
-      tabindex="-1" 
-      role="dialog" 
-      class="modal fade" 
-      aria-labelledby="exampleModalLabel" 
+    <div
+      id="nodeModal"
+      tabindex="-1"
+      role="dialog"
+      class="modal fade"
+      aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div 
-        class="modal-dialog modal-lg" 
+      <div
+        class="modal-dialog modal-lg"
         role="document"
       >
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
-            <h5 
+            <h5
               id="exampleModalLabel"
-              class="modal-title" 
+              class="modal-title"
             >
               {{ store.state.strings.modals_edit }} {{ fullname }}
             </h5>
-            <button 
-              type="button" 
-              class="close text-white" 
-              data-dismiss="modal" 
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
@@ -78,16 +78,16 @@
                 v-model="description"
                 class="form-control"
                 :placeholder="store.state.strings.modals_no_description"
-                rows="5" 
+                rows="5"
               />
             </div>
             <div class="form-group">
               <label for="estimate_duration">
                 <b>
                   {{ store.state.strings.estimate_duration }}
-                  <i class="fa fa-spinner" /> 
+                  <i class="fa fa-spinner" />
                   :
-                </b> 
+                </b>
               </label>
               <input
                 id="estimate_duration"
@@ -111,76 +111,76 @@
               </p>
             </div>
             <div>
-              <b>Background image 
-                <i 
-                  :class="store.state.version ? 'fa-solid fa-image' : 'fa fa-picture-o'" 
-                /> 
+              <b>Background image
+                <i
+                  :class="store.state.version ? 'fa-solid fa-image' : 'fa fa-picture-o'"
+                />
                 :</b>
               <p>
                 If no course image is available, the selected stock image will be choosen.
               </p>
-              <div 
+              <div
                 v-if="store.state.node && store.state.node.imagepaths && Object.keys(store.state.node.imagepaths).length > 0"
                 class="mb-2"
               >
                 <p>
                   If no image is selected, the course image will be selected.
                 </p>
-                <button 
-                  type="button" 
-                  class="btn btn-info" 
+                <button
+                  type="button"
+                  class="btn btn-info"
                   @click="showCourseImageSelection = !showCourseImageSelection"
                 >
                   Select course image
                 </button>
-                <div 
-                  v-if="selectedCourseImagePath" 
+                <div
+                  v-if="selectedCourseImagePath"
                   class="image-preview-container"
                 >
-                  <img 
-                    :src="selectedCourseImagePath" 
-                    alt="Selected Image" 
+                  <img
+                    :src="selectedCourseImagePath"
+                    alt="Selected Image"
                     class="image-preview"
                   >
-                  <button 
+                  <button
                     class="deselect-btn"
-                    @click="selectedCourseImagePath = ''" 
+                    @click="selectedCourseImagePath = ''"
                   >
                     Deselect
                   </button>
                 </div>
-                <div 
-                  v-if="showCourseImageSelection" 
+                <div
+                  v-if="showCourseImageSelection"
                   class="image-selection-container"
                 >
-                  <div 
-                    v-for="path in store.state.node.imagepaths" 
-                    :key="path" 
-                    class="image-option" 
+                  <div
+                    v-for="path in store.state.node.imagepaths"
+                    :key="path"
+                    class="image-option"
                     @click="selectCourseImage(path)"
                   >
-                    <img 
-                      :src="path" 
-                      alt="Image" 
+                    <img
+                      :src="path"
+                      alt="Image"
                       class="image-option-img"
                     >
                   </div>
                 </div>
               </div>
-              <button 
-                type="button" 
-                class="btn btn-info" 
+              <button
+                type="button"
+                class="btn btn-info"
                 @click="showImageSelection = !showImageSelection"
               >
                 Select Stock Image
               </button>
-              <div 
-                v-if="selectedImagePath" 
+              <div
+                v-if="selectedImagePath"
                 class="image-preview-container"
               >
-                <img 
-                  :src="selectedImagePath" 
-                  alt="Selected Image" 
+                <img
+                  :src="selectedImagePath"
+                  alt="Selected Image"
                   class="image-preview"
                 >
                 <button @click="selectedImagePath = ''" class="deselect-btn">Deselect</button>
@@ -193,16 +193,16 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
+            <button
+              type="button"
+              class="btn btn-secondary"
               data-dismiss="modal"
             >
               {{ store.state.strings.modals_close }}
             </button>
-            <button 
-              type="button" 
-              class="btn btn-primary" 
+            <button
+              type="button"
+              class="btn btn-primary"
               data-dismiss="modal"
               @click="saveChanges"
             >
@@ -255,9 +255,9 @@ const selectCourseImage = (path) => {
 };
 
 onMounted( async () => {
-  imagePaths.value = await store.dispatch('fetchImagePaths', {
-    path: 'node_background_image'
-  });
+  if (store.state.lpimages.helpingslider) {
+    imagePaths.value = store.state.lpimages.node_background_image;
+  }
   learningpathModal.value = props.learningpath
 })
 
@@ -268,8 +268,8 @@ const emit = defineEmits([
 // updating changes and closing modal
 const saveChanges = () => {
   store.commit('updatedNode', {
-    fullname: fullname.value, 
-    description: description.value, 
+    fullname: fullname.value,
+    description: description.value,
     estimate_duration: estimate_duration.value,
     shortname: shortname.value,
     selected_image: selectedImagePath.value,

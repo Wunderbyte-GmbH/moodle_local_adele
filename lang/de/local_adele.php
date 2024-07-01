@@ -119,6 +119,8 @@ $string['title_delete'] = 'Lernpfad gelöscht';
 $string['description_delete'] = 'Sie haben den Lernpfad gelöscht!';
 $string['title_save'] = 'Lernpfad gespeichert/aktualisiert';
 $string['description_save'] = 'Sie haben den Lernpfad gespeichert/aktualisiert!';
+$string['image_title_save'] = 'Lernpfad-Bild gespeichert/aktualisiert';
+$string['image_description_save'] = 'Sie haben das Lernpfad-Bild gespeichert/aktualisiert!';
 
 // Knotenzeichenfolgen.
 $string['node_coursefullname'] = 'Knotenname:';

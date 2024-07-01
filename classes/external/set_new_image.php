@@ -32,7 +32,8 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-use local_adele\learning_paths;
+use external_multiple_structure;
+use local_adele\asset_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,7 +47,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class save_learningpath extends external_api {
+class set_new_image extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -55,53 +56,27 @@ class save_learningpath extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'userid' => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
-            'name'  => new external_value(PARAM_TEXT, 'name', VALUE_REQUIRED),
-            'description'  => new external_value(PARAM_TEXT, 'description', VALUE_REQUIRED),
-            'image'  => new external_value(PARAM_TEXT, 'image', VALUE_REQUIRED),
-            'json'  => new external_value(PARAM_RAW, 'json', VALUE_REQUIRED),
-            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            'contextid' => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'learningpathid' => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'image' => new external_value(PARAM_RAW, 'file data', VALUE_REQUIRED),
+        ]);
     }
 
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $userid
-     * @param int $learningpathid
-     * @param string $name
-     * @param string $description
-     * @param string $json
      * @param int $contextid
-     * @return bool
+     * @param int $learningpathid
+     * @param mixed $image
+     * @return array
      */
-    public static function execute(
-        $userid,
-        $learningpathid,
-        $name,
-        $description,
-        $image,
-        $json,
-        $contextid
-    ): array {
-        $params = self::validate_parameters(self::execute_parameters(), [
-            'userid' => $userid,
-            'learningpathid' => $learningpathid,
-            'name' => $name,
-            'description' => $description,
-            'image' => $image,
-            'json' => $json,
-            'contextid' => $contextid,
-        ]);
-
+    public static function execute($contextid, $learningpathid, $image): array {
         require_login();
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return ['learningpath' => learning_paths::save_learning_path($params)];
+        return asset_handler::set_new_image($contextid, $learningpathid, $image);
     }
 
     /**
@@ -111,17 +86,8 @@ class save_learningpath extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'learningpath' => new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Condition description'),
-                    'name' => new external_value(PARAM_TEXT, 'Condition description'),
-                    'description' => new external_value(PARAM_TEXT, 'Condition description'),
-                    'timecreated' => new external_value(PARAM_TEXT, 'Condition label'),
-                    'timemodified' => new external_value(PARAM_TEXT, 'Condition label'),
-                    'createdby' => new external_value(PARAM_TEXT, 'Condition label'),
-                    'json' => new external_value(PARAM_RAW, 'Condition label'),
-                ]
-            ),
-            ]
-        );
+                'status' => new external_value(PARAM_TEXT, 'Image path'),
+                'filename' => new external_value(PARAM_TEXT, 'Image path'),
+        ]);
     }
 }

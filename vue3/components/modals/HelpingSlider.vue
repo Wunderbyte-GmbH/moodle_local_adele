@@ -24,12 +24,12 @@
 
 <template>
   <div>
-    <div 
-      id="helpingSlider" 
-      tabindex="-1" 
-      role="dialog" 
-      class="modal fade" 
-      aria-labelledby="helpingSliderModal" 
+    <div
+      id="helpingSlider"
+      tabindex="-1"
+      role="dialog"
+      class="modal fade"
+      aria-labelledby="helpingSliderModal"
       aria-hidden="true"
     >
       <div
@@ -38,38 +38,38 @@
         style="max-width: 70% !important;"
       >
         <div class="modal-content">
-          <div 
-            class="modal-header text-white" 
+          <div
+            class="modal-header text-white"
             :style="{ backgroundColor: store.state.strings.DARK_GREEN }"
           >
-            <h5 
+            <h5
               id="exampleModalLabel"
-              class="modal-title" 
+              class="modal-title"
             >
               {{ store.state.strings.modals_how_to_learningpath }}
             </h5>
-            <button 
-              type="button" 
-              class="close text-white" 
-              data-dismiss="modal" 
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div 
+          <div
             class="modal-body d-flex"
             :style="{ backgroundColor: store.state.strings.LIGHT_GRAY }"
           >
-            <div 
-              id="carouselExampleControls" 
-              class="carousel slide" 
-              data-ride="carousel" 
+            <div
+              id="carouselExampleControls"
+              class="carousel slide"
+              data-ride="carousel"
               data-interval="false"
             >
               <div class="carousel-inner helping-slide">
-                <div 
-                  v-for="(imagepath, index) in imagepaths" 
+                <div
+                  v-for="(imagepath, index) in imagepaths"
                   :key="index"
                   :class="{
                     'carousel-item': true,
@@ -77,22 +77,22 @@
                   }"
                   style="height: 500px;"
                 >
-                  <div 
+                  <div
                     class="d-flex justify-content-center align-items-center w-100"
                     style="height: 500px;"
                   >
-                    <img 
-                      :src="imagepath.path" 
-                      class="d-block w-100" 
+                    <img
+                      :src="imagepath.path"
+                      class="d-block w-100"
                       :alt="'Slide ' + (index + 1)"
                     >
                   </div>
                 </div>
               </div>
-              <a 
-                class="carousel-control-prev" 
-                href="#carouselExampleControls" 
-                role="button" 
+              <a
+                class="carousel-control-prev"
+                href="#carouselExampleControls"
+                role="button"
                 data-slide="prev"
                 :style="{color: store.state.strings.DARK_GREEN}"
                 style="width: 5%"
@@ -103,10 +103,10 @@
                   {{ store.state.strings.modals_previous }}
                 </span>
               </a>
-              <a 
-                class="carousel-control-next" 
-                href="#carouselExampleControls" 
-                role="button" 
+              <a
+                class="carousel-control-next"
+                href="#carouselExampleControls"
+                role="button"
                 data-slide="next"
                 :style="{color: store.state.strings.DARK_GREEN}"
                 style="width: 5%"
@@ -119,27 +119,27 @@
                   {{ store.state.strings.modals_next }}
                 </span>
               </a>
-              <ol 
+              <ol
                 class="carousel-indicators"
                 :style="{backgroundColor: store.state.strings.DARK_GREEN}"
               >
-                <li 
+                <li
                   v-for="(imagepath, index) in imagepaths"
-                  :key="index" 
-                  data-target="#carouselExampleControls" 
-                  :data-slide-to="index" 
+                  :key="index"
+                  data-target="#carouselExampleControls"
+                  :data-slide-to="index"
                   :class="{ 'active': index === 0 }"
                 />
               </ol>
             </div>
           </div>
-          <div 
-            class="modal-footer" 
+          <div
+            class="modal-footer"
             :style="{ backgroundColor: store.state.strings.DARK_GREEN }"
           >
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
+            <button
+              type="button"
+              class="btn btn-secondary"
               data-dismiss="modal"
             >
               {{ store.state.strings.modals_close }}
@@ -156,19 +156,14 @@
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
-// Load Store 
+// Load Store
 const store = useStore();
 
 const imagepaths = ref([])
 
 onMounted(async () => {
-  try {
-    const response = await store.dispatch('fetchImagePaths', {
-      path: 'helpingslider'
-    });
-    imagepaths.value = response; 
-  } catch (error) {
-    console.error('Error fetching image paths:', error);
+  if (store.state.lpimages.helpingslider) {
+    imagepaths.value = store.state.lpimages.helpingslider;
   }
 });
 

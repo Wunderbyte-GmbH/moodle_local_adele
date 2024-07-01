@@ -159,4 +159,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_upload_lp_image' => [
+      'classname' => 'local_adele\external\set_new_image',
+      'classpath' => '',
+      'description' => 'Set new image',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

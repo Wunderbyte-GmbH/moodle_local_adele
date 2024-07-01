@@ -65,6 +65,7 @@ class learning_paths {
         $data = new stdClass;
         $data->name = $params['name'];
         $data->description = $params['description'];
+        $data->image = $params['image'];
         $data->timemodified = time();
         $data->json = $params['json'];
         $id = 0;
@@ -132,7 +133,7 @@ class learning_paths {
      */
     public static function get_learning_paths() {
         global $DB;
-        $learningpaths = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description');
+        $learningpaths = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description, image');
         return array_map(fn($a) => (array)$a, $learningpaths);
     }
 
@@ -148,13 +149,14 @@ class learning_paths {
                 'id' => 0,
                 'name' => '',
                 'description' => '',
+                'image' => '',
                 'json' => '',
             ];
             return $learningpath;
         }
         global $DB;
         $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
-            'id, name, description, json');
+            'id, name, description, image, json');
         $learningpath = self::get_image_paths($learningpath);
         return (array) $learningpath;
     }
@@ -209,7 +211,7 @@ class learning_paths {
         global $DB, $USER;
 
         $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
-            'name, description, json');
+            'name, description, image, json');
 
         if (isset($learningpath)) {
             $copyindex = 1;

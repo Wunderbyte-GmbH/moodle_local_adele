@@ -57,7 +57,6 @@ class get_image_paths extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
           'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-          'path'  => new external_value(PARAM_TEXT, 'path', VALUE_REQUIRED),
         ]);
     }
 
@@ -68,26 +67,32 @@ class get_image_paths extends external_api {
      * @param string $path
      * @return array
      */
-    public static function execute($contextid, $path): array {
+    public static function execute($contextid): array {
         require_login();
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return asset_handler::get_image_paths($path);
+        return asset_handler::get_image_paths();
     }
 
     /**
      * Returns description of method result value.
      *
-     * @return external_multiple_structure
+     * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'path' => new external_value(PARAM_TEXT, 'Image path'),
-                ]
-            )
-        );
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'helpingslider' => new external_multiple_structure(
+                new external_single_structure([
+                    'path' => new external_value(PARAM_TEXT, 'Image path for helping slider'),
+                ])
+            ),
+            'node_background_image' => new external_multiple_structure(
+                new external_single_structure([
+                    'path' => new external_value(PARAM_TEXT, 'Image path for node background image'),
+                ])
+            ),
+        ]);
     }
 }

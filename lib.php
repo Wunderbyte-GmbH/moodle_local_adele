@@ -59,3 +59,44 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
 
     return $output;
 }
+
+/**
+ *  Callback checking permissions and preparing the file for serving plugin files, see File API.
+ *
+ * @param stdClass $course the course object
+ * @param stdClass $cm the course module object
+ * @param stdClass $context the context
+ * @param string $filearea the name of the file area
+ * @param array $args extra arguments (itemid, path)
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if the file not found, just send the file otherwise and do not return anything
+ */
+function local_adele_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    // Check the contextlevel is as expected - if your plugin is a block.
+    // We need context course if wee like to acces template files.
+    if (!in_array($context->contextlevel, [CONTEXT_SYSTEM])) {
+        return false;
+    }
+
+    // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
+    $itemid = array_shift($args); // The first item in the $args array.
+    $filename = array_pop($args); // The last item in the $args array.
+    if (!$args) {
+        // Var $args is empty => the path is '/'.
+        $filepath = '/';
+    } else {
+        // Var $args contains elements of the filepath.
+        $filepath = '/' . implode('/', $args) . '/';
+    }
+
+    // Retrieve the file from the Files API.
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'local_adele', $filearea, $itemid, $filepath, $filename);
+    if (!$file) {
+        return false; // The file does not exist.
+    }
+
+    // Send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.
+    send_stored_file($file, 0, 0, true, $options);
+}

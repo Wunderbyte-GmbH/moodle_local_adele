@@ -51,7 +51,8 @@ export function createAppStore() {
                 lpuserpathrelation: null,
                 feedback: null,
                 modules: null,
-                version: 0
+                version: 0,
+                lpimages: 0,
             };
         },
         getters: {
@@ -93,7 +94,7 @@ export function createAppStore() {
                 state.node.selected_image = data.selected_image;
                 state.learningpath.json.tree.nodes = state.learningpath.json.tree.nodes.map(element_node => {
                     if (element_node.id === data.node_id) {
-                      return { ...element_node, 
+                      return { ...element_node,
                         fullname: data.fullname,
                         selected_course_image: data.selected_course_image,
                         selected_image: data.selected_image,
@@ -108,6 +109,9 @@ export function createAppStore() {
             setLpUserPathRelation(state, data){
                 state.lpuserpathrelation = data;
             },
+            setLpImages(state, data){
+              state.lpimages = data;
+          },
         },
         actions: {
             // Actions are asynchronous.
@@ -151,13 +155,13 @@ export function createAppStore() {
                 }
                 else {
                   learningpath = await ajax('local_adele_get_learningpath',
-                      { 
-                        userid: 0, 
+                      {
+                        userid: 0,
                         learningpathid: context.state.learningPathID,
                         contextid: context.state.contextid,
                       });
                   if (learningpath.json != '') {
-                      learningpath.json = await JSON.parse(learningpath.json); 
+                      learningpath.json = await JSON.parse(learningpath.json);
                   }
                 }
                 context.commit('setLearningpath', learningpath);
@@ -165,8 +169,8 @@ export function createAppStore() {
             },
             async fetchUserPathRelations(context) {
                 const lpUserPathRelations = await ajax('local_adele_get_user_path_relations',
-                { 
-                  userid: context.state.user, 
+                {
+                  userid: context.state.user,
                   learningpathid: context.state.learningPathID,
                   contextid: context.state.contextid,
                 });
@@ -174,14 +178,14 @@ export function createAppStore() {
             },
             async fetchUserPathRelation(context, route) {
                 const lpUserPathRelation = await ajax('local_adele_get_user_path_relation',
-                    { 
+                    {
                       learningpathid: route.learningpathId,
                       userpathid: route.userId,
                       contextid: context.state.contextid,
                     });
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
                 if (lpUserPathRelation.json != '') {
-                  lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json); 
+                  lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json);
                 }
                 return lpUserPathRelation
             },
@@ -197,8 +201,8 @@ export function createAppStore() {
             },
             async fetchLearningpaths(context) {
                 const learningpaths = await ajax('local_adele_get_learningpaths',
-                { 
-                  userid: context.state.user, 
+                {
+                  userid: context.state.user,
                   learningpathid: context.state.learningPathID,
                   contextid: context.state.contextid,
                 });
@@ -206,7 +210,7 @@ export function createAppStore() {
             },
             async fetchAvailablecourses(context) {
                 const availablecourses = await ajax('local_adele_get_availablecourses',
-                { 
+                {
                   userid: context.state.user,
                   learningpathid: context.state.learningPathID,
                   contextid: context.state.contextid,
@@ -215,20 +219,21 @@ export function createAppStore() {
             },
             async saveLearningpath(context, payload) {
                 const result = await ajax('local_adele_save_learningpath',
-                { userid: context.state.user, 
-                  learningpathid: context.state.learningPathID, 
-                  name: payload.name, 
-                  description: payload.description, 
+                { userid: context.state.user,
+                  learningpathid: context.state.learningPathID,
+                  name: payload.name,
+                  description: payload.description,
+                  image: payload.image,
                   json: JSON.stringify(payload.json),
                   contextid: context.state.contextid,
-                });                
+                });
                 context.dispatch('fetchLearningpaths');
                 return result.learningpath.id;
             },
             async deleteLearningpath(context, payload) {
-                const result = await ajax('local_adele_delete_learningpath', 
+                const result = await ajax('local_adele_delete_learningpath',
                 {
-                  userid: context.state.user, 
+                  userid: context.state.user,
                   learningpathid: payload.learningpathid,
                   contextid: context.state.contextid,
                 });
@@ -236,9 +241,9 @@ export function createAppStore() {
                 return result.result;
             },
             async duplicateLearningpath(context, payload) {
-                const result = await ajax('local_adele_duplicate_learningpath', 
+                const result = await ajax('local_adele_duplicate_learningpath',
                 {
-                  userid: context.state.user, 
+                  userid: context.state.user,
                   learningpathid: payload.learningpathid,
                   contextid: context.state.contextid,
                 });
@@ -267,8 +272,8 @@ export function createAppStore() {
                 return result;
             },
             async fetchCatquizScales(context, payload) {
-                const result = await ajax('local_adele_get_catquiz_scales', 
-                { 
+                const result = await ajax('local_adele_get_catquiz_scales',
+                {
                   userid: context.state.user,
                   learningpathid: context.state.learningPathID,
                   testid: payload.testid,
@@ -285,9 +290,9 @@ export function createAppStore() {
             },
             async fetchCatquizParentScale(context, payload) {
                 const result = await ajax('local_adele_get_catquiz_parent_scale',
-                { 
-                  userid: context.state.user, 
-                  learningpathid: context.state.learningPathID, 
+                {
+                  userid: context.state.user,
+                  learningpathid: context.state.learningPathID,
                   sacleid: payload.scaleid,
                   contextid: context.state.contextid,
                 });
@@ -295,18 +300,31 @@ export function createAppStore() {
             },
             async fetchModQuizzes(context) {
                 const result = await ajax('local_adele_get_mod_quizzes',
-                { 
+                {
                   contextid: context.state.contextid,
                 });
                 return result;
             },
-            async fetchImagePaths(context, args) {
+            async fetchImagePaths(context) {
               const result = await ajax('local_adele_get_image_paths', {
-                contextid: context.state.contextid,
-                path: args.path,
+                contextid: context.state.contextid
               });
+              context.commit('setLpImages', result);
               return result;
-          },
+            },
+            async uploadNewLpImage(context, image) {
+              try {
+                const result = await ajax('local_adele_upload_lp_image', {
+                  contextid: context.state.contextid,
+                  learningpathid: context.state.learningPathID,
+                  image: image,
+                });
+                return result;
+              } catch (error) {
+                console.error('Error in uploadNewLpImage action:', error);
+                throw error;
+              }
+            },
         }
     });
 }

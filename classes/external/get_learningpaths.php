@@ -96,6 +96,7 @@ class get_learningpaths extends external_api {
                     'id' => new external_value(PARAM_INT, 'Item id'),
                     'name' => new external_value(PARAM_TEXT, 'Historyid id'),
                     'description' => new external_value(PARAM_TEXT, 'Item name'),
+                    'image' => new external_value(PARAM_TEXT, 'Item image'),
                 ]
             )
         );

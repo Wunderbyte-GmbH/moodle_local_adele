@@ -23,6 +23,8 @@
  */
 
 namespace local_adele;
+use context_system;
+use moodle_url;
 
 /**
  * Class learning_path_courses
@@ -35,18 +37,105 @@ namespace local_adele;
 class asset_handler {
 
     /**
+     *
+     * @var array
+     */
+    public static $paths = [
+      'helpingslider',
+      'node_background_image',
+
+    ];
+
+    /**
      * Start a new attempt for a user.
-     * @param string $path
      * @return array
      */
-    public static function get_image_paths($path) {
-        global $CFG;
-        $path = $CFG->dirroot . '/local/adele/public/' . $path . '/*';
-        $filelist = glob($path);
-        $filepath = [];
-        foreach ($filelist as $file) {
-            $filepath[] = [ 'path' => str_replace($CFG->dirroot, '', $file)];
+    public static function get_image_paths() {
+        global $CFG, $DB;
+        $filepath = [
+            'helpingslider' => [],
+            'node_background_image' => [],
+        ];
+        foreach (self::$paths as $path) {
+            $path = $CFG->dirroot . '/local/adele/public/' . $path . '/*';
+            $filelist = glob($path);
+            foreach ($filelist as $file) {
+                $filepath[$path][] = [ 'path' => str_replace($CFG->dirroot, '', $file)];
+            }
+        }
+        // Get uploaded images from mdl_files.
+        $contextid = context_system::instance()->id;
+        $sql = "SELECT * FROM {files}
+                WHERE component = 'local_adele'
+                  AND filearea = 'lp_images'
+                  AND filename LIKE 'uploaded_file_lp_%'";
+
+        $uploadedfiles = $DB->get_records_sql($sql, ['contextid' => $contextid]);
+        foreach ($uploadedfiles as $file) {
+            $url = moodle_url::make_pluginfile_url(
+                $file->contextid,
+                $file->component,
+                $file->filearea,
+                $file->itemid,
+                $file->filepath,
+                $file->filename
+            );
+            $filepath['node_background_image'][] = ['path' => $url->out(false)];
         }
         return $filepath;
+    }
+
+    /**
+     * Start a new attempt for a user.
+     * @param int $contextid
+     * @param int $learningpathid
+     * @param mixed $image
+     * @return array
+     */
+    public static function set_new_image($contextid, $learningpathid, $image) {
+        global $USER;
+
+        // Decode the file data from Base64.
+        $decodedfile = base64_decode($image);
+        if ($decodedfile === false) {
+            throw new \invalid_parameter_exception('Invalid file data');
+        }
+
+        $fs = get_file_storage();
+
+        // Generate a temporary file path.
+        $tempfile = tempnam(sys_get_temp_dir(), 'upload_');
+        file_put_contents($tempfile, $decodedfile);
+
+        // Prepare the file record.
+        $filename = 'uploaded_file_lp_' . $learningpathid . '.jpg';
+        $filepath = '/';
+
+        // Check if a file already exists and delete it.
+        if ($existingfile = $fs->get_file($contextid, 'local_adele', 'lp_images', 0, $filepath, $filename)) {
+            $existingfile->delete();
+        }
+
+        $filerecord = [
+            'contextid' => $contextid,
+            'component' => 'local_adele',
+            'filearea'  => 'lp_images',
+            'itemid'    => $learningpathid,
+            'filepath'  => '/',
+            'filename'  => $filename,
+            'userid'    => $USER->id,
+            'license'   => 'allrightsreserved',
+            'author'    => $USER->firstname . ' ' . $USER->lastname,
+        ];
+
+        // Save the file to Moodle file storage
+        $storedfile = $fs->create_file_from_pathname($filerecord, $tempfile);
+        // Clean up the temporary file
+        unlink($tempfile);
+        if ($storedfile) {
+            return ['status' => 'success', 'filename' => $storedfile->get_filename()];
+        } else {
+            throw new moodle_exception('File upload failed');
+        }
     }
 }

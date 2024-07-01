@@ -86,6 +86,7 @@
                 :goal="store.state.learningpath"
                 @change-GoalName="changeGoalName"
                 @change-GoalDescription="changeGoalDescription"
+                @change-LpImage="changeLpImage"
               />
               <div v-if="learningpath">
                 <LearingPath
@@ -122,7 +123,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, onMounted, nextTick, onBeforeMount } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
@@ -155,6 +156,10 @@ const changeGoalDescription = (newGoalDescription) => {
   store.state.learningpath.description = newGoalDescription;
 }
 
+const changeLpImage = (newLpImage) => {
+  store.state.learningpath.image = newLpImage;
+}
+
 // Checking routes
 const checkRoute = (currentRoute) => {
   if(currentRoute == undefined && !route.path.includes('/learningpaths/edit')){
@@ -173,7 +178,6 @@ const checkRoute = (currentRoute) => {
     nextTick(() => showForm(null));
   }
 };
-
 
 // Trigger web services on mount
 onMounted(() => {

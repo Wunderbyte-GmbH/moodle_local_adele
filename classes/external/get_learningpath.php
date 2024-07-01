@@ -87,6 +87,7 @@ class get_learningpath extends external_api {
                 'id' => $learningpathid,
                 'name' => get_string('not_found', 'local_adele'),
                 'description' => get_string('not_found', 'local_adele'),
+                'image' => get_string('not_found', 'local_adele'),
                 'json' => '',
             ];
         }
@@ -103,6 +104,7 @@ class get_learningpath extends external_api {
             'id' => new external_value(PARAM_INT, 'Item id'),
             'name' => new external_value(PARAM_TEXT, 'Historyid id'),
             'description' => new external_value(PARAM_TEXT, 'Item name'),
+            'image' => new external_value(PARAM_TEXT, 'Item image'),
             'json' => new external_value(PARAM_RAW, 'Additional JSON data'),
         ]
         );
