@@ -458,9 +458,10 @@ class learning_paths {
         ];
 
         $sql = "SELECT lpu.id, lpu.user_id, lpu.json, usr.username,
-            usr.firstname, usr.lastname, usr.email, lpu.json
+            usr.firstname, usr.lastname, usr.email, lpu.json, lap.image
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
+            LEFT JOIN {local_adele_learning_paths} lap ON lpu.learning_path_id = lap.id
             WHERE lpu.learning_path_id = :learning_path_id
             AND lpu.status = 'active'
             AND lpu.course_id = :courseid
@@ -478,6 +479,7 @@ class learning_paths {
             'lastname' => 'not found',
             'email' => 'not found',
             'json' => 'not found',
+            'image' => 'not found',
         ];
     }
 

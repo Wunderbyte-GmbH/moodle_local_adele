@@ -1,6 +1,6 @@
 /*!
-  * vue-router v4.2.5
-  * (c) 2023 Eduardo San Martin Morote
+  * vue-router v4.4.0
+  * (c) 2024 Eduardo San Martin Morote
   * @license MIT
   */
 
@@ -15,7 +15,7 @@
  */
 
 /**
-* @vue/shared v3.4.19
+* @vue/shared v3.4.30
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/

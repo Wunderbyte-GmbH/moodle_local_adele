@@ -101,6 +101,7 @@ class get_lp_user_path_relation extends external_api {
                     'lastname' => new external_value(PARAM_TEXT, 'Lastname'),
                     'email' => new external_value(PARAM_RAW, 'email'),
                     'json' => new external_value(PARAM_RAW, 'Flow Chart'),
+                    'image' => new external_value(PARAM_RAW, 'image'),
             ]
         );
     }
