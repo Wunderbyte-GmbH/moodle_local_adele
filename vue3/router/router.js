@@ -38,11 +38,17 @@ const routes = [
         }
     },
     {
-      path: '/',
-      redirect: {
-          name: 'learningpaths-edit-overview'
-      }
-  },
+        path: '/',
+        redirect: {
+            name: 'learningpaths-edit-overview'
+        }
+    },
+    {
+        path: '/section-:id(\\d+)',
+        redirect: {
+            name: 'learningpaths-edit-overview'
+        }
+    },
     {
         path: '/learningpaths/edit',
         component: learningpathsEdit,

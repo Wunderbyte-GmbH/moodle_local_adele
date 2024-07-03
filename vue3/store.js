@@ -59,7 +59,6 @@ export function createAppStore() {
           learningPaths(state) {
             return state.learningpaths;
           }
-
         },
         mutations: {
             setlearningPathID(state, id) {

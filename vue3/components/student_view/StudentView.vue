@@ -23,28 +23,78 @@
  */ -->
 
 <template>
-  <div>
-    <div>
-      <UserPath />
+  <div v-if="userLearningpath">
+    <div v-if="isMobile">
+      <MobileViews
+        :selected-tab="selectedTab"
+      />
+      <ViewButton
+        :selected-tab="selectedTab"
+        @changed-view="toggleView"
+      />
+    </div>
+    <div v-else>
+      <UserPath
+        :user-learningpath="userLearningpath"
+      />
       <UserList />
     </div>
   </div>
 </template>
-  
+
 <script setup>
 // Import needed libraries
-import { onMounted, ref } from 'vue';
-import UserList from '../user_view/UserList.vue';
-import UserPath from '../user_view/UserPath.vue';
+import { onMounted, onUnmounted, ref } from 'vue'
+import UserList from '../user_view/UserList.vue'
+import UserPath from '../user_view/UserPath.vue'
+import ViewButton from '../mobile/ViewButton.vue'
+import MobileViews from '../mobile/MobileViews.vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 
 const store = useStore()
+const route = useRoute()
 const learningpath = ref(null)
 const userLearningpaths = ref(null)
+const selectedTab = ref(false)
+const userLearningpath = ref(null)
+
+
+const isMobile = ref(window.innerWidth <= 600)
+
+const updateDeviceType = () => {
+  isMobile.value = window.innerWidth <= 600
+};
+
+const toggleView = (view) => {
+  selectedTab.value = view
+};
 
 onMounted(async() => {
+  // Check if available courses are set
+  if (!store.state.availablecourses) {
+    store.dispatch('fetchAvailablecourses')
+  }
+  let params = []
+  if (store.state.view == 'student') {
+    params = {
+      learningpathId: store.state.learningPathID,
+      userId: store.state.user,
+    }
+  }else {
+    params = route.params
+  }
+  userLearningpath.value = await store.dispatch('fetchUserPathRelation', params)
   learningpath.value = await store.dispatch('fetchLearningpath')
   userLearningpaths.value = await store.dispatch('fetchUserPathRelations')
+  window.addEventListener('resize', updateDeviceType)
+  updateDeviceType()
 })
+
+// Remove event listener on unmount
+onUnmounted(() => {
+  window.removeEventListener('resize', updateDeviceType)
+});
+
 
 </script>

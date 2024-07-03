@@ -23,7 +23,9 @@
  */ -->
 
 <template>
-  <table class="table table-margin-top">
+  <table
+    class="table table-margin-top"
+  >
     <thead>
       <tr>
         <th>{{ store.state.strings.user_view_id }}</th>
@@ -35,12 +37,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr 
-        v-for="relation in store.state.lpuserpathrelations" 
+      <tr
+        v-for="relation in store.state.lpuserpathrelations"
         :key="relation.id"
       >
         <td>
-          <router-link 
+          <router-link
             v-if="store.state.view!='student'"
             :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
           >
@@ -67,7 +69,7 @@ import { watch } from 'vue';
 import { useStore } from 'vuex'
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 
-// Load Store 
+// Load Store
 const store = useStore()
 
 const stop = watch(

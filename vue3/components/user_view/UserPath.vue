@@ -125,7 +125,7 @@
   <script setup>
   // Import needed libraries
 import { nextTick, onMounted, ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import TransitionEdge from '../edges/TransitionEdge.vue'
@@ -140,7 +140,6 @@ import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
 
 // Load Router
 const router = useRouter()
-const route = useRoute()
 // Load Store
 const store = useStore()
 
@@ -152,50 +151,44 @@ const goBack = () => {
   router.go(-1) // Go back one step in the history
 }
 
+const props = defineProps({
+  userLearningpath: {
+    type: Array,
+    required: true,
+  }
+});
+
 // Declare reactive variable for nodes
 const nodes = ref([]);
 const edges = ref([]);
-const userLearningpath = ref(null)
-
 const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
 
 onMounted( async () => {
-  // Check if available courses are set
-  if (!store.state.availablecourses) {
-    store.dispatch('fetchAvailablecourses');
-  }
-  let params = []
-  if (store.state.view == 'student') {
-    params = {
-      learningpathId: store.state.learningPathID,
-      userId: store.state.user,
-    }
-  }else {
-    params = route.params
-  }
-  userLearningpath.value = await store.dispatch('fetchUserPathRelation', params)
-  setTimeout(() => {
-    nextTick().then(() => {
-      fitView({ duration: 1000, padding: 0.5 }).then(() => {
-        zoomLock.value = true
-        watch(
-          () => viewport.value.zoom,
-          (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
-              if (newVal > oldVal) {
-                setZoomLevel('in', newVal)
-              } else if (newVal < oldVal) {
-                setZoomLevel('out', newVal)
+  if(props.userLearningpath){
+    setFlowchart()
+    setTimeout(() => {
+      nextTick().then(() => {
+        fitView({ duration: 1000, padding: 0.5 }).then(() => {
+          zoomLock.value = true
+          watch(
+            () => viewport.value.zoom,
+            (newVal, oldVal) => {
+              if (newVal && oldVal && zoomLock.value) {
+                if (newVal > oldVal) {
+                  setZoomLevel('in', newVal)
+                } else if (newVal < oldVal) {
+                  setZoomLevel('out', newVal)
+                }
               }
-            }
-          },
-          { deep: true }
-        );
-      });
-    })
-  }, 300)
+            },
+            { deep: true }
+          );
+        });
+      })
+    }, 300)
+  }
 })
 
 const handleZoomLock = (node) => {
@@ -232,12 +225,12 @@ const setZoomLevel = async (action) => {
   if (newViewport == 0.2) {
     edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
     setTimeout(() => {
-      drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
+      drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
     }, 50);
   } else if (oldViewport < 0.25) {
     edges.value = innerGraphDisplay(edges.value, removeEdges)
     setTimeout(() => {
-      drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
+      drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
     }, 50);
   }
   if (newViewport != undefined) {
@@ -249,8 +242,13 @@ const setZoomLevel = async (action) => {
   }
 }
 // Watch for changes in the nodes
-watch(() => userLearningpath.value, () => {
-  const flowchart = userLearningpath.value.json
+watch(() => props.userLearningpath, () => {
+  setFlowchart()
+}, { deep: true } )
+
+// Set flowchart
+function setFlowchart() {
+  const flowchart = props.userLearningpath.json
   nodes.value = flowchart.tree.nodes;
   edges.value = innerGraphDisplay(flowchart.tree.edges);
   edges.value.forEach((edge) => {
@@ -258,9 +256,9 @@ watch(() => userLearningpath.value, () => {
     edge.type = 'custom'
   })
   setTimeout(() => {
-    drawModules(userLearningpath.value, addNodes, removeNodes, findNode)
+    drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
   }, 100);
-}, { deep: true } )
+}
 
 // Zoom in node
 function onNodeClick(event) {
