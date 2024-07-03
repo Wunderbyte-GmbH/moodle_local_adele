@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
  <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
@@ -74,15 +74,16 @@ const toggleVisibility = () => {
 };
 
 // Connection handles
-const handleStyle = computed(() => ({ 
-  backgroundColor: props.data.color, 
-  filter: 'invert(100%)', 
-  width: '10px', 
+const handleStyle = computed(() => ({
+  backgroundColor: props.data.color,
+  filter: 'invert(100%)',
+  width: '10px',
   height: '10px'
 }))
 
 const renderFeedback = (action, emitting) => {
   let checked = false
+  let priority = 3
   switch (action) {
     case 'before':
       checked = feedback.value.feedback_before_checkmark
@@ -94,44 +95,52 @@ const renderFeedback = (action, emitting) => {
       checked = feedback.value.feedback_inbetween_checkmark
       break
   }
-  if (checked) {
-    let renderedFeedback = ''
-    const start_node = findNode(feedback.value.childCondition)
-    let nextNode = null;
-    if (start_node.data.visibility) {
-      renderedFeedback += start_node.data['description_' + action]
+
+  let renderedFeedback = ''
+  const start_node = findNode(feedback.value.childCondition)
+  let nextNode = null;
+  if (start_node.data.visibility) {
+    renderedFeedback += start_node.data['description_' + action]
+  }
+  if (start_node.childCondition) {
+    if (typeof(start_node.childCondition) == 'string') {
+      start_node.childCondition = [start_node.childCondition]
     }
-    if (start_node.childCondition) {
-      if (typeof(start_node.childCondition) == 'string') {
-        start_node.childCondition = [start_node.childCondition]
+    start_node.childCondition.forEach((childCondition) => {
+      if (!childCondition.includes('feedback')) {
+        nextNode = childCondition
       }
-      start_node.childCondition.forEach((childCondition) => {
+    })
+  }
+  if (start_node) {
+    priority = start_node.data.priority
+  }
+  while(nextNode) {
+    nextNode = findNode(nextNode)
+    if (nextNode && nextNode.data.visibility) {
+      if (priority > nextNode.data.priority) {
+        priority = nextNode.data.priority
+      }
+      if (renderedFeedback != '') {
+        renderedFeedback += ', '
+      }
+      renderedFeedback += nextNode.data['description_' + action]
+    }
+    if (nextNode && nextNode.childCondition) {
+      nextNode.childCondition =
+        typeof nextNode.childCondition == 'string' ? [nextNode.childCondition ] : nextNode.childCondition
+      nextNode.childCondition.forEach((childCondition) => {
         if (!childCondition.includes('feedback')) {
           nextNode = childCondition
         }
       })
+    } else {
+      nextNode = null
     }
-    while(nextNode) {
-      nextNode = findNode(nextNode)
-      if (nextNode && nextNode.data.visibility) {
-        if (renderedFeedback != '') {
-          renderedFeedback += ', '
-        }
-        renderedFeedback += nextNode.data['description_' + action]
-      }
-      if (nextNode && nextNode.childCondition) {
-        nextNode.childCondition = 
-          typeof nextNode.childCondition == 'string' ? [nextNode.childCondition ] : nextNode.childCondition 
-        nextNode.childCondition.forEach((childCondition) => {
-          if (!childCondition.includes('feedback')) {
-            nextNode = childCondition
-          }
-        })
-      } else {
-        nextNode = null
-      }
-    }
+  }
+  if (checked) {
     feedback.value['feedback_' + action] = renderedFeedback
+    feedback.value['feedback_priority'] = priority
   }
   if (emitting) {
     emit('updateFeedback', feedback.value)
@@ -146,29 +155,29 @@ const renderFeedback = (action, emitting) => {
     class="custom-node rounded p-3 has-text"
     style="width: 350px; min-height: 200px;"
   >
-    <button 
+    <button
       style="position: absolute; top: 5px; left: 5px; background: none; border: none; z-index: 100;"
-      @click="toggleVisibility" 
+      @click="toggleVisibility"
     >
-      <i 
-        class="fa" 
-        :class="{ 
-          'fa-eye': feedback.visibility, 
-          'fa-eye-slash': !feedback.visibility, 
-          'strikethrough': !feedback.visibility 
+      <i
+        class="fa"
+        :class="{
+          'fa-eye': feedback.visibility,
+          'fa-eye-slash': !feedback.visibility,
+          'strikethrough': !feedback.visibility
         }"
       />
     </button>
     <div class="text-center">
       <div class="container">
         <div class="row justify-content-center">
-          <div 
+          <div
             class="col-md-12"
           >
             <div class="mb-3">
               <div>
-                <label 
-                  for="exampleFormControlTextarea1" 
+                <label
+                  for="exampleFormControlTextarea1"
                   class="form-label"
                 >
                   <h5>
@@ -181,7 +190,7 @@ const renderFeedback = (action, emitting) => {
               </div>
               <input
                 id="feedback_before"
-                v-model="feedback.feedback_before_checkmark" 
+                v-model="feedback.feedback_before_checkmark"
                 class="form-check-input"
                 type="checkbox"
                 :disabled="!feedback.visibility"
@@ -190,13 +199,13 @@ const renderFeedback = (action, emitting) => {
               <label for="feedback_before">
                 Use default feedback
               </label>
-              <textarea 
-                id="exampleFormControlTextarea1" 
-                v-model="feedback.feedback_before" 
+              <textarea
+                id="exampleFormControlTextarea1"
+                v-model="feedback.feedback_before"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
-                rows="5" 
+                rows="5"
                 :disabled="feedback.feedback_before_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
@@ -205,7 +214,7 @@ const renderFeedback = (action, emitting) => {
               </div>
               <input
                 id="feedback_inbetween"
-                v-model="feedback.feedback_inbetween_checkmark" 
+                v-model="feedback.feedback_inbetween_checkmark"
                 class="form-check-input"
                 type="checkbox"
                 :disabled="!feedback.visibility"
@@ -214,12 +223,12 @@ const renderFeedback = (action, emitting) => {
               <label for="feedback_inbetween">
                 Use default feedback
               </label>
-              <textarea 
-                id="exampleFormControlTextarea1" 
-                v-model="feedback.feedback_inbetween" 
+              <textarea
+                id="exampleFormControlTextarea1"
+                v-model="feedback.feedback_inbetween"
                 class="form-control"
                 :placeholder="store.state.strings.nodes_no_feedback"
-                rows="5" 
+                rows="5"
                 :disabled="feedback.feedback_inbetween_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
@@ -228,7 +237,7 @@ const renderFeedback = (action, emitting) => {
               </div>
               <input
                 id="feedback_after"
-                v-model="feedback.feedback_after_checkmark" 
+                v-model="feedback.feedback_after_checkmark"
                 class="form-check-input"
                 type="checkbox"
                 :disabled="!feedback.visibility"
@@ -237,13 +246,13 @@ const renderFeedback = (action, emitting) => {
               <label for="feedback_after">
                 Use default feedback
               </label>
-              <textarea 
-                id="exampleFormControlTextarea1" 
-                v-model="feedback.feedback_after" 
+              <textarea
+                id="exampleFormControlTextarea1"
+                v-model="feedback.feedback_after"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
-                rows="5" 
+                rows="5"
                 :disabled="feedback.feedback_after_checkmark ||!feedback.visibility"
                 @change="emit('updateFeedback', feedback)"
               />
@@ -253,10 +262,10 @@ const renderFeedback = (action, emitting) => {
       </div>
     </div>
 
-    <Handle 
-      id="source_feedback" 
-      type="source" 
-      :position="Position.Bottom" 
+    <Handle
+      id="source_feedback"
+      type="source"
+      :position="Position.Bottom"
       :style="handleStyle"
     />
   </div>

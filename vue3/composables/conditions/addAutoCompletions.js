@@ -29,6 +29,7 @@ const  addAutoCompletions = (node, store) => {
               "description_before": store.state.strings.course_description_before_condition_course_completed,
               "description_inbetween": store.state.strings.course_description_inbetween_condition_course_completed,
               "description_after": store.state.strings.course_description_after_condition_course_completed,
+              "priority": 1,
               "id": 150,
               "label": "course_completed",
               "name": store.state.strings.course_name_condition_course_completed,

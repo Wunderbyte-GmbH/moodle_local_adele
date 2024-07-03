@@ -67,17 +67,19 @@ class relation_update {
                             $failedrestriction = false;
                             $validationconditionstring = [];
                             if (
-                              isset($restrictionnodepath['parentCondition']) &&
-                              $restrictionnodepath['parentCondition'][0] == 'starting_condition'
+                                isset($restrictionnodepath['parentCondition']) &&
+                                $restrictionnodepath['parentCondition'][0] == 'starting_condition'
                             ) {
                                 $currentcondition = $restrictionnodepath;
                                 $validationcondition = false;
-                                while ( $currentcondition ) {
+                                while ($currentcondition) {
                                     $currlabel = $currentcondition['data']['label'];
-                                    if ($currentcondition['data']['label'] == 'timed' ||
+                                    if (
+                                        $currentcondition['data']['label'] == 'timed' ||
                                         $currentcondition['data']['label'] == 'timed_duration' ||
                                         $currentcondition['data']['label'] == 'specific_course' ||
-                                        $currentcondition['data']['label'] == 'parent_courses') {
+                                        $currentcondition['data']['label'] == 'parent_courses'
+                                    ) {
                                         $currcondi = $currentcondition['id'];
                                         $validationcondition =
                                             $restrictioncriteria[$currlabel]['completed'][$currcondi] ?? false;
@@ -86,13 +88,13 @@ class relation_update {
                                         $validationconditionstring[] = $currentcondition['data']['label']
                                             . '_' . $currentcondition['id'];
                                     } else if (
-                                      isset($restrictioncriteria[$currlabel]['completed']) &&
-                                      $currentcondition['data']['label'] == 'parent_node_completed'
-                                      ) {
+                                        isset($restrictioncriteria[$currlabel]['completed']) &&
+                                        $currentcondition['data']['label'] == 'parent_node_completed'
+                                    ) {
                                         foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
                                             $parentcompletioncriteria = course_completion_status::get_condition_status(
-                                              $parentnode,
-                                              $userpath->user_id
+                                                $parentnode,
+                                                $userpath->user_id
                                             );
                                             $parentnode = self::validatenodecompletion(
                                                 $parentnode,
@@ -118,8 +120,11 @@ class relation_update {
                                         $failedrestriction = true;
                                     }
                                     // Get next Condition and return null if no child node exsists.
-                                    $currentcondition = self::searchnestedarray($node['restriction']['nodes'],
-                                        $currentcondition['childCondition'], 'id');
+                                    $currentcondition = self::searchnestedarray(
+                                        $node['restriction']['nodes'],
+                                        $currentcondition['childCondition'],
+                                        'id'
+                                    );
                                 }
                                 if ($validationcondition && !$failedrestriction) {
                                     $restrictionnodepaths[] = $validationconditionstring;
@@ -172,8 +177,9 @@ class relation_update {
      */
     public static function checkcondition($newcompletion, $oldcompletion, $nodeid, $condition) {
         if (
-          isset($oldcompletion['user_path_relation'][$nodeid][$condition]) &&
-          !$newcompletion['valid'] && $oldcompletion['user_path_relation'][$nodeid][$condition]['valid']
+            isset($oldcompletion['user_path_relation'][$nodeid][$condition]) &&
+            !$newcompletion['valid'] &&
+            $oldcompletion['user_path_relation'][$nodeid][$condition]['valid']
         ) {
             return true;
         }
@@ -200,13 +206,15 @@ class relation_update {
             if (
                 isset($completionnode['parentCondition']) &&
                 $completionnode['parentCondition'][0] == 'starting_condition'
-                ) {
+            ) {
                 $currentcondition = $completionnode;
                 $validationcondition = false;
-                while ( $currentcondition ) {
+                while ($currentcondition) {
                     $label = $currentcondition['data']['label'];
-                    if ($label == 'catquiz' ||
-                    $label == 'modquiz') {
+                    if (
+                        $label == 'catquiz' ||
+                        $label == 'modquiz'
+                    ) {
                         $validationcondition =
                             $completioncriteria[$label]['completed'][$currentcondition['id']];
                         $singlecompletionnode[$label
@@ -227,10 +235,10 @@ class relation_update {
                             }
                         }
                         if (
-                          isset($completionnode['data']) &&
-                          isset($completionnode['data']['value']) &&
-                          isset($completionnode['data']['value']['min_courses']) &&
-                          $completionnode['data']['value']['min_courses'] <= $completednodecourses
+                            isset($completionnode['data']) &&
+                            isset($completionnode['data']['value']) &&
+                            isset($completionnode['data']['value']['min_courses']) &&
+                            $completionnode['data']['value']['min_courses'] <= $completednodecourses
                         ) {
                             $validationcondition = true;
                             $validationconditionstring[] = $label;
@@ -249,16 +257,27 @@ class relation_update {
                         $failedcompletion = true;
                     }
                     // Get next Condition and return null if no child node exsists.
-                    $currentcondition = self::searchnestedarray($node['completion']['nodes'],
-                        $currentcondition['childCondition'], 'id');
+                    $currentcondition = self::searchnestedarray(
+                        $node['completion']['nodes'],
+                        $currentcondition['childCondition'],
+                        'id'
+                    );
                 }
-                if ($validationcondition && !$failedcompletion ) {
+                if ($validationcondition && !$failedcompletion) {
                     if (!$mode) {
                         return true;
-                    } else if ($node['restriction'] == null ||count($restrictionnodepaths) ||
-                    !count($node['restriction']['nodes'])) {
+                    } else if (
+                        $node['restriction'] == null ||count($restrictionnodepaths) ||
+                        !count($node['restriction']['nodes'])
+                    ) {
                         $completionnodepaths[] = $validationconditionstring;
-                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
+                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']]['text'];
+                        if (
+                            !$priority ||
+                            $priority > $feedback['completion']['after_all'][$completionnode['id']]['priority']
+                        ) {
+                            $priority = $feedback['completion']['after_all'][$completionnode['id']]['priority'];
+                        }
                         $nodefinished = node_finished::create([
                             'objectid' => $userpath->id,
                             'context' => context_system::instance(),
@@ -272,6 +291,15 @@ class relation_update {
                 }
             }
         }
+        $feedback['completion']['higher'] = [];
+        if ($priority) {
+            foreach ($feedback['completion']['after_all'] as $completionpriority) {
+                if ($completionpriority['priority'] < $priority) {
+                    $feedback['completion']['higher'][] = $completionpriority['text'];
+                }
+            }
+        }
+        unset($feedback['completion']['after_all']);
         if (!$mode) {
             return false;
         }
@@ -299,8 +327,9 @@ class relation_update {
                 foreach ($conditionnodepaths as $conditionnodepath) {
                     foreach ($conditionnodepath as $condition) {
                         if (
-                          $priority == 0 ||
-                          $completionpriorities[$condition] < $priority) {
+                            $priority == 0 ||
+                            $completionpriorities[$condition] < $priority
+                        ) {
                             $priority = $completionpriorities[$condition];
                         }
                     }
@@ -337,8 +366,12 @@ class relation_update {
             if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
                 $feedbacks['completion']['before'][] =
                   isset($conditionnode['data']['feedback_before']) ? $conditionnode['data']['feedback_before'] : '';
-                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] =
-                  isset($conditionnode['data']['feedback_after']) ? $conditionnode['data']['feedback_after'] : '';
+
+                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
+                    'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
+                    'text' => isset($conditionnode['data']['feedback_after']) ? $conditionnode['data']['feedback_after'] : '',
+                ];
+
                 if ($conditionnode['data']['feedback_inbetween_checkmark']) {
                     $feedbacks['completion']['inbetween'][] = str_replace([
                       '{course progress}',
@@ -372,12 +405,12 @@ class relation_update {
      * @param array $haystack
      * @param array $needle
      * @param string $key
-     * @return array
+     * @return mixed
      */
     public static function searchnestedarray($haystack, $needle, $key) {
         foreach ($haystack as $item) {
             foreach ($needle as $need) {
-                if ( !strpos($need, '_feedback' )) {
+                if (!strpos($need, '_feedback')) {
                     if (isset($item[$key]) && $item[$key] === $need) {
                         return $item;
                     }

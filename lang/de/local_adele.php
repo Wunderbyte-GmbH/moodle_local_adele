@@ -276,6 +276,12 @@ $string['nodes_warning_time_restriction'] = 'Diese Einschränkung überschreibt 
 $string['nodes_warning_time_heading'] = 'Warnung!';
 $string['nodes_no_description'] = 'Es wurde keine Kursbeschreibung bereitgestellt';
 $string['nodes_course_node'] = 'Kursknoten';
+$string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
+$string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
+$string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
+$string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
+$string['nodes_feedback_completion_higher'] = 'Knoten ist abgeschlossen! Mit diesen können Sie einen höheren Abschlussstatus erreichen:';
+
 
 // Knoten-Elemente-Strings.
 $string['nodes_items_start'] = 'Start:';

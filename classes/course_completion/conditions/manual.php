@@ -75,6 +75,7 @@ class manual implements course_completion {
             'description_before' => self::get_completion_description_before(),
             'description_after' => self::get_completion_description_after(),
             'description_inbetween' => self::get_completion_description_inbetween(),
+            'priority' => self::get_completion_priority(),
             'label' => $label,
         ];
     }

@@ -39,29 +39,34 @@
       >
         {{ store.state.strings.user_view_user_path_for }}
       </h2>
-      <div class="card">
-        <div v-if="userLearningpath && store.state.view!='student'">
+      <div
+        v-if="user_learningpath"
+        class="card"
+      >
+        <div v-if="store.state.view!='student'">
           <div class="card-body">
             <h5 class="card-title">
               <i
                 :class="store.state.version ? 'fa fa-user-circle' : 'fa fa-user'"
               />
-              {{ userLearningpath.username }}
+              {{ user_learningpath.username }}
             </h5>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                <i class="fa fa-user" /> {{ store.state.strings.user_view_firstname }}: {{ userLearningpath.firstname }}
+                <i class="fa fa-user" /> {{ store.state.strings.user_view_firstname }}: {{ user_learningpath.firstname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-user" /> {{ store.state.strings.user_view_lastname }}: {{ userLearningpath.lastname }}
+                <i class="fa fa-user" /> {{ store.state.strings.user_view_lastname }}: {{ user_learningpath.lastname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-envelope" /> {{ store.state.strings.user_view_email }}: {{ userLearningpath.email }}
+                <i class="fa fa-envelope" /> {{ store.state.strings.user_view_email }}: {{ user_learningpath.email }}
               </li>
             </ul>
           </div>
         </div>
-        <div style="width: 100%; height: 600px;">
+        <div
+          style="width: 100%; height: 600px;"
+        >
           <VueFlow
             :nodes="nodes"
             :edges="edges"
@@ -77,7 +82,7 @@
             <template #node-custom="{ data }">
               <CustomNodeEdit
                 :data="data"
-                :learningpath="userLearningpath"
+                :learningpath="user_learningpath"
                 :zoomstep="zoomstep"
               />
             </template>
@@ -86,7 +91,7 @@
             >
               <CustomStagNodeEdit
                 :data="data"
-                :learningpath="userLearningpath"
+                :learningpath="user_learningpath"
                 :zoomstep="zoomstep"
               />
             </template>
@@ -125,7 +130,7 @@
   <script setup>
   // Import needed libraries
 import { nextTick, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex';
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import TransitionEdge from '../edges/TransitionEdge.vue'
@@ -140,6 +145,8 @@ import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
 
 // Load Router
 const router = useRouter()
+const route = useRoute()
+
 // Load Store
 const store = useStore()
 
@@ -152,7 +159,7 @@ const goBack = () => {
 }
 
 const props = defineProps({
-  userLearningpath: {
+  user_learningpath_parent: {
     type: Array,
     required: true,
   }
@@ -164,9 +171,24 @@ const edges = ref([]);
 const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
+const user_learningpath = ref({})
 
 onMounted( async () => {
-  if(props.userLearningpath){
+  if(!props.user_learningpath_parent){
+    let params = []
+    if (store.state.view == 'student') {
+      params = {
+        learningpathId: store.state.learningPathID,
+        userId: store.state.user,
+      }
+    }else {
+      params = route.params
+    }
+    user_learningpath.value  = await store.dispatch('fetchUserPathRelation', params)
+  } else {
+    user_learningpath.value = props.user_learningpath_parent
+  }
+  if(user_learningpath.value){
     setFlowchart()
     setTimeout(() => {
       nextTick().then(() => {
@@ -225,12 +247,12 @@ const setZoomLevel = async (action) => {
   if (newViewport == 0.2) {
     edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
     setTimeout(() => {
-      drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
+      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);
   } else if (oldViewport < 0.25) {
     edges.value = innerGraphDisplay(edges.value, removeEdges)
     setTimeout(() => {
-      drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
+      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);
   }
   if (newViewport != undefined) {
@@ -242,13 +264,13 @@ const setZoomLevel = async (action) => {
   }
 }
 // Watch for changes in the nodes
-watch(() => props.userLearningpath, () => {
+watch(() => user_learningpath.value, () => {
   setFlowchart()
 }, { deep: true } )
 
 // Set flowchart
 function setFlowchart() {
-  const flowchart = props.userLearningpath.json
+  const flowchart = user_learningpath.value.json
   nodes.value = flowchart.tree.nodes;
   edges.value = innerGraphDisplay(flowchart.tree.edges);
   edges.value.forEach((edge) => {
@@ -256,7 +278,7 @@ function setFlowchart() {
     edge.type = 'custom'
   })
   setTimeout(() => {
-    drawModules(props.userLearningpath, addNodes, removeNodes, findNode)
+    drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
   }, 100);
 }
 

@@ -1,9 +1,13 @@
 <script setup>
   // Import needed libraries
   import { onMounted, onUnmounted, ref } from 'vue';
+  import { useStore } from 'vuex';
 
   // Load Store
   const showFeedbackarea = ref(false);
+
+  // Load Store
+const store = useStore();
 
   const props = defineProps({
     data: {
@@ -47,10 +51,29 @@
     <transition name="fade">
       <div v-if="showFeedbackarea">
         <div
-          v-for="feedback_after in data.completion.feedback.completion.inbetween"
-          :key="feedback_after"
+          v-for="(feedback_condition, condition,) in data.completion.feedback"
+          :key="condition"
         >
-          {{ feedback_after }}
+          <div
+            v-for="(feedbacks, state) in feedback_condition"
+            :key="condition + '_' + state"
+          >
+            <div v-if="feedbacks">
+              <div class="feedback-title">
+                {{ store.state.strings['nodes_feedback_' + condition + '_' + state] }}
+              </div>
+              <ul class="feedback-list">
+                <li
+                  v-for="(feedback, index) in feedbacks"
+                  :key="index + '_' + condition + '_' + state"
+                  class="feedback-item"
+                >
+                  {{ feedback }}
+                  <span v-if="index < feedbacks.length - 1" class="or-text">or</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </transition>
@@ -58,28 +81,55 @@
 </template>
 
 <style scoped>
+.feedback-list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.feedback-item {
+  position: relative;
+}
+
+.feedback-text {
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+}
+
+.or-text {
+  display: block;
+  font-style: italic;
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.feedback-title {
+  font-weight: bold;
+  padding: 10px 0;
+}
+
 .card-container {
   cursor: pointer;
-  justify-content: center; /* Center children horizontally */
-  align-items: center; /* Center children vertically */
+  justify-content: center;
+  align-items: center;
   padding: 5px;
   border-radius: 8px;
   background-color: #EAEAEA;
-  font-weight: bold; /* Make the text bold */
   text-align: center;
 }
 
 .fa-comment {
   color: #333;
-  font-size: 20px; /* Adjust the size as needed */
+  font-size: 20px;
 }
 
 .card-container:hover {
-  background-color: rgb(213, 207, 207); /* Change background color on hover */
+  background-color: rgb(213, 207, 207);
 }
 
 .feedback-container {
-  width: 100%; /* Ensures the container fills the width of its parent */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -98,9 +148,9 @@ textarea {
 }
 
 textarea:focus {
-  border-color: #80bdff; /* Highlight color when focused */
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
-  outline: none; /* Removes the default focus outline */
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 .fade-enter-active, .fade-leave-active {
