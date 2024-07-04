@@ -24,20 +24,20 @@
 
 <template>
   <div>
-    <div 
-      class="dndflow mt-4" 
+    <div
+      class="dndflow mt-4"
       @drop="onDrop"
     >
-      <Modal 
-        v-if="store.state.view != 'teacher'" 
+      <Modal
+        v-if="store.state.view != 'teacher'"
         :learningpath="learningpath"
         @saveEdit="handleSaveEdit"
       />
-      <VueFlow 
-        :default-viewport="{ zoom: 1.0, x: 0, y: 0 }" 
-        :class="{ dark }" 
-        :fit-view-on-init="true" 
-        :max-zoom="1.5" 
+      <VueFlow
+        :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
+        :class="{ dark }"
+        :fit-view-on-init="true"
+        :max-zoom="1.5"
         :min-zoom="0.2"
         :zoom-on-scroll="zoomLock"
         class="learning-path-flow"
@@ -45,13 +45,13 @@
         @node-drag="onDrag"
         @node-click="onNodeClick"
       >
-        <Background 
-          :pattern-color="dark ? '#FFFFFB' : '#aaa'" 
+        <Background
+          :pattern-color="dark ? '#FFFFFB' : '#aaa'"
           gap="8"
         />
         <template #node-custom="{ data }">
-          <CustomNode 
-            :data="data" 
+          <CustomNode
+            :data="data"
             :learningpath="learningpath"
             @change-module="onChangeModule"
           />
@@ -63,7 +63,7 @@
           <ConditionalDropzoneNode :data="data" />
         </template>
         <template #node-orcourses="{ data }">
-          <OrCourses 
+          <OrCourses
             :data="data"
             :learningpath="learningpath"
             @typeChange="typeChanged"
@@ -73,26 +73,26 @@
         <template #node-module="{ data }">
           <ModuleNode :data="data" />
         </template>
-        <MiniMap 
+        <MiniMap
           v-if="shouldShowMiniMap"
-          node-color="grey" 
+          node-color="grey"
         />
       </VueFlow>
-      <Sidebar 
+      <Sidebar
         v-if="store.state.view != 'teacher'"
-        :courses="store.state.availablecourses" 
-        :learningmodule="learningpath" 
-        :strings="store.state.strings" 
+        :courses="store.state.availablecourses"
+        :learningmodule="learningpath"
+        :strings="store.state.strings"
         :style="{ backgroundColor: backgroundSidebar }"
         @nodesIntersected="handleNodesIntersected"
         @changedModule="onChangedModule"
       />
     </div>
     <p />
-    <div 
+    <div
       class="d-flex justify-content-center"
     >
-      <Controls 
+      <Controls
         :learningpath="learningpath"
         @change-class="toggleClass"
         @finish-edit="finishEdit"
@@ -286,8 +286,8 @@ const onDrag = ($event) => {
 
 const onNodeClick = (event) => {
   zoomLock.value = false
-  setCenter( 
-    event.node.position.x + event.node.dimensions.width/2, 
+  setCenter(
+    event.node.position.x + event.node.dimensions.width/2,
     event.node.position.y + event.node.dimensions.height/2,
     { zoom: 1, duration: 500}
   ).then(() => {
@@ -323,7 +323,7 @@ function handleSaveEdit(params){
   emit('save-edit', params);
 }
 
-// Triggers handle connect 
+// Triggers handle connect
 onConnect(handleConnect);
 
 watch(
@@ -399,7 +399,7 @@ function onDrop(event) {
       })
     }
     else if(intersectedNode.value.dropzone.id == 'dropzone_or'){
-      // get the clostestnode and change type and data 
+      // get the clostestnode and change type and data
       let dropzoneNode = intersectedNode.value.closestnode
       if ( !dropzoneNode.data.course_node_id.includes(data.course_node_id[0])) {
         dropzoneNode.type = 'orcourses'
@@ -416,7 +416,7 @@ function onDrop(event) {
             }
             if (dropzoneNode.data.course_node_id.length == 2 &&
               dropzoneNode.data.fullname == dropzoneNode.data.shortname ) {
-              dropzoneNode.data.fullname = '' 
+              dropzoneNode.data.fullname = ''
             }
             node = dropzoneNode
             node = addStagCompletions(node)
@@ -445,12 +445,12 @@ function onDrop(event) {
     if((intersectedNode.value.dropzone.id.includes('dropzone_') &&
       !intersectedNode.value.dropzone.id.includes('_and')) &&
       !intersectedNode.value.dropzone.id.includes('_or')){
-      
+
       newNode = addAutoCompletions(newNode, store)
-      let source = intersectedNode.value.closestnode.id  
+      let source = intersectedNode.value.closestnode.id
       let target = newNode.id
       if(intersectedNode.value.dropzone.id.includes('child')){
-        source = newNode.id 
+        source = newNode.id
         target = intersectedNode.value.closestnode.id
         newNode = addAutoRestrictions(newNode, intersectedNode.value.closestnode, 'child', store)
         newNode.position = {
@@ -530,7 +530,7 @@ watch(
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1em;
 }
-.dndflow aside 
+.dndflow aside
 .nodes>*{
   margin-bottom:10px;
   cursor:grab;
@@ -538,11 +538,11 @@ watch(
   -webkit-box-shadow:5px 5px 10px 2px rgba(0,0,0,.25);
   box-shadow:5px 5px 10px 2px #00000040
 }
-.dndflow aside 
+.dndflow aside
 .description{
   margin-bottom:10px
 }
-.dndflow 
+.dndflow
 .vue-flow-wrapper{
   flex-grow:1;
   height:100%
@@ -550,12 +550,12 @@ watch(
 @media screen and (min-width: 640px)
 {
   .dndflow{flex-direction:row}
-  .dndflow 
+  .dndflow
   aside{min-width:20%}
 }
 @media screen and (max-width: 639px)
 {
-  .dndflow aside 
+  .dndflow aside
   .nodes{
     display:flex;
     flex-direction:row;

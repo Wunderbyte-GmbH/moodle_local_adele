@@ -23,11 +23,21 @@
  */ -->
 
 <template>
-  <div v-if="selectedTab">
-    <ListView />
+  <div v-if="details">
+    <DetailView
+      :details="details"
+      @changed-details="changeDetail"
+    />
+  </div>
+  <div v-else-if="selectedTab">
+    <ListView
+      @changed-details="changeDetail"
+    />
   </div>
   <div v-else>
-    <PathView />
+    <PathView
+      @changed-details="changeDetail"
+    />
   </div>
 </template>
 
@@ -35,6 +45,8 @@
 
 import PathView from './views/PathView.vue';
 import ListView from './views/ListView.vue';
+import { ref } from 'vue';
+import DetailView from './views/DetailView.vue';
 
 const props = defineProps({
   selectedTab: {
@@ -42,5 +54,11 @@ const props = defineProps({
     required: true,
   }
 });
+
+const details = ref(null)
+
+const changeDetail = (node) => {
+  details.value = node
+};
 
 </script>

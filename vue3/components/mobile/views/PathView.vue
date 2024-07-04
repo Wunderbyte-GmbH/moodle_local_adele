@@ -29,6 +29,7 @@
         :nodes="nodes"
         :edges="edges"
         :viewport="viewport"
+        @node-click="onNodeClick"
       >
         <template #node-custom="{ data }">
           <MobileNode
@@ -56,13 +57,19 @@ const { fitView} = useVueFlow()
 
 const nodes = ref([]);
 const edges = ref([]);
+let clickTimeout = null;
 
 onMounted(() => {
   if (store.state.lpuserpathrelation.json) {
     setFlowchart()
-
   }
 })
+
+// Emit to parent component
+const emit = defineEmits([
+  'changed-details',
+]);
+
 
 // Set flowchart
 function setFlowchart() {
@@ -76,5 +83,22 @@ function setFlowchart() {
     fitView({ duration: 1000, padding: 0.5 })
   }, 100)
 }
+
+const onNodeClick = (event) => {
+  if (clickTimeout) {
+    clearTimeout(clickTimeout)
+    clickTimeout = null
+    onNodeDoubleClick(event.node.id)
+  } else {
+    clickTimeout = setTimeout(() => {
+      clickTimeout = null
+    }, 1000) // Adjust the timeout duration as needed
+  }
+}
+
+const onNodeDoubleClick = (node_id) => {
+  emit('changed-details', node_id);
+}
+
 
 </script>

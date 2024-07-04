@@ -25,9 +25,13 @@
 <script setup>
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue'
+import { useStore } from 'vuex'
 
+
+const store = useStore()
 const fullname = ref('')
+const color = ref(null)
 
 const props = defineProps({
   data: {
@@ -41,6 +45,18 @@ onMounted(() => {
   if (props.data.fullname) {
     fullname.value = props.data.fullname
   }
+  const modules = store.state.lpuserpathrelation.json.modules
+  if (
+    store.state.lpuserpathrelation.json.tree.nodes &&
+    typeof props.data.module === 'number' &&
+    !isNaN(props.data.module)
+  ) {
+    modules.forEach((module) => {
+      if (module.id == props.data.module) {
+        color.value = module.color
+      }
+    })
+  }
 })
 
 const priorityClass = computed(() => {
@@ -52,7 +68,7 @@ const priorityClass = computed(() => {
 <template>
   <div
     class="node-card"
-    :style="[{ width: '400px' }]"
+    :style="[{ width: '400px'}, color ? { backgroundColor: color + '10' } : {}]"
   >
     <div class="card-content">
       <span class="task-text">{{ fullname }}</span>

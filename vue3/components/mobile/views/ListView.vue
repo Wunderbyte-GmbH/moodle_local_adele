@@ -44,6 +44,7 @@
         :key="task.id"
         :class="task.type"
         :style="task.color ? { backgroundColor: task.color + '10' } : {}"
+        @click="changeDetails(task)"
       >
         <span :class="task.priority">{{ task.text }}</span>
         <span class="icons">
@@ -91,6 +92,16 @@ onMounted(() => {
     })
   }
 })
+
+// Emit to parent component
+const emit = defineEmits([
+  'changed-details',
+]);
+
+// Function to select a tab
+const changeDetails = (details) => {
+  emit('changed-details', details.id);
+};
 </script>
 
 <style scoped>
