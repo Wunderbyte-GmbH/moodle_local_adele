@@ -1,7 +1,9 @@
+@@ -1,162 +0,0 @@
 <script setup>
   // Import needed libraries
   import { onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from 'vuex';
+  import UserFeedbackBlock from './UserFeedbackBlock.vue';
 
   // Load Store
   const showFeedbackarea = ref(false);
@@ -50,31 +52,26 @@ const store = useStore();
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea">
-        <div
-          v-for="(feedback_condition, condition,) in data.completion.feedback"
-          :key="condition"
-        >
-          <div
-            v-for="(feedbacks, state) in feedback_condition"
-            :key="condition + '_' + state"
-          >
-            <div v-if="feedbacks">
-              <div class="feedback-title">
-                {{ store.state.strings['nodes_feedback_' + condition + '_' + state] }}
-              </div>
-              <ul class="feedback-list">
-                <li
-                  v-for="(feedback, index) in feedbacks"
-                  :key="index + '_' + condition + '_' + state"
-                  class="feedback-item"
-                >
-                  {{ feedback }}
-                  <span v-if="index < feedbacks.length - 1" class="or-text">or</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <UserFeedbackBlock
+          :data="data.completion.feedback.restriction.before"
+          title="restriction_before"
+        />
+        <UserFeedbackBlock
+          :data="data.completion.feedback.completion.before"
+          title="completion_before"
+        />
+        <UserFeedbackBlock
+          :data="data.completion.feedback.completion.inbetween"
+          title="completion_inbetween"
+        />
+        <UserFeedbackBlock
+          :data="data.completion.feedback.completion.after"
+          title="completion_after"
+        />
+        <UserFeedbackBlock
+          :data="data.completion.feedback.completion.higher"
+          title="completion_higher"
+        />
       </div>
     </transition>
   </div>

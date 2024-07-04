@@ -122,7 +122,7 @@ const renderFeedback = (action, emitting) => {
         priority = nextNode.data.priority
       }
       if (renderedFeedback != '') {
-        renderedFeedback += ', '
+        renderedFeedback += ' and '
       }
       renderedFeedback += nextNode.data['description_' + action]
     }

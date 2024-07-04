@@ -300,6 +300,12 @@ class relation_update {
             }
         }
         unset($feedback['completion']['after_all']);
+        $feedback['status'] = self::getnodestatus(
+            $feedback,
+            $restrictionnodepaths,
+            $node['restriction']
+        );
+
         if (!$mode) {
             return false;
         }
@@ -308,6 +314,50 @@ class relation_update {
             'singlecompletionnode' => $singlecompletionnode,
             'feedback' => $feedback,
         ];
+    }
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $restrictions
+     * @return string
+     */
+    public static function getnodestatus($feedback, $restrictionnodepaths, $restrictions) {
+        if ($feedback['completion']['after']) {
+            return 'completed';
+        }
+        if ($restrictionnodepaths) {
+            return 'accessible';
+        }
+        foreach ($restrictions['nodes'] as $restrictionall) {
+            if (str_contains($restrictionall['id'], '_feedback')) {
+                $hastimedcondition = false;
+                $nextid = str_replace('_feedback', '', $restrictionall['id']);
+                while ($nextid) {
+                    foreach ($restrictions as $restrictioncolumn) {
+                        if ($restrictioncolumn['id'] == $nextid) {
+                            if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
+                                $hastimedcondition = true;
+                            }
+                            $newnextid = null;
+                            foreach ($restrictioncolumn['childCondition'] as $children) {
+                                if (!str_contains($children, '_feedback')) {
+                                    $newnextid = $children;
+                                }
+                            }
+                            $nextid = $newnextid;
+                        }
+                    }
+                }
+                if (!$hastimedcondition) {
+                    return 'not_accessible';
+                }
+            }
+        }
+        return 'not_accessible';
+      // return 'closed'
     }
 
     /**
