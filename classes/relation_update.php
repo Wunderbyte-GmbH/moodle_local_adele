@@ -91,22 +91,23 @@ class relation_update {
                                         isset($restrictioncriteria[$currlabel]['completed']) &&
                                         $currentcondition['data']['label'] == 'parent_node_completed'
                                     ) {
-                                        foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
-                                            $parentcompletioncriteria = course_completion_status::get_condition_status(
-                                                $parentnode,
-                                                $userpath->user_id
-                                            );
-                                            $parentnode = self::validatenodecompletion(
-                                                $parentnode,
-                                                $parentcompletioncriteria,
-                                                $userpath,
-                                                $restrictionnodepaths,
-                                                0
-                                            );
-                                            if ($parentnode) {
-                                                $validationcondition = true;
-                                            }
-                                        }
+                                        // foreach ($restrictioncriteria[$currlabel]['completed'] as $keynode => $parentnode) {
+                                        //     $parentcompletioncriteria = course_completion_status::get_condition_status(
+                                        //         $parentnode,
+                                        //         $userpath->user_id
+                                        //     );
+                                        //     $parentnode = self::validatenodecompletion(
+                                        //         $parentnode,
+                                        //         $parentcompletioncriteria,
+                                        //         $userpath,
+                                        //         $restrictionnodepaths,
+                                        //         0
+                                        //     );
+                                        //     if ($parentnode) {
+                                        //         $validationcondition = true;
+                                        //     }
+                                        // }
+                                        $validationcondition = true;
                                         $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                         $validationconditionstring[] = $currentcondition['data']['label'];
                                     } else {
