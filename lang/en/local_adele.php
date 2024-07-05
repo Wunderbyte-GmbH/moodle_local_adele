@@ -322,6 +322,10 @@ $string['nodes_feedback_completion_after'] = 'Node completed because:';
 $string['nodes_feedback_completion_before'] = 'To complete node you have to:';
 $string['nodes_feedback_completion_inbetween'] = 'Current node state:';
 $string['nodes_feedback_completion_higher'] = 'Node is completed! With these, you can achieve a higher completion status:';
+$string['nodes_feedback_before'] = 'Before';
+$string['nodes_feedback_inbetween'] = 'Inbetween';
+$string['nodes_feedback_after'] = 'After';
+$string['nodes_feedback_use_default'] = 'Use default feedback';
 
 // Nodes Items strings.
 $string['nodes_items_start'] = 'Start:';
