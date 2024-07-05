@@ -2,14 +2,12 @@
 <script setup>
   // Import needed libraries
   import { onMounted, onUnmounted, ref } from 'vue';
-  import { useStore } from 'vuex';
   import UserFeedbackBlock from './UserFeedbackBlock.vue';
+  import { useStore } from 'vuex';
 
   // Load Store
   const showFeedbackarea = ref(false);
-
-  // Load Store
-const store = useStore();
+  const store = useStore()
 
   const props = defineProps({
     data: {
@@ -52,6 +50,10 @@ const store = useStore();
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea">
+        <div v-if="data.completion.feedback.status" class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
+        </div>
         <UserFeedbackBlock
           :data="data.completion.feedback.restriction.before"
           title="restriction_before"
@@ -155,5 +157,13 @@ textarea:focus {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+.status-text {
+  font-weight: bold;
+  align-items: center;
+}
+
+.status-text .fa-info-circle {
+  margin-right: 5px;
 }
 </style>

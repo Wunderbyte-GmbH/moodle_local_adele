@@ -303,7 +303,7 @@ class relation_update {
         $feedback['status'] = self::getnodestatus(
             $feedback,
             $restrictionnodepaths,
-            $node['restriction']
+            $node
         );
 
         if (!$mode) {
@@ -324,41 +324,112 @@ class relation_update {
      * @param array $restrictions
      * @return string
      */
-    public static function getnodestatus($feedback, $restrictionnodepaths, $restrictions) {
+    public static function getnodestatus($feedback, $restrictionnodepaths, $node) {
         if ($feedback['completion']['after']) {
             return 'completed';
         }
         if ($restrictionnodepaths) {
             return 'accessible';
         }
-        foreach ($restrictions['nodes'] as $restrictionall) {
+        foreach ($node['restriction']['nodes'] as $restrictionall) {
             if (str_contains($restrictionall['id'], '_feedback')) {
                 $hastimedcondition = false;
                 $nextid = str_replace('_feedback', '', $restrictionall['id']);
-                while ($nextid) {
-                    foreach ($restrictions as $restrictioncolumn) {
+                $safetycounter = 0;
+                $maxiterations = 50;
+                while ($nextid && $safetycounter < $maxiterations) {
+                    $found = false;
+                    $reachablecolumn = true;
+                    foreach ($node['restriction']['nodes'] as $restrictioncolumn) {
                         if ($restrictioncolumn['id'] == $nextid) {
                             if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
                                 $hastimedcondition = true;
+                                $starttime = new \DateTime();
+                                if ($node['data']['first_enrolled']) {
+                                    $starttime->setTimestamp($node['data']['first_enrolled']);
+                                }
+                                $istimeinfuture = self::gettimestamptoday(
+                                    $restrictioncolumn['data'],
+                                    $starttime
+                                );
+                                if (!$istimeinfuture) {
+                                    $reachablecolumn = false;
+                                }
                             }
                             $newnextid = null;
                             foreach ($restrictioncolumn['childCondition'] as $children) {
                                 if (!str_contains($children, '_feedback')) {
                                     $newnextid = $children;
+                                    break;
                                 }
                             }
                             $nextid = $newnextid;
+                            $found = true;
+                            break;
                         }
                     }
+                    if ($reachablecolumn) {
+                        return 'not_accessible';
+                    }
+                    $safetycounter++;
+                    if (!$found) {
+                        break;
+                    }
+                }
+                if ($safetycounter >= $maxiterations) {
+                    return 'error: loop limit exceeded';
                 }
                 if (!$hastimedcondition) {
                     return 'not_accessible';
                 }
             }
         }
-        return 'not_accessible';
-      // return 'closed'
+        return 'closed';
     }
+
+    /**
+     * Check if node is reachable
+     *
+     * @param array $data
+     * @param \DateTime $starttime
+     * @return bool
+    */
+    public static function gettimestamptoday($data, $starttime) {
+        $now = new \DateTime();
+        if (
+            $data['value']['end']
+        ) {
+            $date = \DateTime::createFromFormat('Y-m-d\TH:i', $data['value']['end']);
+            return $date > $now;
+        }
+        if (
+            $data['value']['selectedDuration']
+        ) {
+            $durationvalue = $data['value']['durationValue'];
+            $selectedduration = $data['value']['selectedDuration'];
+            if (isset(self::$durationvaluearray[$durationvalue])) {
+                $totalseconds = self::$durationvaluearray[$durationvalue] * $selectedduration;
+                $endtime = clone $starttime;
+                $endtime->modify("+{$totalseconds} seconds");
+                return $now < $endtime;
+            }
+        }
+        return true;
+    }
+
+     /**
+     * Maps duration types to their equivalent durations in seconds.
+     *
+     * @var array The keys represent the duration types as follows:
+     *            '0' for days, with each day being 86400 seconds;
+     *            '1' for weeks, with each week being 604800 seconds;
+     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
+     */
+    private static $durationvaluearray = [
+        '0' => 86400, // Days.
+        '1' => 604800, // Weeks.
+        '2' => 2629746, // Months.
+    ];
 
     /**
      * Observer for course completed

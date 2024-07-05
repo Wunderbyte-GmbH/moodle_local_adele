@@ -18,13 +18,13 @@
 </script>
 
 <template>
-  <div v-if="data && data.length > 0">
+  <div v-if="data && data.length > 0 && data[0] !== ''">
     <div class="feedback-title">
       {{ store.state.strings['nodes_feedback_' + title] }}
     </div>
     <ul class="feedback-list">
       <li
-        v-for="(feedback, index) in props.data"
+        v-for="(feedback, index) in data"
         :key="index + '_' + title"
         class="feedback-item"
       >

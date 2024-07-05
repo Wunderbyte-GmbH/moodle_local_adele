@@ -127,6 +127,10 @@ $string['node_coursefullname'] = 'Knotenname:';
 $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
 // Bedingungsbeschreibung.
+$string['node_access_completed'] = 'Der Knoten ist abgeschlossen';
+$string['node_access_accessible'] = 'Der Knoten ist zugänglich';
+$string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich';
+$string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich.';
 $string['course_description_condition_completion_manual'] = 'Knoten wird manuell abgeschlossen';
 $string['course_name_condition_completion_manual'] = 'Knotenabschluss-Checkbox';
 $string['course_description_condition_parent_courses'] = 'Knoten wird zugänglich, wenn eine bestimmte Anzahl von übergeordneten Knoten abgeschlossen ist';

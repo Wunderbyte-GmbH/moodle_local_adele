@@ -158,6 +158,10 @@ $string['course_select_condition_timed_duration_weeks'] = 'weeks';
 $string['course_select_condition_timed_duration_months'] = 'months';
 
 // Feedback Strings.
+$string['node_access_completed'] = 'The node is completed';
+$string['node_access_accessible'] = 'The node is accessible';
+$string['node_access_not_accessible'] = 'The node is not accessible yet';
+$string['node_access_closed'] = 'The node is no longer accessible.';
 $string['course_description_condition_course_completed'] = 'One course inside this node has to be completed by student';
 $string['course_description_before_completion_manual'] = 'Completion will be granted manually';
 $string['course_description_inbetween_completion_manual'] = 'Completion was not granted manaully yet';
