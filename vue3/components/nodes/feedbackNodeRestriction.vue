@@ -96,7 +96,7 @@ const renderFeedback = (action, emitting) => {
       nextNode = findNode(nextNode)
       if (nextNode && nextNode.data.visibility) {
         if (renderedFeedback != '') {
-          renderedFeedback += ' and '
+          renderedFeedback += store.state.strings.course_condition_concatination_and
         }
         renderedFeedback += nextNode.data['description_' + action]
       }

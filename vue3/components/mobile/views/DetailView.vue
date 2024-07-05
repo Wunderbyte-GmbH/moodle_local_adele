@@ -27,17 +27,21 @@
     v-if="node"
     class="card"
   >
-    <button @click="goBack(null)" class="back-button">Back</button>
+    <button @click="goBack(null)" class="back-button">{{store.state.strings.mobile_view_detail_back}}</button>
     <div class="card-header">
       <h2>{{ node.data.fullname }}</h2>
     </div>
     <div class="card-body">
       <p v-if="node.id">
-        <strong>ID:</strong> {{ node.id }}
+        <strong>{{store.state.strings.mobile_view_detail_id}}</strong> {{ node.id }}
       </p>
-      <p v-if="node.data.description"><strong>Description:</strong> {{node.data.description}}</p>
-      <p v-if="node.data.estimate_duration"><strong>Estimated duration:</strong> {{node.data.estimate_duration}}</p>
-      <p><a href="details.link" target="_blank" rel="noopener noreferrer">Open Link</a></p>
+      <p v-if="node.data.description"><strong>{{store.state.strings.mobile_view_detail_description}}</strong> {{node.data.description}}</p>
+      <p v-if="node.data.estimate_duration"><strong>
+        {{store.state.strings.mobile_view_detail_estimate}}
+      </strong> {{node.data.mobile_view_detail_course_link}}</p>
+      <p><a href="details.link" target="_blank" rel="noopener noreferrer">
+        {{store.state.strings.mobile_view_detail_estimate}}
+      </a></p>
       <UserInformation
         :data="node.data"
       />

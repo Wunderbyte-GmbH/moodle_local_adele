@@ -321,7 +321,7 @@ class relation_update {
      *
      * @param array $feedback
      * @param array $restrictionnodepaths
-     * @param array $restrictions
+     * @param array $node
      * @return string
      */
     public static function getnodestatus($feedback, $restrictionnodepaths, $node) {
@@ -393,7 +393,7 @@ class relation_update {
      * @param array $data
      * @param \DateTime $starttime
      * @return bool
-    */
+     */
     public static function gettimestamptoday($data, $starttime) {
         $now = new \DateTime();
         if (
@@ -418,13 +418,13 @@ class relation_update {
     }
 
      /**
-     * Maps duration types to their equivalent durations in seconds.
-     *
-     * @var array The keys represent the duration types as follows:
-     *            '0' for days, with each day being 86400 seconds;
-     *            '1' for weeks, with each week being 604800 seconds;
-     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
-     */
+      * Maps duration types to their equivalent durations in seconds.
+      *
+      * @var array The keys represent the duration types as follows:
+      *            '0' for days, with each day being 86400 seconds;
+      *            '1' for weeks, with each week being 604800 seconds;
+      *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
+      */
     private static $durationvaluearray = [
         '0' => 86400, // Days.
         '1' => 604800, // Weeks.

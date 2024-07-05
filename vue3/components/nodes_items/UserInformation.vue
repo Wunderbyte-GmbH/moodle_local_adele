@@ -1,4 +1,4 @@
-@@ -1,162 +0,0 @@
+
 <script setup>
   // Import needed libraries
   import { onMounted, onUnmounted, ref } from 'vue';

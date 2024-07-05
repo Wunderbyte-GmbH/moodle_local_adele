@@ -27,7 +27,7 @@
     <div class="header">
       <h1>
         <i class="fa-solid fa-list" />
-        Nodes List View
+        {{store.state.strings.mobile_view_list_header}}
       </h1>
       <div class="button-group">
         <button @click="filterTasks" title="Filter">

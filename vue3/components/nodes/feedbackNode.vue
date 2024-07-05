@@ -122,7 +122,7 @@ const renderFeedback = (action, emitting) => {
         priority = nextNode.data.priority
       }
       if (renderedFeedback != '') {
-        renderedFeedback += ' and '
+        renderedFeedback += store.state.strings.course_condition_concatination_and
       }
       renderedFeedback += nextNode.data['description_' + action]
     }
@@ -186,7 +186,7 @@ const renderFeedback = (action, emitting) => {
                 </label>
               </div>
               <div>
-                Before
+                {{ store.state.strings.nodes_feedback_before }}
               </div>
               <input
                 id="feedback_before"
@@ -197,7 +197,7 @@ const renderFeedback = (action, emitting) => {
                 @change="renderFeedback('before', true)"
               >
               <label for="feedback_before">
-                Use default feedback
+                {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
                 id="exampleFormControlTextarea1"
@@ -210,7 +210,7 @@ const renderFeedback = (action, emitting) => {
                 @change="emit('updateFeedback', feedback)"
               />
               <div>
-                Inbetween
+                {{ store.state.strings.nodes_feedback_inbetween }}
               </div>
               <input
                 id="feedback_inbetween"
@@ -221,7 +221,7 @@ const renderFeedback = (action, emitting) => {
                 @change="renderFeedback('inbetween', true)"
               >
               <label for="feedback_inbetween">
-                Use default feedback
+                {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
                 id="exampleFormControlTextarea1"
@@ -233,7 +233,7 @@ const renderFeedback = (action, emitting) => {
                 @change="emit('updateFeedback', feedback)"
               />
               <div>
-                After
+                {{ store.state.strings.nodes_feedback_after }}
               </div>
               <input
                 id="feedback_after"
@@ -244,7 +244,7 @@ const renderFeedback = (action, emitting) => {
                 @change="renderFeedback('after', true)"
               >
               <label for="feedback_after">
-                Use default feedback
+                {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
                 id="exampleFormControlTextarea1"

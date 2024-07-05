@@ -28,19 +28,20 @@
       :class="{ active: selectedTab === false }"
       @click="selectTab(false)"
     >
-      Ablaufplan
+      {{ store.state.strings.mobile_view_buttons_path }}
     </button>
     <button
       :class="{ active: selectedTab === true }"
       @click="selectTab(true)"
     >
-      Liste
+      {{ store.state.strings.mobile_view_buttons_list }}
     </button>
   </div>
 </template>
 
 <script setup>
 
+import { useStore } from 'vuex'
 
 const props = defineProps({
   selectedTab: {
@@ -48,6 +49,8 @@ const props = defineProps({
     required: true,
   }
 });
+
+const store = useStore()
 
 // Emit to parent component
 const emit = defineEmits([

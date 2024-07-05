@@ -181,6 +181,8 @@ $string['course_restricition_before_condition_specific_course'] = 'Finish the co
 $string['course_restricition_before_condition_timed'] = 'Accessible from {START} until {END}';
 $string['course_restricition_before_condition_timed_duration'] = 'Accessible for {WEEKS} since {TIMED CONDITION}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'Finish the parent node';
+$string['course_condition_concatination_or'] = "or";
+$string['course_condition_concatination_and'] = " and ";
 
 // Event Strings.
 $string['event_learnpath_deleted'] = 'Learning path deleted';
@@ -377,3 +379,13 @@ $string['main_intro_slider'] = 'Introduction slider';
 $string['main_description'] = 'Description:';
 $string['main_duplicate'] = 'Duplicate';
 $string['main_delete'] = 'Delete';
+
+// Mobile strings.
+$string['mobile_view_buttons_path'] = 'Learning path';
+$string['mobile_view_buttons_list'] = 'Node list';
+$string['mobile_view_list_header'] = 'Nodes List View';
+$string['mobile_view_detail_id'] = 'ID:';
+$string['mobile_view_detail_back'] = 'Back';
+$string['mobile_view_detail_description'] = 'Description:';
+$string['mobile_view_detail_estimate'] = 'Estimated duration:';
+$string['mobile_view_detail_course_link'] = 'Open course';

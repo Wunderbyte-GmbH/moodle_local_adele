@@ -155,6 +155,8 @@ $string['course_restricition_before_condition_specific_course'] = 'Schließen Si
 $string['course_restricition_before_condition_timed'] = 'Zugänglich von {START} bis {END}';
 $string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {WEEKS} seit {TIMED CONDITION}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'Schließen Sie den übergeordneten Knoten ab';
+$string['course_condition_concatination_or'] = "oder";
+$string['course_condition_concatination_and'] = " und ";
 
 // Ereigniszeichenfolgen.
 $string['event_learnpath_deleted'] = 'Lernpfad gelöscht';
@@ -292,7 +294,7 @@ $string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
 $string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
 $string['nodes_feedback_completion_higher'] = 'Knoten ist abgeschlossen! Mit diesen Abschlüssen können Sie einen höheren Status erreichen:';
 
-// Feedback Strings
+// Feedback Strings.
 $string['course_description_before_completion_manual'] = 'Abschluss wird manuell gewährt';
 $string['course_description_inbetween_completion_manual'] = 'Abschluss wurde noch nicht manuell gewährt';
 $string['course_description_after_completion_manual'] = 'Abschluss wurde manuell gewährt';
@@ -354,9 +356,23 @@ $string['user_view_progress'] = 'Fortschritt';
 $string['user_view_nodes'] = 'Knoten';
 $string['user_view_go_back_overview'] = 'Zurück zur Übersicht';
 $string['user_view_user_path_for'] = 'Benutzerpfad für:';
+$string['nodes_feedback_before'] = 'Vorher';
+$string['nodes_feedback_inbetween'] = 'Zwischen';
+$string['nodes_feedback_after'] = 'Nachher';
+$string['nodes_feedback_use_default'] = 'Standard-Feedback verwenden';
 
 // Main strings.
 $string['main_intro_slider'] = 'Einführungsslider';
 $string['main_description'] = 'Beschreibung:';
 $string['main_duplicate'] = 'Duplizieren';
 $string['main_delete'] = 'Löschen';
+
+// Mobile strings.
+$string['mobile_view_buttons_path'] = 'Lernpfad';
+$string['mobile_view_buttons_list'] = 'Knotenliste';
+$string['mobile_view_list_header'] = 'Knotenlistenansicht';
+$string['mobile_view_detail_id'] = 'ID:';
+$string['mobile_view_detail_back'] = 'Zurück';
+$string['mobile_view_detail_description'] = 'Beschreibung:';
+$string['mobile_view_detail_estimate'] = 'Geschätzte Dauer:';
+$string['mobile_view_detail_course_link'] = 'Kurs öffnen';
