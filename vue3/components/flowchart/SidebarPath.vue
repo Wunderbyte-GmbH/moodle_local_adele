@@ -21,10 +21,10 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
@@ -56,7 +56,7 @@ const activeTab = ref(0);
 // Defined props from the parent component
 const props = defineProps({
   learningmodule: {
-    type: Array,
+    type: Object,
     required: true,
   },
   courses: {
@@ -95,16 +95,15 @@ const filteredCourses = computed(() => {
 // Function sets up data for nodes
 function onDrag(event) {
   //find closestNode node
-  const startingNode = findNode('starting_node'); 
-  const dz_check_node = findNode('dropzone_parent'); 
+  const startingNode = findNode('starting_node');
+  const dz_check_node = findNode('dropzone_parent');
   if (dz_check_node == undefined) {
-    closestNode.value = findClosestNode(event); 
+    closestNode.value = findClosestNode(event);
   } else if (!checkDistance(event, closestNode.value)) {
     activeNode.value = null
     closestNode.value = null
   }
-  
-  //add drop zones to this node 
+  //add drop zones to this node
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
   if(closestNode.value && startingNodeIntersecting){
     if (dropzoneShown()) {
@@ -128,34 +127,54 @@ function onDrag(event) {
 }
 
 function checkDistance(event, closestNode) {
-  const { left, top } = vueFlowRef.value.getBoundingClientRect();
-  const position_mouse = project({
-    x: event.clientX - left,
-    y: event.clientY - top,
-  });
-  const position_node = {
-    x: closestNode.position.x + closestNode.dimensions.width/2,
-    y: closestNode.position.y + closestNode.dimensions.height/2,
-  };
-  if (Math.sqrt(
-    Math.pow(position_mouse.x - position_node.x, 2) +
-    Math.pow(position_mouse.y - position_node.y, 2)) 
-    < 550
-  ) {
-    return true
+  if (closestNode) {
+    const { left, top } = vueFlowRef.value.getBoundingClientRect();
+    let event_clientX = event.clientX
+    let event_clientY = event.clientY
+    if (
+      event_clientX == 0 &&
+      event_clientY == 0
+    ){
+      event_clientX = mousePosition.value.x
+      event_clientY = mousePosition.value.y
+    }
+    const position_mouse = project({
+      x: event_clientX - left,
+      y: event_clientY - top,
+    });
+    const position_node = {
+      x: closestNode.position.x + closestNode.dimensions.width/2,
+      y: closestNode.position.y + closestNode.dimensions.height/2,
+    };
+    if (Math.sqrt(
+      Math.pow(position_mouse.x - position_node.x, 2) +
+      Math.pow(position_mouse.y - position_node.y, 2))
+      < 550
+    ) {
+      return true
+    }
   }
   return false
 }
 
 function checkIntersetcion(event, closestNode) {
   let insideStartingNode = false;
+  let event_clientX = event.clientX
+  let event_clientY = event.clientY
+  if (
+    event_clientX == 0 &&
+    event_clientY == 0
+  ){
+    event_clientX = mousePosition.value.x
+    event_clientY = mousePosition.value.y
+  }
   intersectingNode.value = null;
   nodes.value.forEach((node) => {
     if(node.type == 'dropzone' ||node.type == 'conditionaldropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
       const position = project({
-        x: event.clientX - left,
-        y: event.clientY - top,
+        x: event_clientX - left,
+        y: event_clientY - top,
       });
       const nodesIntersecting = areNodesIntersecting(position, node)
       const nodeFormat = formatIntersetingNodes(
@@ -173,16 +192,25 @@ function checkIntersetcion(event, closestNode) {
 function aboveDistance() {
   if (activeNode.value != null) {
     const { left, top } = vueFlowRef.value.getBoundingClientRect();
+    let event_clientX = event.clientX
+    let event_clientY = event.clientY
+    if (
+      event_clientX == 0 &&
+      event_clientY == 0
+    ){
+      event_clientX = mousePosition.value.x
+      event_clientY = mousePosition.value.y
+    }
     const position = project({
-      x: event.clientX - left,
-      y: event.clientY - top,
+      x: event_clientX - left,
+      y: event_clientY - top,
     });
 
     const middleNode = {
       x: activeNode.value.position.x + activeNode.value.dimensions.width/2,
       y: activeNode.value.position.y + activeNode.value.dimensions.height/2,
     };
-  
+
     if (Math.sqrt(Math.pow(position.x - middleNode.x, 2) + Math.pow(position.y - middleNode.y, 2)) > 500) {
       return true
     }
@@ -207,17 +235,40 @@ function areNodesIntersecting(position, node) {
     position.x < node.position.x + node.dimensions.width &&
     position.x > node.position.x &&
     position.y < node.position.y + node.dimensions.height &&
-    position.y > node.position.y 
+    position.y > node.position.y
   );
 }
+const mousePosition = ref({ x: 0, y: 0 });
+
+function updateMousePosition(event) {
+  mousePosition.value = { x: event.clientX, y: event.clientY };
+}
+
+onMounted(() => {
+  document.addEventListener('dragover', updateMousePosition);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('dragover', updateMousePosition);
+});
 
 // Find the closest node within a set boundary
 function findClosestNode(event) {
   const connectionRadius = 550;
   const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  let event_clientX = event.clientX
+  let event_clientY = event.clientY
+  if (
+    event_clientX == 0 &&
+    event_clientY == 0
+  ){
+    event_clientX = mousePosition.value.x
+    event_clientY = mousePosition.value.y
+  }
+
   const position = project({
-    x: event.clientX - left,
-    y: event.clientY - top,
+    x: event_clientX - left,
+    y: event_clientY - top,
   });
   let closestNode = null;
   let closestDistance = Infinity;
@@ -254,7 +305,7 @@ function changeTab(index) {
 
 <template>
   <aside
-    class="col-md-2" 
+    class="col-md-2"
     style="max-width: 20% !important;"
   >
     <div class="nav nav-tabs">
@@ -281,64 +332,64 @@ function changeTab(index) {
         </a>
       </div>
     </div>
-    <div 
+    <div
       v-if="!activeTab"
     >
-      <div 
+      <div
         class="col long-text"
         type="text"
       >
         {{ strings.fromavailablecourses }}
       </div>
-      <div 
+      <div
         class="col long-text"
         type="text"
       >
         {{ strings.tagsearch_description }}
       </div>
-      <div 
+      <div
         class="row ml-2 long-text"
         type="text"
       >
-        <input 
-          id="searchTerm" 
-          v-model="searchTerm" 
-          class="form-control" 
-          :placeholder="strings.placeholder_search" 
+        <input
+          id="searchTerm"
+          v-model="searchTerm"
+          class="form-control"
+          :placeholder="strings.placeholder_search"
         >
       </div>
       <div class="learning-path-nodes-container">
         <div class="nodes">
-          <div 
-            v-for="course in filteredCourses" 
+          <div
+            v-for="course in filteredCourses"
             :key="course.id"
             class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
-            :draggable="true" 
-            :data="course" 
+            :draggable="true"
+            :data="course"
             style="width: 95%; padding-left: 1rem; margin-left: 0.025rem; height: 3rem"
-            @dragstart="onDragStart($event, course)" 
+            @dragstart="onDragStart($event, course)"
             @drag="onDrag($event)"
             @dragend="onDragEnd()"
           >
-            <div 
+            <div
               class="col-auto"
-              data-toggle="tooltip" 
-              data-placement="left" 
-              :title="store.state.strings.flowchart_hover_darg_drop" 
+              data-toggle="tooltip"
+              data-placement="left"
+              :title="store.state.strings.flowchart_hover_darg_drop"
             >
               <i class="fa fa-info-circle fa-lg" />
             </div>
             <div class="col long-text">
               {{ course.fullname }}
             </div>
-            <div 
+            <div
               class="col-auto"
-              data-toggle="tooltip" 
-              data-placement="right" 
-              :title="store.state.strings.flowchart_hover_click_here" 
+              data-toggle="tooltip"
+              data-placement="right"
+              :title="store.state.strings.flowchart_hover_click_here"
             >
-              <a 
-                :href="'/course/view.php?id=' + course.course_node_id[0]" 
+              <a
+                :href="'/course/view.php?id=' + course.course_node_id[0]"
                 target="_blank"
               >
                 <i class="fa fa-link" />
@@ -349,9 +400,9 @@ function changeTab(index) {
       </div>
     </div>
     <div v-else>
-      <LearningModule 
+      <LearningModule
         :learningmodule="learningmodule"
-        :strings="strings" 
+        :strings="strings"
         @changed-module="onChangedModule($event, learningpath)"
       />
     </div>
@@ -375,7 +426,7 @@ function changeTab(index) {
 }
 .nav-item{
   margin-right: 2px;
-  max-width: 50%; 
+  max-width: 50%;
 }
 .nav-tabs {
   display: flex !important;

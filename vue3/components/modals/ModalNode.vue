@@ -232,7 +232,7 @@ const node_id = ref('')
 
 const props = defineProps({
   learningpath: {
-    type: Array,
+    type: Object,
     required: true,
   }
 });

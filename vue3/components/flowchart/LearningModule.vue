@@ -24,16 +24,16 @@
 
 <template>
   <div class="mt-4">
-    <button 
-      type="button" 
+    <button
+      type="button"
       class="btn btn-secondary"
-      @click="toggleAddForm" 
+      @click="toggleAddForm"
     >
       {{ store.state.strings.flowchart_add_learning }}
     </button>
     <transition name="fade">
-      <div 
-        v-if="addLeaerningModule" 
+      <div
+        v-if="addLeaerningModule"
         class="mt-2 addForm"
         :style="{ backgroundColor: addFormColor }"
       >
@@ -43,7 +43,7 @@
               {{ store.state.strings.flowchart_title }}
             </label>
             <input type="text" id="title" v-model="title" class="form-control">
-            <div 
+            <div
               v-if="showValidation"
               class="titleValidation"
               :style="{backgroundColor: backgroundValidation, color: colorValidation}"
@@ -61,17 +61,17 @@
           </div>
         </div>
         <div class="mt-2 d-flex justify-content-between">
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn btn-secondary me-2"
-            @click="toggleAddForm" 
+            @click="toggleAddForm"
           >
             {{ store.state.strings.cancel }}
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn btn-primary"
-            @click="addLearningModule" 
+            @click="addLearningModule"
           >
             {{ store.state.strings.flowchart_add }}
           </button>
@@ -80,33 +80,33 @@
     </transition>
     <div v-if="learningmodules.length > 0">
       {{ store.state.strings.flowchart_existing_learning_modules }}
-      <div 
-        v-for="module in learningmodules" 
+      <div
+        v-for="module in learningmodules"
         :key="module.id"
         class="vue-flow__node-input mt-1 row align-items-center justify-content-between"
-        :draggable="false" 
-        :data="module" 
+        :draggable="false"
+        :data="module"
         style="width: 95%; padding-left: 1rem; margin-left: 0.025rem;"
-      >    
+      >
         <div class="d-flex align-items-center justify-content-between">
-          <span 
-            class="color-circle" 
+          <span
+            class="color-circle"
             :style="{ backgroundColor: module.color }"
           />
           <span class="ml-2">{{ module.name }}</span>
         </div>
-        <a 
-          href="" 
-          @click.prevent="editLearningModule(module)" 
+        <a
+          href=""
+          @click.prevent="editLearningModule(module)"
         >
-          <i 
-            class="icon fa fa-pencil fa-fw iconsmall m-r-0" 
-            :title="store.state.strings.edit" 
+          <i
+            class="icon fa fa-pencil fa-fw iconsmall m-r-0"
+            :title="store.state.strings.edit"
           />
         </a>
         <transition name="fade">
-          <div 
-            v-if="showEdit == module.id" 
+          <div
+            v-if="showEdit == module.id"
             class="col-12 text-center mt-2"
           >
             <div class="col-md-12">
@@ -114,7 +114,7 @@
                 {{ store.state.strings.flowchart_title }}
               </label>
               <input type="text" id="canceltitle" v-model="cancelTitle" class="form-control">
-              <div 
+              <div
                 v-if="showValidation"
                 class="titleValidation"
                 :style="{backgroundColor: backgroundValidation, color: colorValidation}"
@@ -132,22 +132,22 @@
             </div>
             <div class="row mt-2">
               <div class="col-12">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-secondary mr-2"
                   @click="cancelModule()"
                 >
                   {{ store.state.strings.flowchart_cancel_button }}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-primary mr-2"
                   @click="saveModule(module.id)"
                 >
                   {{ store.state.strings.flowchart_save_button }}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-danger"
                   @click="deleteModule(module.id)"
                 >
@@ -170,7 +170,7 @@ import { useStore } from 'vuex';
 // Defined props from the parent component
 const props = defineProps({
   learningmodule: {
-    type: Array,
+    type: Object,
     required: true,
   },
   strings: {
@@ -245,7 +245,7 @@ const addLearningModule = () => {
         }
       }else {
         learningpath.value.json.modules = [newModule]
-      }      
+      }
     }
     if (learningpath.value.id != 0) {
       learningmodules.value = learningpath.value.json.modules
@@ -324,7 +324,7 @@ function editElementById(jsonData, idToEdit) {
   }
   .fade-enter-from, .fade-leave-to {
     opacity: 0;
-  } 
+  }
   .addForm{
     padding: 0.5rem;
     border-radius: 0.5rem;

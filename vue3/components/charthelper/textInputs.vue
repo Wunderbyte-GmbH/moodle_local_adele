@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch, onMounted, inject } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
+import { useStore } from 'vuex'
 
 const props = defineProps({
   goal: {
@@ -10,7 +11,7 @@ const props = defineProps({
 });
 
 // Load Store and Router
-const store = inject('store');
+const store = useStore()
 
 const emit = defineEmits([
     'change-GoalName',

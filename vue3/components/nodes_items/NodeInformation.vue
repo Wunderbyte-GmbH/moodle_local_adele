@@ -10,7 +10,7 @@
     },
     parentnode: {
       type: Object,
-      required: true, 
+      required: true,
     },
   });
   const store = useStore();
@@ -61,9 +61,8 @@
   })
 
   const subscribbed_date = computed(() => {
-    let subscribbed_date = null
     if (props.data.first_enrolled) {
-      const date = new Date(props.data.first_enrolled * 1000); 
+      const date = new Date(props.data.first_enrolled * 1000);
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -73,7 +72,7 @@
         second: '2-digit',
       });
     }
-    return subscribbed_date;
+    return null;
   })
 
   const completion_inbetween = computed(() => {
@@ -132,7 +131,7 @@
     if (nextNodeId.includes('_feedback')) {
       nextNodeId = parentnode.childCondition[1];
     }
-    let nextNode = nodes.find(node => node.id === nextNodeId); 
+    let nextNode = nodes.find(node => node.id === nextNodeId);
     return nextNode
   }
 
@@ -160,20 +159,20 @@
     :class="{ 'card-hover': showCard, [data.node_id + '_node_info_listener']: true}"
     @click="toggleCard()"
   >
-    <div 
-      class="information" 
+    <div
+      class="information"
       :style="{ backgroundColor: backgroundColor }"
     >
       <i class="fa fa-info" />
     </div>
     <transition name="unfold">
-      <div 
-        v-if="showCard" 
-        class="additional-card" 
+      <div
+        v-if="showCard"
+        class="additional-card"
         :style="{ backgroundColor: backgroundColorInfo}"
       >
         <ul class="list-group">
-          <li 
+          <li
             v-if="description"
             class="list-group-item"
           >
@@ -185,7 +184,7 @@
               {{ description }}
             </div>
           </li>
-          <li 
+          <li
             v-if="estimate_duration"
             class="list-group-item"
           >
@@ -195,11 +194,11 @@
             </b>
             <div class="list-group-text">
               <b>
-                Estimated Duration: 
+                Estimated Duration:
               </b>
               {{ estimate_duration }}
             </div>
-            <div 
+            <div
               v-if="ending_date.start_date"
               class="list-group-text"
             >
@@ -208,7 +207,7 @@
               </b>
               {{ ending_date.start_date }}
             </div>
-            <div 
+            <div
               v-if="ending_date.end_date"
               class="list-group-text"
             >
@@ -217,7 +216,7 @@
               </b>
               {{ ending_date.end_date }}
             </div>
-            <div 
+            <div
               v-if="subscribbed_date"
               class="list-group-text"
             >
@@ -236,7 +235,7 @@
             </b>
             <div class="list-group-text">
               <div v-if="props.parentnode.restriction && restriction">
-                <div 
+                <div
                   v-for="restriction_string in restriction"
                   :key="restriction_string"
                 >
@@ -252,14 +251,14 @@
             class="list-group-item"
           >
             <i
-              class="fa fa-tasks" 
+              class="fa fa-tasks"
             />
             <b>
               Completion
             </b>
             <div class="list-group-text">
               <div v-if="props.parentnode.completion && completion">
-                <div 
+                <div
                   v-for="completion_string in completion"
                   :key="completion_string"
                 >
@@ -277,14 +276,14 @@
             class="list-group-item"
           >
             <i
-              class="fa-solid fa-play-circle" 
+              class="fa-solid fa-play-circle"
             />
             <b>
               Completion Inbetween
             </b>
             <div class="list-group-text">
               <div v-if="completion_inbetween.length > 0 && completion_inbetween != ''">
-                <div 
+                <div
                   v-for="completion_string in completion_inbetween"
                   :key="completion_string"
                 >

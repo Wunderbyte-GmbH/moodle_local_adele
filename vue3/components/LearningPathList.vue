@@ -26,7 +26,7 @@
   <div>
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
-    <diV class="col-lg-2">
+    <div class="col-lg-2">
       <button
         type="button"
         class="btn btn-primary mt-4 mb-4 btn-block"
@@ -45,7 +45,7 @@
           :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'"
         />
       </button>
-    </diV>
+    </div>
 
     <h2>
       {{ store.state.strings.overviewlearningpaths }}
@@ -81,7 +81,6 @@
             </div>
             <div
               class="card-body"
-              :style="[nodeBackgroundColor]"
             >
               <div
                 class="mb-2"

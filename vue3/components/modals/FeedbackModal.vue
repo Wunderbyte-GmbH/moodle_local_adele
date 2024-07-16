@@ -24,29 +24,29 @@
 
 <template>
   <div>
-    <div 
-      id="feedbackModal" 
-      class="modal fade" 
-      tabindex="-1" 
-      aria-labelledby="feedbackModalLabel" 
+    <div
+      id="feedbackModal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="feedbackModalLabel"
       aria-hidden="true"
     >
-      <div 
-        class="modal-dialog modal-lg" 
+      <div
+        class="modal-dialog modal-lg"
         role="document"
       >
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
-            <h5 
+            <h5
               id="exampleModalLabel"
-              class="modal-title" 
+              class="modal-title"
             >
               {{ store.state.strings.modals_edit_feedback }}
             </h5>
-            <button 
-              type="button" 
-              class="close text-white" 
-              data-dismiss="modal" 
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
@@ -66,16 +66,16 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
+            <button
+              type="button"
+              class="btn btn-secondary"
               data-dismiss="modal"
             >
               {{ store.state.strings.modals_close }}
             </button>
-            <button 
-              type="button" 
-              class="btn btn-primary" 
+            <button
+              type="button"
+              class="btn btn-primary"
               @click="saveChanges"
             >
               {{ store.state.strings.modals_save_changes }}
@@ -91,7 +91,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
-// Load Store 
+// Load Store
 const store = useStore();
 
 const initialFeedback = ref(null);
@@ -108,7 +108,7 @@ const props = defineProps({
 // updating changes and closing modal
 const saveChanges = () => {
   // Loop over nodes and macht node
-  const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML) 
+  const cleanedHtml = cleanFeedback(feedbackContent.value.innerHTML)
   if (learningpathfeedback.value.json) {
     learningpathfeedback.value.json.tree.nodes.forEach((node) => {
       if (node.id == store.state.node.node_id) {
