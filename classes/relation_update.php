@@ -174,11 +174,11 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param  Array $node
-     * @param  Array $completioncriteria
-     * @param  Object $userpath
-     * @param  Array $restrictionnodepaths
-     * @param  Number $mode
+     * @param  array $node
+     * @param  array $completioncriteria
+     * @param  object $userpath
+     * @param  array $restrictionnodepaths
+     * @param  number $mode
      * @return array
      */
     public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
@@ -186,6 +186,7 @@ class relation_update {
         $singlecompletionnode = [];
         $feedback = self::getfeedback($node, $completioncriteria);
         foreach ($node['completion']['nodes'] as $completionnode) {
+            $priority = false;
             $failedcompletion = false;
             $validationconditionstring = [];
             if (
@@ -252,8 +253,8 @@ class relation_update {
                     if (!$mode) {
                         return true;
                     } else if (
-                        $node['restriction'] == null ||count($restrictionnodepaths) ||
-                        !count($node['restriction']['nodes'])
+                        isset($node['restriction']) &&
+                        ($node['restriction'] == null || count($restrictionnodepaths))
                     ) {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']]['text'];
@@ -316,56 +317,58 @@ class relation_update {
         if ($restrictionnodepaths) {
             return 'accessible';
         }
-        foreach ($node['restriction']['nodes'] as $restrictionall) {
-            if (str_contains($restrictionall['id'], '_feedback')) {
-                $hastimedcondition = false;
-                $nextid = str_replace('_feedback', '', $restrictionall['id']);
-                $safetycounter = 0;
-                $maxiterations = 50;
-                while ($nextid && $safetycounter < $maxiterations) {
-                    $found = false;
-                    $reachablecolumn = true;
-                    foreach ($node['restriction']['nodes'] as $restrictioncolumn) {
-                        if ($restrictioncolumn['id'] == $nextid) {
-                            if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
-                                $hastimedcondition = true;
-                                $starttime = new \DateTime();
-                                if ($node['data']['first_enrolled']) {
-                                    $starttime->setTimestamp($node['data']['first_enrolled']);
+        if (isset($node['restriction'])) {
+            foreach ($node['restriction']['nodes'] as $restrictionall) {
+                if (str_contains($restrictionall['id'], '_feedback')) {
+                    $hastimedcondition = false;
+                    $nextid = str_replace('_feedback', '', $restrictionall['id']);
+                    $safetycounter = 0;
+                    $maxiterations = 50;
+                    while ($nextid && $safetycounter < $maxiterations) {
+                        $found = false;
+                        $reachablecolumn = true;
+                        foreach ($node['restriction']['nodes'] as $restrictioncolumn) {
+                            if ($restrictioncolumn['id'] == $nextid) {
+                                if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
+                                    $hastimedcondition = true;
+                                    $starttime = new \DateTime();
+                                    if ($node['data']['first_enrolled']) {
+                                        $starttime->setTimestamp($node['data']['first_enrolled']);
+                                    }
+                                    $istimeinfuture = self::gettimestamptoday(
+                                        $restrictioncolumn['data'],
+                                        $starttime
+                                    );
+                                    if (!$istimeinfuture) {
+                                        $reachablecolumn = false;
+                                    }
                                 }
-                                $istimeinfuture = self::gettimestamptoday(
-                                    $restrictioncolumn['data'],
-                                    $starttime
-                                );
-                                if (!$istimeinfuture) {
-                                    $reachablecolumn = false;
+                                $newnextid = null;
+                                foreach ($restrictioncolumn['childCondition'] as $children) {
+                                    if (!str_contains($children, '_feedback')) {
+                                        $newnextid = $children;
+                                        break;
+                                    }
                                 }
+                                $nextid = $newnextid;
+                                $found = true;
+                                break;
                             }
-                            $newnextid = null;
-                            foreach ($restrictioncolumn['childCondition'] as $children) {
-                                if (!str_contains($children, '_feedback')) {
-                                    $newnextid = $children;
-                                    break;
-                                }
-                            }
-                            $nextid = $newnextid;
-                            $found = true;
+                        }
+                        if ($reachablecolumn) {
+                            return 'not_accessible';
+                        }
+                        $safetycounter++;
+                        if (!$found) {
                             break;
                         }
                     }
-                    if ($reachablecolumn) {
+                    if ($safetycounter >= $maxiterations) {
+                        return 'error: loop limit exceeded';
+                    }
+                    if (!$hastimedcondition) {
                         return 'not_accessible';
                     }
-                    $safetycounter++;
-                    if (!$found) {
-                        break;
-                    }
-                }
-                if ($safetycounter >= $maxiterations) {
-                    return 'error: loop limit exceeded';
-                }
-                if (!$hastimedcondition) {
-                    return 'not_accessible';
                 }
             }
         }

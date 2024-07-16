@@ -141,8 +141,8 @@ class timed implements course_restriction {
                     if ($startdate) {
                         $startdate = $startdate->format('Y-m-d H:i:s');
                     }
-                    if ($endtime) {
-                        $endtime = $endtime->format('Y-m-d H:i:s');
+                    if ($enddate) {
+                        $enddate = $enddate->format('Y-m-d H:i:s');
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [

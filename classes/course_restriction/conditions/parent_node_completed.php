@@ -133,7 +133,10 @@ class parent_node_completed implements course_restriction {
             $courserestriction['inbetween_info'] = null;
             foreach ($userpath->json['tree']['nodes'] as $usernode) {
                 if (in_array($usernode['id'], $parentnodes)) {
-                    if ($usernode['data']['completion']['feedback']['status'] == 'completed') {
+                    if (
+                        isset($usernode['data']['completion']) &&
+                        $usernode['data']['completion']['feedback']['status'] == 'completed'
+                    ) {
                         $courserestriction['completed'] = $usernode;
                     }
                 }

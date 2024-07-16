@@ -184,7 +184,7 @@ const childStyle = {
           }"
         >
           <div
-            v-if="store.state.view!='teacher'"
+            v-if="store.state.view!='teacher' && editorview"
             class="overlay"
           >
             <span
@@ -223,6 +223,22 @@ const childStyle = {
                 @click="setNodeModal"
               >
                 <i class="fa fa-pencil" />
+              </button>
+            </span>
+          </div>
+          <div
+            v-else-if="!editorview"
+            class="overlay"
+          >
+            <span
+              :title="store.state.strings.nodes_edit_restriction"
+              data-toggle="tooltip"
+            >
+              <button
+                class="icon-link"
+                @click="setRestrictionView"
+              >
+                <i class="fa fa-lock" />
               </button>
             </span>
           </div>
