@@ -24,7 +24,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex';
 
@@ -41,6 +41,20 @@ const intersectingNode = ref(null);
 const nodeHeight = '250px';
 
 const availableEdges = ['target_and', 'target_or', 'source_and', 'source_or']
+
+const mousePosition = ref({ x: 0, y: 0 });
+
+function updateMousePosition(event) {
+  mousePosition.value = { x: event.clientX, y: event.clientY };
+}
+
+onMounted(() => {
+  document.addEventListener('dragover', updateMousePosition);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('dragover', updateMousePosition);
+});
 
 // Function sets up data for nodes
 function onDragStart(event, data) {
@@ -90,9 +104,18 @@ function checkIntersetcion(event, closestNode) {
   props.nodes.forEach((node) => {
     if(node.type.indexOf('dropzone') != -1){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
+      let event_clientX = event.clientX
+      let event_clientY = event.clientY
+      if (
+        event_clientX == 0 &&
+        event_clientY == 0
+      ){
+        event_clientX = mousePosition.value.x
+        event_clientY = mousePosition.value.y
+      }
       const position = project({
-        x: event.clientX - left,
-        y: event.clientY - top,
+        x: event_clientX - left,
+        y: event_clientY - top,
       });
       const nodesIntersecting = areNodesIntersecting(position, node)
       if(nodesIntersecting){
@@ -202,9 +225,18 @@ function arrayDifference(arr1, arr2) {
 function findClosestNode(event) {
   const connectionRadius = 800;
   const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  let event_clientX = event.clientX
+  let event_clientY = event.clientY
+  if (
+    event_clientX == 0 &&
+    event_clientY == 0
+  ){
+    event_clientX = mousePosition.value.x
+    event_clientY = mousePosition.value.y
+  }
   const position = project({
-    x: event.clientX - left,
-    y: event.clientY - top,
+    x: event_clientX - left,
+    y: event_clientY - top,
   });
   let closestNode = null;
   let closestDistance = Infinity;

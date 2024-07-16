@@ -35,7 +35,7 @@
     </div>
     <div v-else>
       <UserPath
-        :user-learningpath-parent="userLearningpath"
+        :userlearningpathparent="userLearningpath"
       />
       <UserList />
     </div>

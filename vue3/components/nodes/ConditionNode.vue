@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
 <script setup>
 // Import needed libraries
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
@@ -64,7 +64,7 @@ const toggleVisibility = () => {
 };
 
 const deleteCondition = () => {
-  replaceNode() 
+  replaceNode()
 }
 
 const getVerticalEdges = (id, edges) => {
@@ -145,7 +145,7 @@ const replaceNode = () => {
         shiftLeft(deletedNode, copieEdges)
       } else if (
         edge.targetHandle == 'target_and' &&
-        edge.target == props.data.node_id  && 
+        edge.target == props.data.node_id  &&
         deletedNode.childCondition.length == 0
       ) {
         let currentNode = findNode(props.data.node_id)
@@ -217,34 +217,34 @@ const shiftLeft = (deletedNode, edges) => {
 
 <template>
   <div>
-    <div 
+    <div
       class="card"
-      :style="[{ minHeight: '250px', width: '350px' }, childStyle]"
+      :style="[{ minHeight: '250px', width: '350px' }]"
     >
       <div class="card-header text-center">
         <div class="row align-items-center">
           <div class="col">
-            <button 
+            <button
               style="position: absolute; top: 5px; left: 5px; background: none; border: none;"
-              @click="toggleVisibility" 
+              @click="toggleVisibility"
             >
-              <i 
-                class="fa" 
-                :class="{ 
-                  'fa-eye': data_visibility.visibility, 
-                  'fa-eye-slash': !data_visibility.visibility, 
-                  'strikethrough': !data_visibility.visibility 
+              <i
+                class="fa"
+                :class="{
+                  'fa-eye': data_visibility.visibility,
+                  'fa-eye-slash': !data_visibility.visibility,
+                  'strikethrough': !data_visibility.visibility
                 }"
               />
             </button>
             <h5>
               {{ data.name }}
             </h5>
-            <button 
+            <button
               style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
-              @click="deleteCondition" 
+              @click="deleteCondition"
             >
-              <i 
+              <i
                 class="fa fa-trash"
               />
             </button>
@@ -253,40 +253,40 @@ const shiftLeft = (deletedNode, edges) => {
       </div>
       <div class="card-body">
         <div v-if="props.type == 'Restriction'">
-          <RestrictionItem 
-            :restriction="data" 
+          <RestrictionItem
+            :restriction="data"
             :learningpath="learningpath"
           />
         </div>
         <div v-else-if="props.type == 'completion'">
-          <CompletionItem 
+          <CompletionItem
             :completion="data"
           />
         </div>
       </div>
     </div>
-    <Handle 
-      id="target_and" 
-      type="target" 
-      :position="Position.Top" 
+    <Handle
+      id="target_and"
+      type="target"
+      :position="Position.Top"
       :style="handleStyle"
     />
-    <Handle 
-      id="source_and" 
-      type="source" 
-      :position="Position.Bottom" 
+    <Handle
+      id="source_and"
+      type="source"
+      :position="Position.Bottom"
       :style="handleStyle"
     />
-    <Handle 
-      id="target_or" 
-      type="target" 
-      :position="Position.Left" 
+    <Handle
+      id="target_or"
+      type="target"
+      :position="Position.Left"
       :style="handleStyle"
     />
-    <Handle 
-      id="source_or" 
-      type="source" 
-      :position="Position.Right" 
+    <Handle
+      id="source_or"
+      type="source"
+      :position="Position.Right"
       :style="handleStyle"
     />
   </div>

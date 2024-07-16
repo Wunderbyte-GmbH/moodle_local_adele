@@ -41,7 +41,7 @@ const props = defineProps({
     required: true,
   },
   visibility: {
-    type: Object,
+    type: Boolean,
     required: true,
   },
 });

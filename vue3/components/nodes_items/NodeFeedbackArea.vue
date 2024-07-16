@@ -3,7 +3,7 @@
   import { onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from 'vuex';
 
-  // Load Store 
+  // Load Store
   const store = useStore();
   const showFeedbackarea = ref(false);
   const dataFeedbackarea = ref({});
@@ -47,7 +47,6 @@
 <template>
   <div
     class="card-container"
-    :class="{ 'card-hover': showCard }"
     @click="toggleFeedbackarea"
   >
     <div>
@@ -55,14 +54,14 @@
     </div>
     <div>
       <transition name="fade">
-        <div 
-          v-if="showFeedbackarea" 
+        <div
+          v-if="showFeedbackarea"
           class="feedback-container"
         >
-          <textarea 
+          <textarea
             v-if="store.state.view !== 'student' && store.state.view !== 'teacher'"
             v-model="dataFeedbackarea.feedback"
-            placeholder="Edit feedback here..." 
+            placeholder="Edit feedback here..."
           />
           <p v-else>
             {{ dataFeedbackarea.feedback }}
@@ -82,7 +81,7 @@
   border-radius: 8px;
   background-color: #EAEAEA;
   font-weight: bold; /* Make the text bold */
-  text-align: center; 
+  text-align: center;
 }
 
 .fa-comment {
@@ -104,10 +103,10 @@
 textarea {
   width: 100%;
   padding: 10px;
-  border-radius: 5px; 
-  border: 1px solid #ced4da; 
+  border-radius: 5px;
+  border: 1px solid #ced4da;
   resize: none;
-  font-family: inherit; 
+  font-family: inherit;
   font-size: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: border-color 0.2s, box-shadow 0.2s;

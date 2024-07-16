@@ -42,7 +42,7 @@
   <div
     v-if="data.completion.feedback && data.completion.feedback.completion.inbetween"
     class="card-container"
-    :class="{ 'card-hover': showCard, [data.node_id + '_user_info_listener']: true}"
+    :class="{ [data.node_id + '_user_info_listener']: true}"
     @click="toggleFeedbackarea"
   >
     <div>

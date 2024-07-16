@@ -76,7 +76,6 @@
             :min-zoom="0.2"
             :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
-            @edge-click="handleEdgeClicked"
             @node-click="onNodeClick"
           >
             <template #node-custom="{ data }">
@@ -159,7 +158,7 @@ const goBack = () => {
 }
 
 const props = defineProps({
-  user_learningpath_parent: {
+  userlearningpathparent: {
     type: Array,
     required: true,
   }

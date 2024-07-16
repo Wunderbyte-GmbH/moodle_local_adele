@@ -46,7 +46,7 @@ const props = defineProps({
     default: null,
   },
   learningpath: {
-    type: String,
+    type: Object,
     required: true,
   },
 });

@@ -110,16 +110,22 @@ class parent_node_completed implements course_restriction {
      *
      * @param array $node
      * @param object $userpath
-     * @return boolean
+     * @return array
      */
     public function get_restriction_status($node, $userpath) {
         $courserestriction = [];
         $parentnodes = [];
-        if (isset($node['restriction']) && isset($node['restriction']['nodes']) &&
-            empty($parentnodes)) {
+        if (
+            isset($node['restriction']) &&
+            isset($node['restriction']['nodes']) &&
+            empty($parentnodes)
+        ) {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
-                if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'parent_node_completed') {
+                if (
+                    isset($restriction['data']['label']) &&
+                    $restriction['data']['label'] == 'parent_node_completed'
+                ) {
                     $parentnodes = $node['parentCourse'];
                 }
             }

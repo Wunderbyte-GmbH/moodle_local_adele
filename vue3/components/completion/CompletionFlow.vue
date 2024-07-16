@@ -111,7 +111,7 @@
           </div>
         </div>
         <div v-else>
-          {{ completion_loading_completion }}
+          {{ store.state.strings.completion_loading_completion }}
         </div>
       </div>
     </div>
@@ -119,7 +119,7 @@
 </template>
 <script setup>
 // Import needed libraries
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import {  VueFlow, useVueFlow } from '@vue-flow/core'
 import Sidebar from './CompletionSidebar.vue'
@@ -224,6 +224,7 @@ const childNodes = ref([]);
 const backgroundSidebar = store.state.strings.DARK_ORANGE
 
 onMounted(async () => {
+    document.addEventListener('dragover', updateMousePosition);
     learningpathcompletion.value = props.learningpath
     try {
         completions.value = await store.dispatch('fetchCompletions');
@@ -262,6 +263,16 @@ onMounted(async () => {
   }, 300)
 });
 
+const mousePosition = ref({ x: 0, y: 0 });
+
+function updateMousePosition(event) {
+  mousePosition.value = { x: event.clientX, y: event.clientY };
+}
+
+onBeforeUnmount(() => {
+  document.removeEventListener('dragover', updateMousePosition);
+});
+
 // Prevent default event if node has been dropped
 function handleNodesIntersected({ intersecting }) {
   intersectedNode.value = intersecting
@@ -285,9 +296,19 @@ function onDrop(event) {
     data.visibility = true
     let parentCondition = 'starting_condition'
 
+    let event_clientX = event.clientX
+    let event_clientY = event.clientY
+    if (
+      event_clientX == 0 &&
+      event_clientY == 0
+    ){
+      event_clientX = mousePosition.value.x
+      event_clientY = mousePosition.value.y
+    }
+
     let position = project({
-      x: event.clientX - left,
-      y: event.clientY - top,
+      x: event_clientX - left,
+      y: event_clientY - top,
     })
 
     const id = getNodeId('condition_', nodes.value)

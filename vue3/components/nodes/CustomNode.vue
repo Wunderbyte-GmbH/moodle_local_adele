@@ -67,7 +67,6 @@ const learningmodule = computed(() => {
 const cover_image = computed(() => get_cover_image(props.data));
 
 onMounted(() => {
-
   dataValue.value = props.data
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
