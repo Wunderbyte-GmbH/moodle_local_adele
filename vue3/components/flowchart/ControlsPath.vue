@@ -57,14 +57,24 @@ const props = defineProps({
 
 const showCancelConfirmation = ref(false)
 
+const current_view = ref(true)
+const current_user_view = ref(true)
+
 // Emit to parent component
 const emit = defineEmits([
   'change-class',
+  'change-user-view',
   'finish-edit'
 ]);
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
+  current_view.value = !current_view.value
   emit('change-class');
+}
+
+function toggleUserView() {
+  current_user_view.value = !current_user_view.value
+  emit('change-user-view')
 }
 
 // Watch for changes of the learning path
@@ -226,6 +236,7 @@ function updatePos() {
     class="save-restore-controls"
   >
     <button
+      v-if="current_user_view"
       id="save-learning-path"
       class="btn btn-primary m-2"
       @click="onSave"
@@ -264,7 +275,13 @@ function updatePos() {
       class="btn btn-warning m-2"
       @click="toggleClass"
     >
-      {{ store.state.strings.btntoggle }}
+      {{ current_view ? store.state.strings.btndarktoggle : store.state.strings.btnlighttoggle }}
+    </button>
+    <button
+      class="btn btn-info m-2"
+      @click="toggleUserView"
+    >
+      {{ current_user_view ? store.state.strings.btnstudenttoggle : store.state.strings.btneditortoggle }}
     </button>
     <a
       href="/backup/restorefile.php?contextid=1"

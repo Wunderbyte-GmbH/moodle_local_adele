@@ -40,6 +40,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  editorview: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const courses = computed(() => {
@@ -155,6 +159,7 @@ const childStyle = {
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
       <OverviewRestrictionCompletion
+        v-if="editorview"
         :node="data"
         :learningpath="props.learningpath"
       />

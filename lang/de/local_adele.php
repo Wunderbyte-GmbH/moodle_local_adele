@@ -77,7 +77,10 @@ $string['btncreatecourse'] = 'Zur Seite gehen und einen Kurs erstellen';
 $string['btnsave'] = 'Speichern';
 $string['btncancel'] = 'Abbrechen';
 $string['btnupdate_positions'] = 'Positionen aktualisieren';
-$string['btntoggle'] = 'Ansicht ändern';
+$string['btndarktoggle'] = 'Dunkle Ansicht';
+$string['btnlighttoggle'] = 'Helle Ansicht';
+$string['btnstudenttoggle'] = 'Student Ansicht';
+$string['btneditortoggle'] = 'Editor Ansicht';
 $string['btnreload'] = 'Seite neu laden';
 
 // Aus Zeichenfolgen.

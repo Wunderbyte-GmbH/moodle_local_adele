@@ -81,6 +81,10 @@ $string['btnsave'] = 'save';
 $string['btncancel'] = 'cancel';
 $string['btnupdate_positions'] = 'update positions';
 $string['btntoggle'] = 'change view';
+$string['btndarktoggle'] = 'Dark view';
+$string['btnlighttoggle'] = 'Light view';
+$string['btnstudenttoggle'] = 'Student view';
+$string['btneditortoggle'] = 'Editor view';
 $string['btnreload'] = 'Reload Page';
 
 // From Strings.

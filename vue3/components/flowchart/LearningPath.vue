@@ -53,6 +53,7 @@
           <CustomNode
             :data="data"
             :learningpath="learningpath"
+            :editorview="editor_view"
             @change-module="onChangeModule"
           />
         </template>
@@ -79,7 +80,7 @@
         />
       </VueFlow>
       <Sidebar
-        v-if="store.state.view != 'teacher'"
+        v-if="store.state.view != 'teacher' &&editor_view"
         :courses="store.state.availablecourses"
         :learningmodule="learningpath"
         :strings="store.state.strings"
@@ -95,6 +96,7 @@
       <Controls
         :learningpath="learningpath"
         @change-class="toggleClass"
+        @change-user-view="toggleUserView"
         @finish-edit="finishEdit"
       />
     </div>
@@ -152,6 +154,7 @@ const emit = defineEmits([
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
+const editor_view = ref(true)
 // Intersected node
 const intersectedNode = ref(null);
 // check the page width
@@ -239,6 +242,10 @@ const setZoomLevel = async (action) => {
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
+}
+
+function toggleUserView() {
+  editor_view.value = !editor_view.value;
 }
 
 function onChangedModule(learningpath) {
