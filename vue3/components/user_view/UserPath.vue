@@ -249,6 +249,7 @@ const setZoomLevel = async (action) => {
       drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);
   } else if (oldViewport < 0.25) {
+
     edges.value = innerGraphDisplay(edges.value, removeEdges)
     setTimeout(() => {
       drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
@@ -271,7 +272,7 @@ watch(() => user_learningpath.value, () => {
 function setFlowchart() {
   const flowchart = user_learningpath.value.json
   nodes.value = flowchart.tree.nodes;
-  edges.value = innerGraphDisplay(flowchart.tree.edges);
+  edges.value = innerGraphDisplay(flowchart.tree.edges, removeEdges);
   edges.value.forEach((edge) => {
     edge.deletable = false
     edge.type = 'custom'
