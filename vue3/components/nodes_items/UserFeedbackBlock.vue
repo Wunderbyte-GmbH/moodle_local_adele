@@ -30,7 +30,7 @@
       >
         {{ feedback }}
         <span v-if="index < data.length - 1" class="or-text">
-          {{ store.strings.course_condition_concatination_or }}
+          {{ store.state.strings.course_condition_concatination_or }}
         </span>
       </li>
     </ul>
