@@ -76,7 +76,10 @@
                 />
               </template>
               <template #node-dropzone="{ data }">
-                <DropzoneNode :data="data" />
+                <DropzoneNode
+                  :data="data"
+                  :editorview="true"
+                />
               </template>
               <template #edge-condition="props">
                 <ConditionLine v-bind="props" />

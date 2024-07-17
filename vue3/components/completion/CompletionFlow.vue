@@ -77,7 +77,10 @@
                 />
               </template>
               <template #node-dropzone="{ data }">
-                <DropzoneNode :data="data" />
+                <DropzoneNode
+                  :editorview="true"
+                  :data="data"
+                />
               </template>
               <template #node-feedback="{ data }">
                 <FeedbackNode
