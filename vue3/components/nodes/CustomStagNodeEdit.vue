@@ -181,8 +181,8 @@ const expandCourses = () => {
           :data
           :parentnode
         />
-        <div class="row">
-          <div class="col-4">
+        <div class="row align-items-center">
+          <div class="col">
             <h5>
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>

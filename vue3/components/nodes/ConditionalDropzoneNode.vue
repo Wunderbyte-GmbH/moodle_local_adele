@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
  <script setup>
  defineProps({
   data: {
@@ -29,15 +29,15 @@
     required: true,
   },
 });
- 
+
 </script>
 <template>
-  <div 
+  <div
     class="custom-node text-center rounded p-3"
-    :style="{ 
-      'background-color': data.bgcolor, 
+    :style="{
+      'background-color': data.bgcolor,
       'opacity' : data.opacity,
-      'height': data.height, 
+      'height': data.height,
       'width': '300px'
     }"
   >

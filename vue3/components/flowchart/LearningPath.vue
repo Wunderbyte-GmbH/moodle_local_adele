@@ -58,7 +58,10 @@
           />
         </template>
         <template #node-dropzone="{ data }">
-          <DropzoneNode :data="data" />
+          <DropzoneNode
+            :data="data"
+            :editorview="editor_view"
+          />
         </template>
         <template #node-conditionaldropzone="{ data }">
           <ConditionalDropzoneNode :data="data" />
@@ -67,12 +70,19 @@
           <OrCourses
             :data="data"
             :learningpath="learningpath"
+            :editorview="editor_view"
             @typeChange="typeChanged"
             @change-module="onChangeModule"
           />
         </template>
         <template #node-module="{ data }">
           <ModuleNode :data="data" />
+        </template>
+        <template #node-expandedcourses="{ data }">
+          <ExpandNodeEdit
+            :data="data"
+            :zoomstep="zoomstep"
+          />
         </template>
         <MiniMap
           v-if="shouldShowMiniMap"
@@ -130,6 +140,7 @@ import addStagCompletions from '../../composables/conditions/addStagCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 import addAndConditions from '../../composables/conditions/addAndConditions'
 import drawModules from '../../composables/nodesHelper/drawModules'
+import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 
 // Load Store and Router
 const store = useStore()

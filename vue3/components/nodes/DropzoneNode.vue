@@ -21,7 +21,7 @@
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ -->
- 
+
  <script setup>
  // Import needed libraries
  import { Handle, Position } from '@vue-flow/core'
@@ -31,40 +31,44 @@ defineProps({
     type: Object,
     required: true,
   },
+  editorview: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 </script>
 <template>
-  <div>
-    <div 
+  <div v-if="editorview">
+    <div
       class="custom-node text-center rounded p-3"
-      :style="{ 
-        'background-color': data.bgcolor, 
+      :style="{
+        'background-color': data.bgcolor,
         'opacity' : data.opacity,
-        'height': data.height, 
+        'height': data.height,
         'width': data.width ? data.width : '400px'
       }"
     >
       {{ data.infotext }}
     </div>
-    <Handle 
-      id="target_and" 
-      type="target" 
+    <Handle
+      id="target_and"
+      type="target"
       :position="Position.Top"
     />
-    <Handle 
-      id="source_and" 
-      type="source" 
+    <Handle
+      id="source_and"
+      type="source"
       :position="Position.Bottom"
     />
-    <Handle 
-      id="target_or" 
-      type="target" 
+    <Handle
+      id="target_or"
+      type="target"
       :position="Position.Left"
     />
-    <Handle 
-      id="source_or" 
-      type="source" 
+    <Handle
+      id="source_or"
+      type="source"
       :position="Position.Right"
     />
   </div>

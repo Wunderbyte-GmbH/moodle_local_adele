@@ -152,8 +152,8 @@ const goToCourse = () => {
           :data
           :parentnode
         />
-        <div class="row">
-          <div class="col-10">
+        <div class="row align-items-center">
+          <div class="col">
             <h5>
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>

@@ -28,9 +28,13 @@ import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
+import NodeInformation from '../nodes_items/NodeInformation.vue';
+import ProgressBar from '../nodes_items/ProgressBar.vue';
+import UserInformation from '../nodes_items/UserInformation.vue';
 
 // Load Store
 const store = useStore();
+const parentnode = ref({})
 const props = defineProps({
   data: {
     type: Object,
@@ -142,6 +146,13 @@ const changeModule = (data) => {
   emit('changeModule', data);
 }
 
+const nodeBackgroundColor = computed(() => {
+  if (!props.editorview) {
+    return store.state.strings.LIGHT_GRAY
+  }
+  return ''
+});
+
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
@@ -164,6 +175,11 @@ const childStyle = {
         :learningpath="props.learningpath"
       />
       <div class="card-header text-center">
+        <NodeInformation
+          v-if="!editorview"
+          :data
+          :parentnode
+        />
         <div class="row align-items-center">
           <div class="col">
             <h5>
@@ -172,7 +188,10 @@ const childStyle = {
           </div>
         </div>
       </div>
-      <div class="card-body">
+      <div
+        class="card-body"
+        :style="{backgroundColor: nodeBackgroundColor}"
+      >
         <div
           class="card-img dashboard-card-img"
           :style="{
@@ -232,11 +251,9 @@ const childStyle = {
           >
             <span
               :title="store.state.strings.nodes_edit_restriction"
-              data-toggle="tooltip"
             >
               <button
                 class="icon-link"
-                @click="setRestrictionView"
               >
                 <i class="fa fa-lock" />
               </button>
@@ -269,18 +286,46 @@ const childStyle = {
             </select>
           </div>
         </div>
-        <h5 class="card-title">
-          {{ store.state.strings.nodes_included_courses }}
-        </h5>
         <div
-          v-for="(value, key) in courses"
-          :key="key"
-          class="card-text"
+          v-if="editorview"
         >
-          <div class="fullname-container">
-            {{ value.fullname }}
+          <h5 class="card-title">
+            {{ store.state.strings.nodes_included_courses }}
+          </h5>
+          <div
+            v-for="(value, key) in courses"
+            :key="key"
+            class="card-text"
+          >
+            <div class="fullname-container">
+              {{ value.fullname }}
+            </div>
           </div>
         </div>
+        <div
+          v-else
+          class="row mb-2 mt-2"
+        >
+          <div class="col-4 text-left">
+            <b>
+              {{ store.state.strings.nodes_progress }}
+            </b>
+          </div>
+          <div
+            class="col-8"
+            style="display: flex; justify-content: end;"
+          >
+            <ProgressBar :progress="0" />
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="!editorview && data"
+        class="card-footer"
+      >
+        <UserInformation
+          :data="data"
+        />
       </div>
     </div>
     <Handle

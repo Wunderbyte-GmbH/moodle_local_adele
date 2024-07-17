@@ -28,6 +28,12 @@ import { Handle, Position } from '@vue-flow/core'
 import { useStore } from 'vuex';
 import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { computed, onMounted, ref } from 'vue';
+import ProgressBar from '../nodes_items/ProgressBar.vue';
+import CourseCarousel from '../nodes_items/CourseCarousel.vue';
+import UserInformation from '../nodes_items/UserInformation.vue';
+import NodeInformation from '../nodes_items/NodeInformation.vue';
+import CourseCompletion from '../nodes_items/CourseCompletion.vue';
+import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
 
 const courses = computed(() => {
   if (
@@ -48,7 +54,10 @@ const courses = computed(() => {
 
 const cardHeight = computed(() => {
   const minHeight = 275
-  return  minHeight + courses.value.length * 60
+  if (props.editorview) {
+    return  minHeight + courses.value.length * 60
+  }
+  return  minHeight
 })
 
 const dataValue = ref('')
@@ -62,6 +71,10 @@ const props = defineProps({
   },
   learningpath: {
     type: Object,
+    required: true,
+  },
+  editorview: {
+    type: Boolean,
     required: true,
   },
 });
@@ -137,6 +150,8 @@ const removeElement = (array, elementToRemove) => {
   return array
 };
 
+let min_courses = 1
+
 const targetHandleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 // Set the node that handle has been clicked
@@ -158,6 +173,24 @@ const childStyle = {
   borderWidth: '2px',
 };
 
+const nodeBackgroundColor = computed(() => {
+  if (!props.editorview) {
+    return store.state.strings.LIGHT_GRAY
+  }
+  return ''
+});
+
+const courseExpanded = ref(false);
+const isBlocked = ref(false);
+const expandCourses = () => {
+  courseExpanded.value = !courseExpanded.value
+  isBlocked.value = true
+}
+
+const enableButton = () => {
+  isBlocked.value = false
+};
+
 </script>
 <template>
   <div>
@@ -165,108 +198,169 @@ const childStyle = {
       class="card"
       :style="[{ minHeight: cardHeight + 'px', width: '400px' }, childStyle]"
     >
-      <div class="card-header text-center">
-        <div class="row align-items-center">
-          <div class="col">
-            <h5>
-              {{ data.fullname || store.state.strings.nodes_collection }}
-            </h5>
-          </div>
-        </div>
-      </div>
-
       <div
-        class="card-body"
+        :class="!editorview ? 'non_parallel' : ''"
       >
-        <div
-          class="card-img dashboard-card-img"
-          :style="{
-            height: '10rem',
-            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundColor: cover_image ? '' : '#cccccc'
-          }"
-        >
-          <div
-            v-if="store.state.view!='teacher'"
-            class="overlay"
-          >
-            <button
-              class="icon-link"
-              @click="setRestrictionView"
-            >
-              <i class="fa fa-lock" />
-            </button>
-            <button
-              class="icon-link"
-              @click="setPretestView"
-            >
-              <i
-                class="fa fa-tasks"
-              />
-            </button>
-            <button
-              class="icon-link"
-              data-toggle="modal"
-              data-target="#nodeModal"
-              @click="setNodeModal"
-            >
-              <i class="fa fa-pencil" />
-            </button>
+        <div class="card-header text-center">
+          <NodeInformation
+          v-if="!editorview"
+            :data
+            :parentnode
+          />
+          <div class="row align-items-center">
+            <div class="col">
+              <h5>
+                {{ data.fullname || store.state.strings.nodes_collection }}
+              </h5>
+            </div>
           </div>
         </div>
-        <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
-          <h5 class="card-title">
-            {{ store.state.strings.nodes_learning_module }}
-          </h5>
-          <select
-            v-model="dataValue.module"
-            class="form-select form-control"
-            @change="changeModule(dataValue)"
-          >
-            <option
-              value=""
-              selected
-            >
-              {{ store.state.strings.nodes_select_module }}
-            </option>
-            <option
-              v-for="module in learningmodule"
-              :key="module.id"
-              :value="module.id"
-            >
-              {{ module.name }}
-            </option>
-          </select>
-        </div>
-        <h5 class="card-title">
-          {{ store.state.strings.nodes_included_courses }}
-        </h5>
+
         <div
-          v-for="(value, key) in courses"
-          :key="key"
-          class="card-text"
+          class="card-body"
+          :style="{backgroundColor: nodeBackgroundColor}"
         >
-          <div class="fullname-container">
-            {{ value.fullname }}
-            <button
-              v-if="store.state.view != 'teacher'"
-              type="button"
-              class="btn btn-danger btn-sm trash-button"
-              @click="removeCourse(value.id)"
+        <div v-if="!editorview && min_courses > 1">
+          <CourseCompletion
+            :min-courses="min_courses"
+            :finished-courses="{}"
+          />
+        </div>
+          <div
+            class="card-img dashboard-card-img"
+            :style="{
+              height: '10rem',
+              backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: cover_image ? '' : '#cccccc'
+            }"
+          >
+            <div
+              v-if="store.state.view!='teacher' && editorview"
+              class="overlay"
             >
-              <i
-                :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
-              />
-            </button>
+              <button
+                class="icon-link"
+                @click="setRestrictionView"
+              >
+                <i class="fa fa-lock" />
+              </button>
+              <button
+                class="icon-link"
+                @click="setPretestView"
+              >
+                <i
+                  class="fa fa-tasks"
+                />
+              </button>
+              <button
+                class="icon-link"
+                data-toggle="modal"
+                data-target="#nodeModal"
+                @click="setNodeModal"
+              >
+                <i class="fa fa-pencil" />
+              </button>
+            </div>
+            <div
+              v-else-if="!editorview"
+              class="overlay"
+            >
+              <button
+                class="icon-link"
+                :disabled="isBlocked"
+                @click="expandCourses"
+              >
+                <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
+              </button>
+            </div>
+          </div>
+          <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
+            <h5 class="card-title">
+              {{ store.state.strings.nodes_learning_module }}
+            </h5>
+            <select
+              v-model="dataValue.module"
+              class="form-select form-control"
+              @change="changeModule(dataValue)"
+            >
+              <option
+                value=""
+                selected
+              >
+                {{ store.state.strings.nodes_select_module }}
+              </option>
+              <option
+                v-for="module in learningmodule"
+                :key="module.id"
+                :value="module.id"
+              >
+                {{ module.name }}
+              </option>
+            </select>
+          </div>
+          <div v-if="editorview">
+            <h5 class="card-title">
+              {{ store.state.strings.nodes_included_courses }}
+            </h5>
+            <div
+              v-for="(value, key) in courses"
+              :key="key"
+              class="card-text"
+            >
+              <div class="fullname-container">
+                {{ value.fullname }}
+                <button
+                  v-if="store.state.view != 'teacher'"
+                  type="button"
+                  class="btn btn-danger btn-sm trash-button"
+                  @click="removeCourse(value.id)"
+                >
+                  <i
+                    :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            v-else
+            class="row mb-2 mt-2"
+          >
+            <div class="col-4 text-left">
+              <b>
+                {{ store.state.strings.nodes_progress }}
+              </b>
+            </div>
+            <div
+              class="col-8"
+              style="display: flex; justify-content: end;"
+            >
+              <ProgressBar :progress="0" />
+            </div>
+          </div>
+          <div v-if="courseExpanded">
+            <ExpandedCourses
+              :data="data"
+              @doneFolding="enableButton"
+            />
           </div>
         </div>
       </div>
       <div class="card-footer">
         <OverviewRestrictionCompletion
+          v-if="editorview"
           :node="data"
           :learningpath="learningpath"
+        />
+        <CourseCarousel
+          v-if="!editorview"
+          :courses="props.data"
+        />
+        <UserInformation
+          v-if="!editorview"
+          :data="data"
         />
       </div>
     </div>
@@ -337,6 +431,30 @@ const childStyle = {
 
 .trash-button {
   margin-left: 10px; /* Adjust margin as needed */
+}
+
+.non_parallel::before,
+.non_parallel::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ececec;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  z-index: -1;
+}
+
+.non_parallel::before {
+  transform: rotate(4deg);
+  top: -20px;
+  left: -20px;
+}
+
+.non_parallel::after {
+  transform: rotate(-4deg);
+  top: -20px;
+  left: -20px;
 }
 
 </style>

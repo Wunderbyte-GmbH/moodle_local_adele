@@ -27,35 +27,37 @@
   const description = ref({})
   const estimate_duration = ref({})
 
-  const restriction = computed(() => props.data.completion.feedback.restriction.before)
-  const completion = computed(() => props.data.completion.feedback.completion.before)
+  const restriction = computed(() => props.data.completion.feedback.restriction.before || null )
+  const completion = computed(() => props.data.completion.feedback.completion.before || null )
 
   const ending_date = computed(() => {
     let return_date = {
       start_date: null,
       end_date: null,
     }
-    Object.entries(props.data.completion.restrictioncriteria).forEach(([key, value]) => {
-      if (key.includes('timed')) {
-        Object.entries(value).forEach(([condition, times]) => {
-          if (times.inbetween_info != undefined) {
-            Object.entries(times.inbetween_info).forEach(([start_end, time]) => {
-              if (
-                start_end == 'starttime' &&
-                (return_date.start_date == null ||return_date.start_date > time)
+    if (props.data.completion) {
+      Object.entries(props.data.completion.restrictioncriteria).forEach(([key, value]) => {
+        if (key.includes('timed')) {
+          Object.entries(value).forEach(([condition, times]) => {
+            if (times.inbetween_info != undefined) {
+              Object.entries(times.inbetween_info).forEach(([start_end, time]) => {
+                if (
+                  start_end == 'starttime' &&
+                  (return_date.start_date == null ||return_date.start_date > time)
+                  ) {
+                    return_date.start_date = time
+                } else if (
+                  start_end == 'endtime' &&
+                  (return_date.end_date == null ||return_date.end_date > time)
                 ) {
-                  return_date.start_date = time
-              } else if (
-                start_end == 'endtime' &&
-                (return_date.end_date == null ||return_date.end_date > time)
-              ) {
-                return_date.end_date = time
-              }
-            });
-          }
-        });
-      }
-    });
+                  return_date.end_date = time
+                }
+              });
+            }
+          });
+        }
+      });
+    }
     return_date = format_dates(return_date)
     return return_date;
   })
@@ -76,7 +78,10 @@
   })
 
   const completion_inbetween = computed(() => {
-    return props.data.completion.feedback.completion.inbetween
+    if (props.data.completion) {
+      return props.data.completion.feedback.completion.inbetween
+    }
+    return null
   })
 
   const format_dates = (return_date) => {
@@ -234,7 +239,7 @@
               Restriction
             </b>
             <div class="list-group-text">
-              <div v-if="props.parentnode.restriction && restriction">
+              <div v-if="props.parentnode && props.parentnode.restriction && restriction">
                 <div
                   v-for="restriction_string in restriction"
                   :key="restriction_string"
@@ -257,7 +262,7 @@
               Completion
             </b>
             <div class="list-group-text">
-              <div v-if="props.parentnode.completion && completion">
+              <div v-if="props.parentnode && props.parentnode.completion && completion">
                 <div
                   v-for="completion_string in completion"
                   :key="completion_string"
@@ -282,7 +287,7 @@
               Completion Inbetween
             </b>
             <div class="list-group-text">
-              <div v-if="completion_inbetween.length > 0 && completion_inbetween != ''">
+              <div v-if="completion_inbetween && completion_inbetween.length > 0 && completion_inbetween != ''">
                 <div
                   v-for="completion_string in completion_inbetween"
                   :key="completion_string"
