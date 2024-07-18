@@ -47,7 +47,6 @@ const showCancelConfirmation = ref(false)
     await store.dispatch('saveUserPathRelation', {
         nodes: completion.nodes,
         route: route_params});
-
     router.push({
       path: '/learningpaths/edit/',
       query: {notify: true}

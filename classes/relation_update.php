@@ -32,6 +32,7 @@ use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
+use local_adele\event\user_path_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -55,6 +56,10 @@ class relation_update {
         // Get the user path relation.
         $userpath = $event->other['userpath'];
         if ($userpath) {
+            $creation = false;
+            if (!isset($userpath->json['user_path_relation'])) {
+                $creation = true;
+            }
             self::subscribe_user_starting_node($userpath);
             if (!empty($userpath->json['tree']['nodes'])) {
                 foreach ($userpath->json['tree']['nodes'] as $node) {
@@ -146,9 +151,41 @@ class relation_update {
                     }
                 }
                 $userpathrelationhelper = new user_path_relation();
-                $userpathrelationhelper->revision_user_path_relation($userpath);
+                $userpathid = $userpathrelationhelper->revision_user_path_relation($userpath);
+                if ($creation) {
+                    global $DB;
+                    $createduserpath = $DB->get_record('local_adele_path_user', ['id' => $userpathid]);
+                    $createduserpath->json = json_decode($createduserpath->json, true);
+                    $createduserpath->json = self::translate_completion_criteria($createduserpath->json);
+                    $eventsingle = user_path_updated::create([
+                      'objectid' => $userpathid,
+                      'context' => context_system::instance(),
+                      'other' => [
+                        'userpath' => $createduserpath,
+                      ],
+                    ]);
+                    $eventsingle->trigger();
+                }
             }
         }
+    }
+
+    /**
+     * Translate the completion into nodes on creation
+     *
+     * @param  array $json
+     * @return array
+     */
+    public static function translate_completion_criteria($json) {
+        foreach ($json['tree']['nodes'] as &$node) {
+            if (
+                !isset($node['data']['completion']) &&
+                isset($json['user_path_relation'][$node['id']])
+            ) {
+                $node['data']['completion'] = $json['user_path_relation'][$node['id']];
+            }
+        }
+        return $json;
     }
 
     /**
@@ -252,10 +289,7 @@ class relation_update {
                 if ($validationcondition && !$failedcompletion) {
                     if (!$mode) {
                         return true;
-                    } else if (
-                        isset($node['restriction']) &&
-                        ($node['restriction'] == null || count($restrictionnodepaths))
-                    ) {
+                    } else {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']]['text'];
                         if (

@@ -58,7 +58,7 @@ import UserInformation from '../../nodes_items/UserInformation.vue';
 const store = useStore()
 const props = defineProps({
   details: {
-    type: Object,
+    type: String,
     required: true,
   }
 });

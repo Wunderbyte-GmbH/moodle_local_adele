@@ -28,7 +28,6 @@
       <VueFlow
         :nodes="nodes"
         :edges="edges"
-        :viewport="viewport"
         @node-click="onNodeClick"
       >
         <template #node-custom="{ data }">

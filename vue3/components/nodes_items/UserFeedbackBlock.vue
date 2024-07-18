@@ -7,7 +7,7 @@
   const props = defineProps({
     data: {
       type: Object,
-      required: true,
+      default: () => ({}),
     },
     title: {
       type: String,
