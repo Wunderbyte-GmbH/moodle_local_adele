@@ -129,38 +129,65 @@ $string['image_description_save'] = 'Sie haben das Lernpfad-Bild gespeichert/akt
 $string['node_coursefullname'] = 'Knotenname:';
 $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
-// Bedingungsbeschreibung.
+// Conditions description.
+$string['course_description_condition_completion_manual'] = 'Der Knoten wird manuell abgeschlossen';
+$string['course_description_condition_parent_courses'] = 'Der Knoten wird zugänglich, wenn eine bestimmte Anzahl übergeordneter Knoten abgeschlossen ist';
+$string['course_name_condition_completion_manual'] = 'Knotenabschluss-Kontrollkästchen';
+$string['course_name_condition_parent_courses'] = 'Entsprechend der übergeordneten Knoten';
+$string['course_description_condition_restriction_manual'] = 'Der Zugang wird manuell gewährt';
+$string['course_name_condition_restriction_manual'] = 'Knotenzugang-Kontrollkästchen';
+$string['course_description_condition_restriction_specific_course'] = 'Nur wenn ein bestimmter Knoten dieses Lernpfads abgeschlossen ist';
+$string['course_name_condition_restriction_specific_course'] = 'Bestimmter Knoten abgeschlossen';
+$string['course_description_condition_timed'] = 'Knotenstartdatum; Knotenenddatum';
+$string['course_name_condition_timed'] = 'Knotenstart-/Enddatum';
+$string['course_name_condition_course_completed'] = 'Kurs(e) abgeschlossen';
+$string['course_description_condition_catquiz'] = 'Entsprechend den Catquiz-Ergebnissen/-Versuchen';
+$string['course_name_condition_catquiz'] = 'Catquiz-Quiz';
+$string['course_description_condition_modquiz'] = 'Entsprechend dem Mod-Quiz-Ergebnis';
+$string['course_name_condition_modquiz'] = 'Mod-Quiz';
+$string['course_description_condition_parent_node_completed'] = 'Wenn ein übergeordneter Knoten abgeschlossen ist';
+$string['course_name_condition_parent_node_completed'] = 'Übergeordneter Knoten abgeschlossen';
+$string['course_description_condition_timed_duration'] = 'Zeitraum, in dem der Kurs bearbeitet werden kann';
+$string['course_name_condition_timed_duration'] = 'Kursbearbeitungszeitraum';
+$string['course_select_condition_timed_duration_learning_path'] = 'Seit der Anmeldung zum Lernpfad';
+$string['course_select_condition_timed_duration_node'] = 'Seit der Anmeldung zum Knoten';
+$string['course_select_condition_timed_duration_days'] = 'Tage';
+$string['course_select_condition_timed_duration_weeks'] = 'Wochen';
+$string['course_select_condition_timed_duration_months'] = 'Monate';
+
+// Feedback Strings.
 $string['node_access_completed'] = 'Der Knoten ist abgeschlossen';
 $string['node_access_accessible'] = 'Der Knoten ist zugänglich';
 $string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich';
 $string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich.';
-$string['node_access_nothing_defined'] = 'Kein User Feedback verfügbar';
-$string['course_description_condition_completion_manual'] = 'Knoten wird manuell abgeschlossen';
-$string['course_name_condition_completion_manual'] = 'Knotenabschluss-Checkbox';
-$string['course_description_condition_parent_courses'] = 'Knoten wird zugänglich, wenn eine bestimmte Anzahl von übergeordneten Knoten abgeschlossen ist';
-$string['course_name_condition_parent_courses'] = 'Gemäß übergeordneter Knoten';
-$string['course_description_condition_restriction_manual'] = 'Zugriff wird manuell gewährt';
-$string['course_name_condition_restriction_manual'] = 'Knotenbeschränkungs-Checkbox';
-$string['course_description_condition_restriction_specific_course'] = 'Nur wenn ein bestimmter Knoten dieses Lernpfads abgeschlossen ist';
-$string['course_name_condition_restriction_specific_course'] = 'Bestimmter Knoten abgeschlossen';
-$string['course_description_condition_timed'] = 'Knotenstartdatum; Knotenddatum';
-$string['course_name_condition_timed'] = 'Knotenstart-/Enddatum';
-$string['course_description_condition_course_completed'] = 'Ein Kurs innerhalb dieses Knotens muss vom Studenten abgeschlossen sein';
-$string['course_name_condition_course_completed'] = 'Kurs(e) abgeschlossen';
-$string['course_description_condition_catquiz'] = 'Gemäß catquiz Ergebnissen/Versuchen';
-$string['course_name_condition_catquiz'] = 'Catquiz-Quiz';
-$string['course_description_condition_modquiz'] = 'Gemäß mod-Quiz-Ergebnis';
-$string['course_name_condition_modquiz'] = 'Mod-Quiz';
-$string['course_description_condition_parent_node_completed'] = 'Wenn ein übergeordneter Knoten abgeschlossen ist';
-$string['course_name_condition_parent_node_completed'] = 'Übergeordneter Knoten abgeschlossen';
-$string['course_restricition_before_condition_manual'] = 'Zugriff wird manuell gewährt';
-$string['course_restricition_before_condition_parent_courses'] = 'Schließen Sie die folgenden 3/4 Kurse des übergeordneten Knotens ab';
-$string['course_restricition_before_condition_specific_course'] = 'Schließen Sie die Kurse {placeholder} ab';
-$string['course_restricition_before_condition_timed'] = 'Zugänglich von {START} bis {END}';
-$string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {WEEKS} seit {TIMED CONDITION}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Schließen Sie den übergeordneten Knoten ab';
-$string['course_condition_concatination_or'] = "oder";
-$string['course_condition_concatination_and'] = " und ";
+$string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
+$string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
+
+$string['course_description_before_completion_manual'] = 'Der Abschluss wird manuell gewährt';
+$string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {status} manuell gewährt';
+$string['course_description_after_completion_manual'] = 'Der Abschluss wurde manuell gewährt';
+
+$string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
+$string['course_description_inbetween_condition_course_completed'] = 'Sie müssen {numb_courses} Kurse abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
+$string['course_description_after_condition_course_completed'] = 'Sie haben genug Kurse dieses Knotens abgeschlossen';
+
+$string['course_description_before_condition_catquiz'] = 'Beenden Sie das Quiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_catquiz'] = 'Das Quiz {catquiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
+$string['course_description_after_condition_catquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
+
+$string['course_description_before_condition_modquiz'] = 'Beenden Sie das Quiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_modquiz'] = 'Das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
+$string['course_description_after_condition_modquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
+
+$string['course_restricition_before_condition_manual'] = 'Der Zugang wird manuell gewährt';
+$string['course_restricition_before_condition_parent_courses'] = 'Schließen Sie {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
+$string['course_restricition_before_condition_specific_course'] = 'Beenden Sie den/die Kurs(e): {placeholder}';
+$string['course_restricition_before_condition_timed'] = 'Zugänglich von {start_date} bis {end_date}';
+$string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {duration_period} seit {timed_condition}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Beenden Sie den übergeordneten Knoten {node_name}';
+
+$string['course_condition_concatination_or'] = 'oder';
+$string['course_condition_concatination_and'] = ' und ';
 
 // Ereigniszeichenfolgen.
 $string['event_learnpath_deleted'] = 'Lernpfad gelöscht';

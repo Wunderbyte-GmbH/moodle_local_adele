@@ -12,6 +12,10 @@
       type: Object,
       required: true,
     },
+    mobile: {
+      type: Boolean,
+      default: false,
+    },
   });
   const store = useStore();
 
@@ -160,20 +164,30 @@
 
 <template>
   <div
-    class="icon-container "
-    :class="{ 'card-hover': showCard, [data.node_id + '_node_info_listener']: true}"
-    @click="toggleCard()"
+    :class="{
+      'card-hover': showCard,
+      [data.node_id + '_node_info_listener']: true,
+      'icon-container': !mobile,
+      'card-container': mobile
+    }"
+    @click="toggleCard"
   >
     <div
       class="information"
       :style="{ backgroundColor: backgroundColor }"
     >
-      <i class="fa fa-info" />
+      <i
+        class="fa fa-info"
+        :class="{'fa-info-mobile': mobile}"
+      />
     </div>
-    <transition name="unfold">
+    <transition :name="mobile ? 'fade' : 'unfold'"
+    >
       <div
         v-if="showCard"
-        class="additional-card"
+        :class="{
+          'additional-card': !mobile
+        }"
         :style="{ backgroundColor: backgroundColorInfo}"
       >
         <ul class="list-group">
@@ -310,6 +324,16 @@
 
 <style scoped>
 
+.card-container {
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  border-radius: 8px;
+  background-color: #EAEAEA;
+  text-align: center;
+}
+
 .list-group-text{
   text-align: left;
 }
@@ -375,6 +399,13 @@
 .unfold-enter-active, .unfold-leave-active {
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   visibility: visible;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>

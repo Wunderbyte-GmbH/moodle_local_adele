@@ -54,9 +54,9 @@ const  addAutoCompletions = (node, store) => {
             "data": {
               "childCondition": 'condition_1',
               "visibility": true,
-              "feedback_before": "",
-              "feedback_after": "",
-              "feedback_inbetween": "",
+              "feedback_before": store.state.strings.course_description_before_condition_course_completed,
+              "feedback_after": store.state.strings.course_description_after_condition_course_completed,
+              "feedback_inbetween": store.state.strings.course_description_inbetween_condition_course_completed,
               "feedback_before_checkmark": true,
               "feedback_after_checkmark": true,
               "feedback_inbetween_checkmark": true,

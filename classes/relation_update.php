@@ -222,8 +222,8 @@ class relation_update {
         $completionnodepaths = [];
         $singlecompletionnode = [];
         $feedback = self::getfeedback($node, $completioncriteria);
+        $priority = false;
         foreach ($node['completion']['nodes'] as $completionnode) {
-            $priority = false;
             $failedcompletion = false;
             $validationconditionstring = [];
             if (
@@ -348,7 +348,10 @@ class relation_update {
         if ($feedback['completion']['after']) {
             return 'completed';
         }
-        if ($restrictionnodepaths) {
+        if (
+          $restrictionnodepaths ||
+          is_null($feedback['restriction']['before'])
+        ) {
             return 'accessible';
         }
         if (isset($node['restriction'])) {
@@ -358,9 +361,9 @@ class relation_update {
                     $nextid = str_replace('_feedback', '', $restrictionall['id']);
                     $safetycounter = 0;
                     $maxiterations = 50;
-                    while ($nextid && $safetycounter < $maxiterations) {
+                    $reachablecolumn = true;
+                    while ($nextid && $safetycounter < $maxiterations && $reachablecolumn) {
                         $found = false;
-                        $reachablecolumn = true;
                         foreach ($node['restriction']['nodes'] as $restrictioncolumn) {
                             if ($restrictioncolumn['id'] == $nextid) {
                                 if (str_contains($restrictioncolumn['data']['label'], 'timed')) {

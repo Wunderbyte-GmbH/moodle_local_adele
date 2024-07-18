@@ -36,14 +36,20 @@
         <strong>{{store.state.strings.mobile_view_detail_id}}</strong> {{ node.id }}
       </p>
       <p v-if="node.data.description"><strong>{{store.state.strings.mobile_view_detail_description}}</strong> {{node.data.description}}</p>
-      <p v-if="node.data.estimate_duration"><strong>
-        {{store.state.strings.mobile_view_detail_estimate}}
-      </strong> {{node.data.mobile_view_detail_course_link}}</p>
-      <p><a href="details.link" target="_blank" rel="noopener noreferrer">
-        {{store.state.strings.mobile_view_detail_estimate}}
-      </a></p>
+      <p>
+        <a :href=link target="_blank" rel="noopener noreferrer">
+          Go to course
+        </a>
+      </p>
+      <NodeInformation
+        class="mb-4"
+        :data = node.data
+        :parentnode = {}
+        :mobile = true
+      />
       <UserInformation
         :data="node.data"
+        :mobile = true
       />
     </div>
   </div>
@@ -53,6 +59,7 @@
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex'
 import UserInformation from '../../nodes_items/UserInformation.vue';
+import NodeInformation from '../../nodes_items/NodeInformation.vue';
 
 
 const store = useStore()
@@ -65,6 +72,7 @@ const props = defineProps({
 
 const node = ref(null)
 const feedback = ref(null)
+const link = ref('/course/view.php?id=')
 
 onMounted(() => {
   const json = store.state.lpuserpathrelation.json
@@ -72,6 +80,7 @@ onMounted(() => {
     json.tree.nodes.forEach((user_node) => {
       if (user_node.id == props.details) {
         node.value = user_node
+        link.value += user_node.data.course_node_id[0]
       }
     })
   }

@@ -14,6 +14,10 @@
       type: Object,
       required: true,
     },
+    mobile: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   const toggleFeedbackarea = () => {
@@ -45,7 +49,10 @@
     @click="toggleFeedbackarea"
   >
     <div>
-      <i class="fa fa-comment" />
+      <i
+        class="fa fa-comment"
+        :class="{'fa-comment-mobile' : mobile}"
+      />
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea">
@@ -54,17 +61,19 @@
           <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
         </div>
         <UserFeedbackBlock
-          v-if="data.completion"
+          v-if="data.completion &&
+            (data.completion.feedback.status == 'not_accessible' || data.completion.feedback.status == 'closed')"
           :data="data.completion.feedback.restriction.before"
           title="restriction_before"
         />
         <UserFeedbackBlock
-          v-if="data.completion"
+          v-if="data.completion && data.completion.feedback.status == 'closed'"
           :data="data.completion.feedback.completion.before"
           title="completion_before"
         />
         <UserFeedbackBlock
-          v-if="data.completion"
+          v-if="data.completion && data.completion.feedback.status != 'completed' &&
+            data.completion.feedback.status != 'closed'"
           :data="data.completion.feedback.completion.inbetween"
           title="completion_inbetween"
         />
@@ -130,6 +139,10 @@
 .fa-comment {
   color: #333;
   font-size: 20px;
+}
+
+.fa-comment-mobile {
+  font-size: 50px !important;
 }
 
 .card-container:hover {
