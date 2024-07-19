@@ -20,9 +20,70 @@
         </option>
       </select>
     </div>
-    <div>
+    <div v-if="scales.parent">
+      <table class="table table-bordered table-striped bg-white">
+          <thead class="thead-light">
+            <tr>
+              <th>
+                {{ store.state.strings.conditions_parent_scale_name }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              :class="[
+                scales.parent && (scales.parent.scale || scales.parent.attempts > 0) ? 'green-row' : 'empty-row'
+              ]"
+            >
+              <td class="position-relative">
+                <div
+                  class="item-container"
+                  @click="showDetails(scales.parent.name, ['parent'])"
+                >
+                  {{ scales.parent.name }}
+                  <div
+                    v-if="scales.parent.showDetails"
+                    class="icon-container"
+                  >
+                    <i class="fa-solid fa-arrow-right" />
+                  </div>
+                </div>
+                <div
+                  v-if="scales.parent && scales.parent.showDetails"
+                  class="dynamic-content-container"
+                >
+                  <label for="scalevalue">
+                    {{ store.state.strings.conditions_scale_value }}
+                  </label>
+                  <input
+                    id="scalevalue"
+                    v-model="scalevalue"
+                    class="form-control"
+                  >
+                  <label
+                    for="attempts"
+                    class="mt-3"
+                  >
+                    {{ store.state.strings.conditions_attempts }}
+                  </label>
+                  <input
+                    id="attempts"
+                    v-model="attempts"
+                    class="form-control"
+                  >
+                  <button
+                    class="btn btn-primary rounded-pill"
+                    @click="setValues(scales.parent.id, 'parent')"
+                  >
+                    {{ store.state.strings.conditions_set_values }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+      </table>
       <button
-        v-if="scales.length > 0"
+        v-if="scales.sub && scales.sub.length > 0"
         class="btn btn-primary rounded-pill"
         @click="toggleTable"
       >
@@ -46,7 +107,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="scale in scales"
+              v-for="scale in scales.sub"
               :key="scale.id"
               :class="[
                 (scale.scale || scale.attempts > 0) ? 'green-row' : 'empty-row'
@@ -55,7 +116,7 @@
               <td class="position-relative">
                 <div
                   class="item-container"
-                  @click="showDetails(scale.name)"
+                  @click="showDetails(scale.name, ['sub'])"
                 >
                   {{ scale.name }}
                   <div
@@ -90,7 +151,7 @@
                   >
                   <button
                     class="btn btn-primary rounded-pill"
-                    @click="setValues(scale.id)"
+                    @click="setValues(scale.id, 'sub')"
                   >
                     {{ store.state.strings.conditions_set_values }}
                   </button>
@@ -192,41 +253,61 @@ watch(() => data.value, () => {
 
 const toggleTable = () => {
   showTable.value = !showTable.value;
-  hideDetails('')
+  hideDetails(null, ['sub', 'parent'])
 };
 
-const showDetails = (name) => {
-  hideDetails(name)
-  const scale = scales.value.find((s) => s.name === name);
-  if (scale) {
-    scale.showDetails = !scale.showDetails;
-  }
-  if (scale.scale) {
-    scalevalue.value = scale.scale;
-  }else{
-    scalevalue.value = '';
-  }
-  if (scale.attempts) {
-    attempts.value = scale.attempts;
-  }else{
-    attempts.value = '';
-  }
-};
-
-const hideDetails = (name) => {
-  scales.value.forEach((detail) => {
-    if(detail.name != name){
-      detail.showDetails = false
+const showDetails = (name, scaletypes) => {
+  hideDetails(name, ['sub', 'parent'])
+  scaletypes.forEach((type) => {
+    let scale = null
+    if (type == 'parent') {
+      scale = scales.value[type]
+    } else {
+      scale = scales.value[type].find((s) => s.name === name);
+    }
+    if (scale) {
+      scale.showDetails = !scale.showDetails;
+    }
+    if (scale.scale) {
+      scalevalue.value = scale.scale;
+    }else{
+      scalevalue.value = '';
+    }
+    if (scale.attempts) {
+      attempts.value = scale.attempts;
+    }else{
+      attempts.value = '';
     }
   })
-}
+};
 
-const setValues = (id) => {
-  hideDetails(null)
-  const indexToUpdate = data.value.scales.findIndex((scale) => scale.id === id);
-  if (indexToUpdate !== -1) {
-    data.value.scales[indexToUpdate].scale = scalevalue.value;
-    data.value.scales[indexToUpdate].attempts = attempts.value;
+const hideDetails = (name, scaletypes) => {
+  scaletypes.forEach((type) => {
+    if (scales.value[type]) {
+      if (type == 'parent') {
+        scales.value[type].showDetails = false;
+      } else {
+        scales.value[type].forEach((detail) => {
+          if (detail.name !== name) {
+            detail.showDetails = false;
+          }
+        });
+      }
+    }
+  });
+};
+
+const setValues = (id, scaletype) => {
+  hideDetails(null, ['sub', 'parent'])
+  if (scaletype == 'parent') {
+    data.value.scales[scaletype].scale = scalevalue.value;
+    data.value.scales[scaletype].attempts = attempts.value;
+  } else {
+    const indexToUpdate = data.value.scales.sub.findIndex((scale) => scale.id === id);
+    if (indexToUpdate !== -1) {
+      data.value.scales.sub[indexToUpdate].scale = scalevalue.value;
+      data.value.scales.sub[indexToUpdate].attempts = attempts.value;
+    }
   }
 }
 

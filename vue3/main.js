@@ -30,9 +30,9 @@ import router from './router/router'
 
 
 // Enables the Composition API
-window.__VUE_OPTIONS_API__ = true; 
+window.__VUE_OPTIONS_API__ = true;
 // Disable devtools in production
-window.__VUE_PROD_DEVTOOLS__ = false; 
+window.__VUE_PROD_DEVTOOLS__ = false;
 
 function init() {
     // We need to overwrite the variable for lazy loading.
@@ -60,6 +60,8 @@ function init() {
             store.state.userlist = userListAttributeValue;
             const contextIdValue = localAdeleAppElement.getAttribute('contextid');
             store.state.contextid = contextIdValue;
+            const quizSettingValue = localAdeleAppElement.getAttribute('quizsetting');
+            store.state.quizsetting = quizSettingValue;
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.mount(localAdeleAppElement);
         }
@@ -69,6 +71,6 @@ function init() {
 function canUseNewFaIconsnewVersion(usedVersion){
   const oldVersion = '2023042400'
   return usedVersion >= oldVersion ? true : false;
-} 
+}
 
 export { init };

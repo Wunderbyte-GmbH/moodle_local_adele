@@ -94,13 +94,18 @@ class get_catquiz_scales extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'parent' => new external_single_structure([
+                'id' => new external_value(PARAM_TEXT, 'id'),
+                'name' => new external_value(PARAM_TEXT, 'name'),
+            ]),
+            'sub' => new external_multiple_structure(
+                new external_single_structure([
                     'id' => new external_value(PARAM_TEXT, 'id'),
-                    'name' => new external_value(PARAM_TEXT, 'componentid'),
-                ]
+                    'name' => new external_value(PARAM_TEXT, 'name'),
+                ])
             )
-        );
+        ]);
     }
 }

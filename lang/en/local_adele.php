@@ -119,6 +119,11 @@ $string['tag_invalid'] = 'Following tags were not found: {$a}';
 $string['warning_empty_space'] = 'Please watch for whitespaces and do not end with a comma';
 $string['settings_only_subscribed'] = 'Only courses the teacher is subscribed to.';
 $string['settings_all_courses'] = 'All courses meeting the other criteria.';
+$string['single_quiz'] = 'One quiz has to fullfill all scales.';
+$string['all_quiz'] = 'Among all attempts, all scales have to be fullfilled at least once.';
+$string['all_quiz_global'] = 'Among all attempts with a given global value, all scales have to be fullfilled at least once.';
+$string['quiz_settings'] = 'Quiz settings';
+$string['quiz_settings_desc'] = 'The settings define how the quiz attempts will be verified';
 
 // Notifications.
 $string['title_duplicate'] = 'Learning Path duplicated';
@@ -236,7 +241,8 @@ $string['charthelper_go_to_learningpath'] = 'Go to learning path editing.';
 
 // Conditions strings.
 $string['conditions_no_scales'] = 'No scales available';
-$string['conditions_name'] = 'Name';
+$string['conditions_name'] = 'Subscale';
+$string['conditions_parent_scale_name'] = 'Parent scale';
 $string['conditions_scale_value'] = 'Scale value:';
 $string['conditions_attempts'] = 'Correct answers in %:';
 $string['conditions_set_values'] = 'Set Values';
@@ -250,6 +256,8 @@ $string['completion_invalid_path_title'] = 'Invalid Path';
 $string['completion_invalid_path_text'] = 'Found standalone nodes. Every node must be connected to the path.';
 $string['completion_invalid_condition_title'] = 'Invalid Conditions';
 $string['completion_invalid_condition_text'] = 'Not all conditions have valid values. Please complete or delete these conditions.';
+$string['completion_empty_global_value'] = 'Missing global scale';
+$string['completion_empty_global_value_text'] = 'The global scale of some conditions were not set.';
 $string['completion_go_back_learningpath'] = 'Go Back to Learningpath';
 $string['completion_edit_completion'] = 'Edit Completion criteria of course node';
 $string['completion_completion_for'] = 'Completion Criteria for:';

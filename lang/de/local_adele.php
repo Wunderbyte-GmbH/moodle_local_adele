@@ -114,6 +114,11 @@ $string['tag_invalid'] = 'Folgende Tags wurden nicht gefunden: {$a}';
 $string['warning_empty_space'] = 'Achten Sie bitte auf Leerzeichen und enden Sie nicht mit einem Komma';
 $string['settings_only_subscribed'] = 'Nur Kurse, für die der Lehrer angemeldet ist.';
 $string['settings_all_courses'] = 'Alle Kurse, die den anderen Kriterien entsprechen.';
+$string['single_quiz'] = 'Ein Versuch muss alle Skalen erfüllen.';
+$string['all_quiz'] = 'Über alle Versuche hinweg muss jede Skala mindestens einmal erfüllt werden.';
+$string['all_quiz_global'] = 'Über alle Versuche mit einem bestimmten globalen Wert hinweg muss jede Skala mindestens einmal erfüllt werden.';
+$string['quiz_settings'] = 'Quiz Einstellungen';
+$string['quiz_settings_desc'] = 'Die Quizeinstellungen definieren die Validierung korrekter Versuche.';
 
 // Benachrichtigungen.
 $string['title_duplicate'] = 'Lernpfad dupliziert';
@@ -230,7 +235,8 @@ $string['charthelper_go_to_learningpath'] = 'Zum Bearbeiten des Lernpfads gehen.
 
 // Bedingungszeichenfolgen.
 $string['conditions_no_scales'] = 'Keine Skalen verfügbar';
-$string['conditions_name'] = 'Name';
+$string['conditions_name'] = 'Subskala';
+$string['conditions_parent_scale_name'] = 'Hauptskala';
 $string['conditions_scale_value'] = 'Skalenwert:';
 $string['conditions_attempts'] = 'Versuche:';
 $string['conditions_set_values'] = 'Werte setzen';
@@ -244,6 +250,8 @@ $string['completion_invalid_path_title'] = 'Ungültiger Pfad';
 $string['completion_invalid_path_text'] = 'Eigenständige Knoten gefunden. Jeder Knoten muss mit dem Pfad verbunden sein.';
 $string['completion_invalid_condition_title'] = 'Ungültige Bedingungen';
 $string['completion_invalid_condition_text'] = 'Nicht alle Bedingungen sind korrekt ausgefüllt. Vervollständige oder lösche diese Bedingungen.';
+$string['completion_empty_global_value'] = 'Fehlende globale Skala';
+$string['completion_empty_global_value_text'] = 'Die globale Skala wurde bei manchen Bedingungen nicht gesetzt.';
 $string['completion_go_back_learningpath'] = 'Zurück zum Lernpfad';
 $string['completion_edit_completion'] = 'Abschlusskriterien des Kursknotens bearbeiten';
 $string['completion_completion_for'] = 'Abschlusskriterien für:';

@@ -32,6 +32,7 @@ import loadFlowChart from '../../composables/loadFlowChart'
 import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import validateNodes from '../../composables/validateNodes';
+import validateQuizGlobal from '../../composables/validateQuizGlobal';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 import { useRouter } from 'vue-router';
 import { onMounted, ref, watch } from 'vue';
@@ -55,6 +56,8 @@ const props = defineProps({
 const learningpathCompletion = ref(null)
 const copieLearningpathCompletion = ref({})
 const showCancelConfirmation = ref(false)
+const showedWarning = ref(false)
+const lastGlobalMissing = ref(0)
 
 onMounted(() => {
   learningpathCompletion.value = props.learningpath
@@ -76,7 +79,6 @@ const stopWatcher = watch(() => learningpathCompletion.value, async () => {
   // Watch for changes of the learning path
   if (learningpathCompletion.value && learningpathCompletion.value.json.tree &&
     store.state.node != undefined && learningpathCompletion.value.json != '') {
-
       let condition = learningpathCompletion.value.json.tree.nodes.filter(node => {
         return node.id === store.state.node.node_id
       })
@@ -93,36 +95,59 @@ const stopWatcher = watch(() => learningpathCompletion.value, async () => {
 const onSave = async () => {
   const conditions = perpareCompletion()
   const singleNodes = standaloneNodeCheck(conditions)
-  const invalidNodes = validateNodes(conditions, findNode)
   if (singleNodes) {
     notify({
         title: store.state.strings.completion_invalid_path_title,
         text: store.state.strings.completion_invalid_path_text,
         type: 'error'
       });
-  } else if (invalidNodes) {
+      return;
+  }
+  const invalidNodes = validateNodes(conditions, findNode)
+  if (invalidNodes) {
     notify({
       title: store.state.strings.completion_invalid_condition_title,
       text: store.state.strings.completion_invalid_condition_text,
       type: 'error'
     });
-  } else{
-    //save learning path
-    learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
-        if (element_node.id === store.state.node.node_id) {
-          return { ...element_node, [props.condition]: conditions };
-        }
-        return element_node;
-    });
-    const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
-    router.push('/learningpaths/edit/' + learningpathID);
-    onCancelConfirmation(true);
-    notify({
-      title: store.state.strings.title_save,
-      text: store.state.strings.description_save,
-      type: 'success'
-    })
+    return;
   }
+  const invalidGlobalScale = validateQuizGlobal(conditions, findNode, store.state.quizsetting)
+  if (invalidGlobalScale != lastGlobalMissing.value) {
+    lastGlobalMissing.value = invalidGlobalScale
+    showedWarning.value = false
+  }
+  if (
+    invalidGlobalScale && !showedWarning.value) {
+    notify({
+      title: store.state.strings.completion_empty_global_value,
+      text: store.state.strings.completion_empty_global_value_text,
+      type: 'warn'
+    });
+    showedWarning.value = true
+    lastGlobalMissing.value = invalidGlobalScale
+    return;
+  }
+
+  conditions.nodes.forEach((node) => {
+    delete(node.data.error)
+  })
+
+  //save learning path
+  learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
+      if (element_node.id === store.state.node.node_id) {
+        return { ...element_node, [props.condition]: conditions };
+      }
+      return element_node;
+  });
+  const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
+  router.push('/learningpaths/edit/' + learningpathID);
+  onCancelConfirmation(true);
+  notify({
+    title: store.state.strings.title_save,
+    text: store.state.strings.description_save,
+    type: 'success'
+  })
 };
 
 const perpareCompletion = () => {

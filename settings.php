@@ -78,4 +78,17 @@ if ($hassiteconfig) {
                 [],
                 $categories)
     );
+
+    // Alise quiz settings.
+    $settings->add(
+        new admin_setting_configselect(
+                $componentname . '/quizsettings',
+                get_string('quiz_settings', $componentname),
+                get_string('quiz_settings_desc', $componentname),
+                'all_quiz_global',
+                [
+                    'single_quiz' => get_string('single_quiz', $componentname),
+                    'all_quiz_global' => get_string('all_quiz_global', $componentname),
+                    'all_quiz' => get_string('all_quiz', $componentname),
+                ]));
 }

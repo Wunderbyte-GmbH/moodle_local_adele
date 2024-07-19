@@ -39,6 +39,7 @@ export function createAppStore() {
                 learningPathID: 0,
                 contextid: 0,
                 strings: {},
+                quizsetting: {},
                 learningpaths: null,
                 learningpath: null,
                 availablecourses: null,
@@ -140,7 +141,6 @@ export function createAppStore() {
                     context.commit('setStrings', strings);
                     moodleStorage.set(cacheKey, JSON.stringify(strings));
                 }
-
             },
             async fetchLearningpath(context) {
                 let learningpath = null

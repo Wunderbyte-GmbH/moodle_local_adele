@@ -28,7 +28,10 @@
 <div id="local-adele-app"
     name="local-adele-app"
     user="{{userid}}"
-    contextid="{{contextid}}"  
+    contextid="{{contextid}}"
+    {{#quizsetting}}
+      quizsetting="{{quizsetting}}"
+    {{/quizsetting}}
     {{#learningpath}}
       learningpath="{{learningpath}}"
     {{/learningpath}}

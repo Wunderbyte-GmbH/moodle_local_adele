@@ -85,10 +85,12 @@ class catquiz {
             }
             if (!empty($scaleids)) {
                 list($insql, $params) = $DB->get_in_or_equal($scaleids);
-                $scales = $DB->get_records_select('local_catquiz_catscales', "id $insql", $params);
-                $scales = array_map(function ($scale) {
+                $scales['sub'] = $DB->get_records_select('local_catquiz_catscales', "id $insql", $params);
+                $scales['sub'] = array_map(function ($scale) {
                     return (array)$scale;
-                }, $scales);
+                }, $scales['sub']);
+                $scales['parent'] = $scales['sub'][$catquiz->catscaleid];
+                unset($scales['sub'][$catquiz->catscaleid]);
             }
         }
         return $scales;
