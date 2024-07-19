@@ -248,6 +248,8 @@ $string['conditions_finish_course'] = 'Finish node manually';
 // Completion strings.
 $string['completion_invalid_path_title'] = 'Invalid Path';
 $string['completion_invalid_path_text'] = 'Found standalone nodes. Every node must be connected to the path.';
+$string['completion_invalid_condition_title'] = 'Invalid Conditions';
+$string['completion_invalid_condition_text'] = 'Not all conditions have valid values. Please complete or delete these conditions.';
 $string['completion_go_back_learningpath'] = 'Go Back to Learningpath';
 $string['completion_edit_completion'] = 'Edit Completion criteria of course node';
 $string['completion_completion_for'] = 'Completion Criteria for:';

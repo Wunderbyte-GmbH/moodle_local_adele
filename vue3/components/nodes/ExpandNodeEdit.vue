@@ -37,7 +37,7 @@ const props = defineProps({
     required: true,
   },
   zoomstep: {
-    type: String,
+    type: Number,
     required: true,
   },
 });
@@ -103,9 +103,7 @@ onMounted(() => {
           </div>
         </div>
         <div
-          class="card-body"
-          :class="active ? 'active-node' : 'inactive-node'"
-          :style="[nodeBackgroundColor]"
+          class="card-body active-node"
         >
           <div
             class="card-img dashboard-card-img mb-2"

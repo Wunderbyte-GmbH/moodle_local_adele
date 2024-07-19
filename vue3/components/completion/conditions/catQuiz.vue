@@ -1,19 +1,19 @@
 <template>
   <div class="form-check">
     {{ completion.description }}
-    <DropdownInput 
+    <DropdownInput
       :selected-test-id="selectedTest"
-      :tests="tests" 
+      :tests="tests"
       @update:value="updatedTest"
     />
     <div v-if="parentscales.length > 0">
-      <select 
+      <select
         v-model="selectedparentscale"
         @change="updateScales"
       >
-        <option 
-          v-for="parentScale in parentscales" 
-          :key="parentScale.id" 
+        <option
+          v-for="parentScale in parentscales"
+          :key="parentScale.id"
           :value="parentScale.id"
         >
           {{ parentScale.name }}
@@ -21,10 +21,10 @@
       </select>
     </div>
     <div>
-      <button 
-        v-if="scales.length > 0" 
+      <button
+        v-if="scales.length > 0"
         class="btn btn-primary rounded-pill"
-        @click="toggleTable" 
+        @click="toggleTable"
       >
         {{ showTable ? 'Hide Table' : 'Show Table' }}
       </button>
@@ -32,8 +32,8 @@
       <div v-else>
         {{ store.state.strings.conditions_no_scales }}
       </div>
-      <div 
-        v-if="showTable" 
+      <div
+        v-if="showTable"
         class="mt-3"
       >
         <table class="table table-bordered table-striped bg-white">
@@ -45,8 +45,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="scale in scales" 
+            <tr
+              v-for="scale in scales"
               :key="scale.id"
               :class="[
                 (scale.scale || scale.attempts > 0) ? 'green-row' : 'empty-row'
@@ -58,39 +58,39 @@
                   @click="showDetails(scale.name)"
                 >
                   {{ scale.name }}
-                  <div 
-                    v-if="scale.showDetails" 
+                  <div
+                    v-if="scale.showDetails"
                     class="icon-container"
                   >
                     <i class="fa-solid fa-arrow-right" />
                   </div>
                 </div>
-                <div 
-                  v-if="scale.showDetails" 
+                <div
+                  v-if="scale.showDetails"
                   class="dynamic-content-container"
                 >
                   <label for="scalevalue">
                     {{ store.state.strings.conditions_scale_value }}
                   </label>
-                  <input 
-                    id="scalevalue" 
-                    v-model="scalevalue" 
-                    class="form-control" 
+                  <input
+                    id="scalevalue"
+                    v-model="scalevalue"
+                    class="form-control"
                   >
-                  <label 
-                    for="attempts" 
+                  <label
+                    for="attempts"
                     class="mt-3"
                   >
                     {{ store.state.strings.conditions_attempts }}
                   </label>
-                  <input 
-                    id="attempts" 
-                    v-model="attempts" 
+                  <input
+                    id="attempts"
+                    v-model="attempts"
                     class="form-control"
                   >
-                  <button 
+                  <button
                     class="btn btn-primary rounded-pill"
-                    @click="setValues(scale.id)" 
+                    @click="setValues(scale.id)"
                   >
                     {{ store.state.strings.conditions_set_values }}
                   </button>
@@ -109,7 +109,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import DropdownInput from '../../nodes_items/DropdownInput.vue'
 
-// Load Store 
+// Load Store
 const store = useStore();
 const props = defineProps({
   modelValue:{
@@ -118,7 +118,7 @@ const props = defineProps({
   },
   completion: {
     type: Object,
-    default: null,   
+    default: null,
   }})
 const data = ref([])
 const tests = ref([])
@@ -231,9 +231,15 @@ const setValues = (id) => {
 }
 
 const updatedTest = (test) => {
-  selectedTest.value = test.id;
-  selectedparentscale_courseid.value = test.courseid;
-  selectedtest_component_id.value = test.componentid;
+  if (test) {
+    selectedTest.value = test.id || null;
+    selectedparentscale_courseid.value = test.courseid || null;
+    selectedtest_component_id.value = test.componentid || null;
+  } else {
+    selectedTest.value = null;
+    selectedparentscale_courseid.value = null;
+    selectedtest_component_id.value = null;
+  }
 }
 
 </script>

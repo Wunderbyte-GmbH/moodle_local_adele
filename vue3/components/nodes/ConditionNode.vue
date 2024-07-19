@@ -219,7 +219,11 @@ const shiftLeft = (deletedNode, edges) => {
   <div>
     <div
       class="card"
-      :style="[{ minHeight: '250px', width: '350px' }]"
+      :style="[{
+        minHeight: '250px',
+        width: '350px',
+        border: props.data.error ? '2px solid red' : '1px solid #ccc',
+      }]"
     >
       <div class="card-header text-center">
         <div class="row align-items-center">

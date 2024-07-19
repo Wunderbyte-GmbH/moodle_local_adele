@@ -49,7 +49,7 @@
                 Description
               </b>
               <div class="list-group-text">
-                <div v-if="courses[0].description">
+                <div v-if="courses[0] && courses[0].description">
                   <div v-html="courses[0].description"/>
                 </div>
                 <div v-else>

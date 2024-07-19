@@ -66,7 +66,7 @@ const props = defineProps({
     required: true,
   },
   zoomstep: {
-    type: String,
+    type: Number,
     required: true,
   },
 });

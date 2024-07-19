@@ -160,7 +160,7 @@ const goBack = () => {
 const props = defineProps({
   userlearningpathparent: {
     type: Array,
-    required: true,
+    default: null,
   }
 });
 

@@ -31,6 +31,7 @@ import { notify } from "@kyvg/vue3-notification";
 import loadFlowChart from '../../composables/loadFlowChart'
 import removeDropzones from '../../composables/removeDropzones';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
+import validateNodes from '../../composables/validateNodes';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 import { useRouter } from 'vue-router';
 import { onMounted, ref, watch } from 'vue';
@@ -60,7 +61,7 @@ onMounted(() => {
   copieLearningpathCompletion.value = JSON.parse(JSON.stringify(props.learningpath))
 })
 
-const { onPaneReady, toObject, setNodes, setEdges } = useVueFlow()
+const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits([
@@ -90,19 +91,26 @@ const stopWatcher = watch(() => learningpathCompletion.value, async () => {
 
 // Prepare and save learning path
 const onSave = async () => {
-  const condition = perpareCompletion()
-  const singleNodes = standaloneNodeCheck(condition)
+  const conditions = perpareCompletion()
+  const singleNodes = standaloneNodeCheck(conditions)
+  const invalidNodes = validateNodes(conditions, findNode)
   if (singleNodes) {
     notify({
         title: store.state.strings.completion_invalid_path_title,
         text: store.state.strings.completion_invalid_path_text,
         type: 'error'
       });
+  } else if (invalidNodes) {
+    notify({
+      title: store.state.strings.completion_invalid_condition_title,
+      text: store.state.strings.completion_invalid_condition_text,
+      type: 'error'
+    });
   } else{
     //save learning path
     learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
         if (element_node.id === store.state.node.node_id) {
-          return { ...element_node, [props.condition]: condition };
+          return { ...element_node, [props.condition]: conditions };
         }
         return element_node;
     });

@@ -242,6 +242,8 @@ $string['conditions_finish_course'] = 'Knoten manuell abschließen';
 // Abschlusszeichenfolgen.
 $string['completion_invalid_path_title'] = 'Ungültiger Pfad';
 $string['completion_invalid_path_text'] = 'Eigenständige Knoten gefunden. Jeder Knoten muss mit dem Pfad verbunden sein.';
+$string['completion_invalid_condition_title'] = 'Ungültige Bedingungen';
+$string['completion_invalid_condition_text'] = 'Nicht alle Bedingungen sind korrekt ausgefüllt. Vervollständige oder lösche diese Bedingungen.';
 $string['completion_go_back_learningpath'] = 'Zurück zum Lernpfad';
 $string['completion_edit_completion'] = 'Abschlusskriterien des Kursknotens bearbeiten';
 $string['completion_completion_for'] = 'Abschlusskriterien für:';
