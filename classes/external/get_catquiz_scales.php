@@ -105,7 +105,7 @@ class get_catquiz_scales extends external_api {
                     'id' => new external_value(PARAM_TEXT, 'id'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
                 ])
-            )
+            ),
         ]);
     }
 }
