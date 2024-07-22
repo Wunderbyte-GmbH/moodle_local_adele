@@ -170,20 +170,32 @@ class catquiz implements course_completion {
                         foreach ($scales as $type => $scaletype) {
                             if ($type == 'parent') {
                                 if (
-                                    self::check_scale($personabilityresults, $scaletype, $validationtype,
-                                        $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord) ||
-                                    self::check_attempts($rightanswerspercentage, $scaletype,
-                                        $validationtype, $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord)
+                                    self::check_scale(
+                                        $personabilityresults, $scaletype, $validationtype,
+                                        $invalidattempt, $partialpassedrecords, $record,
+                                        $parentscaleglobal, $parentscalerecord
+                                    ) ||
+                                    self::check_attempts(
+                                        $rightanswerspercentage, $scaletype, $validationtype,
+                                        $invalidattempt, $partialpassedrecords, $record,
+                                        $parentscaleglobal, $parentscalerecord
+                                    )
                                 ) {
                                     break;
                                 }
                             } else {
                                 foreach ($scaletype as $scale) {
                                     if (
-                                        self::check_scale($personabilityresults, $scale, $validationtype,
-                                            $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord) ||
-                                        self::check_attempts($rightanswerspercentage, $scale,
-                                            $validationtype, $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord)
+                                        self::check_scale(
+                                            $personabilityresults, $scale, $validationtype,
+                                            $invalidattempt, $partialpassedrecords, $record,
+                                            $parentscaleglobal, $parentscalerecord
+                                        ) ||
+                                        self::check_attempts(
+                                            $rightanswerspercentage, $scale, $validationtype,
+                                            $invalidattempt, $partialpassedrecords, $record,
+                                            $parentscaleglobal, $parentscalerecord
+                                        )
                                     ) {
                                         break;
                                     }
