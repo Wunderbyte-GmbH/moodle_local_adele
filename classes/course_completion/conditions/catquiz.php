@@ -146,11 +146,12 @@ class catquiz implements course_completion {
                 if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
                   && $complitionnode['data']['label'] == 'catquiz' &&isset($complitionnode['data']['value']['testid'])
                 ) {
+                    $validationtype = get_config('local_adele', 'quizsettings');
                     $componentid = $complitionnode['data']['value']['componentid'];
                     $testidcourseid = $complitionnode['data']['value']['testid_courseid'];
                     $scales = $complitionnode['data']['value']['scales'] ?? null;
-                    $scaleids = array_map(fn($a) => $a['id'], $scales);
-                    $passcatquiz = false;
+                    $scaleids = self::get_scale_ids($scales);
+                    $parentscaleglobal = $scales['parent']['scale'] ?? false;
 
                     $records = Local_catquizCatquiz::return_data_from_attemptstable(
                       100,
@@ -158,38 +159,162 @@ class catquiz implements course_completion {
                       $testidcourseid,
                       $userid
                     );
-                    // Get all records that pass at least one subscale.
                     $allpassedrecords = [];
+                    $partialpassedrecords = [];
                     foreach ($records as $record) {
-                        $recordpass = false;
-                        $attemptpass = false;
-                        $testing = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
+                        $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
                         $rightanswerspercentage =
                           Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
-                        foreach ($scales as $scale) {
-                            if (isset($scale['scale']) && $scale['scale']) {
-                                if (!(isset($testing->{$scale['id']}) && $testing->{$scale['id']} >= $scale['scale'])) {
-                                    $recordpass = false;
+                        $invalidattempt = false;
+                        $parentscalerecord = $personabilityresults->{$scales['parent']['id']};
+                        foreach ($scales as $type => $scaletype) {
+                            if ($type == 'parent') {
+                                if (
+                                    self::check_scale($personabilityresults, $scaletype, $validationtype,
+                                        $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord) ||
+                                    self::check_attempts($rightanswerspercentage, $scaletype,
+                                        $validationtype, $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord)
+                                ) {
+                                    break;
+                                }
+                            } else {
+                                foreach ($scaletype as $scale) {
+                                    if (
+                                        self::check_scale($personabilityresults, $scale, $validationtype,
+                                            $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord) ||
+                                        self::check_attempts($rightanswerspercentage, $scale,
+                                            $validationtype, $invalidattempt, $partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord)
+                                    ) {
+                                        break;
+                                    }
                                 }
                             }
-                            if (isset($scale['attemps'])) {
-                                if (!(isset($attempt[$scale['id']]) && $attempt[$scale['id']] >= $scale['attemps'])) {
-                                    $attemptpass = false;
-                                }
+                            if ($invalidattempt) {
+                                break;
                             }
                         }
-                        if ($recordpass && $attemptpass) {
-                            $passcatquiz = true;
-                            break;
+                        if (!$invalidattempt && $validationtype == 'single_quiz') {
+                            $allpassedrecords['single'] = $record;
                         }
                     }
-                    $catquizzes['completed'][$complitionnode['id']] = $passcatquiz;
+                    if (
+                        $validationtype == 'single_quiz' &&
+                        !empty($allpassedrecords)
+                    ) {
+                        $catquizzes['completed'][$complitionnode['id']] = $allpassedrecords;
+                    } else if (
+                        $partialpassedrecords &&
+                        count($partialpassedrecords['scale']) == count($scaleids) &&
+                        count($partialpassedrecords['percentage']) == count($scaleids)
+                    ) {
+                        $catquizzes['completed'][$complitionnode['id']] = $partialpassedrecords;
+                    } else {
+                        $catquizzes['completed'][$complitionnode['id']] = false;
+                    }
                 } else {
                     $catquizzes['completed'][$complitionnode['id']] = false;
                 }
             }
         }
         return $catquizzes;
+    }
+
+    /**
+     * Check if the sclae of quiz was reached.
+     * @param object $personabilityresults
+     * @param array $scale
+     * @param string $validationtype
+     * @param bool $invalidattempt
+     * @param array $partialpassedrecords
+     * @param object $record
+     * @param string $parentscaleglobal
+     * @param string $parentscalerecord
+     * @return bool
+     */
+    private function check_scale(
+        $personabilityresults, $scale, $validationtype, &$invalidattempt,
+        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord
+    ) {
+        if (isset($scale['scale']) && $scale['scale']) {
+            if (!(isset($personabilityresults->{$scale['id']}) && $personabilityresults->{$scale['id']} >= $scale['scale'])) {
+                if ($validationtype == 'single_quiz') {
+                    $invalidattempt = true;
+                    return true;
+                }
+            } else {
+                if (
+                    $validationtype != 'all_quiz_global' ||
+                    $parentscaleglobal < $parentscalerecord
+                ) {
+                    $partialpassedrecords['scale'][$scale['id']][] = $record->attemptid;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the percentage of correct answers was reached.
+     * @param object $attempts
+     * @param array $scale
+     * @param string $validationtype
+     * @param bool $invalidattempt
+     * @param array $partialpassedrecords
+     * @param object $record
+     * @param string $parentscaleglobal
+     * @param string $parentscalerecord
+     * @return bool
+     */
+    private function check_attempts(
+        $attempts, $scale, $validationtype, &$invalidattempt,
+        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord
+    ) {
+        if (isset($scale['attempts'])) {
+            if (!(isset($attempts[$scale['id']]) && $attempts[$scale['id']]['percentage'] >= $scale['attempts'])) {
+                if ($validationtype == 'single_quiz') {
+                    $invalidattempt = true;
+                    return true;
+                }
+            } else {
+                if (
+                    $validationtype != 'all_quiz_global' ||
+                    !$parentscaleglobal ||
+                    $parentscaleglobal < $parentscalerecord
+                ) {
+                    $partialpassedrecords['percentage'][$scale['id']][] = $record->attemptid;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     * @param array $scaletypes
+     * @return array
+     */
+    private function get_scale_ids($scaletypes) {
+        $scaleids = [];
+        foreach ($scaletypes as $type => $subscales) {
+            if ( $type == 'parent' ) {
+                if (
+                isset($subscales['attempts']) &&
+                $subscales['attempts'] != ''
+                ) {
+                    $scaleids[] = $subscales['id'];
+                }
+            } else {
+                foreach ($subscales as $subscale) {
+                    if (
+                    isset($subscale['attempts']) &&
+                    $subscale['attempts'] != ''
+                    ) {
+                        $scaleids[] = $subscale['id'];
+                    }
+                }
+            }
+        }
+        return $scaleids;
     }
 
     /**
