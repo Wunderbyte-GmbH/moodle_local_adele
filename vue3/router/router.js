@@ -28,7 +28,6 @@ import learningpathsEdit from '../components/LearningpathsEdit';
 import userPath from '../components/user_view/UserPath';
 import { useStore } from 'vuex'
 
-const store = useStore()
 // All available routes
 const routes = [
     {
@@ -85,6 +84,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    const store = useStore()
     // Find a translation for the title.
     if (to.meta && to.meta.title && store.state.strings[to.meta.title]) {
         document.title = store.state.strings[to.meta.title];

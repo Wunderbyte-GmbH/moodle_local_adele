@@ -87,7 +87,7 @@
               <template #node-feedback="{ data }">
                 <FeedbackNode
                   :data="data"
-                  :learningpath="learningpathcompletion"
+                  :learningpath="learningpathrestriction"
                   :visibility="visibility_emitted"
                   @update-feedback="handleFeedback"
                 />

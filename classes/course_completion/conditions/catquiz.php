@@ -215,7 +215,8 @@ class catquiz implements course_completion {
                     ) {
                         $catquizzes['completed'][$complitionnode['id']] = $allpassedrecords;
                     } else if (
-                        $partialpassedrecords &&
+                        isset($partialpassedrecords['scale']) &&
+                        isset($partialpassedrecords['percentage']) &&
                         count($partialpassedrecords['scale']) == count($scaleids) &&
                         count($partialpassedrecords['percentage']) == count($scaleids)
                     ) {

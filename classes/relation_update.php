@@ -313,10 +313,12 @@ class relation_update {
         }
         $feedback['completion']['higher'] = [];
         if ($priority) {
-            foreach ($feedback['completion']['after_all'] as $completionpriority) {
+            $i = 0;
+            foreach ($feedback['completion']['after_all'] as $condition => $completionpriority) {
                 if ($completionpriority['priority'] < $priority) {
-                    $feedback['completion']['higher'][] = $completionpriority['text'];
+                    $feedback['completion']['higher'][] = $feedback['completion']['inbetween'][$i];
                 }
+                $i++;
             }
         }
         unset($feedback['completion']['after_all']);
