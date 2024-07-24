@@ -329,6 +329,11 @@ $string['nodes_warning_time_restriction'] = 'Diese Einschränkung überschreibt 
 $string['nodes_warning_time_heading'] = 'Warnung!';
 $string['nodes_no_description'] = 'Es wurde keine Kursbeschreibung bereitgestellt';
 $string['nodes_course_node'] = 'Kursknoten';
+
+$string['nodes_feedback_restriction_before'] = 'Um den Knoten freizuschalten musst du:';
+$string['nodes_feedback_completion_after'] = 'Knoten wurde abgeschlossen aufgrund:';
+$string['nodes_feedback_completion_before'] = 'Um Knoten abzuschliessen musst du:';
+
 $string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
 $string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
 $string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
