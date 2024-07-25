@@ -122,13 +122,13 @@ $string['quiz_settings_desc'] = 'Die Quizeinstellungen definieren die Validierun
 
 // Benachrichtigungen.
 $string['title_duplicate'] = 'Lernpfad dupliziert';
-$string['description_duplicate'] = 'Sie haben den Lernpfad dupliziert!';
+$string['description_duplicate'] = 'Der Lernpfad wurde dupliziert!';
 $string['title_delete'] = 'Lernpfad gelöscht';
-$string['description_delete'] = 'Sie haben den Lernpfad gelöscht!';
+$string['description_delete'] = 'Der Lernpfad wurde  gelöscht!';
 $string['title_save'] = 'Lernpfad gespeichert/aktualisiert';
-$string['description_save'] = 'Sie haben den Lernpfad gespeichert/aktualisiert!';
+$string['description_save'] = 'Der Lernpfad wurde gespeichert/aktualisiert!';
 $string['image_title_save'] = 'Lernpfad-Bild gespeichert/aktualisiert';
-$string['image_description_save'] = 'Sie haben das Lernpfad-Bild gespeichert/aktualisiert!';
+$string['image_description_save'] = 'Das Lernpfad-Bild wurde gespeichert/aktualisiert!';
 
 // Knotenzeichenfolgen.
 $string['node_coursefullname'] = 'Knotenname:';
@@ -173,23 +173,23 @@ $string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {st
 $string['course_description_after_completion_manual'] = 'Der Abschluss wurde manuell gewährt';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'Sie müssen {numb_courses} Kurse abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
-$string['course_description_after_condition_course_completed'] = 'Sie haben genug Kurse dieses Knotens abgeschlossen';
+$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurse abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
+$string['course_description_after_condition_course_completed'] = 'Du hast genug Kurse dieses Knotens abgeschlossen';
 
-$string['course_description_before_condition_catquiz'] = 'Beenden Sie das Quiz {catquiz_name_link}';
+$string['course_description_before_condition_catquiz'] = 'Beende das Quiz {catquiz_name_link}';
 $string['course_description_inbetween_condition_catquiz'] = 'Das Quiz {catquiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
 $string['course_description_after_condition_catquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
 
-$string['course_description_before_condition_modquiz'] = 'Beenden Sie das Quiz {catquiz_name_link}';
+$string['course_description_before_condition_modquiz'] = 'Beende das Quiz {catquiz_name_link}';
 $string['course_description_inbetween_condition_modquiz'] = 'Das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
 $string['course_description_after_condition_modquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
 
 $string['course_restricition_before_condition_manual'] = 'Der Zugang wird manuell gewährt';
-$string['course_restricition_before_condition_parent_courses'] = 'Schließen Sie {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
-$string['course_restricition_before_condition_specific_course'] = 'Beenden Sie den/die Kurs(e): {placeholder}';
+$string['course_restricition_before_condition_parent_courses'] = 'Schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
+$string['course_restricition_before_condition_specific_course'] = 'Beende den/die Kurs(e): {placeholder}';
 $string['course_restricition_before_condition_timed'] = 'Zugänglich von {start_date} bis {end_date}';
 $string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {duration_period} seit {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Beenden Sie den übergeordneten Knoten {node_name}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Beende den übergeordneten Knoten {node_name}';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';
@@ -338,16 +338,16 @@ $string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
 $string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
 $string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
 $string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
-$string['nodes_feedback_completion_higher'] = 'Knoten ist abgeschlossen! Mit diesen Abschlüssen können Sie einen höheren Status erreichen:';
+$string['nodes_feedback_completion_higher'] = 'Der Knoten ist abgeschlossen! Mit diesen Abschlüssen kannst du einen höheren Status erreichen:';
 
 // Feedback Strings.
 $string['course_description_before_completion_manual'] = 'Abschluss wird manuell gewährt';
 $string['course_description_inbetween_completion_manual'] = 'Abschluss wurde noch nicht manuell gewährt';
 $string['course_description_after_completion_manual'] = 'Abschluss wurde manuell gewährt';
 $string['course_description_before_condition_course_completed'] = 'Kurse dieses Knotens müssen abgeschlossen werden';
-$string['course_description_after_condition_course_completed'] = 'Sie haben genügend Kurse dieses Knotens abgeschlossen';
+$string['course_description_after_condition_course_completed'] = 'Du hast genügend Kurse dieses Knotens abgeschlossen';
 $string['course_description_inbetween_condition_course_completed'] = 'Aktuell beste Abschlussnote: {course progress}%';
-$string['course_description_before_condition_catquiz'] = 'Schließen Sie die Catquiz-Ergebnisse/Versuche ab';
+$string['course_description_before_condition_catquiz'] = 'Schließe die Catquiz-Ergebnisse/Versuche ab';
 $string['course_description_after_condition_catquiz'] = 'Catquiz wurde erfolgreich abgeschlossen';
 $string['course_description_inbetween_condition_catquiz'] = 'Aktuell beste Catquiz-Ergebnisse: {best catquiz}';
 $string['course_description_before_condition_modquiz'] = 'Quiz muss mit einer bestimmten Punktzahl abgeschlossen werden';
