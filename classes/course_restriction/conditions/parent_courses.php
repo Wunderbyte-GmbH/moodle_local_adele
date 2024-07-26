@@ -116,6 +116,7 @@ class parent_courses implements course_restriction {
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
+                $courselist = [];
                 if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'parent_courses') {
                     $coursescompleted = false;
                     $coursestable = [];
@@ -123,6 +124,8 @@ class parent_courses implements course_restriction {
                         foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
                             $coursecompleted = false;
                             $course = get_course($coursesid);
+                            $courselist[] = $course->fullname;
+
                             // Check if the course completion is enabled.
                             if ($course->enablecompletion) {
                                 // Get the course completion instance.
@@ -138,6 +141,8 @@ class parent_courses implements course_restriction {
                             $coursescompleted = true;
                         }
                     }
+                    $parentcourses[$restriction['id']]['placeholders']['numb_courses'] = $restriction['data']['value']['min_courses'];
+                    $parentcourses[$restriction['id']]['placeholders']['node_name'] = $courselist;
                     $parentcourses[$restriction['id']]['completed'] = $coursescompleted;
                     $parentcourses[$restriction['id']]['inbetween_info'] = null;
                 } else {

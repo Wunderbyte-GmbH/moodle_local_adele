@@ -28,6 +28,7 @@
 namespace local_adele\course_completion\conditions;
 
 use completion_info;
+use core_completion\progress;
 use local_adele\course_completion\course_completion;
 
 defined('MOODLE_INTERNAL') || die();
@@ -138,20 +139,40 @@ class course_completed implements course_completion {
     public function get_completion_status($node, $userid) {
         $courses = $node['data']['course_node_id'];
         $coursecompletion = [];
+        $finished = 0;
+        $courseprogresslist = [];
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;
             if ($course->enablecompletion) {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
+                $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
+                $courseprogresslist[] = $course->fullname . ' - ' . $progress . '%';
                 // Check if the user has completed the course.
                 $coursecompleted = $completion->is_course_complete($userid);
                 if ($coursecompleted) {
                     $completed = true;
+                    $finished++;
                 }
             }
             $coursecompletion['completed'][$courseid] = $completed;
         }
+        if (isset($node['completion']) && isset($node['completion']['nodes'])) {
+            foreach ($node['completion']['nodes'] as $complitionnode) {
+                if (
+                    isset($complitionnode['data']) &&
+                    isset($complitionnode['data']['label']) &&
+                    $complitionnode['data']['label'] == 'course_completed'
+                ) {
+                    $minvalue = $complitionnode['data']['value']['min_courses'] ?? 1;
+                    $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses'] = $minvalue;
+                    $coursecompletion[$complitionnode['id']]['placeholders']['course_list'] = $courseprogresslist;
+                    $coursecompletion['completed'][$complitionnode['id']] = $finished >= $minvalue ? true : false;
+                }
+            }
+        }
+        // TODO calculate the farest process.
         $coursecompletion['inbetween_info'] = $node['data']['progress'] ?? '0';
         return $coursecompletion;
     }

@@ -143,6 +143,9 @@ class manual implements course_completion {
             $coursecompletion['completed'] = true;
             $coursecompletion['inbetween_info'] = 'checked';
         }
+        $coursecompletion['placeholders']['checkbox_status'] =
+          $coursecompletion['completed'] ? '' :
+          get_string('course_name_condition_completion_manual_checkbox_status', 'local_adele');
         return $coursecompletion;
     }
 

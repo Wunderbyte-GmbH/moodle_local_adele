@@ -128,7 +128,8 @@ class relation_update {
                             $completioncriteria,
                             $userpath,
                             $restrictionnodepaths,
-                            1
+                            1,
+                            $restrictioncriteria
                         );
                     }
                     $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
@@ -216,12 +217,13 @@ class relation_update {
      * @param  object $userpath
      * @param  array $restrictionnodepaths
      * @param  number $mode
+     * @param  array $restrictioncriteria
      * @return array
      */
-    public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode) {
+    public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode, $restrictioncriteria) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
-        $feedback = self::getfeedback($node, $completioncriteria);
+        $feedback = self::getfeedback($node, $completioncriteria, $restrictioncriteria);
         $priority = false;
         foreach ($node['completion']['nodes'] as $completionnode) {
             $failedcompletion = false;
@@ -236,7 +238,8 @@ class relation_update {
                     $label = $currentcondition['data']['label'];
                     if (
                         $label == 'catquiz' ||
-                        $label == 'modquiz'
+                        $label == 'modquiz' ||
+                        $label == 'course_completed'
                     ) {
                         $validationcondition =
                             $completioncriteria[$label]['completed'][$currentcondition['id']];
@@ -496,9 +499,10 @@ class relation_update {
      *
      * @param array $node
      * @param array $completioncriteria
+     * @param array $restrictioncriteria
      * @return array
      */
-    public static function getfeedback($node, $completioncriteria) {
+    public static function getfeedback($node, $completioncriteria, $restrictioncriteria) {
         $feedbacks = [
           'completion' => [
             'before' => null,
@@ -513,26 +517,26 @@ class relation_update {
         foreach ($node['completion']['nodes'] as $conditionnode) {
             if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
                 $feedbacks['completion']['before'][] =
-                  isset($conditionnode['data']['feedback_before']) ? $conditionnode['data']['feedback_before'] : '';
+                  isset($conditionnode['data']['feedback_before']) ?
+                      self::render_placeholders($conditionnode['data']['feedback_before'], $completioncriteria, $conditionnode['id']) :
+                      '';
 
                 $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
                     'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
-                    'text' => isset($conditionnode['data']['feedback_after']) ? $conditionnode['data']['feedback_after'] : '',
+                    'text' => isset($conditionnode['data']['feedback_after']) ?
+                        self::render_placeholders($conditionnode['data']['feedback_after'], $completioncriteria, $conditionnode['id']) :
+                        '',
                 ];
 
                 if ($conditionnode['data']['feedback_inbetween_checkmark']) {
-                    $feedbacks['completion']['inbetween'][] = str_replace([
-                      '{course progress}',
-                      '{best catquiz}',
-                      '{best quiz}',
-                    ], [
-                      $completioncriteria['course_completed']['inbetween_info'] ?? '0',
-                      $completioncriteria['catquiz']['inbetween_info'] ?? '0',
-                      $completioncriteria['modquiz']['inbetween_info'] ?? '0',
-                    ], $conditionnode['data']['feedback_inbetween']);
+                    $feedbacks['completion']['inbetween'][] = isset($conditionnode['data']['feedback_inbetween']) ?
+                        self::render_placeholders($conditionnode['data']['feedback_inbetween'], $completioncriteria, $conditionnode['id']) :
+                        '';
                 } else {
                     $feedbacks['completion']['inbetween'][] =
-                      isset($conditionnode['data']['feedback_inbetween']) ? $conditionnode['data']['feedback_inbetween'] : '';
+                      isset($conditionnode['data']['feedback_inbetween']) ?
+                          self::render_placeholders($conditionnode['data']['feedback_inbetween'], $completioncriteria, $conditionnode['id']) :
+                          '';
                 }
             }
         }
@@ -540,11 +544,48 @@ class relation_update {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
                     $feedbacks['restriction']['before'][] =
-                      isset($restrictionnode['data']['feedback_before']) ? $restrictionnode['data']['feedback_before'] : '';
+                      isset($restrictionnode['data']['feedback_before']) ?
+                        self::render_placeholders($restrictionnode['data']['feedback_before'], $restrictioncriteria, $restrictionnode['id'] ) :
+                        '';
                 }
             }
         }
         return $feedbacks;
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param string $string
+     * @param array $placeholders
+     * @param string $id
+     * @return string
+     */
+    public static function render_placeholders($string, $placeholders , $id) {
+        $id = str_replace('_feedback', '', $id);
+        foreach ($placeholders as $condition) {
+            if (isset($condition['placeholders'])) {
+                foreach ($condition['placeholders'] as $placeholder => $text) {
+                    $string = str_replace(
+                        '{' . $placeholder . '}',
+                        $text,
+                        $string
+                    );
+                }
+            } else if (isset($condition[$id]['placeholders'])) {
+                foreach ($condition[$id]['placeholders'] as $placeholder => $text) {
+                    if (is_array($text)) {
+                        $text = implode(', ', $text);
+                    }
+                    $string = str_replace(
+                        '{' . $placeholder . '}',
+                        strval($text),
+                        $string
+                    );
+                }
+            }
+        }
+        return $string;
     }
 
     /**

@@ -117,10 +117,12 @@ class specific_course implements course_restriction {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
                 if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'specific_course') {
+                    $courselist = [];
                     $coursecompleted = false;
                     // Get grade and check if valid.
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         $course = get_course($restriction['data']['value']['courseid'][0]);
+                        $courselist[] = $course->fullname;
                         // Check if the course completion is enabled.
                         if ($course->enablecompletion) {
                             // Get the course completion instance.
@@ -132,6 +134,7 @@ class specific_course implements course_restriction {
                             }
                         }
                     }
+                    $specificcourses[$restriction['id']]['placeholders']['course_list'] = $courselist;
                     $specificcourses[$restriction['id']]['completed'] = $coursecompleted;
                     $specificcourses[$restriction['id']]['inbetween_info'] = null;
                 } else {

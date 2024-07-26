@@ -140,9 +140,13 @@ class timed implements course_restriction {
                     }
                     if ($startdate) {
                         $startdate = $startdate->format('Y-m-d H:i:s');
+                        $timed[$restrictionnode['id']]['placeholders']['start_date'] =
+                            get_string('course_restricition_before_condition_from', 'local_adele') . $startdate;
                     }
                     if ($enddate) {
                         $enddate = $enddate->format('Y-m-d H:i:s');
+                        $timed[$restrictionnode['id']]['placeholders']['end_date'] =
+                            get_string('course_restricition_before_condition_to', 'local_adele') . $enddate;
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
