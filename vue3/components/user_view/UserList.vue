@@ -35,15 +35,19 @@
           <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')">{{ store.state.strings.user_view_nodes }}</th>
         </tr>
       </thead>
-      <tbody>
         <transition-group name="list" tag="tbody">
-          <tr v-for="relation in sortedRelations" :key="relation.id">
+          <tr
+            v-for="relation in sortedRelations"
+            :key="relation.id"
+            :class="{ 'highlighted-row': relation.id === focusEntry }"
+          >
             <td>
               <router-link
                 v-if="store.state.view !== 'student'"
                 :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
               >
                 {{ relation.id }}
+
               </router-link>
               <div v-else>
                 {{ relation.id }}
@@ -58,13 +62,12 @@
             <td>{{ relation.progress.completed_nodes }}</td>
           </tr>
         </transition-group>
-      </tbody>
     </table>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 
@@ -73,6 +76,8 @@ const store = useStore();
 const sortedRelations = ref([...store.state.lpuserpathrelations.slice(0, 10)]);
 const sortKey = ref('');
 const sortDirection = ref(1);
+const focusEntry = ref(null);
+
 
 const stop = watch(
   () => store.state.lpuserpathrelations,
@@ -82,12 +87,29 @@ const stop = watch(
     } else {
       sortedRelations.value = [...newVal];
     }
-    // TODO remove line below! Only for demonstration purpose!
-    //sortedRelations.value = sortedRelations.value.slice(0, 50);
-    console.log(store.state)
 
+    if (store.state.view === 'student') {
+      focusEntry.value = store.state.lpuserpathrelation.user_id;
+    }
+    scrollIntoFocus()
   },
 );
+
+onMounted(() => {
+  scrollIntoFocus()
+});
+
+const scrollIntoFocus = () => {
+  nextTick(() => {
+    if (focusEntry.value) {
+      const row = document.querySelector(`.highlighted-row`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.focus();
+      }
+    }
+  });
+}
 
 const sortTable = (key) => {
   if (sortKey.value === key) {
@@ -192,4 +214,10 @@ tbody tr:hover {
   color: #fff;
   border-radius: 10px;
 }
+
+tbody tr.highlighted-row {
+  background-color: #e0f7fa;
+  transition: background-color 0.3s;
+}
+
 </style>
