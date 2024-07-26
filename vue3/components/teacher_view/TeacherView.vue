@@ -26,16 +26,16 @@
   <div>
     <div>
       <div v-if="learningpath">
-        <TextInputs 
+        <TextInputs
           :goal="learningpath"
         />
         <LearningPath :learningpath="learningpath" />
-        <UserList :learning-path-id="learningpath" />
+        <UserList />
       </div>
     </div>
   </div>
 </template>
-  
+
   <script setup>
   // Import needed libraries
 import { onMounted, ref } from 'vue';
