@@ -76,7 +76,7 @@
             :min-zoom="0.2"
             :zoom-on-scroll="zoomLock"
             class="learning-path-flow"
-            @node-click="onNodeClick"
+            @node-click="onNodeClickCall"
           >
             <template #node-custom="{ data }">
               <CustomNodeEdit
@@ -141,6 +141,7 @@ import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import outerGraphDisplay from '../../composables/flowHelper/outerGraphDisplay'
 import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
+import onNodeClick from '../../composables/flowHelper/onNodeClick';
 
 // Load Router
 const router = useRouter()
@@ -218,7 +219,7 @@ const handleZoomLock = (node) => {
       node: null,
     }
     event.node = findNode(node)
-    onNodeClick(event)
+    onNodeClick(event, zoomLock, setCenter)
   })
 }
 
@@ -283,15 +284,8 @@ function setFlowchart() {
 }
 
 // Zoom in node
-function onNodeClick(event) {
-  zoomLock.value = false
-  setCenter(
-    event.node.position.x + event.node.dimensions.width/2,
-    event.node.position.y + event.node.dimensions.height/2,
-    { zoom: 0.5, duration: 500}
-  ).then(() => {
-    zoomLock.value = true
-  })
+function onNodeClickCall(event) {
+  onNodeClick(event, zoomLock, setCenter)
 }
 
 </script>

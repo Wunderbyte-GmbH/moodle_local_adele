@@ -87,16 +87,16 @@ class relation_update {
                                     ) {
                                         $currcondi = $currentcondition['id'];
                                         $validationcondition =
-                                            $restrictioncriteria[$currlabel]['completed'][$currcondi] ?? false;
+                                            $restrictioncriteria[$currlabel][$currcondi]['completed'] ?? false;
                                         $singlerestrictionnode[$currentcondition['data']['label']
                                             . '_' . $currentcondition['id']] = $validationcondition;
                                         $validationconditionstring[] = $currentcondition['data']['label']
                                             . '_' . $currentcondition['id'];
                                     } else if (
                                         $currentcondition['data']['label'] == 'parent_node_completed' &&
-                                        isset($restrictioncriteria[$currlabel]['completed'])
+                                        isset($restrictioncriteria[$currlabel][$currentcondition['id']]['completed'])
                                     ) {
-                                        $validationcondition = $restrictioncriteria[$currlabel]['completed'];
+                                        $validationcondition = $restrictioncriteria[$currlabel][$currentcondition['id']]['completed'];
                                         $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                         $validationconditionstring[] = $currentcondition['data']['label'];
                                     } else {
@@ -434,7 +434,7 @@ class relation_update {
     public static function gettimestamptoday($data, $starttime) {
         $now = new \DateTime();
         if (
-            $data['value']['end']
+           isset($data['value']['end'])
         ) {
             $date = \DateTime::createFromFormat('Y-m-d\TH:i', $data['value']['end']);
             return $date > $now;
@@ -485,8 +485,10 @@ class relation_update {
                 foreach ($conditionnodepaths as $conditionnodepath) {
                     foreach ($conditionnodepath as $condition) {
                         if (
-                            $priority == 0 ||
-                            $completionpriorities[$condition] < $priority
+                            isset($completionpriorities[$condition]) && (
+                                $priority == 0 ||
+                                $completionpriorities[$condition] < $priority
+                            )
                         ) {
                             $priority = $completionpriorities[$condition];
                         }

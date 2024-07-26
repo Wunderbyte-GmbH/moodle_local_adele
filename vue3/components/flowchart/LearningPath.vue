@@ -43,7 +43,7 @@
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
-        @node-click="onNodeClick"
+        @node-click="onNodeClickCall"
       >
         <Background
           :pattern-color="dark ? '#FFFFFB' : '#aaa'"
@@ -141,6 +141,7 @@ import addAutoRestrictions from '../../composables/conditions/addAutoRestriction
 import addAndConditions from '../../composables/conditions/addAndConditions'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
+import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
 // Load Store and Router
 const store = useStore()
@@ -302,15 +303,8 @@ const onDrag = ($event) => {
   }
 }
 
-const onNodeClick = (event) => {
-  zoomLock.value = false
-  setCenter(
-    event.node.position.x + event.node.dimensions.width/2,
-    event.node.position.y + event.node.dimensions.height/2,
-    { zoom: 1, duration: 500}
-  ).then(() => {
-    zoomLock.value = true
-  })
+const onNodeClickCall = (event) => {
+  onNodeClick(event, zoomLock, setCenter)
 }
 
 // Prevent default event if node has been dropped

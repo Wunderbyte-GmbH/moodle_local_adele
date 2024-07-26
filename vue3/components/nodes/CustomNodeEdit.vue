@@ -60,6 +60,7 @@ const emit = defineEmits([
 const active = ref(false)
 
 onMounted(() => {
+
   const userpath = props.learningpath
   userpath.json.tree.nodes.forEach((node) => {
     if (props.data.node_id == node.id) {

@@ -253,123 +253,6 @@ const expandCourses = () => {
           <div v-if="data.manualcompletion">
             <CompletionOutPutItem :data="data" />
           </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div v-if="data.completion.singlerestrictionnode">
-                <button
-                  class="btn btn-link"
-                  aria-expanded="false"
-                  aria-controls="collapseTable"
-                  :disabled="!active"
-                  @click="toggleTable('Restriction')"
-                >
-                  {{ isRestrictionVisible ? 'Hide Restriction' : 'Show Restriction' }}
-                </button>
-                <div
-                  v-show="isRestrictionVisible"
-                  class="table-container table-container-left"
-                >
-                  <div v-if="Object.keys(data.completion.singlerestrictionnode).length > 0">
-                    <table
-                      class="table table-bordered table-hover fancy-table"
-                      style="right: -150%;"
-                    >
-                      <thead class="thead-light">
-                        <tr>
-                          <th>
-                            {{ store.state.strings.nodes_table_key }}
-                          </th>
-                          <th>
-                            {{ store.state.strings.nodes_table_checkmark }}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(value, key) in data.completion.singlerestrictionnode"
-                          :key="key"
-                        >
-                          <td>{{ key }}</td>
-                          <td>
-                            {{ value }}
-                            <span
-                              v-if="value"
-                              class="text-success"
-                            >
-                              &#10004;
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div v-else>
-                    <div class="card">
-                      <div class="card-body">
-                        {{ store.state.strings.nodes_no_restriction_defined }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div v-if="data.completion.singlecompletionnode">
-                <button
-                  class="btn btn-link"
-                  aria-expanded="false"
-                  aria-controls="collapseTable"
-                  :disabled="!active"
-                  @click="toggleTable('Completion')"
-                >
-                  {{ isCompletionVisible ? store.state.strings.nodes_hide_completion : store.state.strings.nodes_show_completion }}
-                </button>
-                <div
-                  v-show="isCompletionVisible"
-                  class="table-container"
-                >
-                  <div v-if="Object.keys(data.completion.singlecompletionnode).length > 0">
-                    <table class="table table-bordered table-hover fancy-table">
-                      <thead class="thead-light">
-                        <tr>
-                          <th>
-                            {{ store.state.strings.nodes_table_key }}
-                          </th>
-                          <th>
-                            {{ store.state.strings.nodes_table_checkmark }}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(value, key) in data.completion.singlecompletionnode"
-                          :key="key"
-                        >
-                          <td>{{ key }}</td>
-                          <td>
-                            {{ value }}
-                            <span
-                              v-if="value"
-                              class="text-success"
-                            >
-                              &#10004;
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div v-else>
-                    <div class="card">
-                      <div class="card-body">
-                        {{ store.state.strings.nodes_no_completion_defined }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         <div v-if="courseExpanded">
           <ExpandedCourses
@@ -379,7 +262,7 @@ const expandCourses = () => {
         </div>
       </div>
       <div
-        v-if="store.state.view=='student' && data"
+        v-if="data"
         class="card-footer"
       >
         <CourseCarousel :courses="props.data" />

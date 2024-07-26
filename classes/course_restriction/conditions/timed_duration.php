@@ -124,6 +124,8 @@ class timed_duration implements course_restriction {
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
                         if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
                             $starttime->setTimestamp($node['data']['first_enrolled']);
+                        } else {
+                            $starttime->setTimestamp($userpath->timecreated);
                         }
                         $durationvalue = $restrictionnode['data']['value']['durationValue'];
                         $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
@@ -138,8 +140,8 @@ class timed_duration implements course_restriction {
                     }
                     if ($endtime) {
                         $endtime = $endtime->format('Y-m-d H:i:s');
-                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $endtime;
                     }
+                    $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $starttime->format('Y-m-d H:i:s');
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
                         $selectedduration . ' ' .$this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
