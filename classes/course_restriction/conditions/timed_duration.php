@@ -140,7 +140,8 @@ class timed_duration implements course_restriction {
                         $endtime = $endtime->format('Y-m-d H:i:s');
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $endtime;
                     }
-                    $timed[$restrictionnode['id']]['placeholders']['duration_period'] = $selectedduration . ' ' .$this->durationplaceholder[$durationvalue];
+                    $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
+                        $selectedduration . ' ' .$this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
                       'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,

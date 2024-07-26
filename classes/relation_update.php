@@ -220,7 +220,14 @@ class relation_update {
      * @param  array $restrictioncriteria
      * @return array
      */
-    public static function validatenodecompletion($node, $completioncriteria, $userpath, $restrictionnodepaths, $mode, $restrictioncriteria) {
+    public static function validatenodecompletion(
+        $node,
+        $completioncriteria,
+        $userpath,
+        $restrictionnodepaths,
+        $mode,
+        $restrictioncriteria
+    ) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
         $feedback = self::getfeedback($node, $completioncriteria, $restrictioncriteria);
@@ -518,24 +525,40 @@ class relation_update {
             if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
                 $feedbacks['completion']['before'][] =
                   isset($conditionnode['data']['feedback_before']) ?
-                      self::render_placeholders($conditionnode['data']['feedback_before'], $completioncriteria, $conditionnode['id']) :
+                      self::render_placeholders(
+                        $conditionnode['data']['feedback_before'],
+                        $completioncriteria,
+                        $conditionnode['id']
+                      ) :
                       '';
 
                 $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
                     'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
                     'text' => isset($conditionnode['data']['feedback_after']) ?
-                        self::render_placeholders($conditionnode['data']['feedback_after'], $completioncriteria, $conditionnode['id']) :
+                        self::render_placeholders(
+                            $conditionnode['data']['feedback_after'],
+                            $completioncriteria,
+                            $conditionnode['id']
+                        ) :
                         '',
                 ];
 
                 if ($conditionnode['data']['feedback_inbetween_checkmark']) {
                     $feedbacks['completion']['inbetween'][] = isset($conditionnode['data']['feedback_inbetween']) ?
-                        self::render_placeholders($conditionnode['data']['feedback_inbetween'], $completioncriteria, $conditionnode['id']) :
+                        self::render_placeholders(
+                            $conditionnode['data']['feedback_inbetween'],
+                            $completioncriteria,
+                            $conditionnode['id']
+                        ) :
                         '';
                 } else {
                     $feedbacks['completion']['inbetween'][] =
                       isset($conditionnode['data']['feedback_inbetween']) ?
-                          self::render_placeholders($conditionnode['data']['feedback_inbetween'], $completioncriteria, $conditionnode['id']) :
+                          self::render_placeholders(
+                            $conditionnode['data']['feedback_inbetween'],
+                            $completioncriteria,
+                            $conditionnode['id']
+                          ) :
                           '';
                 }
             }
@@ -545,7 +568,11 @@ class relation_update {
                 if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
                     $feedbacks['restriction']['before'][] =
                       isset($restrictionnode['data']['feedback_before']) ?
-                        self::render_placeholders($restrictionnode['data']['feedback_before'], $restrictioncriteria, $restrictionnode['id'] ) :
+                        self::render_placeholders(
+                            $restrictionnode['data']['feedback_before'],
+                            $restrictioncriteria,
+                            $restrictionnode['id']
+                        ) :
                         '';
                 }
             }
