@@ -96,7 +96,8 @@ class relation_update {
                                         $currentcondition['data']['label'] == 'parent_node_completed' &&
                                         isset($restrictioncriteria[$currlabel][$currentcondition['id']]['completed'])
                                     ) {
-                                        $validationcondition = $restrictioncriteria[$currlabel][$currentcondition['id']]['completed'];
+                                        $validationcondition =
+                                          $restrictioncriteria[$currlabel][$currentcondition['id']]['completed'];
                                         $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
                                         $validationconditionstring[] = $currentcondition['data']['label'];
                                     } else {
