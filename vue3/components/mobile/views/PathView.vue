@@ -79,7 +79,7 @@ function setFlowchart() {
     edge.type = 'smoothstep'
   })
   setTimeout(() => {
-    fitView({ duration: 1000, padding: 0.5 })
+    fitView({ duration: 1000 })
   }, 100)
 }
 

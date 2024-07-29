@@ -142,7 +142,7 @@ const onCancel = () => {
 
 // Fit pane into view
 onPaneReady(({ fitView,}) => {
-  fitView({ padding: 0.2 })
+  fitView()
 })
 </script>
 

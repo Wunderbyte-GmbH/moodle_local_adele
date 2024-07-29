@@ -192,7 +192,7 @@ onMounted( async () => {
     setFlowchart()
     setTimeout(() => {
       nextTick().then(() => {
-        fitView({ duration: 1000, padding: 0.5 }).then(() => {
+        fitView({ duration: 1000 }).then(() => {
           zoomLock.value = true
           watch(
             () => viewport.value.zoom,
