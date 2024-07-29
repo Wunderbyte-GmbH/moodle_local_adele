@@ -1,6 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { computed, onMounted, onUnmounted, ref } from 'vue';
+  import { computed, ref } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -108,58 +108,6 @@
     return return_date;
   }
 
-  const getConditions = (parentnode, type) => {
-    let condition_strings = []
-    if (parentnode[type].nodes) {
-      parentnode[type].nodes.forEach((node) => {
-        if (node.parentCondition && node.parentCondition.includes('starting_condition')) {
-          let current_node = node
-          let condi_string = ''
-          let i = 0
-          while (current_node && i < 4) {
-            if (current_node.data.visibility) {
-              if (condi_string != '') {
-                condi_string += ', '
-              }
-              condi_string += current_node.data.description
-            }
-            current_node = findNextNode(current_node, parentnode[type].nodes)
-            i += 1
-          }
-          condition_strings.push(condi_string)
-        }
-      })
-    }
-    return condition_strings
-  }
-  const findNextNode = (parentnode, nodes) => {
-    if (!parentnode.childCondition || parentnode.childCondition.length === 0) {
-        return null;
-    }
-    let nextNodeId = parentnode.childCondition[0];
-    if (nextNodeId.includes('_feedback')) {
-      nextNodeId = parentnode.childCondition[1];
-    }
-    let nextNode = nodes.find(node => node.id === nextNodeId);
-    return nextNode
-  }
-
-  const closeOnOutsideClick = (event) => {
-    if (!event.target.closest('.' + props.data.node_id + '_node_info_listener')) {
-      showCard.value = false;
-    }
-  };
-
-  onMounted(() => {
-    description.value = props.data.description ||null
-    estimate_duration.value = props.data.estimate_duration ||null
-    document.addEventListener('click', closeOnOutsideClick);
-  })
-
-  onUnmounted(() => {
-    document.removeEventListener('click', closeOnOutsideClick);
-  });
-
 </script>
 
 <template>
@@ -170,48 +118,70 @@
       'icon-container': !mobile,
       'card-container': mobile
     }"
-    @click="toggleCard"
   >
     <div
       class="information"
       :style="{ backgroundColor: backgroundColor }"
+      @click="toggleCard"
     >
       <i
         class="fa fa-info"
         :class="{'fa-info-mobile': mobile}"
       />
     </div>
-    <transition :name="mobile ? 'fade' : 'unfold'"
-    >
+    <transition :name="mobile ? 'fade' : 'unfold'">
       <div
         v-if="showCard"
         :class="{
           'additional-card': !mobile
         }"
         :style="{ backgroundColor: backgroundColorInfo}"
+        @mousedown.stop
+        @mousemove.stop
+        @mouseup.stop
       >
         <ul class="list-group">
           <li
-            v-if="description"
+            v-if="description && typeof description === 'string'"
             class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
           >
             <i class="fa fa-pencil" />
             <b>
               Description
             </b>
-            <div class="list-group-text">
+            <div
+              class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
+            >
               {{ description }}
             </div>
           </li>
           <li
-            v-if="estimate_duration"
+            v-if="estimate_duration && typeof estimate_duration === 'string'"
             class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
           >
             <i class="fa fa-spinner" />
             <b>
               Dates and Duration
             </b>
-            <div class="list-group-text">
+            <div
+              class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
+            >
               <b>
                 Estimated Duration:
               </b>
@@ -220,6 +190,10 @@
             <div
               v-if="ending_date.start_date"
               class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
             >
               <b>
                 Start Date:
@@ -229,6 +203,10 @@
             <div
               v-if="ending_date.end_date"
               class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
             >
               <b>
                 End Date:
@@ -238,6 +216,10 @@
             <div
               v-if="subscribbed_date"
               class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
             >
               <b>
                 First subscribbed to node:
@@ -247,16 +229,24 @@
           </li>
           <li
             class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
           >
             <i class="fa fa-lock" />
             <b>
               Restriction
             </b>
-            <div class="list-group-text">
+            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.restriction && restriction">
                 <div
                   v-for="restriction_string in restriction"
                   :key="restriction_string"
+                  style="user-select: text;"
+                  @mousedown.stop
+                  @mousemove.stop
+                  @mouseup.stop
                 >
                   - {{ restriction_string }}
                 </div>
@@ -268,6 +258,10 @@
           </li>
           <li
             class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
           >
             <i
               class="fa fa-tasks"
@@ -275,11 +269,15 @@
             <b>
               Completion
             </b>
-            <div class="list-group-text">
+            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.completion && completion">
                 <div
                   v-for="completion_string in completion"
                   :key="completion_string"
+                  style="user-select: text;"
+                  @mousedown.stop
+                  @mousemove.stop
+                  @mouseup.stop
                 >
                   <div v-if="completion_string != ''">
                     - {{ completion_string }}
@@ -293,6 +291,10 @@
           </li>
           <li
             class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
           >
             <i
               class="fa-solid fa-play-circle"
@@ -300,11 +302,15 @@
             <b>
               Completion Inbetween
             </b>
-            <div class="list-group-text">
+            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="completion_inbetween && completion_inbetween.length > 0 && completion_inbetween != ''">
                 <div
                   v-for="completion_string in completion_inbetween"
                   :key="completion_string"
+                  style="user-select: text;"
+                  @mousedown.stop
+                  @mousemove.stop
+                  @mouseup.stop
                 >
                   <div v-if="completion_string != ''">
                     - {{ completion_string }}
@@ -322,20 +328,24 @@
   </div>
 </template>
 
+
 <style scoped>
 
 .card-container {
-  cursor: pointer;
   justify-content: center;
   align-items: center;
   padding: 5px;
   border-radius: 8px;
   background-color: #EAEAEA;
   text-align: center;
+  cursor: default;
+  user-select: text;
 }
 
-.list-group-text{
+.list-group-text {
   text-align: left;
+  cursor: text;
+  user-select: text;
 }
 
 .icon-container {
@@ -346,16 +356,17 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 101;
 }
 
 .information {
+  cursor: pointer;
   display: inline-block;
   width: 50px; /* Diameter of the round button */
   height: 50px; /* Diameter of the round button */
   border-radius: 50%; /* Makes the div round */
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38); /* Adds depth with a shadow */
+  z-index: 3;
 }
 
 .information:hover {
@@ -375,24 +386,25 @@
   text-align: center;
   border-radius: 8px;
   position: absolute;
-  z-index: 11;
-  left: -472px;
-  bottom: -200px;
+  top: 20px;
   text-align: start;
+  z-index: 2;
+  cursor: default;
+  user-select: text;
 }
 
 /* Starting state for entering */
 .unfold-enter-from, .unfold-leave-to {
-  transform: scaleX(0);
+  transform: scaleY(0);
   opacity: 0;
-  transform-origin: right; /* Ensures scaling happens left to right */
+  transform-origin: top; /* Ensures scaling happens left to right */
 }
 
 /* Ending state for entering and starting state for leaving */
 .unfold-enter-to, .unfold-leave-from {
-  transform: scaleX(1);
+  transform: scaleY(1);
   opacity: 1;
-  transform-origin: right;
+  transform-origin: top;
 }
 
 /* Active state for entering and leaving */

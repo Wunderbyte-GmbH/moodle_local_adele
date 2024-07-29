@@ -351,9 +351,7 @@ const expandCourses = () => {
 .icon-link:hover {
   color: lightgray; /* Hover effect */
 }
-.active-node{
-  z-index: 100;
-}
+
 .inactive-node{
   pointer-events: none;
   opacity: 0.5;
@@ -366,7 +364,6 @@ const expandCourses = () => {
 .table-container {
   width: 300px;
   position: absolute;
-  z-index: 100;
 }
 .table-container-left {
   transform: translate(-50%, 0);
@@ -407,19 +404,16 @@ const expandCourses = () => {
   background: #ececec; /* Example background color */
   border-radius: 10px;
   border: 1px solid #ccc; /* Example border */
-  z-index: -1;
 }
 
 .parallel::before {
   top: -20px;
   left: -20px;
-  z-index: -1;
 }
 
 .parallel::after {
   top: -40px;
   left: -40px;
-  z-index: -2;
 }
 .non_parallel::before,
 .non_parallel::after {
@@ -430,18 +424,19 @@ const expandCourses = () => {
   background: #ececec;
   border-radius: 10px;
   border: 1px solid #ccc;
-  z-index: -1;
 }
 
 .non_parallel::before {
   transform: rotate(4deg);
   top: -20px;
   left: -20px;
+  z-index: -1;
 }
 
 .non_parallel::after {
   transform: rotate(-4deg);
   top: -20px;
   left: -20px;
+  z-index: -1;
 }
 </style>

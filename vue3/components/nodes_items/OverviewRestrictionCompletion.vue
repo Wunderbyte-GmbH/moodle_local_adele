@@ -4,8 +4,8 @@
     import { computed, onMounted, ref } from 'vue';
     import { useStore } from 'vuex';
 
-    
-    // Load Store 
+
+    // Load Store
     const store = useStore();
     const props = defineProps({
       node: {
@@ -50,10 +50,10 @@ const computedTriggerGetConditions = computed(() => {
     props.learningpath.json.tree.nodes.forEach((node) => {
         if (node.id == props.node.node_id) {
             if (node.completion != undefined) {
-              returnComputed.completion = getConditions(node.completion.nodes, 'completion') 
+              returnComputed.completion = getConditions(node.completion.nodes, 'completion')
             }
             if (node.restriction != undefined) {
-              returnComputed.restriction = getConditions(node.restriction.nodes, 'restriction') 
+              returnComputed.restriction = getConditions(node.restriction.nodes, 'restriction')
             }
         }
     })
@@ -116,15 +116,15 @@ const toggleCards = () => {
     :class="{ 'card-hover': showCard }"
   >
     <div v-if="store.state.view=='student'">
-      <div 
+      <div
         v-if="node.completion && (
           (node.completion.restrictionnode && node.completion.restrictionnode.valid) ||
           (node.completion.completionnode && node.completion.completionnode.valid)
         )"
         @click="toggleCompletion('completion')"
       >
-        <div 
-          class="completion" 
+        <div
+          class="completion"
           :style="{ color: completionColor }"
         >
           <CourseRating :data="props.node" />
@@ -134,8 +134,8 @@ const toggleCards = () => {
         <div
           @click="toggleCompletion('restriction')"
         >
-          <div 
-            class="restriction" 
+          <div
+            class="restriction"
             :style="{ color: restrictionColor }"
           >
             <i class="fa fa-key" />
@@ -143,45 +143,45 @@ const toggleCards = () => {
         </div>
       </div>
       <transition name="unfold">
-        <div 
-          v-if="showCard" 
-          class="additional-card-student" 
+        <div
+          v-if="showCard"
+          class="additional-card-student"
           :style="{ backgroundColor: shownCondition=='completion' ? completionColor : restrictionColor}"
         >
           <div v-if="shownCondition=='restriction' && computedTriggerGetConditions.restriction.count > 0 ">
             <ul class="list-group mt-3">
-              <li 
-                v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions" 
+              <li
+                v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions"
                 :key="index"
                 class="list-group-item"
               >
                 {{ condition.name }}
-                <i 
-                  v-if="condition.valid" 
+                <i
+                  v-if="condition.valid"
                   class="fa fa-check fa-xl"
                   style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
                 />
               </li>
             </ul>
           </div>
-  
+
           <div v-else-if="shownCondition=='completion' && computedTriggerGetConditions.completion.count > 0 ">
             <ul class="list-group mt-3">
-              <li 
-                v-for="(condition, index) in computedTriggerGetConditions.completion.conditions" 
+              <li
+                v-for="(condition, index) in computedTriggerGetConditions.completion.conditions"
                 :key="index"
                 class="list-group-item"
               >
                 {{ condition.name }}
-                <i 
-                  v-if="condition.valid" 
+                <i
+                  v-if="condition.valid"
                   class="fa fa-check fa-xl"
                   style="color: #63E6BE; font-weight: bold; text-shadow: 0 0 2px #000;"
                 />
               </li>
             </ul>
           </div>
-  
+
           <div v-else>
             <ul class="list-group mt-3">
               <li class="list-group-item">
@@ -193,14 +193,14 @@ const toggleCards = () => {
       </transition>
     </div>
     <div v-else>
-      <div 
-        v-if="computedTriggerGetConditions.restriction" 
+      <div
+        v-if="computedTriggerGetConditions.restriction"
         class="card-container"
         :class="{ 'card-hover': showCard }"
         @click="toggleCards"
       >
-        <div 
-          class="restriction" 
+        <div
+          class="restriction"
           :style="{ color: restrictionColor }"
         >
           <i class="fa fa-key" />
@@ -208,34 +208,34 @@ const toggleCards = () => {
             {{ computedTriggerGetConditions.restriction.count }}
           </span>
         </div>
-        <div 
-          class="completion" 
+        <div
+          class="completion"
           :style="{ color: completionColor }"
         >
           <i
-            :class="store.state.version ? 'fa-solid fa-check-to-slot' : 'fa fa-check-square'" 
+            :class="store.state.version ? 'fa-solid fa-check-to-slot' : 'fa fa-check-square'"
           />
           <span class="count">
             {{ computedTriggerGetConditions.completion.count }}
           </span>
         </div>
-        <button 
-          v-if="showCard" 
-          class="cancel-button" 
+        <button
+          v-if="showCard"
+          class="cancel-button"
           @click.stop="toggleCards"
         >
-          <i 
-            v-if="showCard" 
-            class="fa fa-times cancel-icon" 
-            @click.stop="toggleCards" 
+          <i
+            v-if="showCard"
+            class="fa fa-times cancel-icon"
+            @click.stop="toggleCards"
           />
         </button>
       </div>
-  
+
       <!-- Left Card -->
-      <div 
-        v-if="showCard" 
-        class="additional-card left" 
+      <div
+        v-if="showCard"
+        class="additional-card left"
         :style="{ backgroundColor: restrictionColor }"
       >
         <!-- Content for the left card -->
@@ -245,8 +245,8 @@ const toggleCards = () => {
         </b>
         <div v-if="computedTriggerGetConditions.restriction.count > 0 ">
           <ul class="list-group mt-3">
-            <li 
-              v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions" 
+            <li
+              v-for="(condition, index) in computedTriggerGetConditions.restriction.conditions"
               :key="index"
               class="list-group-item"
             >
@@ -262,11 +262,11 @@ const toggleCards = () => {
           </ul>
         </div>
       </div>
-  
+
       <!-- Right Card -->
-      <div 
-        v-if="showCard" 
-        class="additional-card right" 
+      <div
+        v-if="showCard"
+        class="additional-card right"
         :style="{ backgroundColor: completionColor }"
       >
         <!-- Content for the left card -->
@@ -276,8 +276,8 @@ const toggleCards = () => {
         </b>
         <div v-if="computedTriggerGetConditions.completion.count > 0 ">
           <ul class="list-group mt-3">
-            <li 
-              v-for="(condition, index) in computedTriggerGetConditions.completion.conditions" 
+            <li
+              v-for="(condition, index) in computedTriggerGetConditions.completion.conditions"
               :key="index"
               class="list-group-item"
             >
@@ -307,7 +307,6 @@ const toggleCards = () => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 1;
 }
 
 .card-container {
@@ -336,7 +335,7 @@ const toggleCards = () => {
   border: 1px solid rgba(0,0,0,0.2);
   background-color: #f0f0f0; /* Light background for the button */
   box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Adds depth with a shadow */
-  transition: background-color 0.3s, box-shadow 0.3s; 
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .completion:hover, .restriction:hover {
@@ -380,7 +379,7 @@ const toggleCards = () => {
 
 .cancel-button {
   float: inline-end;
-  margin-left: auto; 
+  margin-left: auto;
   background-color: rgb(109, 107, 107);
   color: white;
   border: none;

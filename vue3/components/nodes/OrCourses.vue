@@ -442,19 +442,20 @@ const enableButton = () => {
   background: #ececec;
   border-radius: 10px;
   border: 1px solid #ccc;
-  z-index: -1;
 }
 
 .non_parallel::before {
   transform: rotate(4deg);
   top: -20px;
   left: -20px;
+  z-index: -1;
 }
 
 .non_parallel::after {
   transform: rotate(-4deg);
   top: -20px;
   left: -20px;
+  z-index: -1;
 }
 
 </style>

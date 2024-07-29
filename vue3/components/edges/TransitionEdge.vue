@@ -49,10 +49,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  style: {
-    type: Object,
-    required: true,
-  },
   hidden: {
     type: Boolean,
     required: false,
@@ -162,8 +158,8 @@ export default {
   <path
     :id="id"
     ref="curve"
-    :style="[style, hiddenStyle]"
-    class="vue-flow__edge-path"
+    :style="[hiddenStyle]"
+    class="vue-flow__edge-path trans-edge"
     :d="path[0]"
     :marker-end="markerEnd"
   />
@@ -181,6 +177,11 @@ export default {
 </template>
 
 <style scoped>
+.trans-edge{
+  stroke: #b1b1b7 !important;
+  stroke-width: 5;
+}
+
 .fade-enter-active,
 .fade-leave-active
 {

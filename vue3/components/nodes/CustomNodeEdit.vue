@@ -60,7 +60,6 @@ const emit = defineEmits([
 const active = ref(false)
 
 onMounted(() => {
-
   const userpath = props.learningpath
   userpath.json.tree.nodes.forEach((node) => {
     if (props.data.node_id == node.id) {
@@ -302,9 +301,6 @@ const goToCourse = () => {
 .icon-link:hover {
   color: lightgray; /* Hover effect */
 }
-.active-node{
-  z-index: 100;
-}
 .inactive-node{
   pointer-events: none;
   opacity: 0.5;
@@ -317,7 +313,6 @@ const goToCourse = () => {
 .table-container {
   width: 300px;
   position: absolute;
-  z-index: 100;
 }
 .table-container-left {
   transform: translate(-50%, 0);

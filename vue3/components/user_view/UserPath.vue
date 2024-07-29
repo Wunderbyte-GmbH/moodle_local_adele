@@ -291,9 +291,7 @@ function onNodeClickCall(event) {
 </script>
 
 <style>
-.vue-flow__edges {
-  z-index: 2 !important;
-}
+
 .control-btns {
   height: 100px;
 }

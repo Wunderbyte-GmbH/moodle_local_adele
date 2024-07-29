@@ -1,7 +1,7 @@
 
 <script setup>
   // Import needed libraries
-  import { onMounted, onUnmounted, ref } from 'vue';
+  import { ref } from 'vue';
   import UserFeedbackBlock from './UserFeedbackBlock.vue';
   import { useStore } from 'vuex';
 
@@ -24,31 +24,17 @@
     showFeedbackarea.value = !showFeedbackarea.value;
   };
 
-  // Function to close the feedback area if clicking outside
-  const closeOnOutsideClick = (event) => {
-    if (!event.target.closest('.' + props.data.node_id + '_user_info_listener')) {
-      showFeedbackarea.value = false;
-    }
-  };
-
-  // Setup and cleanup event listeners
-  onMounted(() => {
-    document.addEventListener('click', closeOnOutsideClick);
-  });
-
-  onUnmounted(() => {
-    document.removeEventListener('click', closeOnOutsideClick);
-  });
-
 </script>
 
 <template>
   <div
     class="card-container"
     :class="{ [data.node_id + '_user_info_listener']: true}"
-    @click="toggleFeedbackarea"
   >
-    <div>
+    <div
+      class="toggle-button"
+      @click="toggleFeedbackarea"
+    >
       <i
         class="fa fa-comment"
         :class="{'fa-comment-mobile' : mobile}"
@@ -127,13 +113,16 @@
 }
 
 .card-container {
-  cursor: pointer;
   justify-content: center;
   align-items: center;
   padding: 5px;
   border-radius: 8px;
   background-color: #EAEAEA;
   text-align: center;
+}
+
+.toggle-button {
+  cursor: pointer;
 }
 
 .fa-comment {

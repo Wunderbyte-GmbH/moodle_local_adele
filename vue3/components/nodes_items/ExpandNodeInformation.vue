@@ -97,7 +97,6 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 101;
 }
 
 .information {
@@ -126,10 +125,10 @@
   text-align: center;
   border-radius: 8px;
   position: absolute;
-  z-index: 11;
   left: -472px;
   top: 50px;
   text-align: start;
+  z-index: 2;
 }
 
 </style>
