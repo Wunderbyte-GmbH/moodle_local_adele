@@ -141,6 +141,7 @@ class course_completed implements course_completion {
         $coursecompletion = [];
         $finished = 0;
         $courseprogresslist = [];
+        $progresses = [];
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;
@@ -148,6 +149,7 @@ class course_completed implements course_completion {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
                 $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
+                $progresses[] = $progress;
                 $courseprogresslist[] = $course->fullname . ' - ' . $progress . '%';
                 // Check if the user has completed the course.
                 $coursecompleted = $completion->is_course_complete($userid);
@@ -172,9 +174,33 @@ class course_completed implements course_completion {
                 }
             }
         }
+
         // TODO calculate the farest process.
-        $coursecompletion['inbetween_info'] = $node['data']['progress'] ?? '0';
+        $coursecompletion['inbetween_info'] = self::get_node_progress($progresses, $minvalue);
         return $coursecompletion;
+    }
+
+    /**
+     * Get the average of the furthest nodes.
+     * @param array $progresses
+     * @param int $minvalue
+     * @return int
+     */
+    public function get_node_progress($progresses, $minvalue) {
+        if (count($progresses) == 0) {
+            return 0;
+        }
+        if (count($progresses) == 1) {
+            return $progresses[0];
+        }
+        rsort($progresses);
+        $strtcount = 0;
+        $alloverprogress = 0;
+        while ($strtcount < $minvalue) {
+            $alloverprogress += $progresses[$strtcount];
+            $strtcount++;
+        }
+        return $alloverprogress / $minvalue;
     }
 
     /**

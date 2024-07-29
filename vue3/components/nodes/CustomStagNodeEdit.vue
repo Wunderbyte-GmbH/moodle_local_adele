@@ -39,6 +39,7 @@ import NodeInformation from '../nodes_items/NodeInformation.vue'
 // Load Store
 const store = useStore();
 const date = ref({})
+const progress = ref(0);
 
 const cover_image = computed(() => get_cover_image(props.data));
 
@@ -117,6 +118,11 @@ onMounted(() => {
   } else if (props.data.completion.restrictionnode.valid) {
     active.value = true
   }
+  if (props.data.completion.completioncriteria.course_completed.inbetween_info) {
+    progress.value = props.data.completion.completioncriteria.course_completed.inbetween_info
+  } else {
+    progress.value = props.data.progress
+  }
 })
 // Dynamic background color based on data.completion
 const nodeBackgroundColor = computed(() => {
@@ -133,19 +139,9 @@ const nodeBackgroundColor = computed(() => {
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
-const isCompletionVisible = ref(false);
-const isRestrictionVisible = ref(false);
 const isParentNode = ref(false);
 const courseExpanded = ref(false);
 const isBlocked = ref(false);
-
-const toggleTable = (condition) => {
-  const otherCondition = condition == store.state.strings.nodes_completion ? store.state.strings.nodes_completion : store.state.strings.nodes_completion;
-  const conditionRef = eval(`is${condition}Visible`);
-  conditionRef.value = !conditionRef.value;
-  const otherconditionRef = eval(`is${otherCondition}Visible`);
-  otherconditionRef.value = false;
-};
 
 const enableButton = () => {
   isBlocked.value = false
@@ -227,7 +223,7 @@ const expandCourses = () => {
             </button>
           </div>
         </div>
-        <div v-if="store.state.learningpath && store.state.view=='student'">
+        <div v-if="store.state.learningpath">
           <div
             class="row mb-2"
           >
@@ -240,11 +236,11 @@ const expandCourses = () => {
               class="col-8"
               style="display: flex; justify-content: end;"
             >
-              <ProgressBar :progress="data.progress" />
+              <ProgressBar :progress="progress" />
             </div>
           </div>
         </div>
-        <div v-else>
+        <div v-if="store.state.view !=='student'">
           <div v-if="data.manualrestriction">
             <RestrictionOutPutItem
               :data="data"
