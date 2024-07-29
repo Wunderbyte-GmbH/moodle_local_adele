@@ -162,10 +162,10 @@ const goToCourse = () => {
       </div>
       <div
         class="card-body"
-        :class="(active || store.state.view == 'teacher') ? 'active-node' : 'inactive-node'"
+        :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
-        <div v-if="store.state.learningpath">
+        <div>
           <div
             class="card-img dashboard-card-img mb-2"
             :style="{
