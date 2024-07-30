@@ -160,11 +160,21 @@ $string['course_select_condition_timed_duration_days'] = 'Tage';
 $string['course_select_condition_timed_duration_weeks'] = 'Wochen';
 $string['course_select_condition_timed_duration_months'] = 'Monate';
 
+$string['nodes_feedback_restriction_before'] = 'Um den Knoten freizuschalten musst du:';
+$string['nodes_feedback_completion_after'] = 'Knoten wurde abgeschlossen aufgrund:';
+$string['nodes_feedback_completion_before'] = 'Um Knoten abzuschliessen musst du:';
+
+$string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
+$string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
+$string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
+$string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
+$string['nodes_feedback_completion_higher'] = 'Mit diesen Abschlüssen kannst du einen höheren Status erreichen:';
+
 // Feedback Strings.
-$string['node_access_completed'] = 'Der Knoten ist abgeschlossen';
-$string['node_access_accessible'] = 'Der Knoten ist zugänglich';
-$string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich';
-$string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich.';
+$string['node_access_completed'] = 'Knoten wurde abgeschlossen aufgrund:';
+$string['node_access_accessible'] = 'Der Knoten ist zugänglich. Aktueller Knoten-Status:';
+$string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Die Zugangskriterien sind:';
+$string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Professor für weitere Schritte. Die Zugangskriterien waren:';
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
@@ -174,7 +184,7 @@ $string['course_description_after_completion_manual'] = 'Der Abschluss wurde man
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurse abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
+$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
 $string['course_description_after_condition_course_completed'] = 'Du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'Beende das Quiz {catquiz_name_link}';
@@ -330,16 +340,6 @@ $string['nodes_warning_time_restriction'] = 'Diese Einschränkung überschreibt 
 $string['nodes_warning_time_heading'] = 'Warnung!';
 $string['nodes_no_description'] = 'Es wurde keine Kursbeschreibung bereitgestellt';
 $string['nodes_course_node'] = 'Kursknoten';
-
-$string['nodes_feedback_restriction_before'] = 'Um den Knoten freizuschalten musst du:';
-$string['nodes_feedback_completion_after'] = 'Knoten wurde abgeschlossen aufgrund:';
-$string['nodes_feedback_completion_before'] = 'Um Knoten abzuschliessen musst du:';
-
-$string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
-$string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
-$string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
-$string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
-$string['nodes_feedback_completion_higher'] = 'Der Knoten ist abgeschlossen! Mit diesen Abschlüssen kannst du einen höheren Status erreichen:';
 
 // Knoten-Elemente-Strings.
 $string['nodes_items_start'] = 'Start:';

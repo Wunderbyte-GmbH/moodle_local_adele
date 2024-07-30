@@ -122,7 +122,7 @@
     <div
       class="information"
       :style="{ backgroundColor: backgroundColor }"
-      @click="toggleCard"
+      @click.stop="toggleCard"
     >
       <i
         class="fa fa-info"

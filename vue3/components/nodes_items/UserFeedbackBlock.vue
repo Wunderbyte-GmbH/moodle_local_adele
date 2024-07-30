@@ -19,7 +19,10 @@
 
 <template>
   <div v-if="data && data.length > 0 && data[0] !== ''">
-    <div class="feedback-title">
+    <div
+      v-if="title != 'completion_after' &&  title != 'completion_inbetween'"
+      class="feedback-title"
+    >
       {{ store.state.strings['nodes_feedback_' + title] }}
     </div>
     <ul class="feedback-list">

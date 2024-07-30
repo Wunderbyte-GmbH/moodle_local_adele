@@ -168,10 +168,10 @@ $string['course_select_condition_timed_duration_weeks'] = 'weeks';
 $string['course_select_condition_timed_duration_months'] = 'months';
 
 // Feedback Strings.
-$string['node_access_completed'] = 'The node is completed';
-$string['node_access_accessible'] = 'The node is accessible';
-$string['node_access_not_accessible'] = 'The node is not accessible yet';
-$string['node_access_closed'] = 'The node is no longer accessible. Please contact your admin for help.';
+$string['node_access_completed'] = 'The node is completed because:';
+$string['node_access_accessible'] = 'The node is accessible. Current node state:';
+$string['node_access_not_accessible'] = 'The node is not accessible yet. The restrictions are:';
+$string['node_access_closed'] = 'The node is no longer accessible. Please contact your admin for help. The restriction were:';
 $string['node_access_nothing_defined'] = 'No user feedback available';
 $string['course_description_condition_course_completed'] = 'One course inside this node has to be completed';
 
@@ -180,7 +180,7 @@ $string['course_description_inbetween_completion_manual'] = 'Completion was {che
 $string['course_description_after_completion_manual'] = 'Completion was granted manually';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} course(s) of this node has/have to be finshed';
-$string['course_description_inbetween_condition_course_completed'] = 'You have two finish {numb_courses} courses. Current completion grades: {course_list}';
+$string['course_description_inbetween_condition_course_completed'] = 'You have two finish {numb_courses} course(s). Current completion grades: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'You finished enough courses of this node';
 
 $string['course_description_before_condition_catquiz'] = 'Complete the catquiz {catquiz_name_link}';
@@ -345,7 +345,7 @@ $string['nodes_feedback_restriction_before'] = 'To unlock node you have to:';
 $string['nodes_feedback_completion_after'] = 'Node completed because:';
 $string['nodes_feedback_completion_before'] = 'To complete node you have to:';
 $string['nodes_feedback_completion_inbetween'] = 'Current node state:';
-$string['nodes_feedback_completion_higher'] = 'Node is completed! With these, you can achieve a higher completion status:';
+$string['nodes_feedback_completion_higher'] = 'With these, you can achieve a higher completion status:';
 $string['nodes_feedback_before'] = 'Before';
 $string['nodes_feedback_inbetween'] = 'Inbetween';
 $string['nodes_feedback_after'] = 'After';

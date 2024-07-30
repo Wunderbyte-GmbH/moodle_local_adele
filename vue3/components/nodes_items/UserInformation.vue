@@ -33,7 +33,7 @@
   >
     <div
       class="toggle-button"
-      @click="toggleFeedbackarea"
+      @click.stop="toggleFeedbackarea"
     >
       <i
         class="fa fa-comment"
