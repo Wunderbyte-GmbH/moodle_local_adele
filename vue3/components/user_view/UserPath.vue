@@ -168,7 +168,7 @@ const props = defineProps({
 // Declare reactive variable for nodes
 const nodes = ref([]);
 const edges = ref([]);
-const zoomSteps = [ 0.2, 0.35, 0.7, 1.5]
+const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
 const user_learningpath = ref({})

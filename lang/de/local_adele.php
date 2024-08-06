@@ -172,9 +172,9 @@ $string['nodes_feedback_completion_higher'] = 'Mit diesen Abschlüssen kannst du
 
 // Feedback Strings.
 $string['node_access_completed'] = 'Knoten wurde abgeschlossen aufgrund:';
-$string['node_access_accessible'] = 'Der Knoten ist zugänglich. Aktueller Knoten-Status:';
-$string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Die Zugangskriterien sind:';
-$string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Professor für weitere Schritte. Die Zugangskriterien waren:';
+$string['node_access_accessible'] = 'Der Knoten ist zugänglich. Um ihn abzuschließen musst du:';
+$string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Um ihn freizuschalten musst du:';
+$string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Dozenten für weitere Schritte. Die Zugangskriterien waren:';
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
