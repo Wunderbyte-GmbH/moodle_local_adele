@@ -51,7 +51,6 @@
           <i class="fa fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
         </div>
-        {{ data.completion.feedback.status }}
         <UserFeedbackBlock
           v-if="data.completion &&
             (data.completion.feedback.status == 'not_accessible' || data.completion.feedback.status == 'closed')"
