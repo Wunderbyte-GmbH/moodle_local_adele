@@ -51,33 +51,36 @@
           <i class="fa fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
         </div>
-        <UserFeedbackBlock
-          v-if="data.completion &&
-            (data.completion.feedback.status == 'not_accessible' || data.completion.feedback.status == 'closed')"
-          :data="data.completion.feedback.restriction.before"
-          title="restriction_before"
-        />
-        <UserFeedbackBlock
-          v-if="data.completion && data.completion.feedback.status == 'closedd'"
-          :data="data.completion.feedback.completion.before"
-          title="completion_before"
-        />
-        <UserFeedbackBlock
-          v-if="data.completion && data.completion.feedback.status != 'completed' &&
-            data.completion.feedback.status != 'closed'"
-          :data="data.completion.feedback.completion.inbetween"
-          title="completion_inbetween"
-        />
-        <UserFeedbackBlock
-          v-if="data.completion"
-          :data="data.completion.feedback.completion.after"
-          title="completion_after"
-        />
-        <UserFeedbackBlock
-          v-if="data.completion"
-          :data="data.completion.feedback.completion.higher"
-          title="completion_higher"
-        />
+        <div v-if="data.completion &&
+            (data.completion.feedback.status == 'not_accessible' || data.completion.feedback.status == 'closed')">
+          <UserFeedbackBlock
+            :data="data.completion.feedback.restriction.before"
+            title="restriction_before"
+          />
+        </div>
+        <div v-else>
+          <UserFeedbackBlock
+            v-if="data.completion && data.completion.feedback.status == 'closedd'"
+            :data="data.completion.feedback.completion.before"
+            title="completion_before"
+          />
+          <UserFeedbackBlock
+            v-if="data.completion && data.completion.feedback.status != 'completed' &&
+              data.completion.feedback.status != 'closed'"
+            :data="data.completion.feedback.completion.inbetween"
+            title="completion_inbetween"
+          />
+          <UserFeedbackBlock
+            v-if="data.completion"
+            :data="data.completion.feedback.completion.after"
+            title="completion_after"
+          />
+          <UserFeedbackBlock
+            v-if="data.completion"
+            :data="data.completion.feedback.completion.higher"
+            title="completion_higher"
+          />
+        </div>
         <div
           v-if="!data.completion"
         >

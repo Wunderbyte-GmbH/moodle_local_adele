@@ -10,7 +10,7 @@ const  addAutoRestrictions = (newNode, oldNode, relation, store) => {
     if (oldNode.restriction != undefined) {
       //oldNode = expandRestriction(newNode, oldNode, relation)
       return oldNode
-    } else {   
+    } else {
       oldNode.restriction = createRestriction(oldNode.id, newNode.id, store)
     }
     return oldNode
@@ -74,7 +74,7 @@ function createRestriction (node_id, parent_node_id, store) {
         "data": {
           "childCondition": 'condition_1',
           "visibility": true,
-          "feedback_before": "",
+          "feedback_before": store.state.strings.course_restricition_before_condition_parent_node_completed,
           "feedback_before_checkmark": true,
         },
         "draggable": false,
@@ -116,7 +116,7 @@ function expandRestriction (newNode, oldNode, relation, store) {
       y = node.position.y
     }
 
-    let tmp_id = parseInt(node.id.replace('condition_', '')); 
+    let tmp_id = parseInt(node.id.replace('condition_', ''));
     if (id == 0 ||id < tmp_id) {
       id = tmp_id
     }
