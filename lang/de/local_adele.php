@@ -138,6 +138,7 @@ $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 $string['course_description_condition_completion_manual'] = 'Der Knoten wird manuell abgeschlossen';
 $string['course_description_condition_parent_courses'] = 'Der Knoten wird zugänglich, wenn eine bestimmte Anzahl übergeordneter Knoten abgeschlossen ist';
 $string['course_name_condition_completion_manual'] = 'Knotenabschluss-Kontrollkästchen';
+$string['course_name_condition_completion_manual_checkbox_status'] = 'not';
 $string['course_name_condition_parent_courses'] = 'Entsprechend der übergeordneten Knoten';
 $string['course_description_condition_restriction_manual'] = 'Der Zugang wird manuell gewährt';
 $string['course_name_condition_restriction_manual'] = 'Knotenzugang-Kontrollkästchen';
