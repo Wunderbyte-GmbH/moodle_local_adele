@@ -36,22 +36,22 @@ const  drawDropzone = (closestNode, store) => {
         height: '200px',
     }
 
-    //check if closest node has childerns TODO   
+    //check if closest node has childerns TODO
     for (const key in dropZoneCourseNodes){
-        data.infotext = dropZoneCourseNodes[key].name 
-        data.width = dropZoneCourseNodes[key].width 
+        data.infotext = dropZoneCourseNodes[key].name
+        data.width = dropZoneCourseNodes[key].width
         let position = {
-            x: 0, 
+            x: 0,
             y: 0
         }
         if (key != 'and' &&key != 'or') {
             position = {
-                x: getOffsetX(closestNode, key), 
+                x: getOffsetX(closestNode, key),
                 y: closestNode.position.y + dropZoneCourseNodes[key].positionY
             }
         } else {
             position = {
-                x: closestNode.position.x + dropZoneCourseNodes[key].positionX, 
+                x: closestNode.position.x + dropZoneCourseNodes[key].positionX,
                 y: getOffsetY(closestNode)
             }
         }
@@ -60,7 +60,10 @@ const  drawDropzone = (closestNode, store) => {
             type: dropZoneCourseNodes[key].type,
             position: position,
             label: `default node`,
-            data: data
+            data: data,
+            style: {
+              zIndex: 1000,
+            },
         }
         newDrop.nodes.push(newNode);
 
@@ -70,7 +73,7 @@ const  drawDropzone = (closestNode, store) => {
         if(key == 'child'){
             targetHandle = 'target_and'
             sourceHandle =  'source'
-        } 
+        }
 
         if (key != 'and' &&key != 'or') {
             const newEdge = {

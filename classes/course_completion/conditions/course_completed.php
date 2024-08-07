@@ -142,6 +142,7 @@ class course_completed implements course_completion {
         $finished = 0;
         $courseprogresslist = [];
         $progresses = [];
+        $minvalue = 1;
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;

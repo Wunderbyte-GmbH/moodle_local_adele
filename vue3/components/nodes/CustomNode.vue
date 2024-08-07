@@ -260,7 +260,8 @@ const childStyle = {
             </span>
           </div>
         </div>
-        <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
+        <div v-if="Object.keys(learningmodule).length > 0 &&
+          store.state.view!='teacher' && editorview">
           <h5 class="card-title">
             {{ store.state.strings.nodes_learning_module }}
           </h5>

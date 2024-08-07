@@ -59,9 +59,9 @@ class save_learningpath extends external_api {
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             'name'  => new external_value(PARAM_TEXT, 'name', VALUE_REQUIRED),
             'description'  => new external_value(PARAM_TEXT, 'description', VALUE_REQUIRED),
-            'image'  => new external_value(PARAM_TEXT, 'image', VALUE_REQUIRED),
             'json'  => new external_value(PARAM_RAW, 'json', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'image'  => new external_value(PARAM_TEXT, 'image', VALUE_OPTIONAL, ''),
             ]
         );
     }
@@ -83,9 +83,9 @@ class save_learningpath extends external_api {
         $learningpathid,
         $name,
         $description,
-        $image,
         $json,
-        $contextid
+        $contextid,
+        $image = null
     ): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,

@@ -30,6 +30,7 @@
   <div
     class="card-container"
     :class="{ [data.node_id + '_user_info_listener']: true}"
+    @click.stop
   >
     <div
       class="toggle-button"
@@ -41,7 +42,11 @@
       />
     </div>
     <transition name="fade">
-      <div v-if="showFeedbackarea">
+      <div v-if="showFeedbackarea"
+        class="selectable"
+        @mousedown.stop
+        @mousemove.stop
+        @mouseup.stop>
         <div v-if="data.completion && data.completion.feedback.status" class="status-text">
           <i class="fa fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
@@ -176,5 +181,9 @@ textarea:focus {
 
 .status-text .fa-info-circle {
   margin-right: 5px;
+}
+.selectable {
+  user-select: text;
+  cursor: text;
 }
 </style>

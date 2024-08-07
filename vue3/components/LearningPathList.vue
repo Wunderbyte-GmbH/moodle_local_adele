@@ -275,6 +275,11 @@ const duplicateLearningpath = (learningpathid) => {
 
 </script>
 
+<style>
+.vue-flow__edges{
+  z-index: 1 !important;
+}
+</style>
 <style scoped>
 
   .search {

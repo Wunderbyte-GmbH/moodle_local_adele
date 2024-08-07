@@ -276,7 +276,8 @@ const enableButton = () => {
               </button>
             </div>
           </div>
-          <div v-if="Object.keys(learningmodule).length > 0 && store.state.view!='teacher'">
+          <div v-if="Object.keys(learningmodule).length > 0 &&
+            store.state.view!='teacher' && editorview">
             <h5 class="card-title">
               {{ store.state.strings.nodes_learning_module }}
             </h5>
@@ -315,7 +316,7 @@ const enableButton = () => {
                   v-if="store.state.view != 'teacher'"
                   type="button"
                   class="btn btn-danger btn-sm trash-button"
-                  @click="removeCourse(value.id)"
+                  @click.stop="removeCourse(value.id)"
                 >
                   <i
                     :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
