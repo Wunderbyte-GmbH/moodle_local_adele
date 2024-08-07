@@ -178,13 +178,14 @@ $string['course_description_condition_course_completed'] = 'One course inside th
 $string['course_description_before_completion_manual'] = 'Completion will be granted manually';
 $string['course_description_inbetween_completion_manual'] = 'Completion was {checkbox_status} granted manaully yet';
 $string['course_description_after_completion_manual'] = 'Completion was granted manually';
+$string['course_description_placeholder_checkbox_status'] = 'not';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} course(s) of this node has/have to be finshed';
 $string['course_description_inbetween_condition_course_completed'] = 'You have two finish {numb_courses} course(s). Current completion grades: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'You finished enough courses of this node';
 
 $string['course_description_before_condition_catquiz'] = 'Complete the catquiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_catquiz'] = 'Quiz {catquiz_name_link}} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_inbetween_condition_catquiz'] = 'Quiz {catquiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
 $string['course_description_after_condition_catquiz'] = 'Quiz {catquiz_name_link}} was successfully finished';
 
 $string['course_description_before_condition_modquiz'] = 'Complete the quiz {catquiz_name_link}';

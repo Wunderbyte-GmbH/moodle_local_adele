@@ -184,7 +184,7 @@ $string['course_description_after_completion_manual'] = 'Der Abschluss wurde man
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_name} - {course progress}%';
+$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'Du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'Beende das Quiz {catquiz_name_link}';
@@ -200,7 +200,7 @@ $string['course_restricition_before_condition_parent_courses'] = 'Schließe {num
 $string['course_restricition_before_condition_specific_course'] = 'Schließe den/die Kurs(e): {course_list}';
 $string['course_restricition_before_condition_timed'] = 'Zugänglich {start_date} {end_date}';
 $string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {duration_period} seit {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Schließe den übergeordneten Knoten {node_name}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Schließe den übergeordneten Knoten {parent_course_list}';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';

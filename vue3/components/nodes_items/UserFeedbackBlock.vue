@@ -20,7 +20,7 @@
 <template>
   <div v-if="data && data.length > 0 && data[0] !== ''">
     <div
-      v-if="title != 'completion_after' &&  title != 'completion_inbetween'"
+      v-if="title == 'completion_higher'"
       class="feedback-title"
     >
       {{ store.state.strings['nodes_feedback_' + title] }}
