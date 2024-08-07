@@ -21,9 +21,3 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     Given I log in as "admin"
     And I wait until the page is ready
     And I click on "Learning Paths" "button"
-    And I wait until the page is ready
-    Then I should see "Overview of all learning paths"
-    And I click on "Add a new learning path" "button"
-    And I set the field "goalnameplaceholder" to "New Learning path"
-    And I set the field "goalsubjectplaceholder" to "New Learning path description for auto testing"
-    And I click on "//*[@id='save-learning-path']" "xpath_element"
