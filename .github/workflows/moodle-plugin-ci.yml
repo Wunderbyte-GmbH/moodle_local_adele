@@ -122,7 +122,7 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --max-warnings 0
+        run: moodle-plugin-ci codechecker ./plugin --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
@@ -144,12 +144,12 @@ jobs:
       - name: Grunt
         continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
-        run: moodle-plugin-ci grunt --max-lint-warnings 0 ./plugin
+        run: moodle-plugin-ci grunt ./plugin --max-lint-warnings 0
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --testdox  ./plugin
+        run: moodle-plugin-ci phpunit ./plugin --testdox
 
       - name: Behat features
         if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome  ./plugin
+        run: moodle-plugin-ci behat ./plugin --profile chrome
