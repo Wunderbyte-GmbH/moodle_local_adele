@@ -126,11 +126,11 @@ jobs:
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci phpdoc --moodle=./plugin
+        run: moodle-plugin-ci phpdoc --moodle=./moodle ./plugin
 
       - name: Validating
         if: ${{ always() }}
-        run: moodle-plugin-ci validate --moodle=./plugin
+        run: moodle-plugin-ci validate --moodle=./moodle ./plugin
 
       - name: Check upgrade savepoints
         if: ${{ always() }}
@@ -152,4 +152,4 @@ jobs:
 
       - name: Behat features
         if: ${{ always() }}
-        run: moodle-plugin-ci behat --moodle=./plugin --profile chrome
+        run: moodle-plugin-ci behat --moodle=./moodle ./plugin --profile chrome
