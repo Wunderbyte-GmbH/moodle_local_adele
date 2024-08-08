@@ -193,7 +193,10 @@ onMounted( async () => {
     setTimeout(() => {
       nextTick().then(() => {
         const topNode = nodes.value.reduce((top, node) => (node.position.y < top.position.y ? node : top), nodes.value[0]);
-        setCenter(topNode.position.x, topNode.position.y + 800, { duration: 1000, zoom: 0.35 }).then(() => {
+        const minX = Math.min(...nodes.value.map(node => node.position.x));
+        const maxX = Math.max(...nodes.value.map(node => node.position.x));
+        const pathCenterX = (minX + maxX) / 2;
+        setCenter(pathCenterX, topNode.position.y + 800, { duration: 1000, zoom: 0.35 }).then(() => {
           zoomLock.value = true;
         }).then(() => {
           zoomLock.value = true
