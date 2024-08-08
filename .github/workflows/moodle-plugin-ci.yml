@@ -101,6 +101,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential
 
+      - name: Verify Node.js installation
+        run: |
+          node -v
+          npm -v
+
       - name: Initialise moodle-plugin-ci
         run: |
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
@@ -110,6 +115,8 @@ jobs:
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
       - name: Install moodle-plugin-ci
         run: |
+          moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
+
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
