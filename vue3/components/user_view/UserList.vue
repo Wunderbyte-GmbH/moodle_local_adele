@@ -104,8 +104,13 @@ const scrollIntoFocus = () => {
     if (focusEntry.value) {
       const row = document.querySelector(`.highlighted-row`);
       if (row) {
-        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        row.focus();
+        // Get the offsetTop of the row relative to the table container
+        const container = document.querySelector('.table-container');
+        const rowOffsetTop = row.offsetTop;
+        const containerHeight = container.clientHeight;
+        const rowHeight = row.clientHeight;
+        const scrollTop = rowOffsetTop - (containerHeight / 2) + (rowHeight / 2);
+        container.scrollTo({ top: scrollTop, behavior: 'smooth' });
       }
     }
   });
