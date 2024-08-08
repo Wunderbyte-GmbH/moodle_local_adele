@@ -9,6 +9,7 @@ const onNodeClick = (event, zoomLock, setCenter) => {
   ).then(() => {
     zoomLock.value = true
   })
+  return 1
 }
 
 export default onNodeClick;

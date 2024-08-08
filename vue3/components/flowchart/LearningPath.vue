@@ -179,6 +179,7 @@ const shouldShowMiniMap = computed(() => {
 
 const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 const zoomLock = ref(false)
+const zoomstep = ref(0)
 
 const finishEdit = () => {
   emit('finish-edit');
@@ -245,6 +246,7 @@ const setZoomLevel = async (action) => {
     }
   }
   if (newViewport != undefined) {
+    zoomstep.value = newViewport
     await zoomTo(newViewport, { duration: 500}).then(() => {
       zoomLock.value = true
     })
@@ -304,7 +306,7 @@ const onDrag = ($event) => {
 }
 
 const onNodeClickCall = (event) => {
-  onNodeClick(event, zoomLock, setCenter)
+  zoomstep.value = onNodeClick(event, zoomLock, setCenter )
 }
 
 // Prevent default event if node has been dropped
