@@ -192,7 +192,10 @@ onMounted( async () => {
     setFlowchart()
     setTimeout(() => {
       nextTick().then(() => {
-        fitView({ duration: 1000 }).then(() => {
+        const topNode = nodes.value.reduce((top, node) => (node.position.y < top.position.y ? node : top), nodes.value[0]);
+        setCenter(topNode.position.x, topNode.position.y + 800, { duration: 1000, zoom: 0.35 }).then(() => {
+          zoomLock.value = true;
+        }).then(() => {
           zoomLock.value = true
           watch(
             () => viewport.value.zoom,

@@ -76,7 +76,10 @@
           />
         </template>
         <template #node-module="{ data }">
-          <ModuleNode :data="data" />
+          <ModuleNode
+          :data="data"
+          :zoomstep="zoomstep"
+          />
         </template>
         <template #node-expandedcourses="{ data }">
           <ExpandNodeEdit

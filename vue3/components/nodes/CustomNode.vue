@@ -143,7 +143,7 @@ const changeModule = (data) => {
   if(typeof data.module == "string") {
     delete data.module
   }
-  emit('changeModule', data);
+  emit('change-module', data);
 }
 
 const nodeBackgroundColor = computed(() => {
