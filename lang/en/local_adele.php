@@ -175,31 +175,31 @@ $string['node_access_closed'] = 'The node is no longer accessible. Please contac
 $string['node_access_nothing_defined'] = 'No user feedback available';
 $string['course_description_condition_course_completed'] = 'One course inside this node has to be completed';
 
-$string['course_description_before_completion_manual'] = 'Completion will be granted manually';
-$string['course_description_inbetween_completion_manual'] = 'Completion was {checkbox_status} granted manaully yet';
-$string['course_description_after_completion_manual'] = 'Completion was granted manually';
+$string['course_description_before_completion_manual'] = 'completion will be granted manually';
+$string['course_description_inbetween_completion_manual'] = 'completion was {checkbox_status} granted manaully yet';
+$string['course_description_after_completion_manual'] = 'completion was granted manually';
 $string['course_description_placeholder_checkbox_status'] = 'not';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} course(s) of this node has/have to be finshed';
-$string['course_description_inbetween_condition_course_completed'] = 'You have to finish {numb_courses} course(s). Current completion grades: {course_list}';
-$string['course_description_after_condition_course_completed'] = 'You finished enough courses of this node';
+$string['course_description_inbetween_condition_course_completed'] = 'you have to finish {numb_courses} course(s). Current completion grades: {course_list}';
+$string['course_description_after_condition_course_completed'] = 'you finished enough courses of this node';
 
-$string['course_description_before_condition_catquiz'] = 'Complete the catquiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_catquiz'] = 'Quiz {catquiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'Quiz {catquiz_name_link}} was successfully finished';
+$string['course_description_before_condition_catquiz'] = 'complete the catquiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_catquiz'] = 'quiz {catquiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_after_condition_catquiz'] = 'quiz {catquiz_name_link}} was successfully finished';
 
-$string['course_description_before_condition_modquiz'] = 'Complete the quiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'Quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_modquiz'] = 'Quiz {catquiz_name_link} was successfully finished';
+$string['course_description_before_condition_modquiz'] = 'complete the quiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_after_condition_modquiz'] = 'quiz {catquiz_name_link} was successfully finished';
 
-$string['course_restricition_before_condition_manual'] = 'Access will be granted manually';
-$string['course_restricition_before_condition_parent_courses'] = 'Finish {numb_courses} course(s) of parent node {node_name}';
-$string['course_restricition_before_condition_specific_course'] = 'Finish the course(s): {course_list}';
-$string['course_restricition_before_condition_timed'] = 'Accessible {start_date} {end_date}';
+$string['course_restricition_before_condition_manual'] = 'access will be granted manually';
+$string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
+$string['course_restricition_before_condition_specific_course'] = 'finish the course(s): {course_list}';
+$string['course_restricition_before_condition_timed'] = 'accessible {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';
-$string['course_restricition_before_condition_timed_duration'] = 'Accessible for {duration_period} since {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Finish the parent node(s) {parent_course_list}';
+$string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} since {timed_condition}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'finish the parent node(s) {parent_course_list}';
 
 $string['course_condition_concatination_or'] = "or";
 $string['course_condition_concatination_and'] = " and ";

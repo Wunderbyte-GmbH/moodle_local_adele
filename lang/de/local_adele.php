@@ -179,29 +179,31 @@ $string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte ko
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
-$string['course_description_before_completion_manual'] = 'Der Abschluss wird manuell gewährt';
+$string['course_description_before_completion_manual'] = 'der Abschluss wird manuell gewährt';
 $string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {checkbox_status} manuell gewährt';
-$string['course_description_after_completion_manual'] = 'Der Abschluss wurde manuell gewährt';
+$string['course_description_after_completion_manual'] = 'der Abschluss wurde manuell gewährt';
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'Du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
-$string['course_description_after_condition_course_completed'] = 'Du hast genug Kurse dieses Knotens abgeschlossen';
+$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
+$string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
-$string['course_description_before_condition_catquiz'] = 'Beende das Quiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_catquiz'] = 'Das Quiz {catquiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
+$string['course_description_before_condition_catquiz'] = 'beende das Quiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_catquiz'] = 'das Quiz {catquiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
+$string['course_description_after_condition_catquiz'] = 'das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
 
-$string['course_description_before_condition_modquiz'] = 'Beende das Quiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'Das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_modquiz'] = 'Das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
+$string['course_description_before_condition_modquiz'] = 'beende das Quiz {catquiz_name_link}';
+$string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
+$string['course_description_after_condition_modquiz'] = 'das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
 
-$string['course_restricition_before_condition_manual'] = 'Der Zugang wird manuell gewährt';
-$string['course_restricition_before_condition_parent_courses'] = 'Schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
-$string['course_restricition_before_condition_specific_course'] = 'Schließe den/die Kurs(e): {course_list}';
-$string['course_restricition_before_condition_timed'] = 'Zugänglich {start_date} {end_date}';
-$string['course_restricition_before_condition_timed_duration'] = 'Zugänglich für {duration_period} seit {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Schließe den übergeordneten Knoten {parent_course_list}';
+$string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
+$string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
+$string['course_restricition_before_condition_specific_course'] = 'schließe den/die Kurs(e): {course_list}';
+$string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
+$string['course_restricition_before_condition_from'] = 'von ';
+$string['course_restricition_before_condition_to'] = 'bis ';
+$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} seit {timed_condition}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'schließe den übergeordneten Knoten {parent_course_list} ab';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';
