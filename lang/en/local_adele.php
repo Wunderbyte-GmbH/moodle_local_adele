@@ -181,7 +181,7 @@ $string['course_description_after_completion_manual'] = 'Completion was granted 
 $string['course_description_placeholder_checkbox_status'] = 'not';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} course(s) of this node has/have to be finshed';
-$string['course_description_inbetween_condition_course_completed'] = 'You have two finish {numb_courses} course(s). Current completion grades: {course_list}';
+$string['course_description_inbetween_condition_course_completed'] = 'You have to finish {numb_courses} course(s). Current completion grades: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'You finished enough courses of this node';
 
 $string['course_description_before_condition_catquiz'] = 'Complete the catquiz {catquiz_name_link}';

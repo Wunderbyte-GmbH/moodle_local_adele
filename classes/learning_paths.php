@@ -457,7 +457,7 @@ class learning_paths {
             'courseid' => (int)$data['courseid'],
         ];
 
-        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, usr.username,
+        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, usr.username,
             usr.firstname, usr.lastname, usr.email, lpu.json, lap.image
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
@@ -473,12 +473,14 @@ class learning_paths {
             return (array)$record;
         }
         return [
+            'id' => 0,
             'user_id' => 0,
             'username' => 'not found',
             'firstname' => 'not found',
             'lastname' => 'not found',
             'email' => 'not found',
             'json' => 'not found',
+            'last_seen_by_owner' => 'not found',
             'image' => 'not found',
         ];
     }
@@ -573,5 +575,21 @@ class learning_paths {
         }
         $node->data->progress = $progress;
         return $node;
+    }
+
+    /**
+     * Get user path relation.
+     *
+     * @param array $node
+     * @return array
+     */
+    public static function update_learning_user_relation($params) {
+        global $DB;
+        $record = new stdClass();
+        $record->id = $params['lpuserpathid'];
+        $record->last_seen_by_owner = time();
+        $DB->update_record('local_adele_path_user', $record);
+
+        return ['last_seen' => $record->last_seen_by_owner];
     }
 }

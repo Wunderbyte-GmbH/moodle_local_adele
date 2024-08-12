@@ -167,4 +167,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_update_user_path_relation' => [
+      'classname' => 'local_adele\external\update_user_path_relation',
+      'classpath' => '',
+      'description' => 'Update user seen lp',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

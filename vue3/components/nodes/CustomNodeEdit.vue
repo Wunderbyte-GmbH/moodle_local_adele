@@ -135,6 +135,28 @@ const goToCourse = () => {
   let course_link = '/course/view.php?id=' + props.data.course_node_id
   window.open(course_link, '_blank');
 }
+const iconState = ref('initial');
+const iconClass = ref('fa-lock');
+
+onMounted(() => {
+  if (
+    props.data.animations &&
+    props.data.animations.completiontime > store.state.lastseen
+  ) {
+  setTimeout(() => {
+      iconState.value = 'fading';
+      setTimeout(() => {
+        iconClass.value = 'fa-play';
+        iconState.value = 'expanding';
+      }, 750);
+    }, 1000);
+  } else if (
+    props.data.completion.feedback.status != 'closed' &&
+    props.data.completion.feedback.status != 'not_accessible'
+  ) {
+    iconClass.value = 'fa-play';
+  }
+});
 
 </script>
 
@@ -182,8 +204,12 @@ const goToCourse = () => {
                 @click="goToCourse"
               >
                 <i
-                  :class="active ? 'fa fa-play' : 'fa fa-lock'"
-                />
+                  :class="
+                    ['fa', iconClass,
+                    { 'icon-unlocking': iconState === 'unlocking',
+                    'icon-fading': iconState === 'fading',
+                    'icon-expanding': iconState === 'expanding' }]"
+                  />
               </button>
             </div>
           </div>
@@ -260,6 +286,36 @@ const goToCourse = () => {
 </template>
 
 <style scoped>
+@keyframes fading {
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(0.2);
+    opacity: 0.1;
+  }
+}
+.icon-fading.fa-lock {
+  animation: fading 0.75s ease-in-out forwards;
+}
+
+@keyframes expanding {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.1;
+  }
+  80% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.icon-expanding.fa-play {
+  animation: expanding 0.75s ease-in-out forwards;
+}
+
 .card-body-outer {
   display: flex;
   justify-content: flex-start;

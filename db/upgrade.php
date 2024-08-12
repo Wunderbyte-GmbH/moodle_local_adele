@@ -97,5 +97,19 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Adele savepoint reached.
         upgrade_plugin_savepoint(true, 2024060304, 'local', 'adele');
     }
+    if ($oldversion < 2024080901) {
+
+        // Define field course_id to be added to local_adele_path_user.
+        $table = new xmldb_table('local_adele_path_user');
+        $field = new xmldb_field('last_seen_by_owner', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+
+        // Conditionally launch add field image.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Adele savepoint reached.
+        upgrade_plugin_savepoint(true, 2024080901, 'local', 'adele');
+    }
     return true;
 }

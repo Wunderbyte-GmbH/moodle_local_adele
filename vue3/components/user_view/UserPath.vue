@@ -150,7 +150,7 @@ const route = useRoute()
 // Load Store
 const store = useStore()
 
-const { fitView, addNodes, addEdges, removeNodes, removeEdges,
+const { addNodes, addEdges, removeNodes, removeEdges,
   findNode, zoomTo, viewport, setCenter } = useVueFlow()
 
 // Function to go back
@@ -216,6 +216,11 @@ onMounted( async () => {
         });
       })
     }, 300)
+  }
+  if (store.state.user == store.state.lpuserpathrelation.user_id) {
+    await store.dispatch('updateUserPathRelation', {
+      lpuserpathid: store.state.lpuserpathrelation.id,
+    });
   }
 })
 

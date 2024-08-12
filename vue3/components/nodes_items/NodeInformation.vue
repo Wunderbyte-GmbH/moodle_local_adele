@@ -1,6 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { computed, ref } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -108,6 +108,32 @@
     return return_date;
   }
 
+  const iconState = ref('initial');
+  const iconClass = ref('fa-info');
+
+  onMounted(() => {
+    if (
+        props.data.animations &&
+        props.data.animations.restrictiontime > store.state.lastseen
+      ) {
+      setTimeout(() => {
+          iconState.value = 'animated';
+          setTimeout(() => {
+            iconClass.value = 'fa-check';
+          }, 750);
+      }, 1000);
+    } else if (
+      props.data.completion.feedback.status != 'closed' &&
+      props.data.completion.feedback.status != 'not_accessible'
+    ) {
+      iconClass.value = 'fa-check';
+    }
+  });
+
+  const handleAnimationEnd = () => {
+    iconClass.value = 'fa-check'; // Change the icon to a checkmark
+  };
+
 </script>
 
 <template>
@@ -125,8 +151,8 @@
       @click.stop="toggleCard"
     >
       <i
-        class="fa fa-info"
-        :class="{'fa-info-mobile': mobile}"
+        :class="['fa', iconClass, {'fa-info-mobile': mobile, 'icon-animated': iconState === 'animated'}]"
+        @animationend="handleAnimationEnd"
       />
     </div>
     <transition :name="mobile ? 'fade' : 'unfold'">
@@ -331,6 +357,25 @@
 
 <style scoped>
 
+@keyframes rotateAndFade {
+  0% {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg);
+    opacity: 0.1;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 1;
+  }
+}
+
+.icon-animated {
+  animation: rotateAndFade 1.5s forwards;
+}
+
 .card-container {
   justify-content: center;
   align-items: center;
@@ -374,7 +419,8 @@
   box-shadow: 0 6px 8px rgba(0,0,0,0.2); /* Larger shadow on hover for depth */
 }
 
-.fa-info {
+.fa-info,
+.fa-check{
   font-size: 30px; /* Make the icon larger */
   color: white; /* Change the color if needed */
   margin-top: 7px;

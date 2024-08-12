@@ -54,6 +54,7 @@ export function createAppStore() {
                 modules: null,
                 version: 0,
                 lpimages: 0,
+                lastseen: null,
             };
         },
         getters: {
@@ -111,7 +112,10 @@ export function createAppStore() {
             },
             setLpImages(state, data){
               state.lpimages = data;
-          },
+            },
+            setLastSeen(state, data) {
+              state.lastseen = data;
+            },
         },
         actions: {
             // Actions are asynchronous.
@@ -183,6 +187,7 @@ export function createAppStore() {
                       contextid: context.state.contextid,
                     });
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
+                context.commit('setLastSeen', lpUserPathRelation.last_seen_by_owner);
                 if (lpUserPathRelation.json != '') {
                   lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json);
                 }
@@ -197,6 +202,14 @@ export function createAppStore() {
                     });
                 context.dispatch('fetchUserPathRelation', params.route);
                 context.dispatch('fetchUserPathRelations');
+            },
+            async updateUserPathRelation(context, params) {
+                const response = await ajax('local_adele_update_user_path_relation',
+                    {
+                      lpuserpathid: params.lpuserpathid,
+                      contextid: context.state.contextid,
+                    });
+                context.commit('setLastSeen', response.last_seen);
             },
             async fetchLearningpaths(context) {
                 const learningpaths = await ajax('local_adele_get_learningpaths',

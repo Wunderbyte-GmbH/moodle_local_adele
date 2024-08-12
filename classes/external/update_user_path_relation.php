@@ -46,7 +46,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_lp_user_path_relation extends external_api {
+class update_user_path_relation extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -55,37 +55,30 @@ class get_lp_user_path_relation extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'learningpathid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'userpathid'  => new external_value(PARAM_INT, 'userpathid', VALUE_REQUIRED),
+            'lpuserpathid'  => new external_value(PARAM_INT, 'lpuserpathid', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             ]
         );
     }
+
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $learningpathid
-     * @param int $userpathid
+     * @param int $lpuserpathid
      * @param int $contextid
      * @return array
      */
-    public static function execute($learningpathid, $userpathid, $contextid): array {
+    public static function execute($lpuserpathid, $contextid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
-            'learningpathid' => $learningpathid,
-            'userpathid' => $userpathid,
+            'lpuserpathid' => $lpuserpathid,
             'contextid' => $contextid,
         ]);
+
         require_login();
+
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:view', $context);
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            $params['courseid'] = $context->instanceid;
-        } else {
-            $coursecontext = $context->get_course_context();
-            $params['courseid'] = $coursecontext->instanceid;
-        }
-
-        return learning_paths::get_learning_user_relation($params);
+        return learning_paths::update_learning_user_relation($params);
     }
 
     /**
@@ -95,15 +88,7 @@ class get_lp_user_path_relation extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'ID'),
-                    'user_id' => new external_value(PARAM_INT, 'Item id'),
-                    'username' => new external_value(PARAM_TEXT, 'Username'),
-                    'firstname' => new external_value(PARAM_TEXT, 'Firstname'),
-                    'lastname' => new external_value(PARAM_TEXT, 'Lastname'),
-                    'email' => new external_value(PARAM_RAW, 'email'),
-                    'json' => new external_value(PARAM_RAW, 'Flow Chart'),
-                    'last_seen_by_owner' => new external_value(PARAM_TEXT, 'Last seen'),
-                    'image' => new external_value(PARAM_RAW, 'image'),
+                'last_seen' => new external_value(PARAM_TEXT, 'Last seen by owner'),
             ]
         );
     }

@@ -62,7 +62,7 @@ class relation_update {
             }
             self::subscribe_user_starting_node($userpath);
             if (!empty($userpath->json['tree']['nodes'])) {
-                foreach ($userpath->json['tree']['nodes'] as $node) {
+                foreach ($userpath->json['tree']['nodes'] as &$node) {
                     $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
                     $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
                     $restrictionnodepaths = [];
@@ -222,7 +222,7 @@ class relation_update {
      * @return array
      */
     public static function validatenodecompletion(
-        $node,
+        &$node,
         $completioncriteria,
         $userpath,
         $restrictionnodepaths,
@@ -338,6 +338,7 @@ class relation_update {
             $restrictionnodepaths,
             $node
         );
+        $node = self::set_animation_data($node, $feedback['status']);
 
         if (!$mode) {
             return false;
@@ -347,6 +348,30 @@ class relation_update {
             'singlecompletionnode' => $singlecompletionnode,
             'feedback' => $feedback,
         ];
+    }
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $node
+     * @param string $status
+     * @return array
+     */
+    public static function set_animation_data($node, $status) {
+        if (
+            !isset($node['data']['animations']['seenrestriction']) &&
+            $status != 'closed' &&
+            $status != 'not_accessible'
+          ) {
+            $node['data']['animations']['restrictiontime'] = time();
+        }
+        if (
+          !isset($node['data']['animations']['seencompletion']) &&
+          $status == 'completed'
+        ) {
+            $node['data']['animations']['completiontime'] = time();
+        }
+        return $node;
     }
 
     /**
