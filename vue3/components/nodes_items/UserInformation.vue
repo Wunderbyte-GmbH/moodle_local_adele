@@ -22,7 +22,6 @@
 
   const toggleFeedbackarea = () => {
     showFeedbackarea.value = !showFeedbackarea.value;
-    console.log(props.data.completion)
   };
 
 </script>
