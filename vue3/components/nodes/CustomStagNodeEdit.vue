@@ -212,7 +212,7 @@ const expandCourses = () => {
               v-if="active"
               class="icon-link"
               :disabled="isBlocked"
-              @click="expandCourses"
+              @click.stop="expandCourses"
             >
               <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
             </button>

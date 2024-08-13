@@ -33,6 +33,11 @@
         :learningpath="learningpath"
         @saveEdit="handleSaveEdit"
       />
+      <CourseModal
+        v-if="store.state.view != 'teacher'"
+        :learningpath="learningpath"
+        @saveEditCourse="handleSaveEditCourse"
+      />
       <VueFlow
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
@@ -127,6 +132,7 @@ import Controls from './ControlsPath.vue'
 import CustomNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
 import Modal from '../modals/ModalNode.vue'
+import CourseModal from '../modals/ModalCourse.vue'
 import { MiniMap } from '@vue-flow/minimap'
 import getNodeId from '../../composables/getNodeId'
 import DropzoneNode from '../nodes/DropzoneNode.vue'
@@ -165,7 +171,8 @@ const emit = defineEmits([
   'save-edit',
   'move-node',
   'changedModule',
-  'changedLearningpathTree'
+  'changedLearningpathTree',
+  'save-edit-course'
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -338,6 +345,10 @@ emit('add-edge', addCustomEdge( params.target, params.source));
 
 function handleSaveEdit(params){
   emit('save-edit', params);
+}
+
+function handleSaveEditCourse(params){
+  emit('save-edit-course', params);
 }
 
 // Triggers handle connect

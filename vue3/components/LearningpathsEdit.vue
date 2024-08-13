@@ -99,6 +99,7 @@
                   @moveNode="handleMoveNode"
                   @changedModule="onChangedModule"
                   @changedLearningpathTree="onChangedTree"
+                  @saveEditCourse="handleSaveEditCourse"
                 />
               </div>
             </div>
@@ -192,6 +193,7 @@ onMounted(() => {
       query: {}
     });
   }
+
   store.dispatch('fetchAvailablecourses');
   if(store.state.view!='student'){
     store.dispatch('fetchLearningpaths');
@@ -347,6 +349,23 @@ const handleSaveEdit = async (params) => {
     type: 'success'
   })
 }
+
+const handleSaveEditCourse = async (params) => {
+  learningpath.value.json.tree.nodes.forEach((node) => {
+    if (node.id == store.state.node.node_id) {
+      node.data.fullname = params.fullname
+      node.data.description = params.description
+    }
+  })
+
+  notify({
+    title: store.state.strings.title_save,
+    text: store.state.strings.description_save,
+    type: 'success'
+  })
+}
+
+
 
 const handleMoveNode = (params) => {
   learningpath.value.json.tree.nodes.forEach((node) => {

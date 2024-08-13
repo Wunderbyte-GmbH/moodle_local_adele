@@ -43,13 +43,20 @@ const courses = computed(() => {
   ) {
     return [];
   }
-  return store.state.availablecourses.filter(course =>
+
+  const coursedata =  store.state.availablecourses.filter(course =>
     props.data.course_node_id.includes(course.course_node_id[0])
     ).map(course => ({
+      givenname: props.data.course_node_id_description &&
+        props.data.course_node_id_description[course.course_node_id[0]]
+        ? props.data.course_node_id_description[course.course_node_id[0]].fullname
+        : null,
       fullname: course.fullname,
       id: [course.course_node_id[0]]
     })
-  )}
+  )
+  return coursedata
+}
 );
 
 const cardHeight = computed(() => {
@@ -88,6 +95,11 @@ const emit = defineEmits([
 // Set node data for the modal
 const setNodeModal = () => {
   store.state.node = props.data
+};
+
+const setCourseModal = (id) => {
+  store.state.node = props.data
+  store.state.nodecourse = id
 };
 
 // Set node data for the modal
@@ -270,7 +282,7 @@ const enableButton = () => {
               <button
                 class="icon-link"
                 :disabled="isBlocked"
-                @click="expandCourses"
+                @click.stop="expandCourses"
               >
                 <i :class="['fa', courseExpanded ? 'fa-minus-circle' : 'fa-plus-circle']" />
               </button>
@@ -311,17 +323,33 @@ const enableButton = () => {
               class="card-text"
             >
               <div class="fullname-container">
-                {{ value.fullname }}
-                <button
+                {{ value.givenname || value.fullname }}
+                <div
                   v-if="store.state.view != 'teacher'"
-                  type="button"
-                  class="btn btn-danger btn-sm trash-button"
-                  @click.stop="removeCourse(value.id)"
+                  class="button-group"
                 >
-                  <i
-                    :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
-                  />
-                </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm trash-button"
+                    data-toggle="modal"
+                    data-target="#courseModal"
+                    @click="setCourseModal(value.id)"
+                  >
+                    <i
+                      class="fa fa-pencil"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm trash-button"
+                    @click.stop="removeCourse(value.id)"
+                  >
+                    <i
+                      :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
+                    />
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>

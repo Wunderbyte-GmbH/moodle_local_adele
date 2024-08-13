@@ -52,6 +52,9 @@
                 <div v-if="courses[0] && courses[0].description">
                   <div v-html="courses[0].description"/>
                 </div>
+                <div v-else-if="courses[0] && courses[0].summary">
+                  <div v-html="courses[0].summary"/>
+                </div>
                 <div v-else>
                   {{store.state.strings.nodes_no_description}}
                 </div>

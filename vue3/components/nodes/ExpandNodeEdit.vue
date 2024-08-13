@@ -57,17 +57,27 @@ const get_cover_image = (data) => {
 }
 
 const courses = computed(() => {
+
   if (
     !store.state.availablecourses ||
     !props.data.course_id
   ) {
     return [];
   }
+
   return store.state.availablecourses.filter(course =>
     props.data.course_id == course.course_node_id[0]
     ).map(course => ({
+      givenname: props.data.course_node_id_description &&
+        props.data.course_node_id_description[course.course_node_id[0]]
+        ? props.data.course_node_id_description[course.course_node_id[0]].fullname
+        : null,
+      description: props.data.course_node_id_description &&
+        props.data.course_node_id_description[course.course_node_id[0]]
+        ? props.data.course_node_id_description[course.course_node_id[0]].description
+        : null,
       fullname: course.fullname,
-      description: course.summary,
+      summary: course.summary,
       id: [course.course_node_id[0]]
     })
   )}
@@ -94,7 +104,7 @@ onMounted(() => {
           <div class="row">
             <div class="col-10">
               <h5 v-if="courses[0]">
-                {{ courses[0].fullname }}
+                {{ courses[0].givenname || courses[0].fullname }}
               </h5>
               <h5 v-else>
                 Subcourse

@@ -55,6 +55,7 @@ export function createAppStore() {
                 version: 0,
                 lpimages: 0,
                 lastseen: null,
+                nodecourse: 0,
             };
         },
         getters: {
@@ -104,6 +105,25 @@ export function createAppStore() {
                     return element_node;
                 });
             },
+            updatedCourseNode(state, data) {
+              if (!state.node.course_node_id_description) {
+                state.node.course_node_id_description = {}
+              }
+              state.node.course_node_id_description[data.courseid] = {
+                fullname: data.fullname,
+                description: data.description,
+              };
+              state.learningpath.json.tree.nodes = state.learningpath.json.tree.nodes.map(element_node => {
+                  if (element_node.id === state.node.node_id) {
+                    return { ...element_node,
+                      fullname: data.fullname,
+                      selected_course_image: data.selected_course_image,
+                      selected_image: data.selected_image,
+                    };
+                  }
+                  return element_node;
+              });
+          },
             setLpUserPathRelations(state, data){
                 state.lpuserpathrelations = data;
             },

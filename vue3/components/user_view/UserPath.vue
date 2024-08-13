@@ -174,6 +174,9 @@ const zoomstep = ref(0)
 const user_learningpath = ref({})
 
 onMounted( async () => {
+  if (!store.state.availablecourses) {
+    store.dispatch('fetchAvailablecourses')
+  }
   if(!props.user_learningpath_parent){
     let params = []
     if (store.state.view == 'student') {
