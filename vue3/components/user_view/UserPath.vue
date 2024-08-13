@@ -256,7 +256,7 @@ const setZoomLevel = async (action) => {
     }
   }
   if (newViewport == 0.2) {
-    edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
+    //edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
     setTimeout(() => {
       drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);

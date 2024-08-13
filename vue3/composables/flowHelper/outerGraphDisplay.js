@@ -8,10 +8,12 @@ const outerGraphDisplay = (edges, findNode, addEdges) => {
       edge.data.hidden = true
       const source = findNode(edge.source)
       const target = findNode(edge.target)
+
       const edgename = source.data.module + '_module' + target.data.module + '_module'
       if (
         source.data.module !== target.data.module &&
-        !newmoduleedgesnames.includes(edgename)
+        !newmoduleedgesnames.includes(edgename) &&
+        !edgename.includes('undefined')
       ) {
         newmoduleedgesnames.push(edgename)
         const newEdge = {

@@ -140,23 +140,35 @@ const iconClass = ref('fa-lock');
 
 onMounted(() => {
   if (
-    props.data.animations &&
-    props.data.animations.completiontime > store.state.lastseen
-  ) {
-  setTimeout(() => {
-      iconState.value = 'fading';
-      setTimeout(() => {
-        iconClass.value = 'fa-play';
-        iconState.value = 'expanding';
-      }, 750);
-    }, 1000);
-  } else if (
     props.data.completion.feedback.status != 'closed' &&
     props.data.completion.feedback.status != 'not_accessible'
   ) {
-    iconClass.value = 'fa-play';
+    if (
+      props.data.animations &&
+      props.data.animations.completiontime > store.state.lastseen
+    ) {
+    setTimeout(() => {
+        iconState.value = 'fading';
+        setTimeout(() => {
+          iconClass.value = 'fa-play';
+          iconState.value = 'expanding';
+        }, 750);
+      }, 1000);
+    }
+    else {
+      iconClass.value = 'fa-play';
+    }
   }
+
 });
+
+function truncatedText(text) {
+  const maxTextLength = 13;
+  if (text.length > maxTextLength) {
+    return text.substring(0, maxTextLength) + '...';
+  }
+  return text;
+}
 
 </script>
 
@@ -250,22 +262,13 @@ onMounted(() => {
     <div
       v-else
       class="card"
-      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
+      :style="[{ minHeight: '300px', width: '400px' }, parentStyle]"
     >
-      <div class="card-header text-center">
-        <div class="row">
-          <div class="col-12">
-            <h1>
-              {{ store.state.strings.nodes_course_node }}
-            </h1>
-          </div>
-        </div>
-      </div>
       <div
         class="card-body card-body-outer"
         :style="[nodeBackgroundColor]"
       >
-        {{ data.fullname || store.state.strings.nodes_collection }}
+        {{ truncatedText(data.fullname || store.state.strings.nodes_collection) }}
       </div>
     </div>
     <Handle
@@ -318,12 +321,12 @@ onMounted(() => {
 
 .card-body-outer {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   text-align: left;
   min-height: 200px;
   padding: 1rem;
-  font-size: clamp(34px, 2.8vw, 64px);
+  font-size: clamp(45px, 2.8vw, 64px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

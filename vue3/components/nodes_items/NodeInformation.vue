@@ -112,21 +112,20 @@
   const iconClass = ref('fa-info');
 
   onMounted(() => {
-    if (
-        props.data.animations &&
-        props.data.animations.restrictiontime > store.state.lastseen
-      ) {
-      setTimeout(() => {
-          iconState.value = 'animated';
-          setTimeout(() => {
-            iconClass.value = 'fa-check';
-          }, 750);
-      }, 1000);
-    } else if (
-      props.data.completion.feedback.status != 'closed' &&
-      props.data.completion.feedback.status != 'not_accessible'
-    ) {
-      iconClass.value = 'fa-check';
+    if (props.data.completion.feedback.status == 'completed') {
+      if (
+          props.data.animations &&
+          props.data.animations.restrictiontime > store.state.lastseen
+        ) {
+        setTimeout(() => {
+            iconState.value = 'animated';
+            setTimeout(() => {
+              iconClass.value = 'fa-check';
+            }, 750);
+        }, 1000);
+      } else {
+        iconClass.value = 'fa-check';
+      }
     }
   });
 
