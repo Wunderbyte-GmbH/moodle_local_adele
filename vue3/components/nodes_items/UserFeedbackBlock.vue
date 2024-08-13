@@ -15,10 +15,13 @@
     },
   });
 
-  function capitalize(text, index) {
+  function capitalize(text, index, length) {
     if (!text) return ''
-    else if (index != 0) return text
-    return text.charAt(0).toUpperCase() + text.slice(1);
+    else if (index == 0) text.charAt(0).toUpperCase() + text.slice(1);
+    if (index == length - 1) {
+        return text + '.'
+    }
+    return text
   }
 
 </script>
@@ -37,7 +40,7 @@
         :key="index + '_' + title"
         class="feedback-item"
       >
-        {{ capitalize(feedback, index) }}
+        {{ capitalize(feedback, index, data.length) }}
         <span v-if="index < data.length - 1" class="or-text">
           {{ store.state.strings.course_condition_concatination_or }}
         </span>
