@@ -32,6 +32,7 @@ import RestrictionOutPutItem from '../restriction/RestrictionOutPutItem.vue'
 import UserInformation from '../nodes_items/UserInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
+import truncatedText from '../../composables/nodesHelper/truncatedText';
 
 // Load Store
 const store = useStore();
@@ -161,15 +162,6 @@ onMounted(() => {
   }
 
 });
-
-function truncatedText(text) {
-  const maxTextLength = 13;
-  if (text.length > maxTextLength) {
-    return text.substring(0, maxTextLength) + '...';
-  }
-  return text;
-}
-
 </script>
 
 <template>
@@ -326,7 +318,7 @@ function truncatedText(text) {
   text-align: left;
   min-height: 200px;
   padding: 1rem;
-  font-size: clamp(45px, 2.8vw, 64px);
+  font-size: clamp(40px, 2.8vw, 64px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

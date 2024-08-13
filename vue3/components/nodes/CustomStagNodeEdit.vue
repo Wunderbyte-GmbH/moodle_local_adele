@@ -35,6 +35,7 @@ import CourseCompletion from '../nodes_items/CourseCompletion.vue'
 import ProgressBar from '../nodes_items/ProgressBar.vue'
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue'
 import NodeInformation from '../nodes_items/NodeInformation.vue'
+import truncatedText from '../../composables/nodesHelper/truncatedText'
 
 // Load Store
 const store = useStore();
@@ -270,25 +271,16 @@ const expandCourses = () => {
     <div
       v-else
       class="card"
-      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
+      :style="[{ minHeight: '300px', width: '400px' }, parentStyle]"
     >
       <div
         :class="'non_parallel'"
       />
-      <div class="card-header text-center">
-        <div class="row">
-          <div class="col-12">
-            <h1>
-              {{ store.state.strings.nodes_course_node }}
-            </h1>
-          </div>
-        </div>
-      </div>
       <div
         class="card-body card-body-outer"
         :style="[nodeBackgroundColor]"
       >
-        {{ data.fullname || store.state.strings.nodes_collection }}
+        {{ truncatedText(data.fullname || store.state.strings.nodes_collection) }}
       </div>
     </div>
     <Handle
@@ -312,15 +304,15 @@ const expandCourses = () => {
 
 .card-body-outer {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   text-align: left;
   min-height: 200px;
-  padding: 1rem; /* Add some padding for better spacing */
-  font-size: clamp(34px, 2.8vw, 64px); /* Responsive font size */
-  white-space: nowrap; /* Prevent text wrapping */
-  overflow: hidden; /* Hide overflow text */
-  text-overflow: ellipsis; /* Add ellipsis to overflow text */
+  padding: 1rem;
+  font-size: clamp(40px, 2.8vw, 64px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-weight: bold;
 }
 .overlay {
