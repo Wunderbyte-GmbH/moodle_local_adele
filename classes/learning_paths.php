@@ -580,7 +580,7 @@ class learning_paths {
     /**
      * Get user path relation.
      *
-     * @param array $node
+     * @param array $params
      * @return array
      */
     public static function update_learning_user_relation($params) {

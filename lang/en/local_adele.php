@@ -322,6 +322,7 @@ $string['nodes_collection'] = 'Collection';
 $string['nodes_edit'] = 'Edit';
 $string['nodes_learning_module'] = 'Learning Module';
 $string['nodes_select_module'] = 'Select a module';
+$string['nodes_deselect_module'] = 'Deselect module';
 $string['nodes_included_courses'] = 'Included Courses';
 $string['nodes_edit_restriction'] = 'Edit Restriction';
 $string['nodes_edit_completion'] = 'Edit Completion';

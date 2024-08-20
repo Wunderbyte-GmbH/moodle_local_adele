@@ -323,6 +323,7 @@ $string['nodes_collection'] = 'Sammlung';
 $string['nodes_edit'] = 'Bearbeiten';
 $string['nodes_learning_module'] = 'Lernmodul';
 $string['nodes_select_module'] = 'Modul auswählen';
+$string['nodes_deselect_module'] = 'Modul abwählen';
 $string['nodes_included_courses'] = 'Enthaltene Kurse';
 $string['nodes_edit_restriction'] = 'Einschränkung bearbeiten';
 $string['nodes_edit_completion'] = 'Abschluss bearbeiten';
