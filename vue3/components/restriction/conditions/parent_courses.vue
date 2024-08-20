@@ -3,27 +3,27 @@
     {{ restriction.description }}
     <div class="form-group">
       <div v-if="data.courses_id && data.courses_id.length > 0">
-        <label 
-          class="form-label" 
+        <label
+          class="form-label"
           for="courseSelect"
         >
           {{ store.state.strings.restriction_select_number }}
         </label>
-        <select 
+        <select
           v-model="data.min_courses"
-          class="form-select" 
+          class="form-select"
           @change="emitSelectedParentCourse"
         >
-          <option 
-            disabled 
-            value="" 
+          <option
+            disabled
+            value=""
             selected
           >
             {{ store.state.strings.restriction_choose_number }}
           </option>
-          <option 
-            v-for="number in parentCourses" 
-            :key="number" 
+          <option
+            v-for="number in parentCourses"
+            :key="number"
             :value="number"
           >
             {{ number }}
@@ -46,7 +46,7 @@ const props = defineProps({
   modelValue: {
     type: Object,
     default: null,
-  }, 
+  },
   restriction: {
     type: Object,
     required: true,
@@ -78,19 +78,10 @@ onMounted(() => {
         parentCourses.value = 0
       } else{
         parentCourses.value = node.parentCourse.length
-        parentCoursesId = node.parentCourse
+        data.value.courses_id = node.parentCourse
       }
     }
   })
-  let CoursesId = [];
-  if (parentCoursesId != null) {
-    store.state.learningpath.json.tree.nodes.forEach((node) => {
-      if (parentCoursesId.includes(node.id)) {
-        CoursesId.push(node.data.course_node_id[0])
-      }
-    })
-  }
-  data.value.courses_id = CoursesId
 });
 
 </script>

@@ -1,7 +1,7 @@
 <template>
-  <component 
-    :is="dynamicComponent" 
-    v-model="restriction.value" 
+  <component
+    :is="dynamicComponent"
+    v-model="restriction.value"
     :restriction="restriction"
     :learningpath="learningpath"
   />

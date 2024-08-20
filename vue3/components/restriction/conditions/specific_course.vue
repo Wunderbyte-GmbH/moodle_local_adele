@@ -2,26 +2,26 @@
   <div class="form-check">
     {{ restriction.description }}
     <div class="form-group">
-      <label 
-        class="form-label" 
+      <label
+        class="form-label"
         for="courseSelect"
       >
         {{ store.state.strings.restriction_select_course }}
       </label>
-      <select 
-        id="courseSelect" 
+      <select
+        id="courseSelect"
         v-model="selectedCourse"
-        class="form-select" 
+        class="form-select"
       >
-        <option 
-          :value="null" 
+        <option
+          :value="null"
           disabled
         >
           {{ store.state.strings.restriction_select_course }}
         </option>
-        <option 
-          v-for="course in courses" 
-          :key="course.id" 
+        <option
+          v-for="course in courses"
+          :key="course.id"
           :value="course.id"
         >
           {{ course.name }}
@@ -35,13 +35,13 @@
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
-// Load Store 
+// Load Store
 const store = useStore();
 const props = defineProps({
   modelValue: {
     type: Object,
     default: null,
-  }, 
+  },
   restriction: {
     type: Object,
     required: true,
@@ -54,9 +54,9 @@ const emit = defineEmits(['update:modelValue'])
 
 onMounted(async () => {
   store.state.learningpath.json.tree.nodes.forEach(node => {
-    if (store.state.node.course_node_id != node.data.course_node_id) {
+    if (store.state.node.id != node.id) {
       courses.value.push({
-        id: node.data.course_node_id,
+        id: node.id,
         name: node.data.fullname
       });
     }

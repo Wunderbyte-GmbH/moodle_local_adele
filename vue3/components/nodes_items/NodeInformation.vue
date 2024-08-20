@@ -112,7 +112,10 @@
   const iconClass = ref('fa-info');
 
   onMounted(() => {
-    if (props.data.completion.feedback.status == 'completed') {
+    if (
+      props.data.completion.feedback &&
+      props.data.completion.feedback.status == 'completed'
+    ) {
       if (
           props.data.animations &&
           props.data.animations.restrictiontime > store.state.lastseen

@@ -198,7 +198,7 @@ $string['course_description_after_condition_modquiz'] = 'das Quiz {catquiz_name_
 
 $string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
 $string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
-$string['course_restricition_before_condition_specific_course'] = 'schließe den/die Kurs(e): {course_list}';
+$string['course_restricition_before_condition_specific_course'] = 'schließe den Kurs {course_list} ab';
 $string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';

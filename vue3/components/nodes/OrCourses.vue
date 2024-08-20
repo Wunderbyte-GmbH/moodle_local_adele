@@ -26,7 +26,6 @@
  // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
 import { useStore } from 'vuex';
-import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import { computed, onMounted, ref } from 'vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import CourseCarousel from '../nodes_items/CourseCarousel.vue';
@@ -68,7 +67,15 @@ const cardHeight = computed(() => {
 })
 
 const dataValue = ref('')
-const learningmodule = ref({})
+const learningmodule = computed(() => {
+  let parsedLearningModule = props.learningpath.json;
+  if (typeof parsedLearningModule === 'string' && parsedLearningModule !== '') {
+    parsedLearningModule = JSON.parse(parsedLearningModule);
+  }
+  return parsedLearningModule && parsedLearningModule.modules
+    ? parsedLearningModule.modules
+    : {};
+});
 const cover_image = computed(() => get_cover_image(props.data));
 
 const props = defineProps({
@@ -90,6 +97,7 @@ const store = useStore();
 const emit = defineEmits([
   'typeChange',
   'change-module',
+  'delete-node',
 ]);
 
 // Set node data for the modal
@@ -124,11 +132,6 @@ onMounted(() => {
   let parsedLearningModule = props.learningpath.json
   if ( typeof parsedLearningModule == 'string' && parsedLearningModule != '') {
     parsedLearningModule = JSON.parse(props.learningpath.json)
-  }
-  if (props.learningpath.json && props.learningpath.json.modules) {
-    learningmodule.value = props.learningpath.json.modules
-  } else {
-    learningmodule.value = {}
   }
 })
 
@@ -203,6 +206,10 @@ const enableButton = () => {
   isBlocked.value = false
 };
 
+const deleteCondition = () => {
+  emit('delete-node', props.data);
+}
+
 </script>
 <template>
   <div>
@@ -213,20 +220,33 @@ const enableButton = () => {
       <div
         :class="!editorview ? 'non_parallel' : ''"
       >
-        <div class="card-header text-center">
-          <NodeInformation
-          v-if="!editorview"
-            :data
-            :parentnode
+      <div class="card-header text-center">
+  <NodeInformation
+    v-if="!editorview"
+    :data
+    :parentnode
+  />
+  <div class="d-flex justify-content-center position-relative">
+      <h4 class="flex-grow-1 text-center">
+        {{ data.fullname || store.state.strings.nodes_collection }}
+      </h4>
+      <div
+        v-if="store.state.view != 'teacher'"
+        class="position-absolute"
+        style="right: 0;"
+      >
+        <button
+          type="button"
+          class="btn btn-danger btn-sm trash-button"
+          @click.stop="deleteCondition"
+        >
+          <i
+            :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
           />
-          <div class="row align-items-center">
-            <div class="col">
-              <h5>
-                {{ data.fullname || store.state.strings.nodes_collection }}
-              </h5>
-            </div>
-          </div>
-        </div>
+        </button>
+      </div>
+    </div>
+  </div>
 
         <div
           class="card-body"
@@ -299,8 +319,16 @@ const enableButton = () => {
               @change="changeModule(dataValue)"
             >
               <option
+                v-if="dataValue.module != null"
                 value=""
                 selected
+              >
+                {{ store.state.strings.nodes_deselect_module }}
+              </option>
+              <option
+                v-else
+                value=""
+                disabled
               >
                 {{ store.state.strings.nodes_select_module }}
               </option>
@@ -378,11 +406,7 @@ const enableButton = () => {
         </div>
       </div>
       <div class="card-footer">
-        <OverviewRestrictionCompletion
-          v-if="editorview"
-          :node="data"
-          :learningpath="learningpath"
-        />
+
         <CourseCarousel
           v-if="!editorview"
           :courses="props.data"

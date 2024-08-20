@@ -122,18 +122,15 @@ class parent_courses implements course_restriction {
                     $coursestable = [];
                     if (isset($restriction['data']['value']['courses_id'])) {
                         foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
-                            $coursecompleted = false;
-                            $course = get_course($coursesid);
-                            $courselist[] = $course->fullname;
-
-                            // Check if the course completion is enabled.
-                            if ($course->enablecompletion) {
-                                // Get the course completion instance.
-                                $completion = new completion_info($course);
-                                // Check if the user has completed the course.
-                                $coursecompleted = $completion->is_course_complete($userpath->user_id);
-                                if ($coursecompleted) {
-                                    $coursestable[] = $coursesid;
+                            foreach ($userpath->json['tree']['nodes'] as $usernode) {
+                                if ($usernode['id'] == $coursesid) {
+                                    $courselist[] = $usernode['data']['fullname'];
+                                    if (
+                                        isset($usernode['data']['completion']) &&
+                                        $usernode['data']['completion']['feedback']['status'] == 'completed'
+                                    ) {
+                                        $coursestable[] = $coursesid;
+                                    }
                                 }
                             }
                         }

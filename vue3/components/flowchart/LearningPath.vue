@@ -60,6 +60,7 @@
             :learningpath="learningpath"
             :editorview="editor_view"
             @change-module="onChangeModule"
+            @delete-node="onRemoveNode"
           />
         </template>
         <template #node-dropzone="{ data }">
@@ -78,6 +79,7 @@
             :editorview="editor_view"
             @typeChange="typeChanged"
             @change-module="onChangeModule"
+            @remove-node="onRemoveNode"
           />
         </template>
         <template #node-module="{ data }">
@@ -165,14 +167,15 @@ const props = defineProps({
 // Emit to parent component
 const emit = defineEmits([
   'finish-edit',
-  'remove-node',
+  'removeNodeConditions',
   'add-edge',
   'remove-edge',
   'save-edit',
   'move-node',
   'changedModule',
   'changedLearningpathTree',
-  'save-edit-course'
+  'save-edit-course',
+  'removeNode'
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
@@ -391,6 +394,7 @@ function onDrop(event) {
       type,
       label: `${type} node`,
       draggable: true,
+      deletable: false,
     }
     if(intersectedNode.value.closestnode.id == 'starting_node'){
       parentCourse.push('starting_node')
@@ -523,7 +527,7 @@ watch(
       if (props.learningpath.json && props.learningpath.json.tree) {
         const deletedNode = props.learningpath.json.tree.nodes.filter(item => !nodes.value.some(otherItem => otherItem.id === item.id))
         if (deletedNode[0]) {
-          emit('removeNode', deletedNode[0].id);
+          emit('removeNode', deletedNode[0]);
         }
         setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, true)
         if (deletedNode[0] && deletedNode[0].id) {
@@ -533,6 +537,22 @@ watch(
     }
   },
 );
+
+
+// Prevent default event if node has been dropped
+function onRemoveNode(data) {
+    let node = findNode(data.node_id)
+    let confirmation = true;
+
+    if (node.type != 'module') {
+      confirmation = window.confirm('Do you want to remove node ' + node.data.fullname + '?');
+    }
+    if (confirmation) {
+      node.deletable = true;
+      removeNodes(data.node_id)
+      emit('removeNodeConditions', data.node_id);
+    }
+}
 
 </script>
 

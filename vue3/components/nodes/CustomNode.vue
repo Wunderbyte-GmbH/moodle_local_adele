@@ -27,7 +27,6 @@
 import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref  } from 'vue';
 import { useStore } from 'vuex';
-import OverviewRestrictionCompletion from '../nodes_items/OverviewRestrictionCompletion.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import UserInformation from '../nodes_items/UserInformation.vue';
@@ -137,6 +136,7 @@ const removeTooltips = () => {
 
 const emit = defineEmits([
   'change-module',
+  'delete-node',
 ]);
 
 const changeModule = (data) => {
@@ -161,6 +161,11 @@ const childStyle = {
   borderWidth: '2px',
 };
 
+const deleteCondition = () => {
+  emit('delete-node', props.data);
+}
+
+
 </script>
 
 <template>
@@ -169,11 +174,6 @@ const childStyle = {
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
-      <OverviewRestrictionCompletion
-        v-if="editorview"
-        :node="data"
-        :learningpath="props.learningpath"
-      />
       <div class="card-header text-center">
         <NodeInformation
           v-if="!editorview"
@@ -185,6 +185,14 @@ const childStyle = {
             <h5>
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
+            <button
+              style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
+              @click.stop="deleteCondition"
+            >
+              <i
+                class="fa fa-trash"
+              />
+            </button>
           </div>
         </div>
       </div>

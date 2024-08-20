@@ -121,21 +121,19 @@ class specific_course implements course_restriction {
                     $coursecompleted = false;
                     // Get grade and check if valid.
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
-                        $course = get_course($restriction['data']['value']['courseid'][0]);
-                        $courselist[] = $course->fullname;
-                        // Check if the course completion is enabled.
-                        if ($course->enablecompletion) {
-                            // Get the course completion instance.
-                            $completion = new completion_info($course);
-                            // Check if the user has completed the course.
-                            $coursecompleted = $completion->is_course_complete($userpath->user_id);
-                            if ($coursecompleted) {
-                                $coursecompleted = true;
+                        foreach ($userpath->json['tree']['nodes'] as $usernode) {
+                            if ($usernode['id'] == $restriction['data']['value']['courseid']) {
+                                $specificcourses[$restriction['id']]['placeholders']['course_list'] =
+                                    [$usernode['data']['fullname']];
+                                if (
+                                    isset($usernode['data']['completion']) &&
+                                    $usernode['data']['completion']['feedback']['status'] == 'completed'
+                                ) {
+                                    $specificcourses[$restriction['id']]['completed'] = $usernode;
+                                }
                             }
                         }
                     }
-                    $specificcourses[$restriction['id']]['placeholders']['course_list'] = $courselist;
-                    $specificcourses[$restriction['id']]['completed'] = $coursecompleted;
                     $specificcourses[$restriction['id']]['inbetween_info'] = null;
                 } else {
                     $specificcourses[$restriction['id']] = [

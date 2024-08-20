@@ -194,7 +194,7 @@ $string['course_description_after_condition_modquiz'] = 'quiz {catquiz_name_link
 
 $string['course_restricition_before_condition_manual'] = 'access will be granted manually';
 $string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
-$string['course_restricition_before_condition_specific_course'] = 'finish the course(s): {course_list}';
+$string['course_restricition_before_condition_specific_course'] = 'finish the course {course_list}';
 $string['course_restricition_before_condition_timed'] = 'accessible {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';

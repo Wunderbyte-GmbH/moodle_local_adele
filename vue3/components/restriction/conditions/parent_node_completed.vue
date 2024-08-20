@@ -36,24 +36,28 @@ const props = defineProps({
     required: true,
   }
 })
+const data = ref({
+  node_id: [],
+});
 
 const parentNodes = ref([])
+const emit = defineEmits(['update:modelValue'])
 
 onMounted(() => {
   props.learningpath.json.tree.nodes.forEach(node => {
-
     if (node.childCourse.includes(store.state.node.node_id)) {
       let fullname = node.data.fullname
       if (fullname == '') {
         fullname = store.state.strings.nodes_collection
       }
-
       parentNodes.value.push({
         id: node.id,
         name: fullname
       });
+      data.value.node_id.push(node.id)
     }
   })
+  emit('update:modelValue', data.value);
 });
 </script>
 

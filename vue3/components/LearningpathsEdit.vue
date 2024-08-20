@@ -92,7 +92,7 @@
                 <LearingPath
                   :learningpath="learningpath"
                   @finish-edit="finishEdit"
-                  @removeNode="handleRemoveNode"
+                  @removeNodeConditions="handleRemoveNode"
                   @addEdge="handleAddEdge"
                   @removeEdge="handleRemoveEdge"
                   @saveEdit="handleSaveEdit"
@@ -136,6 +136,7 @@ import TextInputs from './charthelper/textInputs.vue'
 import TeacherView from './teacher_view/TeacherView.vue';
 import StudentView from './student_view/StudentView.vue';
 import { notify } from "@kyvg/vue3-notification";
+import removeNodeConditions from '../composables/flowHelper/removeNodeConditions';
 
 const store = useStore()
 // Load Store and Router
@@ -148,6 +149,18 @@ const goaldescription = ref('')
 const learningpath = ref('')
 const copiedLearningpath = ref({})
 const showBackConfirmation = ref(false)
+
+
+const handleRemoveNode = (data) => {
+  let nodes = []
+  learningpath.value.json.tree.nodes.forEach((node) => {
+    if (node.id != data) {
+      node = removeNodeConditions(node, data)
+      nodes.push(node)
+    }
+  })
+  learningpath.value.json.tree.nodes = nodes
+}
 
 const changeGoalName = (newGoalName) => {
   store.state.learningpath.name = newGoalName;
@@ -281,32 +294,6 @@ const goBackConfirmation = (toggle) => {
 
 const finishEdit = () => {
   learningpath.value = null
-}
-
-const handleRemoveNode = (nodeId) => {
-  if (nodeId) {
-    const nodesArray = learningpath.value.json.tree.nodes;
-    const edgesArray = learningpath.value.json.tree.edges;
-    const nodeIndex = nodesArray.findIndex(node => node.id === nodeId);
-
-    if (nodeIndex !== -1) {
-      nodesArray.splice(nodeIndex, 1); // Remove the node
-    }
-
-    const updatedEdges = edgesArray.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
-    learningpath.value.json.tree.edges = updatedEdges;
-
-    nodesArray.forEach(node => {
-      ['childCourse', 'parentCourse'].forEach(key => {
-        if (node[key]) {
-          const index = node[key].indexOf(nodeId);
-          if (index !== -1) {
-            node[key].splice(index, 1); // Remove the nodeId from the array
-          }
-        }
-      });
-    });
-  }
 }
 
 const handleAddEdge = (edge) => {

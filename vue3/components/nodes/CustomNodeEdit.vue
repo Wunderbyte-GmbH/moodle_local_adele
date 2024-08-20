@@ -141,6 +141,7 @@ const iconClass = ref('fa-lock');
 
 onMounted(() => {
   if (
+    props.data.completion.feedback &&
     props.data.completion.feedback.status != 'closed' &&
     props.data.completion.feedback.status != 'not_accessible'
   ) {

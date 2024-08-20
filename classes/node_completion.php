@@ -49,7 +49,11 @@ class node_completion {
     public static function enrol_child_courses($event) {
         // Get the user path relation.
         global $DB;
-        $userpath = json_decode($event->other['userpath']->json);
+
+        $userpath = $event->other['userpath']->json;
+        if (is_string($userpath)) {
+            $userpath = json_decode($userpath);
+        }
         $firstenrollededit = false;
         foreach ($userpath->tree->nodes as $node) {
             if (in_array($node->id, $event->other['node']['childCourse'])) {

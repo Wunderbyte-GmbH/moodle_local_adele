@@ -53,7 +53,7 @@ class enrollment {
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
-                self::subscribe_user_to_learning_path($learningpath, $params);
+                self::subscribe_user_to_learning_path($learningpath, $params, $params->courseid);
             }
         }
     }
