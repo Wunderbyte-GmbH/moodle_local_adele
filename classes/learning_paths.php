@@ -129,6 +129,8 @@ class learning_paths {
     /**
      * Get all learning paths.
      *
+     * @param bool $hascapability
+     * @param array $sessionvalue
      * @return array
      */
     public static function get_learning_paths($hascapability, $sessionvalue) {

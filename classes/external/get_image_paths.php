@@ -77,7 +77,12 @@ class get_image_paths extends external_api {
 
         // If the user doesn't have the capability and the session value is empty, handle the error.
         if (!$hascapability && empty($sessionvalue)) {
-            throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermission', 'You do not have the required capability and the session key is not set.');
+            throw new required_capability_exception(
+              $context,
+              'local/adele:canmanage',
+              'nopermission',
+              'You do not have the required capability and the session key is not set.'
+            );
         }
 
         return asset_handler::get_image_paths();
