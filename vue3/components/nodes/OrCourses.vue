@@ -231,7 +231,7 @@ const deleteCondition = () => {
         {{ data.fullname || store.state.strings.nodes_collection }}
       </h4>
       <div
-        v-if="store.state.view != 'teacher'"
+        v-if="store.state.view != 'teacher' && editorview"
         class="position-absolute"
         style="right: 0;"
       >
@@ -247,7 +247,6 @@ const deleteCondition = () => {
       </div>
     </div>
   </div>
-
         <div
           class="card-body"
           :style="{backgroundColor: nodeBackgroundColor}"

@@ -34,10 +34,12 @@ use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use local_adele\learning_paths;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/local/adele/lib.php');
 
 /**
  * External Service for local adele.
@@ -80,9 +82,18 @@ class get_learningpaths extends external_api {
 
         require_login();
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:view', $context);
 
-        return learning_paths::get_learning_paths();
+        $hascapability = has_capability('local/adele:canmanage', $context);
+        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+
+        // If the user doesn't have the capability and the session value is empty, handle the error.
+        if (!$hascapability && empty($sessionvalue)) {
+            throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermission', 'You do not have the required capability and the session key is not set.');
+        }
+        return learning_paths::get_learning_paths(
+          $hascapability,
+          $sessionvalue
+        );
     }
 
     /**
@@ -90,15 +101,26 @@ class get_learningpaths extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+            'edit' => new external_multiple_structure(
+                new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Item id'),
-                    'name' => new external_value(PARAM_TEXT, 'Historyid id'),
-                    'description' => new external_value(PARAM_TEXT, 'Item name'),
+                    'name' => new external_value(PARAM_TEXT, 'Item name'),
+                    'description' => new external_value(PARAM_TEXT, 'Item description'),
                     'image' => new external_value(PARAM_TEXT, 'Item image'),
-                ]
+                ]),
+                VALUE_OPTIONAL
+            ),
+            'view' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Item id'),
+                    'name' => new external_value(PARAM_TEXT, 'Item name'),
+                    'description' => new external_value(PARAM_TEXT, 'Item description'),
+                    'image' => new external_value(PARAM_TEXT, 'Item image'),
+                ]),
+                VALUE_OPTIONAL
             )
-        );
+        ]);
     }
 }

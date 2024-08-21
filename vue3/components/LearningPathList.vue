@@ -167,6 +167,64 @@
         </div>
       </div>
     </span>
+    <div v-if="viewLearningPaths">
+      <h2>
+        Viewable learningpath
+      </h2>
+      <div
+        v-for="viewablelearningpath in viewLearningPaths"
+        :key="viewablelearningpath.id"
+        class="learningcard"
+      >
+        <div
+          class="card shadow"
+          style="width: 450px;"
+        >
+          <div class="card-header text-center bg-primary text-white">
+            <h5>
+              {{ viewablelearningpath.name }}
+            </h5>
+          </div>
+          <div
+            class="card-body"
+          >
+            <div
+              class="mb-2"
+              :style="{
+                height: '10rem',
+                backgroundImage: viewablelearningpath.image ? `url(${viewablelearningpath.image})` : '',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#cccccc',
+                borderRadius: '1rem'
+              }"
+            >
+              <div class="overlay">
+                <a
+                  class="icon-link"
+                  href=""
+                  data-toggle="tooltip"
+                  data-placement="right"
+                  :title="store.state.strings.view"
+                  @click.prevent="viewLearningpath(viewablelearningpath.id)"
+                >
+                  <i
+                    class="icon m-r-0 fa fa-solid fa-eye fa-fw iconsmall"
+                  />
+                </a>
+              </div>
+            </div>
+            <div>
+              <b>
+                {{ store.state.strings.main_description }}
+              </b>
+              {{ viewablelearningpath.description }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
 
@@ -186,6 +244,11 @@ const filteredLpItem = computed(() => {
     }
     return filteredLp;
 })
+
+const viewLearningPaths = computed(() => {
+    return store.state.viewlearningpaths;
+})
+
 
 const search = ref('');
 let learningPaths = [];
@@ -215,6 +278,20 @@ const clicked = ref({})
 const showDeleteConfirm = (index) => {
   clicked.value = {};
   clicked.value[index] = true;
+};
+
+// Edit learning path deletion
+const viewLearningpath = async (singlelearningpathid) => {
+  const tooltips = document.querySelectorAll('.tooltip');
+  tooltips.forEach(tooltip => {
+      tooltip.style.display = 'none';
+  });
+  store.state.learningPathID = singlelearningpathid
+  await store.dispatch('fetchLearningpath')
+  router.push({
+    name: 'learningpath-view',
+    params: { learningpathId: singlelearningpathid  }
+  })
 };
 
 // Edit learning path deletion

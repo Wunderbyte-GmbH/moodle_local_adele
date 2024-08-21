@@ -111,5 +111,25 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Adele savepoint reached.
         upgrade_plugin_savepoint(true, 2024080901, 'local', 'adele');
     }
+    if ($oldversion < 2024081201) {
+        // Define table local_adele_lp_editors to be created.
+        $table = new xmldb_table('local_adele_lp_editors');
+
+        // Adding fields to table local_adele_lp_editors.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('learningpathid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table local_adele_lp_editors.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_adele_lp_editors.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Adele savepoint reached.
+        upgrade_plugin_savepoint(true, 2024081201, 'local', 'adele');
+    }
     return true;
 }

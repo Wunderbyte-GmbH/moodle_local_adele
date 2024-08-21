@@ -33,6 +33,8 @@ define('COURSES_PRIORITY_BEST', 1);
 define('COURSES_PRIORITY_SECOND', 2);
 define('COURSES_PRIORITY_THIRD', 3);
 
+define('SESSION_KEY_ADELE', 'LOCAL_ADELE_EDITOR');
+
 /**
  * Renders the popup Link.
  *
@@ -40,24 +42,40 @@ define('COURSES_PRIORITY_THIRD', 3);
  * @return string The HTML
  */
 function local_adele_render_navbar_output(\renderer_base $renderer) {
-    global $CFG;
+    global $CFG, $DB, $USER, $_SESSION;
+    require_login();
+    if (!isset($_SESSION[SESSION_KEY_ADELE])) {
+        $params = [
+            'userid' => (int)$USER->id,
+        ];
 
-    // Early bail out conditions.
-    if (!isloggedin() || isguestuser()
-        || !has_capability('local/adele:canmanage', context_system::instance())) {
+        $sql = "SELECT lpe.learningpathid
+            FROM {local_adele_lp_editors} lpe
+            WHERE lpe.userid = :userid";
+        $_SESSION[SESSION_KEY_ADELE] = $DB->get_records_sql($sql, $params);
+    }
+    if (
+        !isloggedin() ||
+        isguestuser()
+      ) {
         return;
     }
 
-    $output = '<div class="popover-region nav-link icon-no-margin dropdown">
-        <a class="btn btn-secondary"
-        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
-            . $CFG->wwwroot . '/local/adele/index.php#/learningpaths"
-        role="button">
-        '. get_string('btnadele', 'local_adele') .'
-        </a>
-    </div>';
-
-    return $output;
+    if (
+        has_capability('local/adele:canmanage', context_system::instance()) ||
+        !empty($_SESSION[SESSION_KEY_ADELE])
+    ) {
+        $output = '<div class="popover-region nav-link icon-no-margin dropdown">
+            <a class="btn btn-secondary"
+            id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
+                . $CFG->wwwroot . '/local/adele/index.php#/learningpaths"
+            role="button">
+            '. get_string('btnadele', 'local_adele') .'
+            </a>
+        </div>';
+        return $output;
+    }
+    return;
 }
 
 /**

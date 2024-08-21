@@ -186,7 +186,9 @@ const deleteCondition = () => {
               {{ data.fullname || store.state.strings.nodes_collection }}
             </h5>
             <button
-              style="position: absolute; top: 5px; right: 5px; background: none; border: none;"
+              v-if="store.state.view!='teacher' && editorview"
+              class="btn btn-danger btn-sm"
+              style="position: absolute; top: 5px; right: 5px;"
               @click.stop="deleteCondition"
             >
               <i

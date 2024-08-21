@@ -33,9 +33,43 @@
     </div>
     <div v-else>
       <div
-        v-if="store.state.editingadding == false &&
+        v-if="$store.state.viewing == true"
+        class="fade-in"
+      >
+        <button
+          :to="{ name: 'learningpaths-edit-overview' }"
+          tag="button"
+          class="btn btn-outline-primary mb-2"
+          :disabled="showBackConfirmation"
+          @click="goBack"
+        >
+          <i class="fa fa-arrow-left" /> Go Back to Overview
+        </button>
+        <div
+          class="card p-4"
+          style="padding: 2.5rem !important;"
+        >
+          <div class="card-body">
+            <div v-if="store.state.learningpath">
+              <h2>
+                {{store.state.learningpath.name}}
+              </h2>
+              {{store.state.learningpath.description}}
+              <div v-if="learningpath">
+                <LearningPathView
+                  :learningpath="learningpath"
+                  @finish-edit="finishEdit"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        v-else-if="store.state.editingadding == false &&
           store.state.editingpretest == false &&
-          store.state.editingrestriction == false"
+          store.state.editingrestriction == false &&
+          store.state.viewing == false"
         class="fade-in"
       >
         <LearningPathList />
@@ -49,7 +83,7 @@
           tag="button"
           class="btn btn-outline-primary mb-2"
           :disabled="showBackConfirmation"
-          @click="goBack"
+          @click="goBackConfirmation(false)"
         >
           <i class="fa fa-arrow-left" /> Go Back to Overview
         </button>
@@ -131,6 +165,7 @@ import { useRouter } from 'vue-router'
 import Completion from './completion/CompletionFlow.vue'
 import Restriction from './restriction/RestrictionFlow.vue'
 import LearingPath from './flowchart/LearningPath.vue'
+import LearningPathView from './flowchart/LearningPathView.vue';
 import LearningPathList from './LearningPathList.vue'
 import TextInputs from './charthelper/textInputs.vue'
 import TeacherView from './teacher_view/TeacherView.vue';
@@ -189,6 +224,9 @@ const checkRoute = (currentRoute) => {
     nextTick(() => showForm(currentRoute.params.learningpathId));
   } else if (currentRoute.name === 'learningpath-new') {
     store.state.editingadding = true;
+    nextTick(() => showForm(null));
+  } else if (currentRoute.name === 'learningpath-view') {
+    store.state.viewing = true;
     nextTick(() => showForm(null));
   }
 };
@@ -285,6 +323,7 @@ const goBackConfirmation = (toggle) => {
     goBack()
   }
   store.state.editingadding = false
+  store.state.viewing = false
   store.state.editingrestriction = false
   store.state.editingpretest = false
   store.state.learningPathID = null

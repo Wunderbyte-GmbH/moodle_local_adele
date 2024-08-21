@@ -61,12 +61,21 @@ const routes = [
                 path: '/learningpaths/edit/new',
                 component: learningpathsEdit,
                 name: 'learningpath-new'
+            }, {
+                path: '/learningpaths/view/:learningpathId(\\d+)',
+                component: learningpathsEdit,
+                name: 'learningpath-view'
             },
         ],
     }, {
             path: '/learningpaths/edit/:learningpathId(\\d+)/:userId(\\d+)',
             component: userPath,
             name: 'userDetails'
+    },
+    {
+          path: '/learningpaths/view/:learningpathId(\\d+)',
+          component: userPath,
+          name: 'userDetails'
     },
     {
         path: '/learningpaths/:catchAll(.*)',

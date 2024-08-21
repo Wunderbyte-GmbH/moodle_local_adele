@@ -131,10 +131,25 @@ class learning_paths {
      *
      * @return array
      */
-    public static function get_learning_paths() {
+    public static function get_learning_paths($hascapability, $sessionvalue) {
         global $DB;
-        $learningpaths = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description, image');
-        return array_map(fn($a) => (array)$a, $learningpaths);
+        $response = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description, image');
+        $learningpaths = [
+            'edit' => [],
+            'view' => [],
+        ];
+        if ($hascapability) {
+            $learningpaths['edit'] = array_map(fn($a) => (array)$a, $response);
+        } else {
+            foreach ($response as $lpid => $lp) {
+                if (isset($sessionvalue[$lpid])) {
+                    $learningpaths['edit'][] = (array) $lp;
+                } else {
+                    $learningpaths['view'][] = (array) $lp;
+                }
+            }
+        }
+        return $learningpaths;
     }
 
     /**
@@ -212,7 +227,6 @@ class learning_paths {
 
         $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
             'name, description, image, json');
-
         if (isset($learningpath)) {
             $copyindex = 1;
             $copiedname = $learningpath->name .= ' copy';

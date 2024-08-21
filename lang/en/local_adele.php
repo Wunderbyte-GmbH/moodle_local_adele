@@ -53,6 +53,7 @@ $string['learningpaths_edit_no_learningpaths'] = 'There are no goals to show.';
 
 // Learning goals overview.
 $string['edit'] = 'Edit';
+$string['view'] = 'View';
 $string['delete'] = 'Delete';
 $string['deletepromptpre'] = 'Do you really want to delete the learning goal "';
 $string['deletepromptpost'] = '"?';

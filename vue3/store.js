@@ -41,9 +41,11 @@ export function createAppStore() {
                 strings: {},
                 quizsetting: {},
                 learningpaths: null,
+                viewlearningpaths: null,
                 learningpath: null,
                 availablecourses: null,
                 editingadding: false,
+                viewing: false,
                 editingrestriction: false,
                 editingpretest: false,
                 node: null,
@@ -71,7 +73,8 @@ export function createAppStore() {
                 state.strings = strings;
             },
             setLearningpaths(state, ajaxdata) {
-                state.learningpaths = ajaxdata;
+                state.learningpaths = ajaxdata.edit;
+                state.viewlearningpaths = ajaxdata.view;
             },
             setLearningpath(state, ajaxdata) {
               if (typeof ajaxdata.json === 'string' && ajaxdata.json != '') {

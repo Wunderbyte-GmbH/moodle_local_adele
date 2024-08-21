@@ -52,6 +52,10 @@ const props = defineProps({
   learningpath: {
     type: Object,
     default: null,
+  },
+  view: {
+    type: Boolean,
+    default: false,
   }
 });
 
@@ -92,7 +96,9 @@ watch(() => props.learningpath, (newValue) => {
     setNodes([])
     setEdges([])
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+  if (!props.view) {
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+  }
 });
 
 watch(() => learningpathcontrol.value, async() => {
@@ -115,9 +121,11 @@ onMounted( async () => {
     learningpathcontrol.value.json.tree.nodes = nodesDimensions
     drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
   }
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
-  deepCopy.value = JSON.parse(JSON.stringify(toObject()))
-  deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath))
+  if (!props.view) {
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+    deepCopy.value = JSON.parse(JSON.stringify(toObject()))
+    deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath))
+  }
 });
 
 
@@ -192,47 +200,16 @@ const onCancelConfirmation = (toggle) => {
     store.state.editingadding = false;
     store.state.editingrestriction = false;
     store.state.editingpretest = false;
+    store.state.viewing = false;
     emit('finish-edit');
     router.push({name: 'learningpaths-edit-overview'});
 };
-
-// Update the position of the nodes
-function updatePos() {
-  let elements = toObject();
-  let loop = true
-  //get all ids
-  let nodelabels = ['starting_node'];
-  let yvalue = 0;
-
-  while (loop) {
-    let newlabels = []
-    let xvalue = 0;
-    elements.nodes.forEach((el) => {
-      nodelabels.forEach((label) => {
-          if(el.parentCourse && el.parentCourse.includes(label)){
-            el.position.y = yvalue
-            el.position.x = xvalue
-            xvalue -= 500;
-            newlabels.push(el.id)
-          }
-      })
-    })
-    yvalue += 350;
-    newlabels == [...new Set(newlabels)]
-    nodelabels = newlabels
-    if (nodelabels.length == 0 ) {
-      loop = false
-    }
-  }
-  setNodes(elements.nodes)
-  setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
-}
 
 </script>
 
 <template>
   <Panel
-    v-if="store.state.view != 'teacher'"
+    v-if="store.state.view != 'teacher' && !props.view"
     class="save-restore-controls"
   >
     <button
@@ -295,6 +272,19 @@ function updatePos() {
         {{ store.state.strings.btncreatecourse }}
       </button>
     </a>
+  </Panel>
+  <Panel
+    v-else-if="props.view"
+    class="save-restore-controls"
+  >
+    <button
+      id="cancel-learning-path"
+      class="btn btn-secondary m-2"
+      :disabled="showCancelConfirmation"
+      @click="onCancelConfirmation(false)"
+    >
+      {{ store.state.strings.btncancel }}
+    </button>
   </Panel>
 </template>
 

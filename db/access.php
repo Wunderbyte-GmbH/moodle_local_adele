@@ -34,6 +34,13 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
             ],
         ],
+        'local/adele:teacheredit' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_COURSE,
+            'archetypes' => [
+                'teacher' => CAP_ALLOW,
+            ],
+        ],
         'local/adele:view' => [
             'captype' => 'view',
             'contextlevel' => CONTEXT_SYSTEM,

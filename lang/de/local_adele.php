@@ -50,6 +50,7 @@ $string['learningpaths_edit_no_learningpaths'] = 'Es gibt keine Ziele zum Anzeig
 
 // Uebersicht Lernziele.
 $string['edit'] = 'Bearbeiten';
+$string['view'] = 'Anschauen';
 $string['delete'] = 'Löschen';
 $string['deletepromptpre'] = 'Möchten Sie das Lernziel "';
 $string['deletepromptpost'] = '" wirklich löschen?';

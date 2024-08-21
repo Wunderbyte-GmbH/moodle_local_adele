@@ -113,6 +113,7 @@
 
   onMounted(() => {
     if (
+      props.data.completion &&
       props.data.completion.feedback &&
       props.data.completion.feedback.status == 'completed'
     ) {

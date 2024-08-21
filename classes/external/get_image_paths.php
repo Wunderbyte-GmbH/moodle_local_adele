@@ -34,10 +34,12 @@ use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use local_adele\asset_handler;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/local/adele/lib.php');
 
 /**
  * External Service for local catquiz.
@@ -70,7 +72,13 @@ class get_image_paths extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:canmanage', $context);
+        $hascapability = has_capability('local/adele:canmanage', $context);
+        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+
+        // If the user doesn't have the capability and the session value is empty, handle the error.
+        if (!$hascapability && empty($sessionvalue)) {
+            throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermission', 'You do not have the required capability and the session key is not set.');
+        }
 
         return asset_handler::get_image_paths();
     }
