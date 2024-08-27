@@ -47,7 +47,6 @@
         </button>
         <div
           class="card p-4"
-          style="padding: 2.5rem !important;"
         >
           <div class="card-body">
             <div v-if="store.state.learningpath">
@@ -109,12 +108,11 @@
         </div>
         <div
           class="card p-4"
-          style="padding: 2.5rem !important;"
         >
           <h2 class="mt-3">
             {{ store.state.strings.learningpath_form_title_edit }}
           </h2>
-          <div class="card-body">
+          <div>
             <div v-if="store.state.learningpath">
               <TextInputs
                 :goal="store.state.learningpath"

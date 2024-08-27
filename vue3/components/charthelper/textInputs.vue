@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import { useStore } from 'vuex'
 
@@ -116,105 +116,181 @@ const editLearningpath = async (singlelearningpathid) => {
   window.open('/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
 };
 
+const selectedUsers = ref([]);
+
+const users = [
+  { id: 1, name: 'Alice Johnson' },
+  { id: 2, name: 'Bob Smith' },
+  { id: 3, name: 'Charlie Brown' },
+  { id: 4, name: 'Diana Prince' },
+  { id: 5, name: 'Evan Davis' }
+];
+
+const searchQuery = ref('');
+
+// Function to add a selected user to the list
+const addUser = (event) => {
+  const userId = parseInt(event.target.value, 10);
+  const user = users.find(user => user.id === userId);
+  if (user && !selectedUsers.value.some(u => u.id === user.id)) {
+    selectedUsers.value.push(user);
+  }
+  event.target.value = ''; // Reset the dropdown to allow re-selection
+};
+
+// Function to remove a selected user from the list
+const removeUser = (userId) => {
+  selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+};
+
+// Computed property to filter users based on the search query
+const filteredUsers = computed(() => {
+  return users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+    !selectedUsers.value.some(selected => selected.id === user.id)
+  );
+});
+
 </script>
 
 <template>
   <div>
     <div v-if="store.state.view!='teacher'">
-      <h4 class="font-weight-bold">
-        {{ store.state.strings.fromlearningtitel }}
-      </h4>
-      <div class="mb-2">
-        <input
-          id="goalnameplaceholder"
-          v-model="goalname"
-          v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
-          class="form-control fancy-input"
-          :placeholder="store.state.strings.goalnameplaceholder"
-          type="text"
-          autofocus
-        >
+      <div class="col-12">
+        <h4 class="font-weight-bold">
+          {{ store.state.strings.fromlearningtitel }}
+        </h4>
+        <div class="mb-2">
+          <input
+            id="goalnameplaceholder"
+            v-model="goalname"
+            v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
+            class="form-control fancy-input"
+            :placeholder="store.state.strings.goalnameplaceholder"
+            type="text"
+            autofocus
+          >
+        </div>
       </div>
-      <h4 class="font-weight-bold">
-        {{ store.state.strings.fromlearningdescription }}
-      </h4>
-      <div class="mb-2">
-        <textarea
-          id="goalsubjectplaceholder"
-          v-model="goaldescription"
-          v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
-          class="form-control fancy-input"
-          :placeholder="store.state.strings.goalsubjectplaceholder"
-        />
+      <div class="col-12">
+        <h4 class="font-weight-bold">
+          {{ store.state.strings.fromlearningdescription }}
+        </h4>
+        <div class="mb-2">
+          <textarea
+            id="goalsubjectplaceholder"
+            v-model="goaldescription"
+            v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
+            class="form-control fancy-input"
+            :placeholder="store.state.strings.goalsubjectplaceholder"
+          />
+        </div>
       </div>
-      <h4 class="font-weight-bold">
-        {{ store.state.strings.from_default_node_image }}
-      </h4>
-      <div class="mb-2">
-        Upload your default node image
-        <div
-          v-if="store.state.lpimages && Object.keys(store.state.lpimages).length > 0"
-          class="mb-2"
-        >
-          <button
-            type="button"
-            class="btn btn-info"
-            @click="showCourseImageSelection = !showCourseImageSelection"
-          >
-            Select learning path image
-          </button>
-          <div
-            v-if="selectedCourseImagePath"
-            class="image-preview-container"
-          >
-            <img
-              :src="selectedCourseImagePath"
-              alt="Selected Image"
-              class="image-preview"
-            >
-            <button
-              class="deselect-btn"
-              @click="selectCourseImage()"
-            >
-              Deselect
-            </button>
-          </div>
-          <div
-            v-if="showCourseImageSelection"
-            class="image-selection-container"
-          >
+      <div class="col-12 row">
+        <div class="col-6">
+          <h4 class="font-weight-bold">
+            {{ store.state.strings.from_default_node_image }}
+          </h4>
+          <div class="mb-2">
+            Upload your default node image
             <div
-              v-for="path in selectionImages"
-              :key="path"
-              class="image-option"
-              @click="selectCourseImage(path)"
+              v-if="store.state.lpimages && Object.keys(store.state.lpimages).length > 0"
+              class="mb-2"
             >
-              <img
-                :src="path"
-                alt="Image"
-                class="image-option-img"
+              <button
+                type="button"
+                class="btn btn-info"
+                @click="showCourseImageSelection = !showCourseImageSelection"
               >
+                Select learning path image
+              </button>
+              <div
+                v-if="selectedCourseImagePath"
+                class="image-preview-container"
+              >
+                <img
+                  :src="selectedCourseImagePath"
+                  alt="Selected Image"
+                  class="image-preview"
+                >
+                <button
+                  class="deselect-btn"
+                  @click="selectCourseImage()"
+                >
+                  Deselect
+                </button>
+              </div>
+              <div
+                v-if="showCourseImageSelection"
+                class="image-selection-container"
+              >
+                <div
+                  v-for="path in selectionImages"
+                  :key="path"
+                  class="image-option"
+                  @click="selectCourseImage(path)"
+                >
+                  <img
+                    :src="path"
+                    alt="Image"
+                    class="image-option-img"
+                  >
+                </div>
+              </div>
+            </div>
+            <div>
+              <label for="newImage">Or upload a new image:</label>
+              <input type="file" id="newImage" @change="onFileChange">
+              <div
+                v-if="newImagePreview"
+              >
+                <img
+                  :src="newImagePreview"
+                  alt="Selected Image"
+                  class="image-preview"
+                >
+                <button
+                  type="button"
+                  class="btn btn-info"
+                  @click="uploadNewImage()"
+                >
+                  Upload and use image
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        <div>
-          <label for="newImage">Or upload a new image:</label>
-          <input type="file" id="newImage" @change="onFileChange">
-          <div
-            v-if="newImagePreview"
+        <div class="col-6">
+          <h4>Select Users</h4>
+          <input
+            v-model="searchQuery"
+            placeholder="Search users..."
+            class="form-control mb-2"
           >
-            <img
-              :src="newImagePreview"
-              alt="Selected Image"
-              class="image-preview"
+          <select @change="addUser" class="form-control mb-3">
+            <option value="" disabled>Select a user</option>
+            <option v-for="user in filteredUsers" :key="user.id" :value="user.id">
+              {{ user.name }}
+            </option>
+          </select>
+
+          <div v-if="selectedUsers.length" class="d-flex flex-wrap">
+            <div
+              v-for="user in selectedUsers"
+              :key="user.id"
+              class="card card-user mb-2 mr-2"
             >
-            <button
-              type="button"
-              class="btn btn-info"
-              @click="uploadNewImage()"
-            >
-              Upload and use image
-            </button>
+              <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                <span>{{ user.name }}</span>
+                <button
+                  class="btn btn-link text-danger p-0"
+                  @click="removeUser(user.id)"
+                  title="Remove"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -226,7 +302,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.fromlearningtitel }}
           </h5>
         </div>
-        <div class="card-body">
+        <div>
           <h4>{{ goalname }}</h4>
           <span v-if="goalname">
             <button
@@ -249,7 +325,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.fromlearningdescription }}
           </h5>
         </div>
-        <div class="card-body">
+        <div>
           <p class="card-text">
             {{ goaldescription ? goaldescription : store.state.strings.charthelper_no_name }}
           </p>
