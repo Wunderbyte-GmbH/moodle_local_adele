@@ -89,7 +89,9 @@ onMounted(() => {
       }
     })
   }
-  if (props.data.completion.singlerestrictionnode && props.data.completion.singlerestrictionnode.length == 0) {
+  if (store.state.view == 'teacher') {
+    active.value = true
+  } else if (props.data.completion.singlerestrictionnode && props.data.completion.singlerestrictionnode.length == 0) {
     active.value = true
   } else if (props.data.completion.restrictionnode && props.data.completion.restrictionnode.valid) {
     active.value = true

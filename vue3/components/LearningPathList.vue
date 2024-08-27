@@ -167,7 +167,7 @@
         </div>
       </div>
     </span>
-    <div v-if="viewLearningPaths">
+    <div v-if="viewLearningPaths && viewLearningPaths.length != 0">
       <h2>
         Viewable learningpath
       </h2>

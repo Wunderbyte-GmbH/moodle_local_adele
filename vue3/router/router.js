@@ -73,11 +73,6 @@ const routes = [
             name: 'userDetails'
     },
     {
-          path: '/learningpaths/view/:learningpathId(\\d+)',
-          component: userPath,
-          name: 'userDetails'
-    },
-    {
         path: '/learningpaths/:catchAll(.*)',
         component: notFound
     },
