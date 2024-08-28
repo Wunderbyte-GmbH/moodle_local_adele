@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { notify } from "@kyvg/vue3-notification";
 import { useStore } from 'vuex'
+import userSearch from './userSearch.vue';
 
 const props = defineProps({
   goal: {
@@ -116,41 +117,6 @@ const editLearningpath = async (singlelearningpathid) => {
   window.open('/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
 };
 
-const selectedUsers = ref([]);
-
-const users = [
-  { id: 1, name: 'Alice Johnson' },
-  { id: 2, name: 'Bob Smith' },
-  { id: 3, name: 'Charlie Brown' },
-  { id: 4, name: 'Diana Prince' },
-  { id: 5, name: 'Evan Davis' }
-];
-
-const searchQuery = ref('');
-
-// Function to add a selected user to the list
-const addUser = (event) => {
-  const userId = parseInt(event.target.value, 10);
-  const user = users.find(user => user.id === userId);
-  if (user && !selectedUsers.value.some(u => u.id === user.id)) {
-    selectedUsers.value.push(user);
-  }
-  event.target.value = ''; // Reset the dropdown to allow re-selection
-};
-
-// Function to remove a selected user from the list
-const removeUser = (userId) => {
-  selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
-};
-
-// Computed property to filter users based on the search query
-const filteredUsers = computed(() => {
-  return users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
-    !selectedUsers.value.some(selected => selected.id === user.id)
-  );
-});
-
 </script>
 
 <template>
@@ -260,39 +226,7 @@ const filteredUsers = computed(() => {
             </div>
           </div>
         </div>
-        <div class="col-6">
-          <h4>Select Users</h4>
-          <input
-            v-model="searchQuery"
-            placeholder="Search users..."
-            class="form-control mb-2"
-          >
-          <select @change="addUser" class="form-control mb-3">
-            <option value="" disabled>Select a user</option>
-            <option v-for="user in filteredUsers" :key="user.id" :value="user.id">
-              {{ user.name }}
-            </option>
-          </select>
-
-          <div v-if="selectedUsers.length" class="d-flex flex-wrap">
-            <div
-              v-for="user in selectedUsers"
-              :key="user.id"
-              class="card card-user mb-2 mr-2"
-            >
-              <div class="card-body p-2 d-flex align-items-center justify-content-between">
-                <span>{{ user.name }}</span>
-                <button
-                  class="btn btn-link text-danger p-0"
-                  @click="removeUser(user.id)"
-                  title="Remove"
-                >
-                  &times;
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+          <userSearch />
       </div>
     </div>
     <div v-else>

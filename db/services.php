@@ -175,4 +175,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_get_lp_edit_users' => [
+      'classname' => 'local_adele\external\get_lp_edit_users',
+      'classpath' => '',
+      'description' => 'Update user seen lp',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

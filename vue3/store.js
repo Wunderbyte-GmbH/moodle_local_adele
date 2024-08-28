@@ -360,6 +360,19 @@ export function createAppStore() {
                 throw error;
               }
             },
+            async getFoundUsers(context, query) {
+              const result = await ajax('mod_booking_search_users', {
+                query: query,
+              });
+              return result;
+            },
+            async getLpEditUsers(context, lpid) {
+              const result = await ajax('local_adele_get_lp_edit_users', {
+                contextid: context.state.contextid,
+                lpid: lpid,
+              });
+              return result;
+            },
         }
     });
 }
