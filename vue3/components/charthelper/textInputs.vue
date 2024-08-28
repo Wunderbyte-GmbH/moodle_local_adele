@@ -302,7 +302,7 @@ const filteredUsers = computed(() => {
             {{ store.state.strings.fromlearningtitel }}
           </h5>
         </div>
-        <div>
+        <div style="padding: 1rem;">
           <h4>{{ goalname }}</h4>
           <span v-if="goalname">
             <button
@@ -319,13 +319,15 @@ const filteredUsers = computed(() => {
           </span>
         </div>
       </div>
-      <div class="card border-secondary">
+      <div
+        class="card border-secondary"
+      >
         <div class="card-header bg-secondary text-white">
           <h5 class="card-title mb-0">
             {{ store.state.strings.fromlearningdescription }}
           </h5>
         </div>
-        <div>
+        <div         style="padding: 1rem;">
           <p class="card-text">
             {{ goaldescription ? goaldescription : store.state.strings.charthelper_no_name }}
           </p>

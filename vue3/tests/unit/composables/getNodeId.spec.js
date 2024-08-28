@@ -1,4 +1,4 @@
-import getNodeId from '../../composables/getNodeId';
+import getNodeId from '../../../composables/getNodeId';
 
 describe('getNodeId', () => {
   it('Search for the node id given a prefixe', () => {

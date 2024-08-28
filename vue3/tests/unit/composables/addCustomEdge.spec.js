@@ -1,4 +1,4 @@
-import addCustomEdge from '../../composables/addCustomEdge';
+import addCustomEdge from '../../../composables/addCustomEdge';
 import { MarkerType } from '@vue-flow/core';
 
 describe('addCustomEdge', () => {

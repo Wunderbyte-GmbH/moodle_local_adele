@@ -23,46 +23,56 @@
  */ -->
 
  <template>
-  <div class="table-container">
-    <table class="table table-margin-top">
-      <thead>
-        <tr>
-          <th @click="sortTable('id')" :class="getSortClass('id')">{{ store.state.strings.user_view_id }}</th>
-          <th @click="sortTable('username')" :class="getSortClass('username')">{{ store.state.strings.user_view_username }}</th>
-          <th @click="sortTable('firstname')" :class="getSortClass('firstname')">{{ store.state.strings.user_view_firstname }}</th>
-          <th @click="sortTable('lastname')" :class="getSortClass('lastname')">{{ store.state.strings.user_view_lastname }}</th>
-          <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')">{{ store.state.strings.user_view_progress }}</th>
-          <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')">{{ store.state.strings.user_view_nodes }}</th>
-        </tr>
-      </thead>
-        <transition-group name="list" tag="tbody">
-          <tr
-            v-for="relation in sortedRelations"
-            :key="relation.id"
-            :class="{ 'highlighted-row': relation.id === focusEntry }"
-          >
-            <td>
-              <router-link
-                v-if="store.state.view !== 'student'"
-                :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
+  <div>
+    <button @click="toggleTable" class="btn-primary toggle-button">
+      {{ isTableVisible ? 'Hide ' : 'Show ' }} User List
+    </button>
+    <transition name="slide-fade">
+      <div
+        v-if="isTableVisible"
+        class="table-container"
+      >
+        <table class="table">
+          <thead>
+            <tr>
+              <th @click="sortTable('id')" :class="getSortClass('id')">{{ store.state.strings.user_view_id }}</th>
+              <th @click="sortTable('username')" :class="getSortClass('username')">{{ store.state.strings.user_view_username }}</th>
+              <th @click="sortTable('firstname')" :class="getSortClass('firstname')">{{ store.state.strings.user_view_firstname }}</th>
+              <th @click="sortTable('lastname')" :class="getSortClass('lastname')">{{ store.state.strings.user_view_lastname }}</th>
+              <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')">{{ store.state.strings.user_view_progress }}</th>
+              <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')">{{ store.state.strings.user_view_nodes }}</th>
+            </tr>
+          </thead>
+            <transition-group name="list" tag="tbody">
+              <tr
+                v-for="relation in sortedRelations"
+                :key="relation.id"
+                :class="{ 'highlighted-row': relation.id === focusEntry }"
               >
-                {{ relation.id }}
+                <td>
+                  <router-link
+                    v-if="store.state.view !== 'student'"
+                    :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
+                  >
+                    {{ relation.id }}
 
-              </router-link>
-              <div v-else>
-                {{ relation.id }}
-              </div>
-            </td>
-            <td>{{ relation.username }}</td>
-            <td>{{ relation.firstname }}</td>
-            <td>{{ relation.lastname }}</td>
-            <td>
-              <ProgressBar :progress="relation.progress.progress" />
-            </td>
-            <td>{{ relation.progress.completed_nodes }}</td>
-          </tr>
-        </transition-group>
-    </table>
+                  </router-link>
+                  <div v-else>
+                    {{ relation.id }}
+                  </div>
+                </td>
+                <td>{{ relation.username }}</td>
+                <td>{{ relation.firstname }}</td>
+                <td>{{ relation.lastname }}</td>
+                <td>
+                  <ProgressBar :progress="relation.progress.progress" />
+                </td>
+                <td>{{ relation.progress.completed_nodes }}</td>
+              </tr>
+            </transition-group>
+        </table>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -77,9 +87,9 @@ const sortedRelations = ref([...store.state.lpuserpathrelations.slice(0, 10)]);
 const sortKey = ref('');
 const sortDirection = ref(1);
 const focusEntry = ref(null);
+const isTableVisible = ref(true);
 
-
-const stop = watch(
+watch(
   () => store.state.lpuserpathrelations,
   (newVal) => {
     if (store.state.view === 'student' && store.state.userlist === 2) {
@@ -116,6 +126,10 @@ const scrollIntoFocus = () => {
   });
 }
 
+const toggleTable = () => {
+  isTableVisible.value = !isTableVisible.value;
+};
+
 const sortTable = (key) => {
   if (sortKey.value === key) {
     sortDirection.value *= -1;
@@ -141,7 +155,29 @@ const getSortClass = (key) => {
 </script>
 
 <style scoped>
+.toggle-button {
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
 
+.toggle-button:hover {
+  background-color: #0056b3;
+}
+
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.slide-fade-enter-from, .slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 .list-move,
 .list-enter-active,
 .list-leave-active {

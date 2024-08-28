@@ -1,39 +1,58 @@
-
 <script setup>
-  // Import needed libraries
-  import { ref } from 'vue';
-  import UserFeedbackBlock from './UserFeedbackBlock.vue';
-  import { useStore } from 'vuex';
+// Import needed libraries
+import { ref, watchEffect } from 'vue';
+import UserFeedbackBlock from './UserFeedbackBlock.vue';
+import { useStore } from 'vuex';
 
-  // Load Store
-  const showFeedbackarea = ref(false);
-  const store = useStore()
+// Load Store
+const showFeedbackarea = ref(false);
+const feedbackStyle = ref({});
+const store = useStore();
 
-  const props = defineProps({
-    data: {
-      type: Object,
-      required: true,
-    },
-    mobile: {
-      type: Boolean,
-      default: false,
-    },
-  });
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
+  mobile: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-  const toggleFeedbackarea = () => {
-    showFeedbackarea.value = !showFeedbackarea.value;
-  };
+const toggleFeedbackarea = () => {
+  showFeedbackarea.value = !showFeedbackarea.value;
+};
 
+watchEffect(() => {
+  if (showFeedbackarea.value) {
+    feedbackStyle.value = {
+      position: 'absolute',
+      top: '100%',
+      left: '0',
+      width: '100%',
+      backgroundColor: '#EAEAEA',
+      padding: '10px',
+      borderBottomLeftRadius: '8px',
+      borderBottomRightRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+      zIndex: 100,
+    };
+  } else {
+    feedbackStyle.value = {};
+  }
+});
 </script>
 
 <template>
   <div
     class="card-container"
-    :class="{ [data.node_id + '_user_info_listener']: true}"
+    :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }"
     @click.stop
   >
     <div
       class="toggle-button"
+      :class="{ 'no-bottom-radius': showFeedbackarea }"
       @click.stop="toggleFeedbackarea"
     >
       <i
@@ -43,6 +62,7 @@
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea"
+        :style="feedbackStyle"
         class="selectable"
         @mousedown.stop
         @mousemove.stop
@@ -121,6 +141,7 @@
 }
 
 .card-container {
+  position: relative;
   justify-content: center;
   align-items: center;
   padding: 5px;
@@ -129,12 +150,28 @@
   text-align: center;
 }
 
+.card-container.no-bottom-radius {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+
 .toggle-button {
   cursor: pointer;
+  border-radius: 8px; /* This is the default state */
+  transition: background-color 0.3s ease, border-radius 0.3s ease;
+}
+
+.toggle-button.no-bottom-radius {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.toggle-button:hover {
+  background-color: rgb(123, 127, 132);
 }
 
 .fa-comment {
-  color: #333;
   font-size: 20px;
 }
 
@@ -146,37 +183,19 @@
   background-color: rgb(213, 207, 207);
 }
 
-.feedback-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ced4da;
-  resize: none;
-  font-family: inherit;
-  font-size: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-textarea:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  outline: none;
+.selectable {
+  user-select: text;
+  cursor: text;
 }
 
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s ease;
 }
+
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
+
 .status-text {
   font-weight: bold;
   align-items: center;
@@ -184,9 +203,5 @@ textarea:focus {
 
 .status-text .fa-info-circle {
   margin-right: 5px;
-}
-.selectable {
-  user-select: text;
-  cursor: text;
 }
 </style>
