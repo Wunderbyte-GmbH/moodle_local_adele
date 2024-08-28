@@ -57,7 +57,7 @@ class learning_path_editors {
     /**
      * Save learning path.
      *
-     * @param int $params
+     * @param int $lpid
      * @return array
      */
     public static function get_editors($lpid) {
@@ -76,7 +76,7 @@ class learning_path_editors {
                 'id' => $editor->id,
                 'email' => $editor->email,
                 'firstname' => $editor->firstname,
-                'lastname' => $editor->lastname
+                'lastname' => $editor->lastname,
             ];
         }
         return $result;
