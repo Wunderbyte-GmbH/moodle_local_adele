@@ -211,6 +211,7 @@ const onCancelConfirmation = (toggle) => {
   <Panel
     v-if="store.state.view != 'teacher' && !props.view"
     class="save-restore-controls"
+    style="margin-top:3rem"
   >
     <button
       v-if="current_user_view"

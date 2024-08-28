@@ -310,10 +310,12 @@ const expandCourses = () => {
   min-height: 200px;
   padding: 1rem;
   font-size: clamp(40px, 2.8vw, 64px);
-  white-space: nowrap;
-  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
   text-overflow: ellipsis;
   font-weight: bold;
+  hyphens: auto;
 }
 .overlay {
   position: relative;
