@@ -55,7 +55,7 @@ class learning_path_editors {
     }
 
     /**
-     * Save learning path.
+     * Get editors of user path.
      *
      * @param int $lpid
      * @return array
@@ -80,5 +80,38 @@ class learning_path_editors {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Create a new editor for a field.
+     *
+     * @param int $lpid
+     * @param int $userid
+     * @return array
+     */
+    public static function create_editors($lpid, $userid) {
+        global $DB;
+        $data = new stdClass();
+        $data->learningpathid = $lpid;
+        $data->userid = $userid;
+        $result = $DB->insert_record('local_adele_lp_editors', $data);
+        return ['success' => $result];
+    }
+
+    /**
+     * Create a new editor for a field.
+     *
+     * @param int $lpid
+     * @param int $userid
+     * @return array
+     */
+    public static function remove_editors($lpid, $userid) {
+        global $DB;
+        $DB->delete_records('local_adele_lp_editors', [
+            'learningpathid' => $lpid,
+            'userid' => $userid
+          ]
+        );
+        return ['success' => true];
     }
 }

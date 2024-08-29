@@ -23,8 +23,11 @@ watch(searchQuery, () => {
 });
 
 const addUser = (user) => {
-  console.log(selectedUsers.value)
-  console.log(user)
+  store.dispatch('createLpEditUsers',
+  {
+    lpid: store.state.learningPathID,
+    userid: user.id,
+  });
   if (!selectedUsers.value.some(selected => selected.id === user.id)) {
     selectedUsers.value.push(user);
   }
@@ -32,6 +35,10 @@ const addUser = (user) => {
 };
 
 const removeUser = (userId) => {
+  store.dispatch('removeLpEditUsers', {
+    lpid: store.state.learningPathID,
+    userid: userId,
+  });
   selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
 };
 

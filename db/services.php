@@ -183,4 +183,20 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_create_lp_edit_users' => [
+      'classname' => 'local_adele\external\create_lp_edit_users',
+      'classpath' => '',
+      'description' => 'Update user seen lp',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
+    'local_adele_remove_lp_edit_users' => [
+      'classname' => 'local_adele\external\remove_lp_edit_users',
+      'classpath' => '',
+      'description' => 'Update user seen lp',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];
