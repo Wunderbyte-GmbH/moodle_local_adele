@@ -131,5 +131,17 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Adele savepoint reached.
         upgrade_plugin_savepoint(true, 2024081201, 'local', 'adele');
     }
+    if ($oldversion < 2024082905) {
+        // Define table local_adele_lp_editors to be created.
+        $table = new xmldb_table('local_adele_learning_paths');
+        $field = new xmldb_field('visibility', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+
+        // Conditionally launch add field image.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Adele savepoint reached.
+        upgrade_plugin_savepoint(true, 2024082905, 'local', 'adele');
+    }
     return true;
 }

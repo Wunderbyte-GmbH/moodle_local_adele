@@ -135,7 +135,12 @@ class learning_paths {
      */
     public static function get_learning_paths($hascapability, $sessionvalue) {
         global $DB;
-        $response = $DB->get_records('local_adele_learning_paths', null, '' , 'id, name, description, image');
+        $response = $DB->get_records(
+          'local_adele_learning_paths',
+          null,
+          '' ,
+          'id, name, description, image, visibility'
+        );
         $learningpaths = [
             'edit' => [],
             'view' => [],

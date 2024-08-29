@@ -32,9 +32,8 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-use external_multiple_structure;
-use local_adele\learning_paths;
-use required_capability_exception;
+use local_adele\learning_path_editors;
+use local_adele\learning_path_update;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -49,7 +48,7 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_learningpaths extends external_api {
+class update_lp_visiblity extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -58,9 +57,9 @@ class get_learningpaths extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'learningpathid'  => new external_value(PARAM_INT, 'learningpathd', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'lpid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'visibility'  => new external_value(PARAM_BOOL, 'contextid', VALUE_REQUIRED),
             ]
         );
     }
@@ -68,21 +67,14 @@ class get_learningpaths extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $userid
-     * @param int $learningpathid
      * @param int $contextid
+     * @param int $lpid
+     * @param int $visibility
      * @return array
      */
-    public static function execute($userid, $learningpathid, $contextid): array {
-        $params = self::validate_parameters(self::execute_parameters(), [
-            'userid' => $userid,
-            'learningpathid' => $learningpathid,
-            'contextid' => $contextid,
-        ]);
-
+    public static function execute($contextid, $lpid, $visibility): array {
         require_login();
         $context = context::instance_by_id($contextid);
-
         $hascapability = has_capability('local/adele:canmanage', $context);
         $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
 
@@ -95,10 +87,8 @@ class get_learningpaths extends external_api {
               'You do not have the required capability and the session key is not set.'
             );
         }
-        return learning_paths::get_learning_paths(
-          $hascapability,
-          $sessionvalue
-        );
+
+        return learning_path_update::update_visiblity($lpid, $visibility);
     }
 
     /**
@@ -108,26 +98,8 @@ class get_learningpaths extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'edit' => new external_multiple_structure(
-                new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
-                    'name' => new external_value(PARAM_TEXT, 'Item name'),
-                    'description' => new external_value(PARAM_TEXT, 'Item description'),
-                    'image' => new external_value(PARAM_TEXT, 'Item image'),
-                    'visibility' => new external_value(PARAM_TEXT, 'visibility'),
-                ]),
-                VALUE_OPTIONAL
-            ),
-            'view' => new external_multiple_structure(
-                new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Item id'),
-                    'name' => new external_value(PARAM_TEXT, 'Item name'),
-                    'description' => new external_value(PARAM_TEXT, 'Item description'),
-                    'image' => new external_value(PARAM_TEXT, 'Item image'),
-                    'visibility' => new external_value(PARAM_TEXT, 'visibility'),
-                ]),
-                VALUE_OPTIONAL
-              ),
-        ]);
+                    'success' => new external_value(PARAM_INT, 'Condition description'),
+                ]
+        );
     }
 }

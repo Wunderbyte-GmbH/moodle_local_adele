@@ -373,6 +373,27 @@ export function createAppStore() {
               });
               return result;
             },
+            createLpEditUsers(context, params) {
+              ajax('local_adele_create_lp_edit_users', {
+                contextid: context.state.contextid,
+                lpid: params.lpid,
+                userid: params.userid,
+              });
+            },
+            removeLpEditUsers(context, params) {
+              ajax('local_adele_remove_lp_edit_users', {
+                contextid: context.state.contextid,
+                lpid: params.lpid,
+                userid: params.userid,
+              });
+            },
+            updateLearningPathVisibility(context, params) {
+              ajax('local_adele_update_lp_visiblity', {
+                contextid: context.state.contextid,
+                lpid: params.lpid,
+                visibility: params.visibility,
+              });
+            },
         }
     });
 }

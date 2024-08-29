@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\strategy
+ * @covers \local_adele
  */
 class learning_path_editors_test extends advanced_testcase {
 

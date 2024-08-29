@@ -74,11 +74,26 @@
             class="card shadow"
             style="width: 450px;"
           >
-            <div class="card-header text-center bg-primary text-white">
-              <h5>
+          <div class="card-header bg-primary text-white">
+            <div class="position-relative">
+              <h5 class="text-center mb-0">
                 {{ singlelearningpath.name }}
               </h5>
+              <a
+                class="icon-link position-absolute"
+                href="#"
+                data-toggle="tooltip"
+                data-placement="right"
+                :title="singlelearningpath.visibility ? 'Make Invisible' : 'Make Visible'"
+                @click.prevent="toggleVisibility(singlelearningpath)"
+              >
+                <i
+                  class="icon fa-fw iconsmall"
+                  :class="singlelearningpath.visibility ? 'fa fa-eye' : 'fa fa-eye-slash'"
+                />
+              </a>
             </div>
+          </div>
             <div
               class="card-body"
             >
@@ -171,59 +186,62 @@
       <h2>
         Viewable learningpath
       </h2>
-      <div
-        v-for="viewablelearningpath in viewLearningPaths"
-        :key="viewablelearningpath.id"
-        class="learningcard"
-      >
+      <span class="learningcardcont">
         <div
-          class="card shadow"
-          style="width: 450px;"
+          v-for="viewablelearningpath in viewLearningPaths"
+          :key="viewablelearningpath.id"
+          class="learningcard"
         >
-          <div class="card-header text-center bg-primary text-white">
-            <h5>
-              {{ viewablelearningpath.name }}
-            </h5>
-          </div>
           <div
-            class="card-body"
+            v-if="viewablelearningpath.visibility == 1"
+            class="card shadow"
+            style="width: 450px;"
           >
+            <div class="card-header text-center bg-primary text-white">
+              <h5>
+                {{ viewablelearningpath.name }}
+              </h5>
+            </div>
             <div
-              class="mb-2"
-              :style="{
-                height: '10rem',
-                backgroundImage: viewablelearningpath.image ? `url(${viewablelearningpath.image})` : '',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundColor: '#cccccc',
-                borderRadius: '1rem'
-              }"
+              class="card-body"
             >
-              <div class="overlay">
-                <a
-                  class="icon-link"
-                  href=""
-                  data-toggle="tooltip"
-                  data-placement="right"
-                  :title="store.state.strings.view"
-                  @click.prevent="viewLearningpath(viewablelearningpath.id)"
-                >
-                  <i
-                    class="icon m-r-0 fa fa-solid fa-eye fa-fw iconsmall"
-                  />
-                </a>
+              <div
+                class="mb-2"
+                :style="{
+                  height: '10rem',
+                  backgroundImage: viewablelearningpath.image ? `url(${viewablelearningpath.image})` : '',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundColor: '#cccccc',
+                  borderRadius: '1rem'
+                }"
+              >
+                <div class="overlay">
+                  <a
+                    class="icon-link"
+                    href=""
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    :title="store.state.strings.view"
+                    @click.prevent="viewLearningpath(viewablelearningpath.id)"
+                  >
+                    <i
+                      class="icon m-r-0 fa fa-solid fa-play fa-fw iconsmall"
+                    />
+                  </a>
+                </div>
+              </div>
+              <div>
+                <b>
+                  {{ store.state.strings.main_description }}
+                </b>
+                {{ viewablelearningpath.description }}
               </div>
             </div>
-            <div>
-              <b>
-                {{ store.state.strings.main_description }}
-              </b>
-              {{ viewablelearningpath.description }}
-            </div>
           </div>
-        </div>
 
-      </div>
+        </div>
+      </span>
     </div>
   </div>
 </template>
@@ -249,7 +267,6 @@ const viewLearningPaths = computed(() => {
     return store.state.viewlearningpaths;
 })
 
-
 const search = ref('');
 let learningPaths = [];
 let filteredLp = [];
@@ -260,11 +277,27 @@ onMounted(async () => {
     if (store.state.learningpaths) {
     learningPaths = store.state.learningpaths;
     filteredLp = [...learningPaths];
+    filteredLp.forEach(lp => {
+          if (lp.visibility === undefined) {
+            lp.visibility = false;
+          }
+        });
     }
   }, {
        deep: true
       });
 });
+
+// Handle toggling of visibility
+const toggleVisibility = (learningPath) => {
+  learningPath.visibility = !learningPath.visibility;
+  store.dispatch('updateLearningPathVisibility',
+    {
+      lpid: learningPath.id,
+      visibility: learningPath.visibility
+    }
+  )
+};
 
 
 // Load Store and Router
@@ -358,7 +391,17 @@ const duplicateLearningpath = (learningpathid) => {
 }
 </style>
 <style scoped>
+  .position-relative {
+    position: relative;
+  }
 
+  .icon-link.position-absolute {
+    position: absolute;
+    right: 0; /* Aligns the icon to the right */
+    top: 50%; /* Vertically centers the icon */
+    transform: translateY(-50%); /* Adjust for perfect vertical centering */
+    padding-right: 15px; /* Adjust as needed to give space from the right edge */
+  }
   .search {
     max-width: 500px;
   }
@@ -377,7 +420,6 @@ const duplicateLearningpath = (learningpathid) => {
   .learningcard {
     display: flex;
     flex-flow: column;
-    margin: 20px;
   }
 
   .card-header {
@@ -409,6 +451,7 @@ const duplicateLearningpath = (learningpathid) => {
   .card {
     height: 100%;
     display: flex;
+    margin: 20px;
   }
 
   .icon-link {

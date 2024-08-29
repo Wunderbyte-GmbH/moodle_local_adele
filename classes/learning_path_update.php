@@ -32,6 +32,7 @@ use local_adele\helper\user_path_relation;
 use context_system;
 use core_completion\progress;
 use mod_adele_observer;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -161,5 +162,20 @@ class learning_path_update {
                 }
             }
         }
+    }
+
+    /**
+     * Trigger user path subscription
+     *
+     * @param string $lpid
+     * @param bool $visibility
+     */
+    public static function update_visiblity($lpid, $visibility) {
+        global $DB;
+        $data = new stdClass();
+        $data->id = $lpid;
+        $data->visibility = $visibility;
+        $result = $DB->update_record('local_adele_learning_paths', $data);
+        return ['success' => $result];
     }
 }
