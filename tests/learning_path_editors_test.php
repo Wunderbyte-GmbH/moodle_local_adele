@@ -17,7 +17,7 @@
 /**
  * Tests strategy
  *
- * @package    local_catquiz
+ * @package    local_adele
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,13 +28,11 @@ namespace local_adele;
 use local_adele\learning_path_editors;
 use advanced_testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests strategy
  *
  * @package    local_adele
- * @author DJacob Viertel
+ * @author Jacob Viertel
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *

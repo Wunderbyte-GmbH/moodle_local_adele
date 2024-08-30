@@ -109,7 +109,7 @@ class learning_path_editors {
         global $DB;
         $DB->delete_records('local_adele_lp_editors', [
             'learningpathid' => $lpid,
-            'userid' => $userid
+            'userid' => $userid,
           ]
         );
         return ['success' => true];

@@ -17,8 +17,8 @@
 /**
  * Tests strategy
  *
- * @package    local_catquiz
- * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @package    local_adele
+ * @author Jacob Viertel
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,10 +27,6 @@ namespace local_adele;
 
 use local_adele\learning_path_update;
 use advanced_testcase;
-use stdClass;
-
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests strategy
@@ -45,8 +41,9 @@ defined('MOODLE_INTERNAL') || die();
 class learning_path_update_test extends advanced_testcase {
 
     /**
-     * @runInSeparateProcess
      * Test the update_visibility method.
+     *
+     * @runInSeparateProcess
      */
     public function test_update_visibility() {
         global $DB;
@@ -57,7 +54,6 @@ class learning_path_update_test extends advanced_testcase {
             ->with(
                 $this->equalTo('local_adele_learning_paths'),
                 $this->callback(function($data) {
-                    // Ensure the data passed to update_record has the correct values.
                     return $data->id === 1 && $data->visibility === true;
                 })
             )

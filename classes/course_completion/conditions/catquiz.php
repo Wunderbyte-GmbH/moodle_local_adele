@@ -296,6 +296,7 @@ class catquiz implements course_completion {
      * @param object $record
      * @param string $parentscaleglobal
      * @param string $parentscalerecord
+     * @param array $partialpassedattemptids
      * @return bool
      */
     private function check_scale(
@@ -333,6 +334,7 @@ class catquiz implements course_completion {
      * @param object $record
      * @param string $parentscaleglobal
      * @param string $parentscalerecord
+     * @param array $partialpassedattemptids
      * @return bool
      */
     private function check_attempts(
