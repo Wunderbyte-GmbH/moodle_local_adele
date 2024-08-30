@@ -40,7 +40,7 @@
         :key="index + '_' + title"
         class="feedback-item"
       >
-        {{ capitalize(feedback, index, data.length) }}
+        <span v-html="capitalize(feedback, index, data.length)"></span>
         <span v-if="index < data.length - 1" class="or-text">
           {{ store.state.strings.course_condition_concatination_or }}
         </span>

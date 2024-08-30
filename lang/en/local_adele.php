@@ -185,9 +185,10 @@ $string['course_description_before_condition_course_completed'] = '{numb_courses
 $string['course_description_inbetween_condition_course_completed'] = 'you have to finish {numb_courses} course(s). Current completion grades: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'you finished enough courses of this node';
 
-$string['course_description_before_condition_catquiz'] = 'complete the catquiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_catquiz'] = 'quiz {catquiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'quiz {catquiz_name_link}} was successfully finished';
+$string['course_description_before_condition_catquiz'] = 'complete the catquiz {quiz_name}';
+$string['course_description_inbetween_condition_catquiz'] = 'quiz {quiz_name} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_after_condition_catquiz'] = 'your results of the quiz "{quiz_name}". Congratulation! {quiz_attempts_list}';
+$string['course_description_after_condition_modquiz_list'] = 'In attempt from {$a->time} your were able to demonstrate the required competencies in the following areas: {$a->scales}. <a href="{$a->link}" target="_blank">Click to see details</a>.<br>';
 
 $string['course_description_before_condition_modquiz'] = 'complete the quiz {catquiz_name_link}';
 $string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';

@@ -629,7 +629,15 @@ class relation_update {
                 }
             } else if (isset($condition[$id]['placeholders'])) {
                 foreach ($condition[$id]['placeholders'] as $placeholder => $text) {
-                    if (is_array($text)) {
+                    if ($placeholder == 'quiz_attempts_list') {
+                        $tmptext = '';
+                        foreach ($text as $textelement) {
+                            $textelement = (object) $textelement;
+                            $tmptext .=
+                              get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
+                        }
+                        $text = $tmptext;
+                    } else if (is_array($text)) {
                         $text = implode(', ', $text);
                     }
                     $string = str_replace(

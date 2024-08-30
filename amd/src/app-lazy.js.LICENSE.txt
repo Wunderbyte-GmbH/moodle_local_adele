@@ -6,6 +6,8 @@
 
 /*! #__NO_SIDE_EFFECTS__ */
 
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
 /**
  *
  * @package     local_adele
@@ -15,7 +17,16 @@
  */
 
 /**
-* @vue/shared v3.4.31
+ * Validate if the string does excist.
+ *
+ * @package     local_adele
+ * @author      Jacob Viertel
+ * @copyright  2023 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+* @vue/shared v3.4.38
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
