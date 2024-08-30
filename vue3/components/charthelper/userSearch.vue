@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
-import { debounce } from 'lodash-es';
+import { debounce } from 'lodash';
 
 const store = useStore();
 
