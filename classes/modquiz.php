@@ -25,10 +25,6 @@
 
 namespace local_adele;
 
-use local_catquiz\catquiz_handler;
-use local_catquiz\data\dataapi;
-use local_catquiz\testenvironment;
-
 /**
  * Class learning_paths
  *

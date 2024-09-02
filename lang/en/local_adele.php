@@ -135,6 +135,8 @@ $string['title_save'] = 'Learning Path saved/updated';
 $string['description_save'] = 'You have saved/updated the Learning Path!';
 $string['image_title_save'] = 'Learning Path image has been saved/updated';
 $string['image_description_save'] = 'You have saved/updated the Learning Path image!';
+$string['title_change_visibility'] = 'Changed learning path visibility';
+$string['description_change_visibility'] = 'You have successfully changed the Learning Path visibility!';
 
 
 // Node Strings.
@@ -187,7 +189,7 @@ $string['course_description_after_condition_course_completed'] = 'you finished e
 
 $string['course_description_before_condition_catquiz'] = 'complete the catquiz {quiz_name}';
 $string['course_description_inbetween_condition_catquiz'] = 'quiz {quiz_name} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'your results of the quiz "{quiz_name}". Congratulation! {quiz_attempts_list}';
+$string['course_description_after_condition_catquiz'] = 'your results of the quiz "{quiz_name}". Congratulation!<br>{quiz_attempts_list}';
 $string['course_description_after_condition_modquiz_list'] = 'In attempt from {$a->time} your were able to demonstrate the required competencies in the following areas: {$a->scales}. <a href="{$a->link}" target="_blank">Click to see details</a>.<br>';
 
 $string['course_description_before_condition_modquiz'] = 'complete the quiz {catquiz_name_link}';

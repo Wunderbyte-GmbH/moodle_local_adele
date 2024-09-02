@@ -89,7 +89,7 @@
               >
                 <i
                   class="icon fa-fw iconsmall"
-                  :class="singlelearningpath.visibility ? 'fa fa-eye' : 'fa fa-eye-slash'"
+                  :class="singlelearningpath.visibility== '1' ? 'fa fa-eye' : 'fa fa-eye-slash'"
                 />
               </a>
             </div>
@@ -297,6 +297,11 @@ const toggleVisibility = (learningPath) => {
       visibility: learningPath.visibility
     }
   )
+  notify({
+    title: store.state.strings.title_change_visibility,
+    text: store.state.strings.description_change_visibility,
+    type: 'success'
+  });
 };
 
 

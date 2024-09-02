@@ -130,6 +130,8 @@ $string['title_save'] = 'Lernpfad gespeichert/aktualisiert';
 $string['description_save'] = 'Der Lernpfad wurde gespeichert/aktualisiert!';
 $string['image_title_save'] = 'Lernpfad-Bild gespeichert/aktualisiert';
 $string['image_description_save'] = 'Das Lernpfad-Bild wurde gespeichert/aktualisiert!';
+$string['title_change_visibility'] = 'Sichtbarkeit geändert';
+$string['description_change_visibility'] = 'Du hast erfolgreich die Sichtbarkeit des Lernpfades geändert!';
 
 // Knotenzeichenfolgen.
 $string['node_coursefullname'] = 'Knotenname:';
@@ -191,7 +193,7 @@ $string['course_description_after_condition_course_completed'] = 'du hast genug 
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
 $string['course_description_inbetween_condition_catquiz'] = 'das Quiz {quiz_name} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'deine Ergebnisse im Quiz "{quiz_name}". Gratulation! {quiz_attempts_list}';
+$string['course_description_after_condition_catquiz'] = 'deine Ergebnisse im Quiz "{quiz_name}". Gratulation!.<br>{quiz_attempts_list}';
 $string['course_description_after_condition_modquiz_list'] = 'Im Versuch am {$a->time} hast du die geforderten Kompetenzen in folgenden Bereichen nachgewiesen: {$a->scales}. <a href="{$a->link}" target="_blank">Zum Ergebnis im Detail</a>.<br>';
 
 $string['course_description_before_condition_modquiz'] = 'beende das Quiz {catquiz_name_link}';
