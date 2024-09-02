@@ -35,6 +35,7 @@ use external_single_structure;
 use external_multiple_structure;
 use local_adele\course_restriction\course_restriction_info;
 use local_adele\learning_path_editors;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 

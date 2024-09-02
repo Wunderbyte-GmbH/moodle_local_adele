@@ -363,13 +363,13 @@ class relation_update {
             $status != 'closed' &&
             $status != 'not_accessible'
           ) {
-            $node['data']['animations']['restrictiontime'] = time();
+            $node['data']['animations']['seenrestriction'] = false;
         }
         if (
           !isset($node['data']['animations']['seencompletion']) &&
           $status == 'completed'
         ) {
-            $node['data']['animations']['completiontime'] = time();
+            $node['data']['animations']['seencompletion'] = false;
         }
         return $node;
     }

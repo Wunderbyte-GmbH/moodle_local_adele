@@ -87,6 +87,7 @@
 // Import needed libraries
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
+import { useStore } from 'vuex';
 import Controls from './ControlsPath.vue'
 import CustomNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
@@ -95,6 +96,8 @@ import OrCourses from '../nodes/OrCourses.vue'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 
+// Load Store
+const store = useStore()
 
 const props = defineProps({
   learningpath: {
@@ -191,7 +194,7 @@ const setZoomLevel = async (action) => {
 }
 
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter )
+  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
 }
 
 </script>

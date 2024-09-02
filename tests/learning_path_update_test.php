@@ -27,6 +27,8 @@ namespace local_adele;
 
 use local_adele\learning_path_update;
 use advanced_testcase;
+use moodle_database;
+use stdClass;
 
 /**
  * Tests strategy
@@ -48,7 +50,7 @@ class learning_path_update_test extends advanced_testcase {
     public function test_update_visibility() {
         global $DB;
 
-        $DB = $this->createMock(\moodle_database::class);
+        $DB = $this->createMock(moodle_database::class);
         $DB->expects($this->once())
             ->method('update_record')
             ->with(
@@ -65,6 +67,81 @@ class learning_path_update_test extends advanced_testcase {
 
         $this->assertArrayHasKey('success', $result);
     }
+
+    /**
+     * Test the update_animations method.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_update_animations() {
+        global $DB;
+        $learningpathid = 1;
+        $userid = 2;
+        $nodeid = 'node-1';
+        $animations = json_encode([
+            'seenrestriction' => true,
+            'seencompletion' => false,
+        ]);
+        $record = new stdClass();
+        $record->id = 10;
+        $record->json = json_encode([
+            'tree' => [
+                'nodes' => [
+                    [
+                        'id' => 'node-1',
+                        'data' => [
+                            'animations' => new stdClass(),
+                        ],
+                    ],
+                    [
+                        'id' => 'node-2',
+                        'data' => [
+                            'animations' => new stdClass(),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        // Mock the DB get_record method.
+        $DB = $this->createMock(moodle_database::class);
+        $DB->expects($this->once())
+            ->method('get_record')
+            ->with(
+                'local_adele_path_user',
+                [
+                    'user_id' => $userid,
+                    'learning_path_id' => $learningpathid,
+                    'status' => 'active',
+                ],
+                'id, json'
+            )
+            ->willReturn($record);
+
+        // Mock the DB update_record method.
+        $DB->expects($this->once())
+            ->method('update_record')
+            ->with(
+                'local_adele_path_user',
+                $this->callback(function($arg) use ($record) {
+                    $json = json_decode($arg['json']);
+                    return $arg['id'] == $record->id &&
+                          $json->tree->nodes[0]->data->animations->seenrestriction == true &&
+                          $json->tree->nodes[0]->data->animations->seencompletion == false;
+                })
+            )
+            ->willReturn(true);
+
+        // Run the update_animations function.
+        $result = learning_path_update::update_animations(
+            $learningpathid,
+            $userid,
+            $nodeid,
+            $animations
+        );
+        // Assert the expected result.
+        $this->assertEquals(['success' => true], $result);
+    }
+
     /**
      * Helper method to replace the global $DB with a mock.
      *

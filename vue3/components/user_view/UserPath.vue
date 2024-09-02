@@ -233,7 +233,7 @@ const handleZoomLock = (node) => {
       node: null,
     }
     event.node = findNode(node)
-    zoomstep.value = onNodeClick(event, zoomLock, setCenter)
+    zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
   })
 }
 
@@ -299,7 +299,7 @@ function setFlowchart() {
 
 // Zoom in node
 function onNodeClickCall(event) {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter)
+  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
   edges.value = innerGraphDisplay(edges.value, removeEdges)
 }
 

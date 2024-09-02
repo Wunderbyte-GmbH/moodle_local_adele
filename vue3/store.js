@@ -394,6 +394,15 @@ export function createAppStore() {
                 visibility: params.visibility,
               });
             },
+            setNodeAnimations(context, params){
+              ajax('local_adele_update_lp_animations', {
+                contextid: context.state.contextid,
+                learningpathid: context.state.learningPathID,
+                userid: context.state.user,
+                nodeid: params.nodeid,
+                animations: JSON.stringify(params.animations),
+              });
+            }
         }
     });
 }

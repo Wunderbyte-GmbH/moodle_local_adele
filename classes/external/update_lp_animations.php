@@ -32,9 +32,7 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
-use external_multiple_structure;
-use local_adele\course_restriction\course_restriction_info;
-use local_adele\learning_path_editors;
+use local_adele\learning_path_update;
 use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,7 +48,7 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @copyright  2023 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_lp_edit_users extends external_api {
+class update_lp_animations extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -60,7 +58,10 @@ class get_lp_edit_users extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            'lpid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
+            'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
+            'nodeid'  => new external_value(PARAM_TEXT, 'nodeid', VALUE_REQUIRED),
+            'animations'  => new external_value(PARAM_TEXT, 'animations', VALUE_REQUIRED),
             ]
         );
     }
@@ -69,42 +70,40 @@ class get_lp_edit_users extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $contextid
-     * @param int $lpid
+     * @param int $learningpathid
+     * @param int $userid
+     * @param string $nodeid
+     * @param string $animations
      * @return array
      */
-    public static function execute($contextid, $lpid): array {
+    public static function execute(
+        $contextid,
+        $learningpathid,
+        $userid,
+        $nodeid,
+        $animations
+    ): array {
         require_login();
         $context = context::instance_by_id($contextid);
-        $hascapability = has_capability('local/adele:canmanage', $context);
-        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+        require_capability('local/adele:view', $context);
 
-        // If the user doesn't have the capability and the session value is empty, handle the error.
-        if (!$hascapability && empty($sessionvalue)) {
-            throw new required_capability_exception(
-              $context,
-              'local/adele:canmanage',
-              'nopermission',
-              'You do not have the required capability and the session key is not set.'
-            );
-        }
-
-        return learning_path_editors::get_editors($lpid);
+        return learning_path_update::update_animations(
+          $learningpathid,
+          $userid,
+          $nodeid,
+          $animations
+        );
     }
 
     /**
      * Returns description of method result value.
      *
-     * @return external_multiple_structure
+     * @return external_single_structure
      */
-    public static function execute_returns(): external_multiple_structure {
-        return new external_multiple_structure(
-            new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'Condition description'),
-                    'email' => new external_value(PARAM_EMAIL, 'Condition email'),
-                    'firstname' => new external_value(PARAM_TEXT, 'Condition firstname'),
-                    'lastname' => new external_value(PARAM_TEXT, 'Condition lastname'),
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure([
+                    'success' => new external_value(PARAM_INT, 'Condition description'),
                 ]
-            )
         );
     }
 }

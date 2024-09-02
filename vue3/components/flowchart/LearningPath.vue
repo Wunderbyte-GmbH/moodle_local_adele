@@ -319,7 +319,7 @@ const onDrag = ($event) => {
 }
 
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter )
+  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store )
 }
 
 // Prevent default event if node has been dropped

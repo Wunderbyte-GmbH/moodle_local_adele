@@ -38,7 +38,6 @@ import truncatedText from '../../composables/nodesHelper/truncatedText';
 const store = useStore();
 const date = ref({})
 const includedCourses = ref([])
-
 const parentnode = ref({})
 const props = defineProps({
   data: {
@@ -55,10 +54,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits([
-  'node-clicked',
-]);
 const active = ref(false)
+const startanimation = ref(true);
+
+const handleNodeClick = () => {
+  startanimation.value = false;
+};
 
 onMounted(() => {
   const userpath = props.learningpath
@@ -96,6 +97,39 @@ onMounted(() => {
   } else if (props.data.completion.restrictionnode && props.data.completion.restrictionnode.valid) {
     active.value = true
   }
+  const triggerAnimation = () => {
+    if (
+      props.data.completion.feedback &&
+      props.data.completion.feedback.status !== 'closed' &&
+      props.data.completion.feedback.status !== 'not_accessible'
+    ) {
+      if (
+        props.data.animations &&
+        props.data.animations.seencompletion === false &&
+        startanimation.value
+      ) {
+        iconState.value = 'expanding';
+          setTimeout(() => {
+          iconClass.value = 'fa-play';
+          setTimeout(() => {
+            iconState.value = 'fading';
+            setTimeout(() => {
+              triggerAnimation();
+              if (!startanimation.value) {
+                iconClass.value = 'fa-play';
+              } else {
+                iconClass.value = 'fa-lock';
+              }
+            }, 2000);
+          }, 2000);
+        }, 750);
+      } else {
+        iconClass.value = 'fa-play';
+        iconState.value = '';
+      }
+    }
+  };
+  triggerAnimation();
 })
 
 const cover_image = computed(() => get_cover_image(props.data));
@@ -140,36 +174,11 @@ const goToCourse = () => {
 }
 const iconState = ref('initial');
 const iconClass = ref('fa-lock');
-
-onMounted(() => {
-  if (
-    props.data.completion.feedback &&
-    props.data.completion.feedback.status != 'closed' &&
-    props.data.completion.feedback.status != 'not_accessible'
-  ) {
-    if (
-      props.data.animations &&
-      props.data.animations.completiontime > store.state.lastseen
-    ) {
-    setTimeout(() => {
-        iconState.value = 'fading';
-        setTimeout(() => {
-          iconClass.value = 'fa-play';
-          iconState.value = 'expanding';
-        }, 750);
-      }, 1000);
-    }
-    else {
-      iconClass.value = 'fa-play';
-    }
-  }
-
-});
 </script>
 
 <template>
   <div
-    @click="emit('node-clicked', props.data)"
+    @click="handleNodeClick"
   >
     <div
       v-if="zoomstep != '0.2'"
@@ -213,9 +222,12 @@ onMounted(() => {
                 <i
                   :class="
                     ['fa', iconClass,
-                    { 'icon-unlocking': iconState === 'unlocking',
-                    'icon-fading': iconState === 'fading',
-                    'icon-expanding': iconState === 'expanding' }]"
+                    {
+                      'icon-fading': iconState === 'fading',
+                      'icon-expanding': iconState === 'expanding',
+                      'icon-fadingIn': iconState === 'fadingIn',
+                    },
+                  ]"
                   />
               </button>
             </div>
@@ -285,16 +297,13 @@ onMounted(() => {
 
 <style scoped>
 @keyframes fading {
-  50% {
-    transform: scale(1.2);
-  }
   100% {
+    opacity: 0;
     transform: scale(0.2);
-    opacity: 0.1;
   }
 }
-.icon-fading.fa-lock {
-  animation: fading 0.75s ease-in-out forwards;
+.icon-fading {
+  animation: fading 1s ease-out forwards;
 }
 
 @keyframes expanding {
@@ -308,10 +317,25 @@ onMounted(() => {
   }
   100% {
     transform: scale(1);
+    opacity: 1;
   }
 }
-.icon-expanding.fa-play {
+.icon-expanding {
   animation: expanding 0.75s ease-in-out forwards;
+}
+
+@keyframes fadingIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.icon-fadingIn {
+  animation: fadingIn 1s ease-out forwards;
 }
 
 .card-body-outer {

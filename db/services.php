@@ -207,4 +207,12 @@ $functions = [
       'ajax' => true,
       'capabilities' => 'local/adele:edit',
     ],
+    'local_adele_update_lp_animations' => [
+      'classname' => 'local_adele\external\update_lp_animations',
+      'classpath' => '',
+      'description' => 'Update user seen lp',
+      'type' => 'read',
+      'ajax' => true,
+      'capabilities' => 'local/adele:edit',
+    ],
 ];

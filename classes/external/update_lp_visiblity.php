@@ -34,6 +34,7 @@ use external_value;
 use external_single_structure;
 use local_adele\learning_path_editors;
 use local_adele\learning_path_update;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -21,6 +21,8 @@
 
   // Create a ref for conditions
   const showCard = ref(false);
+  const iconState = ref('initial');
+  const iconClass = ref('fa-info');
 
   const toggleCard = () => {
     showCard.value = !showCard.value
@@ -108,9 +110,6 @@
     return return_date;
   }
 
-  const iconState = ref('initial');
-  const iconClass = ref('fa-info');
-
   onMounted(() => {
     if (
       props.data.completion &&
@@ -119,7 +118,7 @@
     ) {
       if (
           props.data.animations &&
-          props.data.animations.restrictiontime > store.state.lastseen
+          props.data.animations.seenrestriction == false
         ) {
         setTimeout(() => {
             iconState.value = 'animated';

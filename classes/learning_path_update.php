@@ -178,4 +178,40 @@ class learning_path_update {
         $result = $DB->update_record('local_adele_learning_paths', $data);
         return ['success' => $result];
     }
+
+    /**
+     * Observer for course completed
+     *
+     * @param object $event
+     */
+    public static function update_animations(
+        $learningpathid,
+        $userid,
+        $nodeid,
+        $animations
+    ) {
+        global $DB;
+        $record = $DB->get_record(
+          'local_adele_path_user',
+          [
+            'user_id' => $userid,
+            'learning_path_id' => $learningpathid,
+            'status' => 'active',
+          ],
+          'id, json',
+        );
+        $animations = (array) json_decode($animations);
+        $json = json_decode($record->json);
+        foreach ($json->tree->nodes as $node) {
+            if ($node->id == $nodeid) {
+                $node->data->animations = $animations;
+                break;
+            }
+        }
+        $DB->update_record(
+          'local_adele_path_user',
+          ['id' => $record->id, 'json' => json_encode($json)]
+        );
+        return ['success' => true];
+    }
 }
