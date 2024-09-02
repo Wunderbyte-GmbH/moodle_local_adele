@@ -51,14 +51,14 @@ class modquiz_test extends advanced_testcase {
                 'id' => 1,
                 'course' => 101,
                 'name' => 'Quiz 1',
-                'coursename' => 'Course 1'
+                'coursename' => 'Course 1',
             ],
             (object)[
                 'id' => 2,
                 'course' => 102,
                 'name' => 'Quiz 2',
-                'coursename' => 'Course 2'
-            ]
+                'coursename' => 'Course 2',
+            ],
         ];
         $DB->expects($this->once())
             ->method('get_records_sql')
@@ -70,7 +70,7 @@ class modquiz_test extends advanced_testcase {
         // Define what we expect the result to look like.
         $expectedresult = [
             ['id' => 1, 'course' => 101, 'name' => 'Quiz 1', 'coursename' => 'Course 1'],
-            ['id' => 2, 'course' => 102, 'name' => 'Quiz 2', 'coursename' => 'Course 2']
+            ['id' => 2, 'course' => 102, 'name' => 'Quiz 2', 'coursename' => 'Course 2'],
         ];
         $this->assertEquals($expectedresult, $result);
     }
@@ -78,8 +78,7 @@ class modquiz_test extends advanced_testcase {
     /**
      * Helper method to set global mock objects.
      *
-     * @param string $globalname
-     * @param mixed $mockobject
+     * @param \moodle_database $mockdb
      */
     protected function set_global_db($mockdb) {
         global $DB;
