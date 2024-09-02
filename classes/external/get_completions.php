@@ -84,10 +84,10 @@ class get_completions extends external_api {
             new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Condition description'),
                     'name' => new external_value(PARAM_TEXT, 'Condition description'),
-                    'description' => new external_value(PARAM_TEXT, 'Condition description'),
-                    'description_before' => new external_value(PARAM_TEXT, 'Condition description before'),
-                    'description_after' => new external_value(PARAM_TEXT, 'Condition description after'),
-                    'description_inbetween' => new external_value(PARAM_TEXT, 'Condition description inbetween'),
+                    'description' => new external_value(PARAM_RAW, 'Condition description'),
+                    'description_before' => new external_value(PARAM_RAW, 'Condition description before'),
+                    'description_after' => new external_value(PARAM_RAW, 'Condition description after'),
+                    'description_inbetween' => new external_value(PARAM_RAW, 'Condition description inbetween'),
                     'priority' => new external_value(PARAM_TEXT, 'Conditions priority'),
                     'label' => new external_value(PARAM_TEXT, 'Condition label'),
                 ]

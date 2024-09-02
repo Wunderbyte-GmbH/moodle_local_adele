@@ -69,21 +69,18 @@
 
 <style scoped>
 
-/* Starting state for entering */
 .unfold-enter-from, .unfold-leave-to {
   transform: scaleX(0);
   opacity: 0;
-  transform-origin: right; /* Ensures scaling happens left to right */
+  transform-origin: right;
 }
 
-/* Ending state for entering and starting state for leaving */
 .unfold-enter-to, .unfold-leave-from {
   transform: scaleX(1);
   opacity: 1;
   transform-origin: right;
 }
 
-/* Active state for entering and leaving */
 .unfold-enter-active, .unfold-leave-active {
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
@@ -96,7 +93,7 @@
   position: absolute;
   top: -25px;
   right: -25px;
-  display: inline-flex; /* Use flexbox for centering */
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -104,21 +101,21 @@
 
 .information {
   display: inline-block;
-  width: 50px; /* Diameter of the round button */
-  height: 50px; /* Diameter of the round button */
-  border-radius: 50%; /* Makes the div round */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38); /* Adds depth with a shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
 }
 
 .information:hover {
   background-color: #ababab !important;
-  box-shadow: 0 6px 8px rgba(0,0,0,0.2); /* Larger shadow on hover for depth */
+  box-shadow: 0 6px 8px rgba(0,0,0,0.2);
 }
 
 .fa-info {
-  font-size: 30px; /* Make the icon larger */
-  color: white; /* Change the color if needed */
+  font-size: 30px;
+  color: white;
   margin-top: 7px;
 }
 

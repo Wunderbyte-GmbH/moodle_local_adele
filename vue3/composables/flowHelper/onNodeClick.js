@@ -9,27 +9,29 @@ const onNodeClick = (event, zoomLock, setCenter, store) => {
   ).then(() => {
     zoomLock.value = true
   })
-  if (event.node.data.animations) {
+  if (event.node.data.animations  &&
+    store.state.user == store.state.lpuserpathrelation.user_id
+  ) {
     let triggerws = false
+    let animations = JSON.parse(JSON.stringify(event.node.data.animations));
     if (
-      event.node.data.animations.seenrestriction  == false
+      animations.seenrestriction  == false
     ) {
       triggerws = true
-      event.node.data.animations.seenrestriction = true
+      animations.seenrestriction = true
     }
     if (
-      event.node.data.animations.seencompletion == false
+      animations.seencompletion == false
     ) {
       triggerws = true
-      event.node.data.animations.seencompletion = true
+      animations.seencompletion = true
     }
     if (
-      triggerws &&
-      store.state.user == store.state.lpuserpathrelation.user_id
+      triggerws
     ) {
       store.dispatch('setNodeAnimations',{
         nodeid: event.node.id,
-        animations: event.node.data.animations
+        animations: animations
       })
     }
 

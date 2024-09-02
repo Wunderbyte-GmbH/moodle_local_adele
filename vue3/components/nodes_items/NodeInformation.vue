@@ -1,6 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { computed, onMounted, ref } from 'vue';
+  import { computed, onMounted, onUpdated, ref, watch } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -15,6 +15,10 @@
     mobile: {
       type: Boolean,
       default: false,
+    },
+    startanimation: {
+      type: Boolean,
+      default: true,
     },
   });
   const store = useStore();
@@ -111,31 +115,45 @@
   }
 
   onMounted(() => {
+    triggerAnimation();
+    if (props.startanimation && props.data.animations && props.data.animations.seenrestriction === false) {
+    const stop = watch(() => props.startanimation, (newValue, oldValue) => {
+      if (newValue === false) {
+        iconState.value = 'fadingOut';
+        setTimeout(() => {
+          iconClass.value = 'fa-info';
+          iconState.value = 'fadingIn';
+          setTimeout(() => {
+            triggerAnimation()
+            stop();
+          }, 500);
+        }, 500);
+      }
+    });
+  }
+  });
+
+  const triggerAnimation = () => {
     if (
       props.data.completion &&
       props.data.completion.feedback &&
       props.data.completion.feedback.status == 'completed'
     ) {
       if (
-          props.data.animations &&
-          props.data.animations.seenrestriction == false
-        ) {
+        props.data.animations &&
+        props.data.animations.seenrestriction == false
+      ) {
         setTimeout(() => {
-            iconState.value = 'animated';
-            setTimeout(() => {
-              iconClass.value = 'fa-check';
-            }, 750);
+          iconState.value = 'animated';
+          setTimeout(() => {
+            iconClass.value = 'fa-check';
+          }, 750);
         }, 1000);
       } else {
         iconClass.value = 'fa-check';
       }
     }
-  });
-
-  const handleAnimationEnd = () => {
-    iconClass.value = 'fa-check'; // Change the icon to a checkmark
   };
-
 </script>
 
 <template>
@@ -153,8 +171,12 @@
       @click.stop="toggleCard"
     >
       <i
-        :class="['fa', iconClass, {'fa-info-mobile': mobile, 'icon-animated': iconState === 'animated'}]"
-        @animationend="handleAnimationEnd"
+        :class="['fa', iconClass, {
+          'fa-info-mobile': mobile,
+          'icon-animated': iconState === 'animated',
+          'icon-fadingIn': iconState === 'fadingIn',
+          'icon-fadingOut': iconState === 'fadingOut'
+        }]"
       />
     </div>
     <transition :name="mobile ? 'fade' : 'unfold'">
@@ -358,6 +380,30 @@
 
 
 <style scoped>
+
+@keyframes fadingIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.icon-fadingIn {
+  animation: fadingIn 0.5s ease-out forwards;
+}
+
+@keyframes fadingOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.icon-fadingOut {
+  animation: fadingOut 0.5s ease-out forwards;
+}
 
 @keyframes rotateAndFade {
   0% {

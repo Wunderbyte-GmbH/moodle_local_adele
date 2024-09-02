@@ -189,6 +189,7 @@ const iconClass = ref('fa-lock');
         <NodeInformation
           :data
           :parentnode
+          :startanimation
         />
         <div class="row align-items-center">
           <div class="col">

@@ -68,4 +68,26 @@ describe('ModuleNode.vue', () => {
     expect(wrapper.findComponent(Handle).exists()).toBe(false);
   });
 
+  it('applies correct styles to the custom node and module name', () => {
+    const wrapper = mount(ModuleNode, {
+      props: {
+        data: {
+          color: '#FF5733',
+          opacity: 0.75,
+          height: '150px',
+          width: '250px',
+          name: 'Test Node',
+        },
+        zoomstep: 1,
+      },
+    });
+
+    const customNodeStyle = wrapper.find('.custom-node').attributes('style');
+    expect(customNodeStyle).toContain('background-color: rgb(16, 71, 3)');
+    expect(customNodeStyle).toContain('height: 150px');
+    expect(customNodeStyle).toContain('width: 250px');
+
+    const moduleNameStyle = wrapper.find('.module-name').attributes('style');
+    expect(moduleNameStyle).toContain('border: 5px solid #1047033');
+  });
 });
