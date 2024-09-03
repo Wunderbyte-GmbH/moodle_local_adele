@@ -22,7 +22,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, store, b
           let shifted = false
           //calculate starting node
           nodes.forEach((node) => {
-            if(node.parentCourse == 'starting_node'  && 
+            if(node.parentCourse == 'starting_node'  &&
               node.position.x >= rightStartingNode){
               rightStartingNode = node.position.x
               if(backwards){
@@ -42,7 +42,7 @@ const  setStartingNode = (removeNodes, nextTick, addNodes, nodes, skip, store, b
 
           nodes.forEach((node) => {
             while (areNodesIntersecting(startingNode, node)) {
-              startingNode.position.x +=150 
+              startingNode.position.x +=150
             }
           })
           startingNode.position = {
@@ -71,7 +71,7 @@ const areNodesIntersecting = (node1, node2) => {
       (
         left_outmost_point_1 >= left_outmost_point_2 && left_outmost_point_1 <= right_outmost_point_2 ||
         right_outmost_point_1 <= right_outmost_point_2 && right_outmost_point_1 >= left_outmost_point_2
-      ) 
+      )
       &&
       (
         bottom_outmost_point_1 <= bottom_outmost_point_2 && bottom_outmost_point_1 >= top_outmost_point_2 ||
