@@ -75,6 +75,7 @@
             :max-zoom="1.5"
             :min-zoom="0.2"
             :zoom-on-scroll="zoomLock"
+            :zoom-on-pinch="zoomLock"
             class="learning-path-flow"
             @node-click="onNodeClickCall"
           >
