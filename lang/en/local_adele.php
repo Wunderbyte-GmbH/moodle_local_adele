@@ -302,6 +302,7 @@ $string['flowchart_course_already_inside_title'] = 'Course already inside';
 $string['flowchart_course_already_inside_text'] = 'The course is already inside the node included';
 $string['flowchart_drop_refused_title'] = 'Node drop refused';
 $string['flowchart_drop_refused_text'] = 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.';
+$string['flowchart_delete_confirmation'] = 'Do you want to remove node ';
 $string['flowchart_learning_package'] = 'Learning package';
 $string['flowchart_courses'] = 'Courses';
 $string['flowchart_hover_darg_drop'] = 'Drag and drop the course inside the drop zones to include it in the learning path.';

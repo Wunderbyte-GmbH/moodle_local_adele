@@ -186,7 +186,7 @@ class learning_path_update {
      * @param string $userid
      * @param string $nodeid
      * @param string $animations
-     * @param object $event
+     * @return array
      */
     public static function update_animations(
         $learningpathid,

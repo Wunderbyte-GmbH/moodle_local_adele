@@ -306,6 +306,7 @@ $string['flowchart_course_already_inside_title'] = 'Kurs bereits enthalten';
 $string['flowchart_course_already_inside_text'] = 'Der Kurs ist bereits im enthaltenen Knoten.';
 $string['flowchart_drop_refused_title'] = 'Knotenabwurf abgelehnt';
 $string['flowchart_drop_refused_text'] = 'Bitte lassen Sie den Knoten in den Ablagezonen fallen, die angezeigt werden, wenn Sie einen Knoten zu einem vorhandenen Knoten ziehen.';
+$string['flowchart_delete_confirmation'] = 'Möchtest du folgenden Knoten löschen:  ';
 $string['flowchart_learning_package'] = 'Lernpaket';
 $string['flowchart_courses'] = 'Kurse';
 $string['flowchart_hover_darg_drop'] = 'Ziehen Sie den Kurs in die Ablagezonen, um ihn in den Lernpfad aufzunehmen.';

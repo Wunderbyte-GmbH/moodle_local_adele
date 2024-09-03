@@ -79,7 +79,7 @@
             :editorview="editor_view"
             @typeChange="typeChanged"
             @change-module="onChangeModule"
-            @remove-node="onRemoveNode"
+            @delete-node="onRemoveNode"
           />
         </template>
         <template #node-module="{ data }">
@@ -545,7 +545,7 @@ function onRemoveNode(data) {
     let confirmation = true;
 
     if (node.type != 'module') {
-      confirmation = window.confirm('Do you want to remove node ' + node.data.fullname + '?');
+      confirmation = window.confirm(store.state.strings.flowchart_delete_confirmation + node.data.fullname + '?');
     }
     if (confirmation) {
       node.deletable = true;
