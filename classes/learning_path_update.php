@@ -182,6 +182,10 @@ class learning_path_update {
     /**
      * Observer for course completed
      *
+     * @param string $learningpathid
+     * @param string $userid
+     * @param string $nodeid
+     * @param string $animations
      * @param object $event
      */
     public static function update_animations(
