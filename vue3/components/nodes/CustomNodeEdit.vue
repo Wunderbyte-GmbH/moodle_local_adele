@@ -105,7 +105,7 @@ onMounted(() => {
     ) {
       if (
         props.data.animations &&
-        props.data.animations.seencompletion === false &&
+        props.data.animations.seenrestriction === false &&
         startanimation.value
       ) {
         iconState.value = 'expanding';

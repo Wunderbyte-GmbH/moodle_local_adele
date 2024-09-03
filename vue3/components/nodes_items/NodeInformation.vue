@@ -115,8 +115,8 @@
   }
 
   onMounted(() => {
-    triggerAnimation();
-    if (props.startanimation && props.data.animations && props.data.animations.seenrestriction === false) {
+    triggerAnimation()
+    if (props.startanimation && props.data.animations && props.data.animations.seencompletion === false) {
     const stop = watch(() => props.startanimation, (newValue, oldValue) => {
       if (newValue === false) {
         iconState.value = 'fadingOut';
@@ -141,7 +141,7 @@
     ) {
       if (
         props.data.animations &&
-        props.data.animations.seenrestriction == false
+        props.data.animations.seencompletion == false
       ) {
         setTimeout(() => {
           iconState.value = 'animated';
