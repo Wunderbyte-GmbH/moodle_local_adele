@@ -192,8 +192,9 @@ $string['course_description_inbetween_condition_course_completed'] = 'du musst {
 $string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'das Quiz {quiz_name} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'Deine Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
+$string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen. {quiz_attempts_best}';
+$string['course_description_inbetween_condition_catquiz_best'] = '<a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
+$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'beende das Quiz {catquiz_name_link}';
