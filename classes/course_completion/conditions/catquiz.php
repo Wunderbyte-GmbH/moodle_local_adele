@@ -161,12 +161,25 @@ class catquiz implements course_completion {
                     $allpassedrecords = [];
                     $partialpassedrecords = [];
                     $partialpassedattemptids = [];
+                    $percentageofrightanswersbyscalekeyid = [];
+                    $subscaleids = [];
+                    $bestresult = null;
+                    $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = '';
                     foreach ($records as $record) {
                         $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
+                        if (
+                          is_null($bestresult) ||
+                          $personabilityresults->{$scales['parent']['id']} > $bestresult['scale']
+                        ) {
+                            $bestresult['scale'] = $personabilityresults->{$scales['parent']['id']};
+                            $bestresult['scaleid'] = $scales['parent']['id'];
+                            $bestresult['attemptid'] = $record->attemptid;
+                        }
                         $rightanswerspercentage =
                           Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
                         $invalidattempt = false;
                         $parentscalerecord = $personabilityresults->{$scales['parent']['id']};
+                        $percentageofrightanswersbyscalekeyid[$record->attemptid] = (array)$personabilityresults;
                         foreach ($scales as $type => $scaletype) {
                             if ($type == 'parent') {
                                 $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] = $scaletype['name'];
@@ -174,12 +187,12 @@ class catquiz implements course_completion {
                                     self::check_scale(
                                         $personabilityresults, $scaletype, $validationtype,
                                         $invalidattempt, $partialpassedrecords, $record,
-                                        $parentscaleglobal, $parentscalerecord, $partialpassedattemptids
+                                        $parentscaleglobal, $parentscalerecord, $partialpassedattemptids, $subscaleids
                                     ) ||
                                     self::check_attempts(
                                         $rightanswerspercentage, $scaletype, $validationtype,
                                         $invalidattempt, $partialpassedrecords, $record,
-                                        $parentscaleglobal, $parentscalerecord, $partialpassedattemptids
+                                        $parentscaleglobal, $parentscalerecord, $partialpassedattemptids, $subscaleids
                                     )
                                 ) {
                                     break;
@@ -190,12 +203,12 @@ class catquiz implements course_completion {
                                         self::check_scale(
                                             $personabilityresults, $scale, $validationtype,
                                             $invalidattempt, $partialpassedrecords, $record,
-                                            $parentscaleglobal, $parentscalerecord, $partialpassedattemptids
+                                            $parentscaleglobal, $parentscalerecord, $partialpassedattemptids, $subscaleids
                                         ) ||
                                         self::check_attempts(
                                             $rightanswerspercentage, $scale, $validationtype,
                                             $invalidattempt, $partialpassedrecords, $record,
-                                            $parentscaleglobal, $parentscalerecord, $partialpassedattemptids
+                                            $parentscaleglobal, $parentscalerecord, $partialpassedattemptids, $subscaleids
                                         )
                                     ) {
                                         break;
@@ -223,9 +236,24 @@ class catquiz implements course_completion {
                     ) {
                         $catquizzes['completed'][$complitionnode['id']] = $partialpassedrecords;
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_list'] =
-                          self::get_record_list($partialpassedrecords, $scales, $partialpassedattemptids);
+                          self::get_record_list(
+                            $partialpassedrecords,
+                            $scales,
+                            $partialpassedattemptids,
+                            $percentageofrightanswersbyscalekeyid,
+                            $subscaleids
+                          );
                     } else {
                         $catquizzes['completed'][$complitionnode['id']] = false;
+                        if ($bestresult) {
+                            $result = $this->get_attempt_information($bestresult['attemptid']);
+                            $result->time = date("j.n.y", $result->endtime);
+                            $result->link = '/mod/adaptivequiz/attemptfinished.php?attempt=' .
+                              $result->attemptid .
+                              '&instance=' .
+                              $result->instanceid;
+                            $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = $result;
+                        }
                     }
                 } else {
                     $catquizzes['completed'][$complitionnode['id']] = false;
@@ -237,50 +265,82 @@ class catquiz implements course_completion {
 
     /**
      * Helper function to return localized description strings.
-     * @param array $partialpassedrecords
-     * @param array $scales
-     * @param array $attemptids
-     * @return array
+     * @param array $attemptid
+     * @return object
      */
-    private function get_record_list($partialpassedrecords, $scales, $attemptids) {
+    private function get_attempt_information($attemptid) {
         global $DB;
-        $recordlist = [];
+        return $DB->get_record(
+          'local_catquiz_attempts',
+          ['attemptid' => $attemptid],
+          'attemptid, instanceid, endtime'
+        );
+    }
 
-        $attemptsentries = $DB->get_records_list(
+    /**
+     * Helper function to return localized description strings.
+     * @param array $attemptids
+     * @return object
+     */
+    private function get_attempts_information($attemptids) {
+        global $DB;
+        return $DB->get_records_list(
           'local_catquiz_attempts',
           'attemptid',
           array_values($attemptids),
           null,
           'attemptid, instanceid, endtime'
         );
+    }
+
+    /**
+     * Helper function to return localized description strings.
+     * @param array $partialpassedrecords
+     * @param array $scales
+     * @param array $attemptids
+     * @return array
+     */
+    private function get_record_list(
+      $partialpassedrecords,
+      $scales,
+      $attemptids,
+      $percentageofrightanswersbyscalekeyid,
+      $subscaleids
+    ) {
+        global $DB;
+        $recordlist = [];
+
+        $attemptsentries = $this->get_attempts_information($attemptids);
 
         $scalemap = [];
-
         $scalemap[$scales['parent']['id']] = $scales['parent']['name'];
         foreach ($scales['sub'] as $subscale) {
             $scalemap[$subscale['id']] = $subscale['name'];
         }
 
-        foreach ($attemptids as $partialpassedattemptid) {
-            $scaleattemptids = [];
-            foreach ($partialpassedrecords as $type) {
-                foreach ($type as $scaleid => $attempts) {
-                    if (
-                      in_array($partialpassedattemptid, $attempts) &&
-                      !in_array($scaleid, $scaleattemptids)
-                    ) {
-                        $scaleattemptids[] = $scalemap[$scaleid];
-                    }
+        $bestattemptpescale = [];
+        foreach ($subscaleids as $subscaleid) {
+            foreach ($percentageofrightanswersbyscalekeyid as $attempt => $scalevalues) {
+                if (
+                  !isset($bestattemptpescale[$subscaleid]) ||
+                  $scalevalues[$subscaleid] > $bestattemptpescale[$subscaleid]
+                ) {
+                    $bestattemptpescale[$subscaleid] = [
+                      'scale' => $scalevalues[$subscaleid],
+                      'attemptid' => $attempt,
+                    ];
                 }
             }
+        }
+        foreach ($bestattemptpescale as $scale => $attempt) {
             $recordlist[] = [
-              'time' => date("j.n.y", $attemptsentries[$partialpassedattemptid]->endtime),
-              'scales' => implode(', ', $scaleattemptids),
+              'time' => date("j.n.y", $attemptsentries[$attempt['attemptid']]->endtime),
+              'scale' => $scalemap[$scale],
               'link' =>
                 '/mod/adaptivequiz/attemptfinished.php?attempt=' .
-                $partialpassedattemptid .
+                $attempt['attemptid'] .
                 '&instance=' .
-                $attemptsentries[$partialpassedattemptid]->instanceid,
+                $attemptsentries[$attempt['attemptid']]->instanceid,
             ];
         }
         return $recordlist;
@@ -297,11 +357,12 @@ class catquiz implements course_completion {
      * @param string $parentscaleglobal
      * @param string $parentscalerecord
      * @param array $partialpassedattemptids
+     * @param array $subscaleids
      * @return bool
      */
     private function check_scale(
         $personabilityresults, $scale, $validationtype, &$invalidattempt,
-        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord, &$partialpassedattemptids
+        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord, &$partialpassedattemptids, &$subscaleids
     ) {
         if (isset($scale['scale']) && is_numeric($scale['scale'])) {
             if (!(isset($personabilityresults->{$scale['id']}) && $personabilityresults->{$scale['id']} >= $scale['scale'])) {
@@ -317,6 +378,9 @@ class catquiz implements course_completion {
                     $partialpassedrecords['scale'][$scale['id']][] = $record->attemptid;
                     if (!in_array($record->attemptid, $partialpassedattemptids)) {
                         $partialpassedattemptids[] = $record->attemptid;
+                    }
+                    if (!in_array($scale['id'], $subscaleids)) {
+                        $subscaleids[] = $scale['id'];
                     }
                 }
             }
@@ -339,7 +403,7 @@ class catquiz implements course_completion {
      */
     private function check_attempts(
         $attempts, $scale, $validationtype, &$invalidattempt,
-        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord, &$partialpassedattemptids
+        &$partialpassedrecords, $record, $parentscaleglobal, $parentscalerecord, &$partialpassedattemptids, &$subscaleids
     ) {
         if (isset($scale['attempts']) && is_numeric($scale['attempts'])) {
             if (!(isset($attempts[$scale['id']]) && $attempts[$scale['id']]['percentage'] >= $scale['attempts'])) {
@@ -356,6 +420,9 @@ class catquiz implements course_completion {
                     $partialpassedrecords['percentage'][$scale['id']][] = $record->attemptid;
                     if (!in_array($record->attemptid, $partialpassedattemptids)) {
                         $partialpassedattemptids[] = $record->attemptid;
+                    }
+                    if (!in_array($scale['id'], $subscaleids)) {
+                        $subscaleids[] = $scale['id'];
                     }
                 }
             }

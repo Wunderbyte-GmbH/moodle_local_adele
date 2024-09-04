@@ -188,12 +188,14 @@ $string['course_description_inbetween_condition_course_completed'] = 'you have t
 $string['course_description_after_condition_course_completed'] = 'you finished enough courses of this node';
 
 $string['course_description_before_condition_catquiz'] = 'complete the catquiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'quiz {quiz_name} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'your results of the quiz "{quiz_name}". Congratulation!<br>{quiz_attempts_list}';
-$string['course_description_after_condition_modquiz_list'] = 'In attempt from {$a->time} your were able to demonstrate the required competencies in the following areas: {$a->scales}. <a href="{$a->link}" target="_blank">Click to see details</a>.<br>';
+$string['course_description_inbetween_condition_catquiz'] = 'your results in the „{quiz_name}” test were not sufficient. {quiz_attempts_best}';
+$string['course_description_inbetween_condition_catquiz_best'] = '<a href="{$a->link}" target="_blank">Click here for your best result from {$a->time}</a>';
+$string['course_description_after_condition_catquiz'] = 'your results in the "{quiz_name}" test. Through this, you have sufficiently demonstrated the competencies to be acquired in the course in: <ul>{quiz_attempts_list}</ul>';
+$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">best result on {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'complete the quiz {catquiz_name_link}';
 $string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_inbetween_condition_modquiz_conditional'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
 $string['course_description_after_condition_modquiz'] = 'quiz {catquiz_name_link} was successfully finished';
 
 $string['course_restricition_before_condition_manual'] = 'access will be granted manually';
@@ -405,7 +407,7 @@ $string['user_view_firstname'] = 'Firstname';
 $string['user_view_lastname'] = 'Lastname';
 $string['user_view_email'] = 'Email';
 $string['user_view_progress'] = 'Progress';
-$string['user_view_nodes'] = 'Nodes';
+$string['user_view_nodes'] = 'Finished Nodes';
 $string['user_view_go_back_overview'] = 'Go Back to Overview';
 $string['user_view_user_path_for'] = 'User path for:';
 

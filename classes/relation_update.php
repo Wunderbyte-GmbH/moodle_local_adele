@@ -637,6 +637,8 @@ class relation_update {
                               get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
                         }
                         $text = $tmptext;
+                    } else if ($placeholder == 'quiz_attempts_best') {
+                        $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
                     } else if (is_array($text)) {
                         $text = implode(', ', $text);
                     }

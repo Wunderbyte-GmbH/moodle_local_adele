@@ -407,7 +407,7 @@ class learning_paths {
                 }
             }
             return [
-                'completed_nodes' => $validnodes . '/' . $totalnodes,
+                'completed_nodes' => $validnodes,
                 'progress' => round(100 * $progress, 2),
             ];
 

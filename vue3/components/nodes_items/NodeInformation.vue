@@ -330,7 +330,7 @@
                   @mouseup.stop
                 >
                   <div v-if="completion_string != ''">
-                    - {{ completion_string }}
+                    - <span v-html="completion_string"></span>
                   </div>
                 </div>
               </div>
@@ -363,7 +363,7 @@
                   @mouseup.stop
                 >
                   <div v-if="completion_string != ''">
-                    - {{ completion_string }}
+                    - <span v-html="completion_string"></span>
                   </div>
                 </div>
               </div>

@@ -193,8 +193,8 @@ $string['course_description_after_condition_course_completed'] = 'du hast genug 
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
 $string['course_description_inbetween_condition_catquiz'] = 'das Quiz {quiz_name} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_catquiz'] = 'deine Ergebnisse im Quiz "{quiz_name}". Gratulation!.<br>{quiz_attempts_list}';
-$string['course_description_after_condition_modquiz_list'] = 'Im Versuch am {$a->time} hast du die geforderten Kompetenzen in folgenden Bereichen nachgewiesen: {$a->scales}. <a href="{$a->link}" target="_blank">Zum Ergebnis im Detail</a>.<br>';
+$string['course_description_after_condition_catquiz'] = 'Deine Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
+$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'beende das Quiz {catquiz_name_link}';
 $string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
@@ -395,7 +395,7 @@ $string['user_view_firstname'] = 'Vorname';
 $string['user_view_lastname'] = 'Nachname';
 $string['user_view_email'] = 'E-Mail';
 $string['user_view_progress'] = 'Fortschritt';
-$string['user_view_nodes'] = 'Knoten';
+$string['user_view_nodes'] = 'Abgeschlossene Knoten';
 $string['user_view_go_back_overview'] = 'Zurück zur Übersicht';
 $string['user_view_user_path_for'] = 'Benutzerpfad für:';
 $string['nodes_feedback_before'] = 'Vorher';
