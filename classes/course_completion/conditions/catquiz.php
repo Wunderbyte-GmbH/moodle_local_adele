@@ -237,7 +237,6 @@ class catquiz implements course_completion {
                         $catquizzes['completed'][$complitionnode['id']] = $partialpassedrecords;
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_list'] =
                           self::get_record_list(
-                            $partialpassedrecords,
                             $scales,
                             $partialpassedattemptids,
                             $percentageofrightanswersbyscalekeyid,
@@ -295,23 +294,20 @@ class catquiz implements course_completion {
 
     /**
      * Helper function to return localized description strings.
-     * @param array $partialpassedrecords
      * @param array $scales
      * @param array $attemptids
+     * @param array $percentageofrightanswersbyscalekeyid
+     * @param array $subscaleids
      * @return array
      */
     private function get_record_list(
-      $partialpassedrecords,
       $scales,
       $attemptids,
       $percentageofrightanswersbyscalekeyid,
       $subscaleids
     ) {
-        global $DB;
         $recordlist = [];
-
         $attemptsentries = $this->get_attempts_information($attemptids);
-
         $scalemap = [];
         $scalemap[$scales['parent']['id']] = $scales['parent']['name'];
         foreach ($scales['sub'] as $subscale) {
@@ -399,6 +395,7 @@ class catquiz implements course_completion {
      * @param string $parentscaleglobal
      * @param string $parentscalerecord
      * @param array $partialpassedattemptids
+     * @param array $subscaleids
      * @return bool
      */
     private function check_attempts(
