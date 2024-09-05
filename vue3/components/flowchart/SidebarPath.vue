@@ -82,14 +82,17 @@ function onDragStart(event, data) {
 
 // Calculate searched courses
 const filteredCourses = computed(() => {
-  if(searchTerm.value.toLowerCase().startsWith('#')){
+  if (props.courses) {
+    if(searchTerm.value.toLowerCase().startsWith('#')){
+      return props.courses.filter(course =>
+        course.tags.toLowerCase().includes(searchTerm.value.toLowerCase().slice(1))
+      );
+    }
     return props.courses.filter(course =>
-      course.tags.toLowerCase().includes(searchTerm.value.toLowerCase().slice(1))
+      course.fullname.toLowerCase().includes(searchTerm.value.toLowerCase())
     );
   }
-  return props.courses.filter(course =>
-    course.fullname.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
+  return []
 });
 
 // Function sets up data for nodes

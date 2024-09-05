@@ -153,6 +153,7 @@ import addAndConditions from '../../composables/conditions/addAndConditions'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
+import { debounce } from 'lodash';
 
 // Load Store and Router
 const store = useStore()
@@ -208,14 +209,18 @@ edges: [],
 
 onMounted(() => {
   const observer = new ResizeObserver(entries => {
-    for (let entry of entries) {
+  for (let entry of entries) {
       if (entry.target.classList.contains('dndflow')) {
         dndFlowWidth.value = entry.contentRect.width;
         break;
       }
     }
   });
-  observer.observe(document.querySelector('.dndflow'));
+  const targetElement = document.querySelector('.dndflow');
+
+  if (targetElement) {
+    observer.observe(targetElement);
+  }
   setTimeout(() => {
     nextTick().then(() => {
       fitView({ duration: 1000 }).then(() => {
@@ -538,9 +543,23 @@ watch(
   },
 );
 
+const debouncedHandler = debounce((newVal, oldVal) => {
+  if (newVal.length < oldVal.length) {
+    const lastOldVal = oldVal[oldVal.length - 1];
+    nodes.value = [...lastOldVal]
+    const lastEdgesVal = store.state.undoEdges[store.state.undoEdges.length - 1];
+    edges.value = [...lastEdgesVal]
+    store.commit('unsetUndoEdges');
+  }
+}, 300);
 
-// Prevent default event if node has been dropped
-function onRemoveNode(data) {
+watch(
+  () => store.state.undoNodes,  // The source (undoNodes)
+  debouncedHandler,
+  { deep: true }  // Deep watch to track nested changes (if needed)
+);
+
+async function onRemoveNode(data) {
     let node = findNode(data.node_id)
     let confirmation = true;
 
@@ -548,6 +567,12 @@ function onRemoveNode(data) {
       confirmation = window.confirm(store.state.strings.flowchart_delete_confirmation + node.data.fullname + '?');
     }
     if (confirmation) {
+      const undoNodesSet = [...nodes.value]
+      const undoEdgesSet = [...edges.value]
+      await store.dispatch('setUndoNodes', {
+        undoNodesSet: undoNodesSet,
+        undoEdgesSet: undoEdgesSet,
+      });
       node.deletable = true;
       removeNodes(data.node_id)
       emit('removeNodeConditions', data.node_id);

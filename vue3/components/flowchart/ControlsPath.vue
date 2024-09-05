@@ -36,6 +36,7 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 import removeModules from '../../composables/nodesHelper/removeModules';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
+import { computed } from 'vue';
 
 // Load Store and Router
 const store = useStore();
@@ -191,6 +192,12 @@ const onCancel = () => {
   }
 };
 
+const undoNodesLength = computed(() => store.state.undoNodes.length);
+
+function undoDeletion() {
+  store.commit('unsetUndoNodes');
+}
+
 const onCancelConfirmation = (toggle) => {
     if (toggle) {
       onCancel()
@@ -260,6 +267,13 @@ const onCancelConfirmation = (toggle) => {
       @click="toggleUserView"
     >
       {{ current_user_view ? store.state.strings.btnstudenttoggle : store.state.strings.btneditortoggle }}
+    </button>
+    <button
+      v-if="undoNodesLength"
+      class="btn btn-warning m-2"
+      @click="undoDeletion"
+    >
+      Undo last node deletion
     </button>
     <a
       href="/backup/restorefile.php?contextid=1"
