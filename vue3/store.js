@@ -58,6 +58,8 @@ export function createAppStore() {
                 lpimages: 0,
                 lastseen: null,
                 nodecourse: 0,
+                undoNodes: [],
+                undoEdges: [],
             };
         },
         getters: {
@@ -139,9 +141,31 @@ export function createAppStore() {
             setLastSeen(state, data) {
               state.lastseen = data;
             },
+            setUndoNodes(state, tree) {
+              state.undoNodes.push(tree.undoNodesSet);
+              if (state.undoNodes.length > 3) {
+                state.undoNodes.shift();
+              }
+              state.undoEdges.push(tree.undoEdgesSet);
+              if (state.undoEdges.length > 3) {
+                state.undoEdges.shift();
+              }
+            },
+            unsetUndoNodes(state) {
+              state.undoNodes = state.undoNodes.slice(0, -1);
+            },
+            unsetUndoEdges(state) {
+              state.undoEdges = state.undoEdges.slice(0, -1);
+            },
         },
         actions: {
             // Actions are asynchronous.
+            setUndoNodes({ commit }, nodes) {
+              return new Promise((resolve) => {
+                commit('setUndoNodes', nodes);
+                resolve();
+              });
+            },
             async loadLang(context) {
                 const lang = document.documentElement.lang.replace(/-/g, '_');
                 context.commit('setLang', lang);

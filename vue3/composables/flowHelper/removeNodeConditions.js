@@ -19,7 +19,11 @@ const  removeNodeConditions = (node, removedid) => {
               noderestriction.data.value.node_id &&
               noderestriction.data.value.node_id.includes(removedid)
             ) {
-              noderestriction.data.value.node_id = noderestriction.data.value.node_id.filter(id => id !== removedid);
+              if (Array.isArray(noderestriction.data.value.node_id)) {
+                noderestriction.data.value.node_id = noderestriction.data.value.node_id.filter(id => id !== removedid);
+              } else if (noderestriction.data.value.node_id == removedid) {
+                delete node.restriction;
+              }
             }
             if (
               noderestriction.data.value.courseid &&
