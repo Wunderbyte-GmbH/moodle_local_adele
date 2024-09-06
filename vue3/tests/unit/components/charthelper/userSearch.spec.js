@@ -1,7 +1,6 @@
 import userSearch from '../../../../components/charthelper/userSearch.vue';
 import { mount } from '@vue/test-utils';
 import { createStore } from 'vuex';
-import { debounce } from 'lodash';
 import flushPromises from 'flush-promises';
 
 jest.mock('lodash', () => ({

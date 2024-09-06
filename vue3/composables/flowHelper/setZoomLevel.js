@@ -17,7 +17,12 @@ const setZoomLevel = async (action, zoomLock, viewport, zoomTo) => {
     }
   } else if (action === 'out') {
     if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
+      if (currentStepIndex == 1) {
+        newViewport = zoomSteps[currentStepIndex];
+      } else{
+        newViewport = zoomSteps[currentStepIndex-2];
+
+      }
     } else {
       newViewport = zoomSteps[zoomSteps.length - 2]
     }
