@@ -407,7 +407,10 @@ class relation_update {
                                 if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
                                     $hastimedcondition = true;
                                     $starttime = new \DateTime();
-                                    if ($node['data']['first_enrolled']) {
+                                    if (
+                                      $node['data'] &&
+                                      $node['data']['first_enrolled']
+                                    ) {
                                         $starttime->setTimestamp($node['data']['first_enrolled']);
                                     }
                                     $istimeinfuture = self::gettimestamptoday(
