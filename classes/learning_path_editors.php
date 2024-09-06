@@ -91,10 +91,13 @@ class learning_path_editors {
      */
     public static function create_editors($lpid, $userid) {
         global $DB;
-        $data = new stdClass();
-        $data->learningpathid = $lpid;
-        $data->userid = $userid;
-        $result = $DB->insert_record('local_adele_lp_editors', $data);
+        $result = null;
+        if ($lpid != 0) {
+            $data = new stdClass();
+            $data->learningpathid = $lpid;
+            $data->userid = $userid;
+            $result = $DB->insert_record('local_adele_lp_editors', $data);
+        }
         return ['success' => $result];
     }
 

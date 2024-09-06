@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { debounce } from 'lodash';
+import { computed } from 'vue';
 
 const store = useStore();
 
@@ -51,6 +52,12 @@ const handleClickOutside = (event) => {
   }
 };
 
+const isLearningPathIDZero = computed(() => store.state.learningPathID === 0);
+
+const inputPlaceholder = computed(() =>
+  isLearningPathIDZero.value ? 'Can only be set after learning path was saved' : 'Search users...'
+);
+
 onMounted(async () => {
   selectedUsers.value = await store.dispatch('getLpEditUsers', store.state.learningPathID);
   document.addEventListener('click', handleClickOutside);
@@ -68,8 +75,9 @@ onBeforeUnmount(() => {
     <input
       v-model="searchQuery"
       class="form-control mb-2 user-search-input"
-      placeholder="Search users..."
+      :placeholder="inputPlaceholder"
       @focus="isListVisible = true"
+      :disabled="isLearningPathIDZero"
     >
     <div v-if="isListVisible">
       <div v-if="searchWarnings" class="alert alert-warning">
