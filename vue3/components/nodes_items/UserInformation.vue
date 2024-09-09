@@ -72,7 +72,7 @@ watchEffect(() => {
           <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
         </div>
         <div v-if="data.completion &&
-            (data.completion.feedback.status == 'not_accessible' || data.completion.feedback.status == 'closed')">
+            (data.completion.feedback.status == 'closed')">
           <UserFeedbackBlock
             :data="data.completion.feedback.restriction.before"
             title="restriction_before"
@@ -80,7 +80,7 @@ watchEffect(() => {
         </div>
         <div v-else>
           <UserFeedbackBlock
-            v-if="data.completion && data.completion.feedback.status == 'closedd'"
+            v-if="data.completion && data.completion.feedback.status == 'not_accessible'"
             :data="data.completion.feedback.completion.before"
             title="completion_before"
           />

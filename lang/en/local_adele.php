@@ -188,8 +188,8 @@ $string['course_description_inbetween_condition_course_completed'] = 'you have t
 $string['course_description_after_condition_course_completed'] = 'you finished enough courses of this node';
 
 $string['course_description_before_condition_catquiz'] = 'complete the catquiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'your results in the „{quiz_name}” test were not sufficient. {quiz_attempts_best}';
-$string['course_description_inbetween_condition_catquiz_best'] = '<a href="{$a->link}" target="_blank">Click here for your best result from {$a->time}</a>';
+$string['course_description_inbetween_condition_catquiz'] = 'your results in the „{quiz_name}” test were not sufficient{quiz_attempts_best}';
+$string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Click here for your best result from {$a->time}</a>';
 $string['course_description_after_condition_catquiz'] = 'your results in the "{quiz_name}" test. Through this, you have sufficiently demonstrated the competencies to be acquired in the course in: <ul>{quiz_attempts_list}</ul>';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">best result on {$a->time}</a>)</li>';
 

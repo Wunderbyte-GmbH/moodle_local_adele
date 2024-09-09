@@ -165,6 +165,8 @@ class catquiz implements course_completion {
                     $subscaleids = [];
                     $bestresult = null;
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = '';
+                    $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] = $scales['parent']['name'];
+
                     foreach ($records as $record) {
                         $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
                         if (
@@ -182,7 +184,6 @@ class catquiz implements course_completion {
                         $percentageofrightanswersbyscalekeyid[$record->attemptid] = (array)$personabilityresults;
                         foreach ($scales as $type => $scaletype) {
                             if ($type == 'parent') {
-                                $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] = $scaletype['name'];
                                 if (
                                     self::check_scale(
                                         $personabilityresults, $scaletype, $validationtype,

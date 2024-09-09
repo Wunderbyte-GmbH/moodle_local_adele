@@ -186,14 +186,15 @@ $string['course_description_before_completion_manual'] = 'der Abschluss wird man
 $string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {checkbox_status} manuell gewährt';
 $string['course_description_after_completion_manual'] = 'der Abschluss wurde manuell gewährt';
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
+$string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
 $string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
 $string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen. {quiz_attempts_best}';
-$string['course_description_inbetween_condition_catquiz_best'] = '<a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
+$string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen{quiz_attempts_best}';
+$string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
 $string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
@@ -203,12 +204,12 @@ $string['course_description_after_condition_modquiz'] = 'das Quiz {catquiz_name_
 
 $string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
 $string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
-$string['course_restricition_before_condition_specific_course'] = 'schließe den Kurs {course_list} ab';
+$string['course_restricition_before_condition_specific_course'] = 'den Kurs {course_list} abschließen';
 $string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';
 $string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} seit {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'schließe den übergeordneten Knoten {parent_course_list} ab';
+$string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';

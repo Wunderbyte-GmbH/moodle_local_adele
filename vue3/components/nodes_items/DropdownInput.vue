@@ -140,7 +140,7 @@ const preventScroll = (event) => {
 .dropdown-list {
   list-style-type: none;
   padding: 0;
-  max-height: 100px;
+  max-height: 200px;
   margin: 0;
   overflow-y: auto;
   /* Indicate scrollable content */
