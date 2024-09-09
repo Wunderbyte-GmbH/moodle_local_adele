@@ -217,6 +217,7 @@ onMounted(async () => {
   }
   // watch values from selected node
   watch(() => selectedTest.value, async () => {
+
     if (selectedTest.value == 0) {
       parentscales.value = await store.dispatch('fetchCatquizParentScales')
       scales.value = []
@@ -225,7 +226,7 @@ onMounted(async () => {
         testid_courseid: selectedparentscale_courseid.value,
         componentid: selectedtest_component_id.value,
       }
-    }else{
+    } else if (selectedTest.value !== null) {
       scales.value = await store.dispatch('fetchCatquizScales', {testid: selectedTest.value})
       parentscales.value = []
       data.value = {
@@ -234,11 +235,16 @@ onMounted(async () => {
         componentid: selectedtest_component_id.value,
         scales: scales.value,
       }
+    } else {
+      parentscales.value = []
+      scales.value = []
+      data.value = {}
     }
   }, { deep: true } );
 });
 
 const updateScales = async () => {
+
   scales.value = await store.dispatch('fetchCatquizParentScale', {scaleid: selectedparentscale.value})
   data.value.scales = scales.value
   data.value.parentscales = selectedparentscale.value
