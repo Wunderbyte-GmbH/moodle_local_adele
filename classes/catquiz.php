@@ -26,9 +26,7 @@
 namespace local_adele;
 
 use local_catquiz\catquiz as Local_catquizCatquiz;
-use local_catquiz\data\dataapi;
 use local_catquiz\testenvironment;
-use local_catquiz\catscale;
 
 /**
  * Class learning_paths
