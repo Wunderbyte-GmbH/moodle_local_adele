@@ -59,7 +59,6 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
       })
 
       if (insertModule) {
-
         // Check if rightestNode and lowestNode are assigned values
         if (rightestNode && lowestNode) {
           if (userpath && !active) {

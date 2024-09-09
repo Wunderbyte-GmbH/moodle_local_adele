@@ -56,6 +56,13 @@ describe('drawModules', () => {
     expect(addedModules[1].id).toBe('module2_module');
   });
 
+  it('should call removeModules and addNodes', async () => {
+    learningpath.json.modules = null
+    await drawModules(learningpath, addNodes, removeNodes, findNode, draggedNode);
+    // Ensure addNodes is not called
+    expect(addNodes).not.toHaveBeenCalled();
+  });
+
   it('should set module properties based on completion and active status', async () => {
     await drawModules(learningpath, addNodes, removeNodes, findNode, draggedNode);
 
