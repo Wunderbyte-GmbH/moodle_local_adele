@@ -28,6 +28,8 @@ declare(strict_types=1);
 namespace local_adele;
 
 use stdClass;
+use context_system;
+use local_adele\event\user_path_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -56,7 +58,7 @@ class node_completion {
             $userpath = json_decode($userpath);
         }
         $firstenrollededit = false;
-        foreach ($userpath->tree->nodes as $node) {
+        foreach ($userpath->tree->nodes as &$node) {
             if (in_array($node->id, $event->other['node']['childCourse'])) {
                 foreach ($node->data->course_node_id as $subscribecourse) {
                     if (!enrol_is_enabled('manual')) {
@@ -72,7 +74,7 @@ class node_completion {
                         )) {
                         break; // No manual enrolment instance on this course.
                     }
-                    $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                    $instance = reset($instances);
 
                     if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
@@ -88,11 +90,21 @@ class node_completion {
             }
         }
         if ($firstenrollededit) {
-            $data = [
-                'id' => $event->other['userpath']->id,
+            $latestrecord = $DB->get_record(
+                'local_adele_path_user',
+                [
+                  'status' => 'active',
+                  'user_id' => $event->other['userpath']->user_id,
+                  'learning_path_id' => $event->other['userpath']->learning_path_id,
+                ],
+                'id'
+              );
+
+            $updatedparams = [
+                'id' => $latestrecord->id,
                 'json' => json_encode($userpath),
             ];
-            $DB->update_record('local_adele_path_user', $data);
+            $DB->update_record('local_adele_path_user', $updatedparams);
         }
     }
 

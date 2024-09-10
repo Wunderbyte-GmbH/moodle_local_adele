@@ -151,7 +151,9 @@ class relation_update {
                           $validatenodecompletion['singlecompletionnode'];
                         $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
                     }
+                    $node['data']['completion'] = $userpath->json['user_path_relation'][$node['id']];
                 }
+
                 $userpathrelationhelper = new user_path_relation();
                 $userpathid = $userpathrelationhelper->revision_user_path_relation($userpath);
                 if ($creation) {
