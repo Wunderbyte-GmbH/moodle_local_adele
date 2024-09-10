@@ -28,8 +28,6 @@
 namespace local_adele\course_completion\conditions;
 
 use local_adele\course_completion\course_completion;
-use local_catquiz\catquiz as Local_catquizCatquiz;
-use local_catquiz\catscale;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -183,7 +181,7 @@ class modquiz implements course_completion {
      * @param int $userid
      * @return object
      */
-    private function get_modquiz_records($completion, $userid) {
+    protected function get_modquiz_records($completion, $userid) {
         global $DB;
         return $DB->get_records_select(
             'quiz_grades',
