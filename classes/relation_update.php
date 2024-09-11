@@ -624,11 +624,11 @@ class relation_update {
      * @param string $string
      * @param array $placeholders
      * @param string $id
+     * @param array $nodes
      * @return string
      */
     public static function render_placeholders($string, $placeholders , $id, $nodes) {
         $id = str_replace('_feedback', '', $id);
-
         while ($id != null) {
             foreach ($placeholders as $condition) {
                 if (isset($condition['placeholders'])) {
@@ -669,6 +669,13 @@ class relation_update {
         return $string;
     }
 
+    /**
+     * Find node by id
+     *
+     * @param array $nodes
+     * @param string $id
+     * @return mixed
+     */
     public static function findnodebyid($nodes, $id) {
         foreach ($nodes as $node) {
             if (isset($node['id']) && $node['id'] === $id) {

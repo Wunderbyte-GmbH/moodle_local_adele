@@ -14,18 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use local_adele\course_completion\conditions\modquiz;
+namespace local_adele\course_completion\conditions;
 
-defined('MOODLE_INTERNAL') || die();
+use advanced_testcase;
 
 /**
  * PHPUnit test case for the 'modquiz' class in local_adele.
  *
  * @package     local_adele
- * @group       local_adele
- * @covers      \local_adele\course_completion\conditions\modquiz
+ * @author       local_adele
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_adele_course_completion_conditions_modquiz_test extends advanced_testcase {
+class modquiz_test extends advanced_testcase {
 
 
     /**
@@ -103,11 +104,14 @@ class local_adele_course_completion_conditions_modquiz_test extends advanced_tes
                         'id' => 10,
                         'data' => [
                             'label' => 'modquiz',
-                            'value' => ['grade' => 55, 'quizid' => 1]
-                        ]
-                    ]
-                ]
-            ]
+                            'value' => [
+                              'grade' => 55,
+                              'quizid' => 1,
+                            ],
+                          ],
+                    ],
+                ],
+            ],
         ];
 
         // Simulate calling the get_completion_status method with complete node data.

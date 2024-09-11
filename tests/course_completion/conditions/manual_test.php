@@ -14,21 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use local_adele\course_completion\conditions\manual;
+namespace local_adele\course_completion\conditions;
 
-defined('MOODLE_INTERNAL') || die();
+use advanced_testcase;
 
 /**
- * Tests strategy
+ * PHPUnit test case for the 'modquiz' class in local_adele.
  *
- * @package    local_adele
- * @author Jacob Viertel
+ * @package     local_adele
+ * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \local_adele
  */
-class local_adele_course_completion_conditions_manual_test extends advanced_testcase {
+class manual_test extends advanced_testcase {
 
     /**
      * Set up function to reset all database changes after each test.
@@ -104,8 +102,8 @@ class local_adele_course_completion_conditions_manual_test extends advanced_test
         $nodeincomplete = [
             'data' => [
                 'manualcompletion' => false,
-                'manualcompletionvalue' => false
-            ]
+                'manualcompletionvalue' => false,
+            ],
         ];
 
         $statusincomplete = $manualcompletion->get_completion_status($nodeincomplete, 1);
@@ -116,8 +114,8 @@ class local_adele_course_completion_conditions_manual_test extends advanced_test
         $nodecomplete = [
             'data' => [
                 'manualcompletion' => true,
-                'manualcompletionvalue' => true
-            ]
+                'manualcompletionvalue' => true,
+            ],
         ];
 
         $statuscomplete = $manualcompletion->get_completion_status($nodecomplete, 1);

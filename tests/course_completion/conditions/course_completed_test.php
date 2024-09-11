@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use local_adele\course_completion\conditions\course_completed;
-use completion_info;
-use core_completion\progress;
+namespace local_adele\course_completion\conditions;
 
-defined('MOODLE_INTERNAL') || die();
+use advanced_testcase;
 
 /**
  * PHPUnit test case for the 'modquiz' class in local_adele.
  *
  * @package     local_adele
- * @group       local_adele
- * @covers      \local_adele\course_completion\conditions\course_completed
+ * @author       local_adele
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_adele_course_completion_conditions_course_completed_test extends advanced_testcase {
+class course_completed_test extends advanced_testcase {
 
 
     /**
@@ -107,11 +106,11 @@ class local_adele_course_completion_conditions_course_completed_test extends adv
                         'id' => 1,
                         'data' => [
                             'label' => 'course_completed',
-                            'value' => ['min_courses' => 2]
-                        ]
-                    ]
-                ]
-            ]
+                            'value' => ['min_courses' => 2],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         // Mock course completion info.

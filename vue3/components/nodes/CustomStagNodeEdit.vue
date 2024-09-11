@@ -224,21 +224,19 @@ const expandCourses = () => {
             </button>
           </div>
         </div>
-        <div v-if="store.state.learningpath">
+        <div
+          class="row mb-2"
+        >
+          <div class="col-4 text-left">
+            <b>
+              {{ store.state.strings.nodes_progress }}
+            </b>
+          </div>
           <div
-            class="row mb-2"
+            class="col-8"
+            style="display: flex; justify-content: end;"
           >
-            <div class="col-4 text-left">
-              <b>
-                {{ store.state.strings.nodes_progress }}
-              </b>
-            </div>
-            <div
-              class="col-8"
-              style="display: flex; justify-content: end;"
-            >
-              <ProgressBar :progress="progress" />
-            </div>
+            <ProgressBar :progress="progress" />
           </div>
         </div>
         <div v-if="store.state.view !=='student'">
