@@ -64,7 +64,7 @@ class manual_test extends advanced_testcase {
             'data' => [
                 'manualrestriction' => false,
                 'manualrestrictionvalue' => false,
-            ]
+            ],
         ];
         $userpath = (object) ['userid' => 1];
 
@@ -76,7 +76,7 @@ class manual_test extends advanced_testcase {
             'data' => [
                 'manualrestriction' => true,
                 'manualrestrictionvalue' => false,
-            ]
+            ],
         ];
         $statuscomplete = $manualrestriction->get_restriction_status($nodecomplete, $userpath);
         $this->assertFalse($statuscomplete['completed']);

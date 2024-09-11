@@ -84,7 +84,7 @@ class remove_lp_edit_users extends external_api {
               $context,
               'local/adele:canmanage',
               'nopermission',
-              'You do not have the required capability and the session key is not set.'
+              'You do not have the required capability to delete an editor and the session key is not set.'
             );
         }
 

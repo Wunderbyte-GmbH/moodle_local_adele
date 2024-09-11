@@ -69,22 +69,22 @@ class parent_courses_test extends advanced_testcase {
                             'data' => [
                                 'fullname' => 'Course 1',
                                 'completion' => [
-                                    'feedback' => ['status' => 'completed']
-                                ]
-                            ]
+                                    'feedback' => ['status' => 'completed'],
+                                ],
+                            ],
                         ],
                         [
                             'id' => 2,
                             'data' => [
                                 'fullname' => 'Course 2',
                                 'completion' => [
-                                    'feedback' => ['status' => 'incomplete']
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                    'feedback' => ['status' => 'incomplete'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $node = [
