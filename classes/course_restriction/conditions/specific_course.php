@@ -27,7 +27,6 @@
 
 namespace local_adele\course_restriction\conditions;
 
-use completion_info;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -117,8 +116,6 @@ class specific_course implements course_restriction {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
                 if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'specific_course') {
-                    $courselist = [];
-                    $coursecompleted = false;
                     // Get grade and check if valid.
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         foreach ($userpath->json['tree']['nodes'] as $usernode) {

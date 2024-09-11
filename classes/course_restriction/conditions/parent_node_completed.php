@@ -27,7 +27,6 @@
 
 namespace local_adele\course_restriction\conditions;
 
-use completion_info;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();

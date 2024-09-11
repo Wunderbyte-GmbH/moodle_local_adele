@@ -27,7 +27,6 @@
 
  namespace local_adele\course_restriction\conditions;
 
-use DateInterval;
 use DateTime;
 use local_adele\course_restriction\course_restriction;
 
