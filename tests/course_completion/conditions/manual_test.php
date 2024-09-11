@@ -38,6 +38,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_description function.
+     * @covers \local_adele\course_completion\conditions\manual::get_description
      */
     public function test_get_description() {
         $manualcompletion = new manual();
@@ -54,6 +55,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_completion_priority function.
+     * @covers \local_adele\course_completion\conditions\manual::get_completion_priority
      */
     public function test_get_completion_priority() {
         $manualcompletion = new manual();
@@ -74,6 +76,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_completion_description_after function.
+     * @covers \local_adele\course_completion\conditions\manual::get_completion_description_after
      */
     public function test_get_completion_description_after() {
         $manualcompletion = new manual();
@@ -84,6 +87,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_completion_description_inbetween function.
+     * @covers \local_adele\course_completion\conditions\manual::get_completion_description_inbetween
      */
     public function test_get_completion_description_inbetween() {
         $manualcompletion = new manual();
@@ -94,6 +98,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_completion_status function.
+     * @covers \local_adele\course_completion\conditions\manual::get_completion_status
      */
     public function test_get_completion_status() {
         $manualcompletion = new manual();

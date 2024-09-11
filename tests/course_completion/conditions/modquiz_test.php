@@ -69,12 +69,11 @@ class modquiz_test extends advanced_testcase {
      */
     public function test_get_completion_status() {
         $modquiz = $this->getMockBuilder(modquiz::class)
-            ->onlyMethods(['get_modquiz_records']) // Mock only the method we want
+            ->onlyMethods(['get_modquiz_records'])
             ->getMock();
 
-        // Define what the mocked get_modquiz_records method should return
         $modquiz->method('get_modquiz_records')
-            ->will($this->returnValue([65 => (object)['grade' => 65]])); // Mocked response
+            ->will($this->returnValue([65 => (object)['grade' => 65]]));
 
         // Test incomplete node data (expecting no completion).
         $nodeincomplete = [
@@ -84,11 +83,13 @@ class modquiz_test extends advanced_testcase {
                         'id' => 10,
                         'data' => [
                             'label' => 'modquiz',
-                            'value' => ['grade' => 70]
-                        ]
-                    ]
-                ]
-            ]
+                            'value' => [
+                              'grade' => 70,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         // Simulate calling the get_completion_status method and passing the node.

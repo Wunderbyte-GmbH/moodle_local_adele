@@ -17,6 +17,7 @@
 namespace local_adele\course_completion\conditions;
 
 use advanced_testcase;
+use stdClass;
 
 /**
  * PHPUnit test case for the 'modquiz' class in local_adele.
