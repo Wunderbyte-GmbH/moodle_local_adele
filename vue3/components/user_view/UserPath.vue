@@ -64,6 +64,7 @@
             </ul>
           </div>
         </div>
+        {{ zoomLock }}
         <div
           style="width: 100%; height: 600px;"
         >
@@ -93,6 +94,7 @@
                 :data="data"
                 :learningpath="user_learningpath"
                 :zoomstep="zoomstep"
+                @expanding-cards="handleExpandCards"
               />
             </template>
             <template #node-module="{ data }">
@@ -234,8 +236,17 @@ const handleZoomLock = (node) => {
       node: null,
     }
     event.node = findNode(node)
-    zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+    if (event.node) {
+      zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+    }
   })
+}
+
+const handleExpandCards = async () => {
+    zoomLock.value = false
+    await zoomTo(0.35, { duration: 500}).then(() => {
+      zoomLock.value = true
+    })
 }
 
 const setZoomLevel = async (action) => {

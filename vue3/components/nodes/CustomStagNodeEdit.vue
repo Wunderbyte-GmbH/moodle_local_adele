@@ -75,6 +75,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'node-clicked',
+  'expanding-cards'
 ]);
 const active = ref(false)
 let min_courses = 1
@@ -157,6 +158,9 @@ const parentStyle = {
 const expandCourses = () => {
   courseExpanded.value = !courseExpanded.value
   isBlocked.value = true
+  if (courseExpanded.value) {
+      emit('expanding-cards');
+  }
 }
 
 </script>

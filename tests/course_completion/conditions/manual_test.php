@@ -66,6 +66,7 @@ class manual_test extends advanced_testcase {
 
     /**
      * Test the get_completion_description_before function.
+     * @covers \local_adele\course_completion\conditions\manual::get_completion_description_before
      */
     public function test_get_completion_description_before() {
         $manualcompletion = new manual();
