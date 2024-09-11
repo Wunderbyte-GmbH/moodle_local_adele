@@ -561,7 +561,8 @@ class relation_update {
                       self::render_placeholders(
                         $conditionnode['data']['feedback_before'],
                         $completioncriteria,
-                        $conditionnode['id']
+                        $conditionnode['id'],
+                        $node['completion']['nodes']
                       ) :
                       '';
 
@@ -571,7 +572,8 @@ class relation_update {
                         self::render_placeholders(
                             $conditionnode['data']['feedback_after'],
                             $completioncriteria,
-                            $conditionnode['id']
+                            $conditionnode['id'],
+                            $node['completion']['nodes']
                         ) :
                         '',
                 ];
@@ -581,7 +583,8 @@ class relation_update {
                         self::render_placeholders(
                             $conditionnode['data']['feedback_inbetween'],
                             $completioncriteria,
-                            $conditionnode['id']
+                            $conditionnode['id'],
+                            $node['completion']['nodes']
                         ) :
                         '';
                 } else {
@@ -590,7 +593,8 @@ class relation_update {
                           self::render_placeholders(
                             $conditionnode['data']['feedback_inbetween'],
                             $completioncriteria,
-                            $conditionnode['id']
+                            $conditionnode['id'],
+                            $node['completion']['nodes']
                           ) :
                           '';
                 }
@@ -604,7 +608,8 @@ class relation_update {
                         self::render_placeholders(
                             $restrictionnode['data']['feedback_before'],
                             $restrictioncriteria,
-                            $restrictionnode['id']
+                            $restrictionnode['id'],
+                            $node['restriction']['nodes']
                         ) :
                         '';
                 }
@@ -621,43 +626,60 @@ class relation_update {
      * @param string $id
      * @return string
      */
-    public static function render_placeholders($string, $placeholders , $id) {
+    public static function render_placeholders($string, $placeholders , $id, $nodes) {
         $id = str_replace('_feedback', '', $id);
-        foreach ($placeholders as $condition) {
-            if (isset($condition['placeholders'])) {
-                foreach ($condition['placeholders'] as $placeholder => $text) {
-                    $string = str_replace(
-                        '{' . $placeholder . '}',
-                        $text,
-                        $string
-                    );
-                }
-            } else if (isset($condition[$id]['placeholders'])) {
-                foreach ($condition[$id]['placeholders'] as $placeholder => $text) {
-                    if ($placeholder == 'quiz_attempts_list') {
-                        $tmptext = '';
-                        foreach ($text as $textelement) {
-                            $textelement = (object) $textelement;
-                            $tmptext .=
-                              get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
-                        }
-                        $text = $tmptext;
-                    } else if ($placeholder == 'quiz_attempts_best') {
-                        if ($text != '') {
-                            $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
-                        }
-                    } else if (is_array($text)) {
-                        $text = implode(', ', $text);
+
+        while ($id != null) {
+            foreach ($placeholders as $condition) {
+                if (isset($condition['placeholders'])) {
+                    foreach ($condition['placeholders'] as $placeholder => $text) {
+                        $string = str_replace(
+                            '{' . $placeholder . '}',
+                            $text,
+                            $string
+                        );
                     }
-                    $string = str_replace(
-                        '{' . $placeholder . '}',
-                        strval($text),
-                        $string
-                    );
+                } else if (isset($condition[$id]['placeholders'])) {
+                    foreach ($condition[$id]['placeholders'] as $placeholder => $text) {
+                        if ($placeholder == 'quiz_attempts_list') {
+                            $tmptext = '';
+                            foreach ($text as $textelement) {
+                                $textelement = (object) $textelement;
+                                $tmptext .=
+                                  get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
+                            }
+                            $text = $tmptext;
+                        } else if ($placeholder == 'quiz_attempts_best') {
+                            if ($text != '') {
+                                $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
+                            }
+                        } else if (is_array($text)) {
+                            $text = implode(', ', $text);
+                        }
+                        $needle = '{' . $placeholder . '}';
+                        $pos = strpos($string, $needle);
+                        if ($pos !== false) {
+                            $string = substr_replace($string, strval($text), $pos, strlen($needle));
+                        }
+                    }
+                }
+            }
+            $id = self::findnodebyid($nodes, $id);
+        }
+        return $string;
+    }
+
+    public static function findnodebyid($nodes, $id) {
+        foreach ($nodes as $node) {
+            if (isset($node['id']) && $node['id'] === $id) {
+                foreach ($node['childCondition'] as $childcondition) {
+                    if (strpos($childcondition, '_feedback') === false) {
+                        return $childcondition;
+                    }
                 }
             }
         }
-        return $string;
+        return null;
     }
 
     /**

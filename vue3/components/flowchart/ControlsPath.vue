@@ -156,24 +156,27 @@ const onSave = async () => {
         learningpathcontrol.value.json.tree =
           recalculateParentChild(learningpathcontrol.value.json.tree, 'parentCourse', 'childCourse', 'starting_node')
       }
+
       if (singleNodes) {
-        notify({
-          title: store.state.strings.flowchart_invalid_path_notification_title,
-          text: store.state.strings.flowchart_save_notification_text,
-          type: 'error'
-        });
-      } else {
-        if (!learningpathcontrol.value.image) {
-          learningpathcontrol.value.image = '';
+        const userConfirmed = confirm(
+          store.state.strings.flowchart_invalid_path_notification_title +
+          "\n" +
+          store.state.strings.flowchart_save_notification_text
+        );
+        if (!userConfirmed) {
+          return;
         }
-        await store.dispatch('saveLearningpath', learningpathcontrol.value);
-        onCancelConfirmation(true)
-        notify({
-          title: store.state.strings.title_save,
-          text: store.state.strings.description_save,
-          type: 'success'
-        });
       }
+      if (!learningpathcontrol.value.image) {
+        learningpathcontrol.value.image = '';
+      }
+      await store.dispatch('saveLearningpath', learningpathcontrol.value);
+      onCancelConfirmation(true)
+      notify({
+        title: store.state.strings.title_save,
+        text: store.state.strings.description_save,
+        type: 'success'
+      });
     }
 };
 
