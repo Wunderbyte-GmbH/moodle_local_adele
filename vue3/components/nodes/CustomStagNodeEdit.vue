@@ -308,7 +308,7 @@ const expandCourses = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: left;
+  text-align: center;
   min-height: 200px;
   padding: 1rem;
   font-size: clamp(40px, 2.8vw, 64px);
@@ -319,6 +319,7 @@ const expandCourses = () => {
   font-weight: bold;
   hyphens: auto;
 }
+
 .overlay {
   position: relative;
   top: 50%;
