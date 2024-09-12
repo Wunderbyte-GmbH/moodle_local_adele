@@ -30,6 +30,8 @@ import { useStore } from 'vuex';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import UserInformation from '../nodes_items/UserInformation.vue';
+import truncatedText from '../../composables/nodesHelper/truncatedText';
+
 
 // Load Store
 const store = useStore();
@@ -183,7 +185,7 @@ const deleteCondition = () => {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname || store.state.strings.nodes_collection }}
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 60) }}
             </h5>
             <button
               v-if="store.state.view!='teacher' && editorview"

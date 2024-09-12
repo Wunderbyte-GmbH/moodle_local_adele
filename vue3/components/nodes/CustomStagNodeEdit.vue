@@ -282,7 +282,7 @@ const expandCourses = () => {
         class="card-body card-body-outer"
         :style="[nodeBackgroundColor]"
       >
-        {{ truncatedText(data.fullname || store.state.strings.nodes_collection) }}
+        {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 28) }}
       </div>
     </div>
     <Handle

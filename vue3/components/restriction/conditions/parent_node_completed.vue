@@ -9,7 +9,8 @@
         class="card-text"
       >
         <div class="fullname-container">
-          {{ value.name }}
+
+          {{ truncatedText(value.name, 24) }}
         </div>
       </div>
     </div>
@@ -19,6 +20,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import truncatedText from '../../../composables/nodesHelper/truncatedText';
 
 const store = useStore()
 
@@ -71,9 +73,12 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f0f0f0; /* Set your desired background color */
-  padding: 10px; /* Adjust padding as needed */
-  border-radius: 10px; /* Set your desired border-radius */
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 10px;
+  overflow: visible;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 </style>

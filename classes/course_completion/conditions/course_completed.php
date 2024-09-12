@@ -150,14 +150,15 @@ class course_completed implements course_completion {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
                 $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
-                $progresses[] = $progress;
-                $courseprogresslist[] = $course->fullname . ' - ' . $progress . '%';
                 // Check if the user has completed the course.
                 $coursecompleted = $completion->is_course_complete($userid);
                 if ($coursecompleted) {
+                    $progress = 100;
                     $completed = true;
                     $finished++;
                 }
+                $progresses[] = $progress;
+                $courseprogresslist[] = $course->fullname . ' - ' . $progress . '%';
             }
             $coursecompletion['completed'][$courseid] = $completed;
         }
@@ -176,7 +177,6 @@ class course_completed implements course_completion {
             }
         }
 
-        // TODO calculate the farest process.
         $coursecompletion['inbetween_info'] = self::get_node_progress($progresses, $minvalue);
         return $coursecompletion;
     }

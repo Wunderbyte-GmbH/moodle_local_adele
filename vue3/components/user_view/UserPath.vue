@@ -64,7 +64,6 @@
             </ul>
           </div>
         </div>
-        {{ zoomLock }}
         <div
           style="width: 100%; height: 600px;"
         >

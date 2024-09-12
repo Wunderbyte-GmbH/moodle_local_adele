@@ -1,8 +1,10 @@
 // truncated Text
-function truncatedText(text) {
-  const maxTextLength = 28;
-  if (text.length > maxTextLength) {
-    return text.substring(0, maxTextLength) + '...';
+function truncatedText(text, size=null) {
+  if (size == null) {
+    size = 38;
+  }
+  if (text.length > size) {
+    return text.substring(0, size) + '...';
   }
   return text;
 }

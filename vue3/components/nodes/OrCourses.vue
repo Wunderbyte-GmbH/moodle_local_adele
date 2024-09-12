@@ -33,6 +33,7 @@ import UserInformation from '../nodes_items/UserInformation.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 import CourseCompletion from '../nodes_items/CourseCompletion.vue';
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
+import truncatedText from '../../composables/nodesHelper/truncatedText';
 
 const courses = computed(() => {
   if (
@@ -221,32 +222,29 @@ const deleteCondition = () => {
         :class="!editorview ? 'non_parallel' : ''"
       >
       <div class="card-header text-center">
-  <NodeInformation
-    v-if="!editorview"
-    :data
-    :parentnode
-  />
-  <div class="d-flex justify-content-center position-relative">
-      <h4 class="flex-grow-1 text-center">
-        {{ data.fullname || store.state.strings.nodes_collection }}
-      </h4>
-      <div
-        v-if="store.state.view != 'teacher' && editorview"
-        class="position-absolute"
-        style="right: 0;"
-      >
-        <button
-          type="button"
-          class="btn btn-danger btn-sm trash-button"
-          @click.stop="deleteCondition"
-        >
-          <i
-            :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
-          />
-        </button>
+        <NodeInformation
+          v-if="!editorview"
+          :data
+          :parentnode
+        />
+        <div class="row align-items-center">
+          <div class="col">
+            <h5>
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 60) }}
+            </h5>
+            <button
+              v-if="store.state.view!='teacher' && editorview"
+              class="btn btn-danger btn-sm"
+              style="position: absolute; top: 5px; right: 5px;"
+              @click.stop="deleteCondition"
+            >
+              <i
+                class="fa fa-trash"
+              />
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
         <div
           class="card-body"
           :style="{backgroundColor: nodeBackgroundColor}"

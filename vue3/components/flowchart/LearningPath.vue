@@ -388,6 +388,7 @@ function onDrop(event) {
     }
 
     const id = getNodeId('dndnode_', nodes.value);
+    let addConditions = {}
     data.node_id = id;
 
     //if is starting node dz
@@ -421,14 +422,13 @@ function onDrop(event) {
       const extraImageShift = intersectedNode.value.closestnode.data.selected_course_image ? 200 : 0
       position.y += + intersectedNode.value.dropzone.dimensions.height/2 + 300 + extraImageShift
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
-      const addConditions = addAndConditions(intersectedNode.value, getEdges, id)
+      addConditions = addAndConditions(intersectedNode.value, getEdges, id)
       position.x += 200
       parentCourse = addConditions.parentNodes
       childCourse = addConditions.childNodes
       newNode.restriction = addConditions.newRestrictions
       newNode.completion = addConditions.newCompletions
       newNode.data = data
-      addEdges(addConditions.newEdges)
       nodes.value.forEach((node) => {
         if (addConditions.newOtherRestrictions.includes(node.id)){
           node = addAutoRestrictions(newNode, node, 'and', store)
@@ -472,11 +472,11 @@ function onDrop(event) {
     }
 
     newNode = { ...newNode, ...{
-      data: data,
-      parentCourse: parentCourse,
-      childCourse: childCourse,
-      position,
-    }
+        data: data,
+        parentCourse: parentCourse,
+        childCourse: childCourse,
+        position,
+      }
     }
 
     if((intersectedNode.value.dropzone.id.includes('dropzone_') &&
@@ -509,6 +509,9 @@ function onDrop(event) {
       // Add Completion addAutoAndCompletions.
       newNode = addAutoCompletions(newNode, store)
       addNodes([newNode])
+      if (addConditions.newEdges) {
+        addEdges(addConditions.newEdges)
+      }
     }
     let tree = toObject()
     tree = removeDropzones(tree)
