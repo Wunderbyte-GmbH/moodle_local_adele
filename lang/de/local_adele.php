@@ -189,7 +189,7 @@ $string['course_description_placeholder_checkbox_status'] = 'nicht';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
+$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen.';
 $string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
