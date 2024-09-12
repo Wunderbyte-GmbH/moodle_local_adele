@@ -170,7 +170,7 @@ $string['nodes_feedback_completion_before'] = 'Um Knoten abzuschliessen musst du
 
 $string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
 $string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
-$string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
+$string['nodes_feedback_to_completed'] = 'Knoten wurde abgeschlossen mit:';
 $string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
 $string['nodes_feedback_completion_higher'] = 'Mit diesen Abschlüssen kannst du einen höheren Status erreichen:';
 
