@@ -111,7 +111,6 @@
             <template #edge-custom="props">
               <TransitionEdge
                 v-bind="props"
-                :hidden="props.data.hidden"
                 @end-transition="handleZoomLock"
               />
             </template>
@@ -270,13 +269,12 @@ const setZoomLevel = async (action) => {
     }
   }
   if (newViewport == 0.2) {
-    edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
+    //edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
     setTimeout(() => {
       drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);
   } else if (oldViewport < 0.25) {
-
-    edges.value = innerGraphDisplay(edges.value, removeEdges)
+    //edges.value = innerGraphDisplay(edges.value, removeEdges)
     setTimeout(() => {
       drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
     }, 50);
@@ -298,11 +296,13 @@ watch(() => user_learningpath.value, () => {
 function setFlowchart() {
   const flowchart = user_learningpath.value.json
   nodes.value = flowchart.tree.nodes;
-  edges.value = innerGraphDisplay(flowchart.tree.edges, removeEdges);
+  edges.value = flowchart.tree.edges;
+
   edges.value.forEach((edge) => {
     edge.deletable = false
     edge.type = 'custom'
   })
+
   setTimeout(() => {
     drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
   }, 100);
@@ -311,7 +311,6 @@ function setFlowchart() {
 // Zoom in node
 function onNodeClickCall(event) {
   zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
-  edges.value = innerGraphDisplay(edges.value, removeEdges)
 }
 
 </script>

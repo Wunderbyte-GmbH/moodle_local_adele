@@ -142,9 +142,6 @@ onEdgeClick(({ edge }) => {
   }
 
 })
-const hiddenStyle = computed(() => {
-  return props.hidden ? { display: 'none' } : {}
-})
 
 </script>
 
@@ -158,7 +155,6 @@ export default {
   <path
     :id="id"
     ref="curve"
-    :style="[hiddenStyle]"
     class="vue-flow__edge-path trans-edge"
     :d="path[0]"
     :marker-end="markerEnd"
