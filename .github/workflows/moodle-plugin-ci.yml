@@ -151,7 +151,14 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --testdox
+        run: moodle-plugin-ci phpunit --testdox --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Behat features
         if: ${{ always() }}

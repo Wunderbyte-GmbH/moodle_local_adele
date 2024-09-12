@@ -35,12 +35,26 @@
         <table class="table">
           <thead>
             <tr>
-              <th @click="sortTable('id')" :class="getSortClass('id')">{{ store.state.strings.user_view_id }}</th>
-              <th @click="sortTable('username')" :class="getSortClass('username')">{{ store.state.strings.user_view_username }}</th>
-              <th @click="sortTable('firstname')" :class="getSortClass('firstname')">{{ store.state.strings.user_view_firstname }}</th>
-              <th @click="sortTable('lastname')" :class="getSortClass('lastname')">{{ store.state.strings.user_view_lastname }}</th>
-              <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')">{{ store.state.strings.user_view_progress }}</th>
-              <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')">{{ store.state.strings.user_view_nodes }}</th>
+              <th
+                v-if="store.state.view !== 'student'"
+                @click="sortTable('id')"
+                :class="getSortClass('id')"
+                :style="{ width: columnWidth }"
+              >
+                {{ store.state.strings.user_view_id }}
+              </th>
+              <th @click="sortTable('firstname')" :class="getSortClass('firstname')" :style="{ width: columnWidth }">
+                {{ store.state.strings.user_view_firstname }}
+              </th>
+              <th @click="sortTable('lastname')" :class="getSortClass('lastname')" :style="{ width: columnWidth }">
+                {{ store.state.strings.user_view_lastname }}
+              </th>
+              <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')" :style="{ width: columnWidth }">
+                {{ store.state.strings.user_view_progress }}
+              </th>
+              <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')" :style="{ width: columnWidth }">
+                {{ store.state.strings.user_view_nodes }}
+              </th>
             </tr>
           </thead>
             <transition-group name="list" tag="tbody">
@@ -49,25 +63,17 @@
                 :key="relation.id"
                 :class="{ 'highlighted-row': relation.id === focusEntry }"
               >
-                <td>
-                  <router-link
-                    v-if="store.state.view !== 'student'"
-                    :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
-                  >
+                <td v-if="store.state.view !== 'student'" :style="{ width: columnWidth }">
+                  <router-link :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}">
                     {{ relation.id }}
-
                   </router-link>
-                  <div v-else>
-                    {{ relation.id }}
-                  </div>
                 </td>
-                <td>{{ relation.username }}</td>
-                <td>{{ relation.firstname }}</td>
-                <td>{{ relation.lastname }}</td>
-                <td>
+                <td :style="{ width: columnWidth }">{{ relation.firstname }}</td>
+                <td :style="{ width: columnWidth }">{{ relation.lastname }}</td>
+                <td :style="{ width: columnWidth }">
                   <ProgressBar :progress="relation.progress.progress" />
                 </td>
-                <td>{{ relation.progress.completed_nodes }}</td>
+                <td :style="{ width: columnWidth }">{{ relation.progress.completed_nodes }}</td>
               </tr>
             </transition-group>
         </table>
@@ -77,7 +83,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 
@@ -88,6 +94,10 @@ const sortKey = ref('');
 const sortDirection = ref(1);
 const focusEntry = ref(null);
 const isTableVisible = ref(true);
+
+// Computed column count and dynamic column width
+const columnCount = computed(() => (store.state.view === 'student' ? 6 : 5));
+const columnWidth = computed(() => `${100 / columnCount.value}%`);
 
 watch(
   () => store.state.lpuserpathrelations,
@@ -216,6 +226,14 @@ th {
   cursor: pointer;
   position: relative;
   transition: background-color 0.3s, color 0.3s;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  text-align: left;
+  padding: 10px;
 }
 
 th.sortable::after {
