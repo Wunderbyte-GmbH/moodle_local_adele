@@ -1,6 +1,6 @@
 <script setup>
   // Import needed libraries
-  import { computed, onMounted, onUpdated, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useStore } from 'vuex';
 
   const props = defineProps({
@@ -27,6 +27,7 @@
   const showCard = ref(false);
   const iconState = ref('initial');
   const iconClass = ref('fa-info');
+  const isRotatingBackward = ref(false);
 
   const toggleCard = () => {
     showCard.value = !showCard.value
@@ -144,10 +145,10 @@
         props.data.animations.seencompletion == false
       ) {
         setTimeout(() => {
-          iconState.value = 'animated';
+          iconState.value = 'rotating';
           setTimeout(() => {
             iconClass.value = 'fa-check';
-          }, 750);
+          }, 500);
         }, 1000);
       } else {
         iconClass.value = 'fa-check';
@@ -169,11 +170,11 @@
       class="information"
       :style="{ backgroundColor: backgroundColor }"
       @click.stop="toggleCard"
+      :class="{ 'information-rotating': iconState === 'rotating' }"
     >
       <i
         :class="['fa', iconClass, {
           'fa-info-mobile': mobile,
-          'icon-animated': iconState === 'animated',
           'icon-fadingIn': iconState === 'fadingIn',
           'icon-fadingOut': iconState === 'fadingOut'
         }]"
@@ -381,6 +382,49 @@
 
 <style scoped>
 
+@keyframes rotateY {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateY(180deg);
+    opacity: 1;
+  }
+}
+
+.information {
+  cursor: pointer;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
+  z-index: 3;
+  transform-style: preserve-3d; /* Preserve 3D context */
+  perspective: 1000px; /* Hides the back side during rotation */
+}
+
+.information-rotating {
+  animation: rotateY 1s forwards;
+}
+
+.fa-info,
+.fa-check {
+  font-size: 30px;
+  color: white;
+  margin-top: 7px;
+}
+
+.information-rotating .fa-check {
+  transform: rotateY(180deg);
+}
+
 @keyframes fadingIn {
   0% {
     opacity: 0;
@@ -391,6 +435,7 @@
 }
 .icon-fadingIn {
   animation: fadingIn 0.5s ease-out forwards;
+  transition: transform 0.5s, opacity 0.5s ease;
 }
 
 @keyframes fadingOut {
@@ -403,21 +448,6 @@
 }
 .icon-fadingOut {
   animation: fadingOut 0.5s ease-out forwards;
-}
-
-@keyframes rotateAndFade {
-  0% {
-    transform: rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: rotate(180deg);
-    opacity: 0.1;
-  }
-  100% {
-    transform: rotate(360deg);
-    opacity: 1;
-  }
 }
 
 .icon-animated {
@@ -451,27 +481,9 @@
   cursor: pointer;
 }
 
-.information {
-  cursor: pointer;
-  display: inline-block;
-  width: 50px; /* Diameter of the round button */
-  height: 50px; /* Diameter of the round button */
-  border-radius: 50%; /* Makes the div round */
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38); /* Adds depth with a shadow */
-  z-index: 3;
-}
-
 .information:hover {
-  background-color: #ad0050 !important; /* Darker background on hover for feedback */
-  box-shadow: 0 6px 8px rgba(0,0,0,0.2); /* Larger shadow on hover for depth */
-}
-
-.fa-info,
-.fa-check{
-  font-size: 30px; /* Make the icon larger */
-  color: white; /* Change the color if needed */
-  margin-top: 7px;
+  background-color: #ad0050 !important;
+  box-shadow: 0 6px 8px rgba(0,0,0,0.2);
 }
 
 .additional-card {
