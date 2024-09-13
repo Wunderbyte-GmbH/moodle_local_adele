@@ -166,7 +166,9 @@ class catquiz implements course_completion {
                     $bestresult = null;
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = '';
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
-                      '<a href="/mod/adaptivequiz/view.php?id=' . $scales['parent']['id'] . '" target="_blank">' . $scales['parent']['name'] .'</a>';;
+                      '<a href="/mod/adaptivequiz/view.php?id=' .
+                      $scales['parent']['id'] .
+                      '" target="_blank">' . $scales['parent']['name'] .'</a>';
 
                     foreach ($records as $record) {
                         $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
