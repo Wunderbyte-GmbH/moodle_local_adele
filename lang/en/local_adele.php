@@ -193,10 +193,9 @@ $string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a
 $string['course_description_after_condition_catquiz'] = 'your results in the "{quiz_name}" test. Through this, you have sufficiently demonstrated the competencies to be acquired in the course in: <ul>{quiz_attempts_list}</ul>';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">best result on {$a->time}</a>)</li>';
 
-$string['course_description_before_condition_modquiz'] = 'complete the quiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_inbetween_condition_modquiz_conditional'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_modquiz'] = 'quiz {catquiz_name_link} was successfully finished';
+$string['course_description_before_condition_modquiz'] = 'complete the quiz {quiz_name_link}';
+$string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
+$string['course_description_after_condition_modquiz'] = 'quiz {quiz_name} was successfully finished';
 
 $string['course_restricition_before_condition_manual'] = 'access will be granted manually';
 $string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
