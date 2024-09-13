@@ -156,8 +156,13 @@ class modquiz implements course_completion {
                         WHERE m.name = 'quiz' AND q.id = :quizid";
 
                     $record = $DB->get_record_sql($sql, ['quizid' => $completion['data']['value']['quizid']]);
-                    $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
-                      '<a href="/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';
+                    if ($record) {
+                        $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
+                          '<a href="/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';
+                    } else {
+                        $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
+                          'Mod Quiu';
+                    }
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
                     $modquizzes[$completion['id']]['placeholders']['current_best'] = '9';
                     foreach ($data as $key => $lastgrade) {
