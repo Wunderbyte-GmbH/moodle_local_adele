@@ -411,7 +411,7 @@ class relation_update {
                                     $starttime = new \DateTime();
                                     if (
                                       $node['data'] &&
-                                      $node['data']['first_enrolled']
+                                      isset($node['data']['first_enrolled'])
                                     ) {
                                         $starttime->setTimestamp($node['data']['first_enrolled']);
                                     }

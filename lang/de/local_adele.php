@@ -285,6 +285,8 @@ $string['completion_drop_here'] = 'Hier ablegen, um zu verbinden';
 $string['completion_drop_zone'] = 'Ablagezone';
 $string['completion_list_of_criteria'] = 'Liste der verfügbaren ';
 $string['completion_criteria'] = ' Kriterien';
+$string['completion_edge_or'] = ' ODER';
+$string['completion_edge_and'] = 'UND';
 
 // Flussdiagrammzeichenfolgen.
 $string['flowchart_add_learning'] = 'Ein Lernmodul hinzufügen';

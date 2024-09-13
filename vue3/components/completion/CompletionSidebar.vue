@@ -190,14 +190,14 @@ function drawDropZones(freeEdges, closestNode) {
       // Create an edge connecting the new drop zone node to the closest node
       let edgeData = {
         type: 'disjunctional',
-        text: 'OR',
+        text: store.state.strings.completion_edge_or,
       }
       let targetHandle = 'target_or'
       if(freeEdge == 'source_and'){
         targetHandle = 'target_and'
         edgeData = {
           type: 'additional',
-          text: 'AND',
+          text: store.state.strings.completion_edge_and,
         }
       }
 

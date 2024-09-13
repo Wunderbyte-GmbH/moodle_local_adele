@@ -134,12 +134,13 @@ class modquiz implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
+        global $DB;
         $modquizzes = [
           'completed' => [],
           'inbetween_info' => '',
         ];
-        $bestgrade = null;
-        $maxgrade = null;
+        $bestgrade = 0;
+        $maxgrade = 0;
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             $completions = $node['completion']['nodes'];
             foreach ($completions as $completion) {
@@ -148,6 +149,17 @@ class modquiz implements course_completion {
                     $validcatquiz = false;
                     // Get grade and check if valid.
                     $data = $this->get_modquiz_records($completion, $userid);
+                    $sql = "SELECT q.name, cm.id AS cmid
+                        FROM {quiz} q
+                        JOIN {course_modules} cm ON cm.instance = q.id
+                        JOIN {modules} m ON m.id = cm.module
+                        WHERE m.name = 'quiz' AND q.id = :quizid";
+
+                    $record = $DB->get_record_sql($sql, ['quizid' => $completion['data']['value']['quizid']]);
+                    $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
+                      '<a href="/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';
+                    $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
+                    $modquizzes[$completion['id']]['placeholders']['current_best'] = '9';
                     foreach ($data as $key => $lastgrade) {
                         if ((float)$key >= $bestgrade) {
                             $bestgrade = (float)$key;
@@ -157,6 +169,7 @@ class modquiz implements course_completion {
                             $validcatquiz = true;
                         }
                     }
+                    $modquizzes[$completion['id']]['placeholders']['current_best'] = $bestgrade;
                     $modquizzes['completed'][$completion['id']] = $validcatquiz;
                 } else {
                     $modquizzes['completed'][$completion['id']] = false;

@@ -28,11 +28,13 @@ import { Handle, Position, useVueFlow } from '@vue-flow/core'
 import RestrictionItem from '../restriction/RestrictionItem.vue'
 import CompletionItem from '../completion/CompletionItem.vue'
 import { computed, onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
 
 const { nodes, edges, removeNodes, findNode, addEdges, removeEdges, findEdge } = useVueFlow()
 
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+const store = useStore();
 
 const props = defineProps({
   data: {
@@ -187,7 +189,7 @@ const shiftLeft = (deletedNode, edges) => {
     type: 'condition',
     data: {
       type: 'disjunctional',
-      text: 'OR',
+      text: store.state.strings.completion_edge_or,
     },
   };
   nodes.value.forEach(node => {

@@ -194,8 +194,8 @@ $string['course_description_after_condition_catquiz'] = 'your results in the "{q
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">best result on {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'complete the quiz {quiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name} has to be finished with scale of {scale_min}. Current best result is {current_best}.';
-$string['course_description_after_condition_modquiz'] = 'quiz {quiz_name} was successfully finished';
+$string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Current best result is {current_best}';
+$string['course_description_after_condition_modquiz'] = 'quiz {quiz_name_link} was successfully finished';
 
 $string['course_restricition_before_condition_manual'] = 'access will be granted manually';
 $string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
@@ -280,6 +280,8 @@ $string['completion_drop_here'] = 'Drop to connect here';
 $string['completion_drop_zone'] = 'Drop zone';
 $string['completion_list_of_criteria'] = 'List of available ';
 $string['completion_criteria'] = ' criteria';
+$string['completion_edge_or'] = ' OR';
+$string['completion_edge_and'] = 'AND';
 
 // Flowchart strings.
 $string['flowchart_add_learning'] = 'Add a learning module';
