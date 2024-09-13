@@ -27,10 +27,10 @@ describe('recalculateParentChild', () => {
     parentNode = 'parentNodes';
     childNode = 'childNodes';
     startNode = 'start';
-    result = recalculateParentChild(tree, parentNode, childNode, startNode);
   });
 
   it('should correctly update parent and child nodes', () => {
+    result = recalculateParentChild(tree, parentNode, childNode, startNode);
     const node1 = result.nodes.find(node => node.id === '1');
     const node2 = result.nodes.find(node => node.id === '2');
     const node3 = result.nodes.find(node => node.id === '3');
@@ -49,6 +49,7 @@ describe('recalculateParentChild', () => {
   });
 
   it('should not add orHandles to parent or child nodes', () => {
+    result = recalculateParentChild(tree, parentNode, childNode, startNode);
     result.nodes.forEach(node => {
       expect(node[childNode].includes('4')).toBe(false);
       expect(node[parentNode].includes('3')).toBe(node.id === '1');
@@ -67,5 +68,18 @@ describe('recalculateParentChild', () => {
         expect(node[parentNode]).toEqual([]);
       }
     });
+  });
+
+  it('should change the node type', () => {
+    tree.nodes = [
+      { id: '1', type: 'orcourses', data: {course_node_id: ['12']},parentNodes: [], childNodes: [] },
+      { id: '2', type: 'custom', data: {course_node_id: ['12', '23']}, parentNodes: [], childNodes: [] },
+    ];
+
+    const result = recalculateParentChild(tree, parentNode, childNode, startNode);
+    const node1 = result.nodes.find(node => node.id === '1');
+    const node2 = result.nodes.find(node => node.id === '2');
+    expect(node1['type']).toEqual('custom');
+    expect(node2['type']).toEqual('orcourses');
   });
 });

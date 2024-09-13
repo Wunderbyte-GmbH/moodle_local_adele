@@ -22,7 +22,10 @@ const  recalculateParentChild = (tree, parentNode, childNode, startNode) => {
             if(node[parentNode].length == 0){
                 node[parentNode].push(startNode);
             }
-            if (node.data.course_node_id) {
+            if (
+              node.data != undefined &&
+              node.data.course_node_id != undefined
+            ) {
               if (node.data.course_node_id.length > 1) {
                 node.type = 'orcourses'
               } else {

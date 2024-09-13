@@ -64,6 +64,12 @@ describe('onNodeClick', () => {
     event.node.data.animations = {};
     await onNodeClick(event, zoomLock, setCenter, store);
     expect(store.dispatch).not.toHaveBeenCalled();
+  });
 
+  it('should not trigger the web service if no conditions are met', async () => {
+    event.node.data = true;
+    const result = await onNodeClick(event, zoomLock, setCenter, store);
+    expect(store.dispatch).not.toHaveBeenCalled();
+    expect(result).toBe(1);
   });
 });
