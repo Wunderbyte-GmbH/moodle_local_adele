@@ -262,7 +262,9 @@ class relation_update {
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
-                        if (isset($completioncriteria[$label])) {
+                        if (
+                          isset($completioncriteria[$label]['completed'])
+                        ) {
                             foreach ($completioncriteria[$label]['completed'] as $coursecompleted) {
                                 if ($coursecompleted) {
                                     $completednodecourses += 1;
