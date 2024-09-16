@@ -136,5 +136,4 @@ describe('drawModules', () => {
     const module1 = addedModules.find(module => module.id === 'module1_module');
     expect(module1.data.opacity).toBe('0.6');
   });
-
 });

@@ -57,5 +57,9 @@ describe('setZoomLevel', () => {
     await setZoomLevel('out', zoomLock, viewport, zoomTo);
     expect(zoomTo).toHaveBeenCalledWith(1.15, { duration: 500 });
   });
-
+  it('should set undefined zoom step', async () => {
+    viewport.value.zoom = null;
+    await setZoomLevel('outin', zoomLock, viewport, zoomTo);
+    expect(zoomTo).toHaveBeenCalledTimes(0);
+  });
 });

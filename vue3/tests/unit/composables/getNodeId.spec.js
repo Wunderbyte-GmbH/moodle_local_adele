@@ -77,4 +77,15 @@ describe('getNodeId function test', () => {
     const result = getNodeId(prefix, nodes);
     expect(result).toBe('complex_node_4');
   });
+
+  it('should handle complex prefixes', () => {
+    const prefix = 'complex_node_';
+    const nodes = [
+      { id: 'complex_node_2' },
+      { id: 'complex_node_3' },
+      { id: 'complex_node_1' },
+    ];
+    const result = getNodeId(prefix, nodes);
+    expect(result).toBe('complex_node_4');
+  });
 });

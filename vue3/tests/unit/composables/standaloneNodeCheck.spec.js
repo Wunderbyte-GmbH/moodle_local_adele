@@ -41,6 +41,23 @@ describe('standaloneNodeCheck', () => {
     };
 
     const result = standaloneNodeCheck(tree);
-    expect(result).toBe(true); // node3 is standalone
+    expect(result).toBe(true);
+  });
+  it('returns true when there is a standalone node', () => {
+    const tree = {
+      nodes: [
+        { id: 'node1' },
+        { id: 'node2' },
+        { id: 'node3' },
+      ],
+      edges: [
+        { source: 'node1', target: 'node2' },
+        { source: 'node1', target: 'node3' },
+        { source: 'node2', target: 'node3' },
+      ],
+    };
+
+    const result = standaloneNodeCheck(tree);
+    expect(result).toBe(false);
   });
 });

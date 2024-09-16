@@ -61,5 +61,5 @@
     [
       'eventname' => '\mod_adaptivequiz\event\attempt_completed',
       'callback' => 'local_adele_observer::attempt_finished',
-    ]
+    ],
  ];

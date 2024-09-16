@@ -18,6 +18,7 @@ describe('setStartingNode', () => {
       nodes = [
           { id: 'node1', position: { x: 100, y: 100 }, dimensions: { width: 200, height: 100 }, parentCourse: 'starting_node' },
           { id: 'node2', position: { x: 400, y: 100 }, dimensions: { width: 200, height: 100 }, parentCourse: 'starting_node' },
+          { id: 'node3', position: { x: -400, y: 100 }, dimensions: { width: 200, height: 100 }, parentCourse: 'starting_node' },
       ];
   });
 
