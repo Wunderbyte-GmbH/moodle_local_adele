@@ -30,6 +30,4 @@ $plugin->version = 2024091606;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = [
-    'local_catquiz' => 2024010300,
-    'mod_booking' => 2024071500,
 ];
