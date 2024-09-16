@@ -76,7 +76,7 @@ class modquiz_test extends advanced_testcase {
             ->method('get_record_sql')
             ->willReturn((object)[
                 'name' => 'Sample Quiz Name',
-                'cmid' => 65
+                'cmid' => 65,
             ]);
         $modquiz = $this->getMockBuilder(modquiz::class)
             ->onlyMethods(['get_modquiz_records'])
