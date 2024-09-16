@@ -51,7 +51,9 @@ class timed_duration implements course_restriction {
     private $durationplaceholder;
 
 
-
+    /**
+     * Entities constructor.
+     */
     public function __construct() {
         $this->durationplaceholder = [
             '0' => get_string('course_select_condition_timed_duration_days', 'local_adele'), // Days.
