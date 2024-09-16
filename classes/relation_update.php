@@ -724,26 +724,28 @@ class relation_update {
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
                 if (in_array('starting_node', $node['parentCourse'])) {
-                    foreach ($node['data']['course_node_id'] as $courseid) {
-                        if (!enrol_is_enabled('manual')) {
-                            break; // Manual enrolment not enabled.
+                    if (!is_int($node['data']['course_node_id'])) {
+                        foreach ($node['data']['course_node_id'] as $courseid) {
+                            if (!enrol_is_enabled('manual')) {
+                                break; // Manual enrolment not enabled.
+                            }
+                            if (!$enrol = enrol_get_plugin('manual')) {
+                                break; // No manual enrolment plugin.
+                            }
+                            if (!isset($node['data']['first_enrolled'])) {
+                                $node['data']['first_enrolled'] = time();
+                                $firstenrollededit = true;
+                            }
+                            $instances = $DB->get_records('enrol', [
+                              'courseid' => $courseid,
+                              'enrol' => 'manual',
+                            ]);
+                            if (!$instances) {
+                                break;
+                            }
+                            $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                            $enrol->enrol_user($instance, $userpath->user_id, null);
                         }
-                        if (!$enrol = enrol_get_plugin('manual')) {
-                            break; // No manual enrolment plugin.
-                        }
-                        if (!isset($node['data']['first_enrolled'])) {
-                            $node['data']['first_enrolled'] = time();
-                            $firstenrollededit = true;
-                        }
-                        $instances = $DB->get_records('enrol', [
-                          'courseid' => $courseid,
-                          'enrol' => 'manual',
-                        ]);
-                        if (!$instances) {
-                            break;
-                        }
-                        $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                        $enrol->enrol_user($instance, $userpath->user_id, null);
                     }
                 }
             }

@@ -143,6 +143,9 @@ class course_completed implements course_completion {
         $courseprogresslist = [];
         $progresses = [];
         $minvalue = 1;
+        if (is_int($courses)) {
+            return $coursecompletion;
+        }
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;
