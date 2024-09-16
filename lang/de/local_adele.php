@@ -199,7 +199,7 @@ $string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Te
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'beende das Quiz {quiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Bewertung von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}';
+$string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Bewertung von {scale_min} abgeschlossen werden. Letztes Ergebnis ist {current_best}';
 $string['course_description_after_condition_modquiz'] = 'das Quiz {quiz_name_link} wurde erfolgreich abgeschlossen';
 
 $string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';

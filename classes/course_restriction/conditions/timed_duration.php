@@ -50,7 +50,6 @@ class timed_duration implements course_restriction {
     /** @var array $time span array. */
     private $durationplaceholder;
 
-
     /**
      * Entities constructor.
      */

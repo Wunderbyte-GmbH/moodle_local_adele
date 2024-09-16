@@ -147,8 +147,6 @@ class modquiz implements course_completion {
                 if ( isset($completion['data']) && isset($completion['data']['label'])
                   && $completion['data']['label'] == 'modquiz') {
                     $validcatquiz = false;
-                    // Get grade and check if valid.
-                    $data = $this->get_modquiz_records($completion, $userid);
                     $sql = "SELECT q.name, cm.id AS cmid
                         FROM {quiz} q
                         JOIN {course_modules} cm ON cm.instance = q.id
@@ -164,6 +162,8 @@ class modquiz implements course_completion {
                           'Mod Quiu';
                     }
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
+                    // Get grade and check if valid.
+                    $data = $this->get_modquiz_records($completion, $userid);
                     foreach ($data as $key => $lastgrade) {
                         if ((float)$key >= $bestgrade) {
                             $bestgrade = (float)$key;
@@ -201,11 +201,11 @@ class modquiz implements course_completion {
     protected function get_modquiz_records($completion, $userid) {
         global $DB;
         return $DB->get_records_select(
-            'quiz_grades',
+            'quiz_attempts',
             'quiz = :quiz AND userid = :userid',
             ['quiz' => $completion['data']['value']['quizid'] ?? 0, 'userid' => $userid],
             'timemodified DESC',
-            'grade'
+            'sumgrades'
         );
     }
 }

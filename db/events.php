@@ -51,11 +51,15 @@
       'callback' => 'local_adele_observer::attempt_submitted',
     ],
     [
-      'eventname' => '\mod_quiz\event\attempt_updated',
-      'callback' => 'local_adele_observer::attempt_finished',
-    ],
-    [
       'eventname' => '\mod_quiz\event\attempt_finished',
       'callback' => 'local_adele_observer::attempt_finished',
     ],
+    [
+      'eventname' => '\mod_quiz\event\attempt_reviewed',
+      'callback' => 'local_adele_observer::attempt_finished',
+    ],
+    [
+      'eventname' => '\mod_adaptivequiz\event\attempt_completed',
+      'callback' => 'local_adele_observer::attempt_finished',
+    ]
  ];

@@ -144,6 +144,12 @@ class catquiz implements course_completion {
                 ) {
                     $validationtype = get_config('local_adele', 'quizsettings');
                     $componentid = $complitionnode['data']['value']['componentid'];
+                    $test = $DB->get_record(
+                      'adaptivequiz',
+                      ['id' => $componentid],
+                      'name, course'
+                    );
+                    $coursemoduleid = get_coursemodule_from_instance('adaptivequiz', $componentid, $test->course);
                     $testidcourseid = $complitionnode['data']['value']['testid_courseid'];
                     $scales = $complitionnode['data']['value']['scales'] ?? null;
                     $scaleattemptset = [
@@ -167,8 +173,8 @@ class catquiz implements course_completion {
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = '';
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
                       '<a href="/mod/adaptivequiz/view.php?id=' .
-                      $scales['parent']['id'] .
-                      '" target="_blank">' . $scales['parent']['name'] .'</a>';
+                      $coursemoduleid->id .
+                      '" target="_blank">' . $test->name .'</a>';
 
                     foreach ($records as $record) {
                         $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);
