@@ -138,7 +138,7 @@ class parent_courses implements course_restriction {
                         }
                     }
                     $parentcourses[$restriction['id']]['placeholders']['numb_courses'] =
-                        $restriction['data']['value']['min_courses'];
+                        $restriction['data']['value']['min_courses'] ?? 1;
                     $parentcourses[$restriction['id']]['placeholders']['node_name'] = $courselist;
                     $parentcourses[$restriction['id']]['completed'] = $coursescompleted;
                     $parentcourses[$restriction['id']]['inbetween_info'] = null;
