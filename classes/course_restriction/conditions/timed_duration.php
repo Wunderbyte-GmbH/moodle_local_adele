@@ -47,6 +47,18 @@ class timed_duration implements course_restriction {
     public $id = COURSES_COND_TIMED;
     /** @var string $type of the redered condition in frontend. */
     public $label = 'timed_duration';
+    /** @var array $time span array. */
+    private $durationplaceholder;
+
+
+
+    public function __construct() {
+        $this->durationplaceholder = [
+            '0' => get_string('course_select_condition_timed_duration_days', 'local_adele'), // Days.
+            '1' => get_string('course_select_condition_timed_duration_weeks', 'local_adele'), // Weeks.
+            '2' => get_string('course_select_condition_timed_duration_months', 'local_adele'), // Months.
+        ];
+    }
 
     /**
      * Obtains a string describing this restriction (whether or not
@@ -142,7 +154,7 @@ class timed_duration implements course_restriction {
                     }
                     $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $starttime->format('Y-m-d H:i:s');
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
-                        $selectedduration . ' ' .$this->durationplaceholder[$durationvalue];
+                        $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
                       'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
@@ -171,19 +183,5 @@ class timed_duration implements course_restriction {
         '0' => 86400, // Days.
         '1' => 604800, // Weeks.
         '2' => 2629746, // Months.
-    ];
-
-    /**
-     * Maps duration types to their equivalent durations in seconds.
-     *
-     * @var array The keys represent the duration types as follows:
-     *            '0' for days, with each day being 86400 seconds;
-     *            '1' for weeks, with each week being 604800 seconds;
-     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
-     */
-    private $durationplaceholder = [
-        '0' => 'Days', // Days.
-        '1' => 'Weeks', // Weeks.
-        '2' => 'Months', // Months.
     ];
 }
