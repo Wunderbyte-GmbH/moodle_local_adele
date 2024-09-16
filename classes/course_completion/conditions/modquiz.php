@@ -154,8 +154,8 @@ class modquiz implements course_completion {
                         JOIN {course_modules} cm ON cm.instance = q.id
                         JOIN {modules} m ON m.id = cm.module
                         WHERE m.name = 'quiz' AND q.id = :quizid";
-
-                    $record = $DB->get_record_sql($sql, ['quizid' => $completion['data']['value']['quizid']]);
+                    $quizid = $completion['data']['value']['quizid'] ?? 0;
+                    $record = $DB->get_record_sql($sql, ['quizid' => $quizid]);
                     if ($record) {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
                           '<a href="/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';

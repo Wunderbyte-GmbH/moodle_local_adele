@@ -555,7 +555,10 @@ class relation_update {
           ],
         ];
         foreach ($node['completion']['nodes'] as $conditionnode) {
-            if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
+            if (
+                strpos($conditionnode['id'], '_feedback') !== false &&
+                isset($conditionnode['data']['visibility'])
+              ) {
                 $feedbacks['completion']['before'][] =
                   isset($conditionnode['data']['feedback_before']) ?
                       self::render_placeholders(
