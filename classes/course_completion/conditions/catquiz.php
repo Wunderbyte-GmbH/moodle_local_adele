@@ -192,7 +192,10 @@ class catquiz implements course_completion {
                         $rightanswerspercentage =
                           Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
                         $invalidattempt = false;
-                        $parentscalerecord = $personabilityresults->{$scales['parent']['id']} ?? 0;
+                        $parentscalerecord = 0;
+                        if (isset($scales['parent']['id'])) {
+                            $parentscalerecord = $personabilityresults->{$scales['parent']['id']};
+                        }
                         $percentageofrightanswersbyscalekeyid[$record->attemptid] = (array)$personabilityresults;
                         foreach ($scales as $type => $scaletype) {
                             if ($type == 'parent') {
