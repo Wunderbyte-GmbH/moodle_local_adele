@@ -247,9 +247,12 @@ class relation_update {
                 while ($currentcondition) {
                     $label = $currentcondition['data']['label'];
                     if (
-                        $label == 'catquiz' ||
-                        $label == 'modquiz' ||
-                        $label == 'course_completed'
+                        isset($completioncriteria[$label]['completed'][$currentcondition['id']]) &&
+                        (
+                            $label == 'catquiz' ||
+                            $label == 'modquiz' ||
+                            $label == 'course_completed'
+                        )
                     ) {
                         $validationcondition =
                             $completioncriteria[$label]['completed'][$currentcondition['id']];
