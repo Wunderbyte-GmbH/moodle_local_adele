@@ -222,6 +222,8 @@ $string['event_user_path_updated'] = 'User path relation was updated';
 $string['event_user_path_updated_description'] = 'The user path path relation for user {$a->user} and learning path {$a->path} was updated';
 $string['event_node_finished'] = 'Node weas finished';
 $string['event_node_finished_description'] = 'The user {$a->user} has finished the node {$a->node}';
+$string['event_attempt_submitted'] = 'Quiz attempt was finished';
+$string['event_attempt_submitted_description'] = 'The user {$a->user} has finished the quiz {$a->node}';
 
 // Color strings.
 $string['DARK_GREEN'] = '#063449';

@@ -218,4 +218,26 @@ class learning_path_update {
         );
         return ['success' => true];
     }
+
+    /**
+     * Finished quiz.
+     *
+     * @param object $event
+     */
+    public static function quiz_finished($event) {
+        // Get the user path relations.
+        $userpathrelation = new user_path_relation();
+        $records = $userpathrelation->get_learning_paths($event->userid);
+        foreach ($records as $userpath) {
+            $eventsingle = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
+        }
+    }
+
 }

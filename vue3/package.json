@@ -17,6 +17,8 @@
     "@vue-flow/controls": "^1.1.0",
     "@vue-flow/core": "^1.26.0",
     "@vue-flow/minimap": "^1.2.0",
+    "flush-promises": "^1.0.2",
+    "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "vue": "^3.3.8",
     "vue-input-autowidth": "^1.0.11",

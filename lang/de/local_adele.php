@@ -227,6 +227,9 @@ $string['event_user_path_updated'] = 'Benutzerpfad-Beziehung wurde aktualisiert'
 $string['event_user_path_updated_description'] = 'Die Benutzerpfad-Beziehung für Benutzer {$a->user} und Lernpfad {$a->path} wurde aktualisiert';
 $string['event_node_finished'] = 'Knoten wurde abgeschlossen';
 $string['event_node_finished_description'] = 'Der Benutzer {$a->user} hat den Knoten {$a->node} abgeschlossen';
+$string['event_attempt_submitted'] = 'Quiz wurde abgeschlossen';
+$string['event_attempt_submitted_description'] = 'Der Benutzer {$a->user} hat das Quiz {$a->node} abgeschlossen';
+
 
 // Farbzeichenfolgen.
 $string['DARK_GREEN'] = '#063449';

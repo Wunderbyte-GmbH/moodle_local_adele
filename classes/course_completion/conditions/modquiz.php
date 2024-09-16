@@ -164,7 +164,6 @@ class modquiz implements course_completion {
                           'Mod Quiu';
                     }
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
-                    $modquizzes[$completion['id']]['placeholders']['current_best'] = '9';
                     foreach ($data as $key => $lastgrade) {
                         if ((float)$key >= $bestgrade) {
                             $bestgrade = (float)$key;
