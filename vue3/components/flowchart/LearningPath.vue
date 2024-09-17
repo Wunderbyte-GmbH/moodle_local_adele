@@ -347,6 +347,7 @@ if (params.source !== store.state.startnode) {
  params.target = params.source;
  params.source = store.state.startnode;
 }
+
 addEdges(addCustomEdge( params.target, params.source));
 emit('add-edge', addCustomEdge( params.target, params.source));
 }
@@ -584,6 +585,15 @@ async function onRemoveNode(data) {
 
 </script>
 
+<style>
+.vue-flow__edge-layer {
+  z-index: 0; /* Ensure edges are below */
+}
+
+.vue-flow__node-layer {
+  z-index: 10; /* Ensure nodes are above */
+}
+</style>
 <style scoped>
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';

@@ -25,7 +25,7 @@
  <!-- Setup props for connection lines -->
  <script setup>
  import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@vue-flow/core'
- import { computed, onMounted } from 'vue'
+ import { computed } from 'vue'
 
  const props = defineProps({
   data: {
