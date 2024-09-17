@@ -171,7 +171,7 @@ $string['nodes_feedback_completion_before'] = 'Um Knoten abzuschliessen musst du
 
 $string['nodes_feedback_to_access'] = 'Um diese Node freizuschalten, musst du:';
 $string['nodes_feedback_to_completion'] = 'Um diese Node abzuschliessen, musst du:';
-$string['nodes_feedback_to_completed'] = 'Node wurde abgeschlossen mit:';
+$string['nodes_feedback_to_completed'] = 'Knoten wurde abgeschlossen mit:';
 $string['nodes_feedback_completion_inbetween'] = 'Aktueller Node Status:';
 $string['nodes_feedback_completion_higher'] = 'Mit diesen Abschlüssen kannst du einen höheren Status erreichen:';
 
@@ -190,7 +190,7 @@ $string['course_description_placeholder_checkbox_status'] = 'nicht';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
 
 $string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
+$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen.';
 $string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
