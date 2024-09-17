@@ -39,10 +39,12 @@ class user_path_relation {
      * Get learning paths that contain course.
      *
      * @param int $userid
+     * @param string $catquiz
+     * @param string $modquiz
      * @return object
      *
      */
-    public function get_learning_paths($userid) {
+    public function get_learning_paths($userid, $catquiz = null, $modquiz = null) {
         global $DB;
         // Using named parameter :courseid in the SQL query.
         $sql = "SELECT *
@@ -54,6 +56,16 @@ class user_path_relation {
             'user_id' => (int)$userid,
         ];
         // Using get_records_sql function to execute the query with parameters.
+        if ($catquiz !== null) {
+            $sql .= " AND lpu.json LIKE :catquiz";
+            $params['catquiz'] = '%' . $DB->sql_like_escape($catquiz) . '%';
+        }
+
+        // Extend the SQL query if modquiz is provided.
+        if ($modquiz !== null) {
+            $sql .= " AND lpu.json LIKE :modquiz";
+            $params['modquiz'] = '%' . $DB->sql_like_escape($modquiz) . '%';
+        }
         $records = $DB->get_records_sql($sql, $params);
 
         return $records;

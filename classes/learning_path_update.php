@@ -77,7 +77,37 @@ class learning_path_update {
     public static function quiz_finished($event) {
         // Get the user path relations.
         $userpathrelation = new user_path_relation();
-        $records = $userpathrelation->get_learning_paths($event->userid);
+        $records = $userpathrelation->get_learning_paths(
+          $event->userid,
+          null,
+          '"quizid":"' . $event->other['quizid'] . '"'
+        );
+        foreach ($records as $userpath) {
+            $userpath->json = json_decode($userpath->json, true);
+            $eventsingle = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
+        }
+    }
+
+    /**
+     * Finished quiz.
+     *
+     * @param object $event
+     */
+    public static function catquiz_finished($event) {
+        // Get the user path relations.
+        $cm = get_coursemodule_from_id(null, $event->contextinstanceid);
+        $userpathrelation = new user_path_relation();
+        $records = $userpathrelation->get_learning_paths(
+          $event->userid,
+          '"componentid":"' . $cm->instance . '"'
+        );
         foreach ($records as $userpath) {
             $userpath->json = json_decode($userpath->json, true);
             $eventsingle = user_path_updated::create([

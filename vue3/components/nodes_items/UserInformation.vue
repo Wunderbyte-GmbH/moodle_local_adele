@@ -22,6 +22,10 @@ const props = defineProps({
 
 const toggleFeedbackarea = () => {
   showFeedbackarea.value = !showFeedbackarea.value;
+  if (!showFeedbackarea.value) {
+    cardStyle.value.zIndex = 2;
+  }
+  handleFocus()
 };
 
 watchEffect(() => {
@@ -36,19 +40,37 @@ watchEffect(() => {
       borderBottomLeftRadius: '8px',
       borderBottomRightRadius: '8px',
       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-      zIndex: 100,
     };
   } else {
     feedbackStyle.value = {};
   }
 });
+
+const cardStyle = ref({
+  zIndex: 2,
+});
+const handleFocus = () => {
+  if(showFeedbackarea.value) {
+    cardStyle.value.zIndex = 4;
+  } else {
+    cardStyle.value.zIndex = 2;
+  }
+};
+
+const handleBlur = () => {
+  cardStyle.value.zIndex = 2;
+};
 </script>
 
 <template>
   <div
     class="card-container"
+    tabindex="0"
+    :style="cardStyle"
     :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }"
     @click.stop
+    @focus="handleFocus"
+    @blur="handleBlur"
   >
     <div
       class="toggle-button"
@@ -155,6 +177,7 @@ watchEffect(() => {
   border-radius: 8px;
   background-color: #EAEAEA;
   text-align: center;
+  z-index: 3,
 }
 
 .card-container.no-bottom-radius {

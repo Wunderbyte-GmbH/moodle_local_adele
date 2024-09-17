@@ -57,6 +57,7 @@ const props = defineProps({
 })
 
 const curve = ref()
+const isActive = ref(false)
 
 const dot = ref()
 
@@ -91,12 +92,18 @@ const debouncedFitBounds = useDebounceFn(fitBounds, 1, { maxWait: 1 })
 
 onEdgeClick(({ edge }) => {
   if (!showDot.value && edge.id == props.id) {
+    isActive.value = true
+    const parentGroup = document.querySelector(`[data-id="${props.id}"]`);
+    const parentNode = parentGroup.parentNode;
+    if (parentGroup && parentGroup.parentNode) {
+      parentNode.style.zIndex = 1
+    }
     const targetisTarget = last_target_node.value != props.target
     const sourceisSource = last_source_node.value != props.source
     last_target_node.value = targetisTarget ? props.target : props.source
     last_source_node.value = sourceisSource ? props.source : props.target
 
-    emit('end-transition', last_source_node.value);
+    emit('end-transition', last_source_node.value)
     showDot.value = true
     let totalLength = curve.value.getTotalLength()
     const initialPos = ref(targetisTarget ?? sourceisSource ? 0 : totalLength)
@@ -111,6 +118,10 @@ onEdgeClick(({ edge }) => {
         stopHandle?.()
         showDot.value = false
         emit('end-transition', last_target_node.value);
+        if (parentGroup && parentGroup.parentNode) {
+          parentNode.style.zIndex = 0
+        }
+        isActive.value = false
       },
     })
     transform.value = curve.value.getPointAtLength(output.value)
@@ -156,6 +167,7 @@ export default {
     :id="id"
     ref="curve"
     class="vue-flow__edge-path trans-edge"
+    :class="{ 'active-edge': isActive }"
     :d="path[0]"
     :marker-end="markerEnd"
   />
@@ -176,6 +188,11 @@ export default {
 .trans-edge{
   stroke: #b1b1b7 !important;
   stroke-width: 5;
+}
+.active-edge {
+  stroke: #666667 !important;
+  stroke-width: 6;
+  z-index: 1
 }
 
 .fade-enter-active,

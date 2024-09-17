@@ -44,7 +44,7 @@ require_once($CFG->libdir . '/externallib.php');
  */
 class enrollment {
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Webservice for the local adele plugin to get next question.
      *
      * @param object $event
      */

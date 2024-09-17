@@ -137,19 +137,15 @@ class catquiz implements course_completion {
     public function get_completion_status($node, $userid) {
         global $DB;
         $catquizzes = [];
+        if (!class_exists('local_catquiz\catquiz')) {
+            return [];
+        }
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             foreach ($node['completion']['nodes'] as $complitionnode) {
                 if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
                   && $complitionnode['data']['label'] == 'catquiz' &&isset($complitionnode['data']['value']['testid'])
                 ) {
                     $validationtype = get_config('local_adele', 'quizsettings');
-                    $componentid = $complitionnode['data']['value']['componentid'];
-                    $test = $DB->get_record(
-                      'adaptivequiz',
-                      ['id' => $componentid],
-                      'name, course'
-                    );
-                    $coursemoduleid = get_coursemodule_from_instance('adaptivequiz', $componentid, $test->course);
                     $testidcourseid = $complitionnode['data']['value']['testid_courseid'];
                     $scales = $complitionnode['data']['value']['scales'] ?? null;
                     $scaleattemptset = [
@@ -158,6 +154,8 @@ class catquiz implements course_completion {
                     ];
                     $scaleids = self::get_scale_ids($scales, $scaleattemptset);
                     $parentscaleglobal = $scales['parent']['scale'] ?? false;
+                    $componentid = $complitionnode['data']['value']['componentid'];
+
                     $records = Local_catquizCatquiz::return_data_from_attemptstable(
                       100,
                       $componentid,
@@ -170,11 +168,26 @@ class catquiz implements course_completion {
                     $percentageofrightanswersbyscalekeyid = [];
                     $subscaleids = [];
                     $bestresult = null;
+                    $test = $DB->get_record(
+                      'adaptivequiz',
+                      ['id' => $componentid],
+                      'name, course'
+                    );
+                    $test = $DB->get_record(
+                      'adaptivequiz',
+                      ['id' => $componentid],
+                      'name, course'
+                    );
+                    if ($test != null) {
+                        $coursemoduleid = get_coursemodule_from_instance('adaptivequiz', $componentid, $test->course);
+                        $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
+                        '<a href="/mod/adaptivequiz/view.php?id=' .
+                        $coursemoduleid->id .
+                        '" target="_blank">' . $test->name .'</a>';
+                    } else {
+                        $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] = 'Test';
+                    }
                     $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_best'] = '';
-                    $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
-                      '<a href="/mod/adaptivequiz/view.php?id=' .
-                      $coursemoduleid->id .
-                      '" target="_blank">' . $test->name .'</a>';
 
                     foreach ($records as $record) {
                         $personabilityresults = Local_catquizCatquiz::get_personabilityresults_of_quizattempt($record);

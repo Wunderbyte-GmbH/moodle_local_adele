@@ -230,7 +230,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.nodes_edit_completion"
+              :title="store.state.strings.edit_node_pretest"
               data-toggle="tooltip"
             >
               <button
@@ -243,7 +243,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.edit"
+              :title="store.state.strings.edit_course_node"
               data-toggle="tooltip"
             >
               <button

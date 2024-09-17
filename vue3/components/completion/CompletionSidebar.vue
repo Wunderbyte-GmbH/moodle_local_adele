@@ -141,7 +141,6 @@ function checkIntersetcion(event, closestNode) {
   emit('nodesIntersected', { intersecting: intersectingNode.value });
 }
 
-
 // Function to check if two nodes intersect
 function areNodesIntersecting(position, node) {
   return (
@@ -241,10 +240,22 @@ function findClosestNode(event) {
   let closestNode = null;
   let closestDistance = Infinity;
   props.nodes.forEach((node) => {
-    if(node.type != 'dropzone' && node.type != 'selected'  && node.type != 'feedback'){
+    if(
+      node.type != 'dropzone' &&
+      node.type != 'selected' &&
+      node.type != 'feedback' &&
+      (
+        node.childCondition.length == 0 ||
+        node.childCondition[0].includes('_feedback')
+      )
+    ){
+      const nodeCenter = {
+        x: node.position.x + node.dimensions.width / 2,
+        y: node.position.y + node.dimensions.height / 2
+      };
       const distance = Math.sqrt(
-        Math.pow(position.x - node.position.x, 2) +
-        Math.pow(position.y - node.position.y, 2)
+        Math.pow(position.x - nodeCenter.x, 2) +
+        Math.pow(position.y - nodeCenter.y, 2)
       );
       if (distance < closestDistance && distance < connectionRadius) {
         closestDistance = distance;
@@ -254,7 +265,6 @@ function findClosestNode(event) {
   });
   return closestNode;
 }
-
 
 function onDragEnd(){
   removeNodes(availableEdges)

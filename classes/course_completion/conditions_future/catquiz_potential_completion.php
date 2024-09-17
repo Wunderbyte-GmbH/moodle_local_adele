@@ -126,6 +126,9 @@ class catquiz_potential_completion implements course_completion {
      */
     public function get_completion_status($node, $userid) {
         global $DB;
+        if (!class_exists('local_catquiz\catquiz')) {
+            return [];
+        }
         $catquizzes = [];
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             foreach ($node['completion']['nodes'] as $complitionnode) {
