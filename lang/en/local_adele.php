@@ -158,6 +158,7 @@ $string['course_name_condition_timed'] = 'Node start/end date';
 $string['course_name_condition_course_completed'] = 'Course(s) completed';
 $string['course_description_condition_catquiz'] = 'Accroding to catquiz results/attempts';
 $string['course_name_condition_catquiz'] = 'Catquiz Quiz';
+$string['no_catquiz_class'] = 'No catquiz found!';
 $string['course_description_condition_modquiz'] = 'Accroding to mod Quiz result';
 $string['course_name_condition_modquiz'] = 'Mod Quiz';
 $string['course_description_condition_parent_node_completed'] = 'If one parent node is finished';

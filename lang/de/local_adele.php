@@ -152,6 +152,7 @@ $string['course_name_condition_timed'] = 'Knotenstart-/Enddatum';
 $string['course_name_condition_course_completed'] = 'Kurs(e) abgeschlossen';
 $string['course_description_condition_catquiz'] = 'Entsprechend den Catquiz-Ergebnissen/-Versuchen';
 $string['course_name_condition_catquiz'] = 'Catquiz-Quiz';
+$string['no_catquiz_class'] = 'Kein Catquiz gefunden';
 $string['course_description_condition_modquiz'] = 'Entsprechend dem Mod-Quiz-Ergebnis';
 $string['course_name_condition_modquiz'] = 'Mod-Quiz';
 $string['course_description_condition_parent_node_completed'] = 'Wenn ein übergeordneter Knoten abgeschlossen ist';

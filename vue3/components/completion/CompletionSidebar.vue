@@ -141,7 +141,6 @@ function checkIntersetcion(event, closestNode) {
   emit('nodesIntersected', { intersecting: intersectingNode.value });
 }
 
-
 // Function to check if two nodes intersect
 function areNodesIntersecting(position, node) {
   return (
@@ -266,7 +265,6 @@ function findClosestNode(event) {
   });
   return closestNode;
 }
-
 
 function onDragEnd(){
   removeNodes(availableEdges)

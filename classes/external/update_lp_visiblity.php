@@ -65,7 +65,7 @@ class update_lp_visiblity extends external_api {
     }
 
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Webservice for the local adele plugin to get next question.
      *
      * @param int $contextid
      * @param int $lpid
