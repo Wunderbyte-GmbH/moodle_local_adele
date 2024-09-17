@@ -114,11 +114,11 @@ jobs:
           node-version: '18'  # Use the appropriate version of Node.js
 
       - name: Install Node.js dependencies
-        working-directory: plugin/local/adele/vue3
+        working-directory: vue3
         run: npm install
 
       - name: Run Jest tests
-        working-directory: plugin/local/adele/vue3
+        working-directory: vue3
         run: npm run test:jest
 
       - name: PHP Lint
