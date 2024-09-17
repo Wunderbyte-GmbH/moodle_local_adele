@@ -27,7 +27,6 @@
   const showCard = ref(false);
   const iconState = ref('initial');
   const iconClass = ref('fa-info');
-  const isRotatingBackward = ref(false);
 
   const toggleCard = () => {
     showCard.value = !showCard.value
@@ -155,6 +154,17 @@
       }
     }
   };
+
+  const cardStyle = ref({
+    zIndex: 3,
+  });
+  const handleFocus = () => {
+    cardStyle.value.zIndex = 4;
+  };
+
+  const handleBlur = () => {
+    cardStyle.value.zIndex = 3;
+  };
 </script>
 
 <template>
@@ -165,6 +175,10 @@
       'icon-container': !mobile,
       'card-container': mobile
     }"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    tabindex="0"
+    :style="cardStyle"
   >
     <div
       class="information"
@@ -405,9 +419,9 @@
   border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
-  z-index: 3;
   transform-style: preserve-3d; /* Preserve 3D context */
   perspective: 1000px; /* Hides the back side during rotation */
+  z-index: 5;
 }
 
 .information-rotating {
@@ -494,7 +508,6 @@
   position: absolute;
   top: 20px;
   text-align: start;
-  z-index: 2;
   cursor: default;
   user-select: text;
 }
