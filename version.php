@@ -30,4 +30,5 @@ $plugin->version = 2024091606;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = [
+    'mod_adele' => 2024060300,
 ];
