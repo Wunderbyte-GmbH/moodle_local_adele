@@ -102,7 +102,6 @@ jobs:
       - name: Install moodle-plugin-ci
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
@@ -115,12 +114,12 @@ jobs:
           node-version: '18'  # Use the appropriate version of Node.js
 
       - name: Install Node.js dependencies
+        working-directory: plugin/local/adele/vue3
         run: npm install
-        working-directory: plugin
 
       - name: Run Jest tests
+        working-directory: plugin/local/adele/vue3
         run: npm run test:jest
-        working-directory: plugin
 
       - name: PHP Lint
         if: ${{ always() }}
