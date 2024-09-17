@@ -78,7 +78,6 @@ class get_catquiz_tests extends external_api {
             return [];
         }
 
-
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
