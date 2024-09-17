@@ -201,10 +201,12 @@ $string['course_description_after_condition_modquiz'] = 'quiz {quiz_name_link} w
 $string['course_restricition_before_condition_manual'] = 'access will be granted manually';
 $string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
 $string['course_restricition_before_condition_specific_course'] = 'finish the course {course_list}';
+$string['course_condition_timed_duration_start'] = 'from the moment of subscription to this node';
+$string['course_condition_timed_duration_since'] = 'since ';
 $string['course_restricition_before_condition_timed'] = 'accessible {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';
-$string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} since {timed_condition}';
+$string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'finish the parent node(s) {parent_course_list}';
 
 $string['course_condition_concatination_or'] = "or";

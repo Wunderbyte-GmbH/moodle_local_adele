@@ -134,15 +134,22 @@ class timed_duration implements course_restriction {
                     $starttime = new DateTime();
                     $endtime = null;
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
-                        if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
-                            $starttime->setTimestamp($node['data']['first_enrolled']);
+                        if ($restrictionnode['data']['value']['selectedOption'] == '1') {
+                            if ($node['data']['first_enrolled']) {
+                                $starttime->setTimestamp($node['data']['first_enrolled']);
+                            } else {
+                                $starttime = 'Testing String';
+                            }
                         } else {
                             $starttime->setTimestamp($userpath->timecreated);
                         }
                         $durationvalue = $restrictionnode['data']['value']['durationValue'];
                         $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
                         // Check if the duration type is valid and calculate the end time.
-                        if (isset($this->durationvaluearray[$durationvalue])) {
+                        if (
+                            isset($this->durationvaluearray[$durationvalue]) &&
+                            !is_string($starttime)
+                          ) {
                             $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
                             $endtime = clone $starttime;
                             $endtime->modify("+{$totalseconds} seconds");
@@ -153,14 +160,25 @@ class timed_duration implements course_restriction {
                     if ($endtime) {
                         $endtime = $endtime->format('Y-m-d H:i:s');
                     }
-                    $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $starttime->format('Y-m-d H:i:s');
+                    if (is_string($starttime)) {
+                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
+                          get_string('course_condition_timed_duration_start', 'local_adele');
+                        $timed[$restrictionnode['id']]['inbetween_info'] = [
+                          'starttime' => $starttime,
+                          'endtime' => $endtime,
+                        ];
+                    } else {
+                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
+                          get_string('course_condition_timed_duration_since', 'local_adele') .
+                          $starttime->format('Y-m-d H:i:s');
+                        $timed[$restrictionnode['id']]['inbetween_info'] = [
+                          'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
+                          'endtime' => $endtime,
+                        ];
+                    }
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
                         $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['inbetween_info'] = [
-                      'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
-                      'endtime' => $endtime,
-                    ];
                 } else {
                     $timed[$restrictionnode['id']] = [
                       'completed' => false,

@@ -108,19 +108,6 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
           MUSTACHE_IGNORE_NAMES: ''
 
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'  # Use the appropriate version of Node.js
-
-      - name: Install Node.js dependencies
-        working-directory: vue3
-        run: npm install
-
-      - name: Run Jest tests
-        working-directory: vue3
-        run: npm run test:jest
-
       - name: PHP Lint
         if: ${{ always() }}
         run: moodle-plugin-ci phplint

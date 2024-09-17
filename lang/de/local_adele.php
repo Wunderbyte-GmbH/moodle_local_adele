@@ -206,10 +206,12 @@ $string['course_description_after_condition_modquiz'] = 'das Quiz {quiz_name_lin
 $string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
 $string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
 $string['course_restricition_before_condition_specific_course'] = 'den Kurs {course_list} abschließen';
+$string['course_condition_timed_duration_start'] = 'ab dem Moment der Einschreibung in diesen Knoten';
+$string['course_condition_timed_duration_since'] = 'seit ';
 $string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
 $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';
-$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} seit {timed_condition}';
+$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
 
 $string['course_condition_concatination_or'] = 'oder';
