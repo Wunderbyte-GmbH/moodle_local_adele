@@ -30,5 +30,5 @@ $plugin->version = 2024091701;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = [
-    'mod_booking' => 2024071500,
+    'mod_adele' => 2024060300,
 ];
