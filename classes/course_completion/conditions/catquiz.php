@@ -137,6 +137,9 @@ class catquiz implements course_completion {
     public function get_completion_status($node, $userid) {
         global $DB;
         $catquizzes = [];
+        if (!class_exists('local_catquiz\catquiz')) {
+            return [];
+        }
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             foreach ($node['completion']['nodes'] as $complitionnode) {
                 if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])

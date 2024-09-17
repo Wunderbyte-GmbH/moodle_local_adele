@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace local_adele\external;
 
 use context;
+use core_plugin_manager;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -62,7 +63,7 @@ class get_catquiz_tests extends external_api {
     }
 
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Webservice for the local adele plugin to get next question.
      *
      * @param int $contextid
      * @return array
@@ -70,6 +71,13 @@ class get_catquiz_tests extends external_api {
     public static function execute($contextid): array {
 
         require_login();
+
+        $pluginman = core_plugin_manager::instance();
+        $plugins = $pluginman->get_installed_plugins('local');
+        if (!array_key_exists('catquiz', $plugins)) {
+            return [];
+        }
+
 
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
