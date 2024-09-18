@@ -216,7 +216,7 @@
           >
             <i class="fa fa-pencil" />
             <b>
-              Description
+              {{ store.state.strings.completion_description_feedback}}
             </b>
             <div
               class="list-group-text"
@@ -238,7 +238,7 @@
           >
             <i class="fa fa-spinner" />
             <b>
-              Dates and Duration
+              {{ store.state.strings.completion_dates_duration_feedback }}
             </b>
             <div
               class="list-group-text"
@@ -248,7 +248,7 @@
               @mouseup.stop
             >
               <b>
-                Estimated Duration:
+                {{ store.state.strings.completion_estimated_duration_feedback }}
               </b>
               {{ estimate_duration }}
             </div>
@@ -261,7 +261,7 @@
               @mouseup.stop
             >
               <b>
-                Start Date:
+                {{ store.state.strings.completion_start_date_feedback }}
               </b>
               {{ ending_date.start_date }}
             </div>
@@ -274,7 +274,7 @@
               @mouseup.stop
             >
               <b>
-                End Date:
+                {{ store.state.strings.completion_end_date_feedback }}
               </b>
               {{ ending_date.end_date }}
             </div>
@@ -287,7 +287,7 @@
               @mouseup.stop
             >
               <b>
-                First subscribbed to node:
+                {{ store.state.strings.completion_first_subscription_feedback }}
               </b>
               {{ subscribbed_date }}
             </div>
@@ -301,7 +301,7 @@
           >
             <i class="fa fa-lock" />
             <b>
-              Restriction
+              {{ store.state.strings.completion_restriction_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.restriction && restriction">
@@ -317,7 +317,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+               {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -332,7 +332,7 @@
               class="fa fa-tasks"
             />
             <b>
-              Completion
+              {{ store.state.strings.completion_completion_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.completion && completion">
@@ -350,7 +350,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+                {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -365,7 +365,7 @@
               class="fa-solid fa-play-circle"
             />
             <b>
-              Completion Inbetween
+              {{ store.state.strings.completion_completion_inbetween_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="completion_inbetween && completion_inbetween.length > 0 && completion_inbetween != ''">
@@ -383,7 +383,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+                {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -392,7 +392,6 @@
     </transition>
   </div>
 </template>
-
 
 <style scoped>
 
