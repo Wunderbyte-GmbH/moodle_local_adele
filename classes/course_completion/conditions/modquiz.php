@@ -156,7 +156,13 @@ class modquiz implements course_completion {
                     $record = $DB->get_record_sql($sql, ['quizid' => $quizid]);
                     if ($record) {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
-                          '<a href="' . $CFG->wwwroot . '/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';
+                          '<a href="' .
+                          $CFG->wwwroot .
+                          '/mod/quiz/view.php?id=' .
+                          $record->cmid .
+                          '" target="_blank">' .
+                          $record->name .
+                          '</a>';
                     } else {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
                           'Mod Quiz';
