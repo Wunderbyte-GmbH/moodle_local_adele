@@ -392,7 +392,7 @@ function changeTab(index) {
               :title="store.state.strings.flowchart_hover_click_here"
             >
               <a
-                :href="'/course/view.php?id=' + course.course_node_id[0]"
+                :href="store.state.wwwroot + '/course/view.php?id=' + course.course_node_id[0]"
                 target="_blank"
               >
                 <i class="fa fa-link" />

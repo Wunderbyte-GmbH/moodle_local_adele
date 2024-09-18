@@ -58,6 +58,7 @@ echo $OUTPUT->render_from_template('local_adele/initview', [
   'userid' => $USER->id,
   'contextid' => $context->id,
   'quizsetting' => get_config('local_adele', 'quizsettings'),
+  'wwwroot' => $CFG->wwwroot,
   'version' => $CFG->version,
 ]);
 

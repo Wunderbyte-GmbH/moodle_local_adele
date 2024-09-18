@@ -60,6 +60,7 @@ export function createAppStore() {
                 nodecourse: 0,
                 undoNodes: [],
                 undoEdges: [],
+                wwwroot: '',
             };
         },
         getters: {

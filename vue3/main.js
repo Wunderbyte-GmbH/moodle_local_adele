@@ -62,6 +62,8 @@ function init() {
             store.state.contextid = contextIdValue;
             const quizSettingValue = localAdeleAppElement.getAttribute('quizsetting');
             store.state.quizsetting = quizSettingValue;
+            const wwwrootValue = localAdeleAppElement.getAttribute('wwwroot');
+            store.state.wwwroot = wwwrootValue;
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.mount(localAdeleAppElement);
         }
