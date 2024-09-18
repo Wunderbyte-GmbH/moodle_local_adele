@@ -27,6 +27,7 @@
     <div
       class="dndflow mt-4"
       @drop="onDrop"
+      @wheel="onWheel"
     >
       <Modal
         v-if="store.state.view != 'teacher'"
@@ -581,6 +582,15 @@ async function onRemoveNode(data) {
       removeNodes(data.node_id)
       emit('removeNodeConditions', data.node_id);
     }
+}
+
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+
+  if (isScrollTarget) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 </script>

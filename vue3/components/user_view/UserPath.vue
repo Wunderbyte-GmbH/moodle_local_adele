@@ -66,6 +66,7 @@
         </div>
         <div
           style="width: 100%; height: 600px;"
+          @wheel="onWheel"
         >
           <VueFlow
             :nodes="nodes"
@@ -287,7 +288,7 @@ const setZoomLevel = async (action) => {
     })
   }
 }
-// Watch for changes in the nodes
+
 watch(() => user_learningpath.value, () => {
   setFlowchart()
 }, { deep: true } )
@@ -311,6 +312,14 @@ function setFlowchart() {
 // Zoom in node
 function onNodeClickCall(event) {
   zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+}
+
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+  if (isScrollTarget) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 </script>

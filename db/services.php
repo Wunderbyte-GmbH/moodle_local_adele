@@ -217,10 +217,10 @@ $functions = [
     ],
     'local_adele_search_users' => [
       'classname' => 'local_adele\external\search_users',
+      'classpath' => '',
       'description' => 'Search a list of all users',
       'type' => 'read',
-      'capabilities' => '',
       'ajax' => true,
-      'capabilities' => 'local/adele:edit',
+      'capabilities' => '',
     ],
 ];
