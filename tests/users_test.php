@@ -32,8 +32,6 @@ class users_test extends advanced_testcase {
 
     protected function setUp(): void {
         global $DB;
-
-        // Mock the global $DB object to ensure sql_concat, sql_like, and get_recordset_sql can be called.
         $DB = $this->getMockBuilder(stdClass::class)
             ->addMethods(['sql_concat', 'sql_like', 'get_recordset_sql'])
             ->getMock();

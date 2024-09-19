@@ -27,7 +27,6 @@ use stdClass;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class modquiz_test extends advanced_testcase {
 
     protected function setUp(): void {

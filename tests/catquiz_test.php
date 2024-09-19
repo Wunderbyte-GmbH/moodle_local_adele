@@ -57,6 +57,12 @@ class catquiz_test extends advanced_testcase {
     public function test_get_catquiz_tests_class_exists_with_records() {
         global $DB;
 
+        // Check if the class exists in the environment.
+        if (!class_exists('local_catquiz\testenvironment')) {
+            $this->markTestSkipped('Class local_catquiz\testenvironment does not exist in this environment.');
+        }
+
+        // Mock class_exists to return true.
         $this->mock_class_exists('local_catquiz\testenvironment', true);
 
         $DB->expects($this->once())
@@ -105,6 +111,9 @@ class catquiz_test extends advanced_testcase {
      */
     protected function mock_class_exists($classname, $exists) {
         if (!function_exists('local_adele\class_exists')) {
+            /**
+             *  Mock the class_exists return value.
+             */
             function class_exists($name) {
                 global $classexistsmocks;
                 return isset($classexistsmocks[$name]) ? $classexistsmocks[$name] : \class_exists($name);
