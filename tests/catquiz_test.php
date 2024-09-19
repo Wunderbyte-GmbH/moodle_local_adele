@@ -66,8 +66,8 @@ class catquiz_test extends advanced_testcase {
                     'id' => 1,
                     'json' => json_encode(['name' => 'Test Quiz']),
                     'fullname' => 'Course Full Name',
-                    'courseid' => 123
-                ]
+                    'courseid' => 123,
+                ],
             ]);
 
         $testenvironmentmock = $this->getMockBuilder('local_catquiz\testenvironment')
@@ -83,8 +83,8 @@ class catquiz_test extends advanced_testcase {
                     'id' => 1,
                     'json' => json_encode(['name' => 'Test Quiz']),
                     'fullname' => 'Course Full Name',
-                    'courseid' => 123
-                ]
+                    'courseid' => 123,
+                ],
             ]);
 
         $result = catquiz::get_catquiz_tests();
@@ -99,6 +99,9 @@ class catquiz_test extends advanced_testcase {
 
     /**
      * Mock the class_exists function within the local_adele namespace.
+     * @param string $classname
+     * @param bool $exists
+     * @return bool
      */
     protected function mock_class_exists($classname, $exists) {
         if (!function_exists('local_adele\class_exists')) {
@@ -107,8 +110,6 @@ class catquiz_test extends advanced_testcase {
                 return isset($classexistsmocks[$name]) ? $classexistsmocks[$name] : \class_exists($name);
             }
         }
-
-        // Set the mock value for class_exists
         global $classexistsmocks;
         $classexistsmocks[$classname] = $exists;
     }

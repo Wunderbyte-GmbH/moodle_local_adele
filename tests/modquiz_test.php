@@ -23,7 +23,9 @@ use stdClass;
  * PHPUnit test case for the 'modquiz' class in local_adele.
  *
  * @package     local_adele
- * @runInSeparateProcess
+ * @author       local_adele
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 class modquiz_test extends advanced_testcase {
@@ -31,8 +33,8 @@ class modquiz_test extends advanced_testcase {
     protected function setUp(): void {
         global $DB;
         $DB = $this->getMockBuilder(stdClass::class)
-                  ->addMethods(['get_records_sql'])
-                  ->getMock();
+            ->addMethods(['get_records_sql'])
+            ->getMock();
     }
 
     /**
@@ -45,8 +47,8 @@ class modquiz_test extends advanced_testcase {
 
         // Expect the get_records_sql method to be called and return an empty array.
         $DB->expects($this->once())
-          ->method('get_records_sql')
-          ->willReturn([]);
+            ->method('get_records_sql')
+            ->willReturn([]);
 
         // Call the method under test.
         $result = modquiz::get_mod_quizzes();
@@ -70,14 +72,14 @@ class modquiz_test extends advanced_testcase {
                 'id' => 1,
                 'course' => 101,
                 'name' => 'Quiz 1',
-                'coursename' => 'Course 1'
+                'coursename' => 'Course 1',
             ],
             (object)[
                 'id' => 2,
                 'course' => 102,
                 'name' => 'Quiz 2',
-                'coursename' => 'Course 2'
-            ]
+                'coursename' => 'Course 2',
+            ],
         ];
 
         // Expect the get_records_sql method to be called once and return the mocked records.

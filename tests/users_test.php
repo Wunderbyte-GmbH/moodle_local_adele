@@ -17,7 +17,6 @@
 namespace local_adele;
 
 use advanced_testcase;
-use ArrayIterator;
 use moodle_recordset;
 use stdClass;
 
@@ -66,8 +65,8 @@ class users_test extends advanced_testcase {
 
         // Mock the moodle_recordset to return a record set with a close() method.
         $recordset = $this->getMockBuilder(moodle_recordset::class)
-                          ->onlyMethods(['close', 'valid', 'current', 'key', 'next', 'rewind'])
-                          ->getMock();
+            ->onlyMethods(['close', 'valid', 'current', 'key', 'next', 'rewind'])
+            ->getMock();
 
         // Mock the users in the recordset.
         $user1 = (object)[
@@ -86,20 +85,20 @@ class users_test extends advanced_testcase {
 
         // Mock the iteration over the recordset.
         $recordset->expects($this->exactly(3))
-                  ->method('valid')
-                  ->willReturnOnConsecutiveCalls(true, true, false); // Iterate over two users.
+            ->method('valid')
+            ->willReturnOnConsecutiveCalls(true, true, false); // Iterate over two users.
 
         $recordset->expects($this->exactly(2)) // Call current() for each valid record.
-                  ->method('current')
-                  ->willReturnOnConsecutiveCalls($user1, $user2);
+            ->method('current')
+            ->willReturnOnConsecutiveCalls($user1, $user2);
 
         $recordset->expects($this->once())
-                  ->method('close'); // Expect close() to be called once.
+            ->method('close'); // Expect close() to be called once.
 
         // Mock get_recordset_sql to return the mocked recordset.
         $DB->expects($this->once())
-           ->method('get_recordset_sql')
-           ->willReturn($recordset);
+            ->method('get_recordset_sql')
+            ->willReturn($recordset);
 
         // Call the method.
         $result = users::load_users('John Smith');
