@@ -28,8 +28,6 @@ declare(strict_types=1);
 namespace local_adele;
 
 use stdClass;
-use context_system;
-use local_adele\event\user_path_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
