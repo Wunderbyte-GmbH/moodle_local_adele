@@ -14,6 +14,8 @@ describe('addCustomEdge', () => {
       targetHandle: 'target',
       style: {
         'stroke-width': 5,
+        'position': 'relative',
+        'z-index': -10
       },
       markerEnd: MarkerType.ArrowClosed,
     };
