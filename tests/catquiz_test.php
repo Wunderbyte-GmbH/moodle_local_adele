@@ -113,6 +113,8 @@ class catquiz_test extends advanced_testcase {
         if (!function_exists('local_adele\class_exists')) {
             /**
              *  Mock the class_exists return value.
+             * @param string $name
+             * @return bool
              */
             function class_exists($name) {
                 global $classexistsmocks;

@@ -382,7 +382,12 @@ function changeTab(index) {
             >
               <i class="fa fa-info-circle fa-lg" />
             </div>
-            <div class="col long-text">
+            <div
+              class="col long-text"
+              data-toggle="tooltip"
+              data-placement="top"
+              :title="course.fullname"
+            >
               {{ course.fullname }}
             </div>
             <div
