@@ -104,10 +104,11 @@ const filteredTests = computed(() => {
   if (testSearch.value != undefined) {
     searchTerm = testSearch.value.toLowerCase();
   }
-  return props.tests.filter((test) =>
-    test.name.toLowerCase().includes(searchTerm) ||
-    test.coursename.toLowerCase().includes(searchTerm)
-  );
+  return props.tests.filter((test) => {
+    const testName = test.name ? test.name.toLowerCase() : '';
+    const courseName = test.coursename ? test.coursename.toLowerCase() : '';
+    return testName.includes(searchTerm) || courseName.includes(searchTerm);
+  });
 });
 
 const selectOption = (option) => {

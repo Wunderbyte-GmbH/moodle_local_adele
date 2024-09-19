@@ -45,7 +45,7 @@ const router = useRouter();
 const props = defineProps({
   condition: {
     type: String,
-    default: null,
+    required: true,
   },
   learningpath: {
     type: Object,
@@ -64,7 +64,10 @@ onMounted(() => {
   copieLearningpathCompletion.value = JSON.parse(JSON.stringify(props.learningpath))
 })
 
-const { onPaneReady, toObject, setNodes, setEdges, findNode } = useVueFlow()
+const {
+  onPaneReady, toObject, setNodes,
+  setEdges, findNode
+} = useVueFlow()
 
 // Emit to parent component
 const emit = defineEmits([
@@ -134,7 +137,9 @@ const onSave = async () => {
   })
 
   //save learning path
-  learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes.map(element_node => {
+  learningpathCompletion.value.json.tree.nodes = learningpathCompletion.value.json.tree.nodes
+    .filter(element_node => element_node.type !== 'dropzone')
+    .map(element_node => {
       if (element_node.id === store.state.node.node_id) {
         return { ...element_node, [props.condition]: conditions };
       }

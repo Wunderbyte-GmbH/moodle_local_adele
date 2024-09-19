@@ -209,6 +209,7 @@ edges: [],
 })
 
 onMounted(() => {
+  store.state.undoNodes = []
   const observer = new ResizeObserver(entries => {
   for (let entry of entries) {
       if (entry.target.classList.contains('dndflow')) {
@@ -555,19 +556,19 @@ const debouncedHandler = debounce((newVal, oldVal) => {
     const lastEdgesVal = store.state.undoEdges[store.state.undoEdges.length - 1];
     edges.value = [...lastEdgesVal]
     store.commit('unsetUndoEdges');
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
   }
 }, 300);
 
 watch(
-  () => store.state.undoNodes,  // The source (undoNodes)
+  () => store.state.undoNodes,
   debouncedHandler,
-  { deep: true }  // Deep watch to track nested changes (if needed)
+  { deep: true }
 );
 
 async function onRemoveNode(data) {
     let node = findNode(data.node_id)
     let confirmation = true;
-
     if (node.type != 'module') {
       confirmation = window.confirm(store.state.strings.flowchart_delete_confirmation + node.data.fullname + '?');
     }

@@ -311,7 +311,7 @@ const deleteCondition = () => {
             class="card-text"
           >
             <div class="fullname-container">
-              {{ value.fullname }}
+              {{ truncatedText(value.fullname, 35) }}
             </div>
           </div>
         </div>
@@ -401,9 +401,12 @@ const deleteCondition = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f0f0f0; /* Set your desired background color */
-  padding: 10px; /* Adjust padding as needed */
-  border-radius: 10px; /* Set your desired border-radius */
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .form-select {

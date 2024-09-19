@@ -272,6 +272,7 @@ let learningPaths = [];
 let filteredLp = [];
 
 onMounted(async () => {
+  store.state.undoNodes = []
   await store.dispatch('fetchImagePaths')
   watch(() => store.state.learningpaths, async () => {
     if (store.state.learningpaths) {

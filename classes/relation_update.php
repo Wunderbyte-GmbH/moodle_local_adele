@@ -728,7 +728,10 @@ class relation_update {
         $firstenrollededit = false;
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
-                if (in_array('starting_node', $node['parentCourse'])) {
+                if (
+                  $node['type'] != 'dropzone' &&
+                  in_array('starting_node', $node['parentCourse'])
+                ) {
                     if (!is_int($node['data']['course_node_id'])) {
                         foreach ($node['data']['course_node_id'] as $courseid) {
                             if (!enrol_is_enabled('manual')) {
