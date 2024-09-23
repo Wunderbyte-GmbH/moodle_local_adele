@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils';
 import { Handle, Position } from '@vue-flow/core';
 
 jest.mock('../../../../composables/nodesHelper/darkenColor', () => jest.fn());
+jest.mock('../../../../composables/nodesHelper/truncatedText', () => jest.fn());
 
 
 describe('ModuleNode.vue', () => {

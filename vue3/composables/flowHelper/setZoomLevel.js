@@ -2,9 +2,8 @@
 
 const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 
-const setZoomLevel = async (action, zoomLock, viewport, zoomTo) => {
+const setZoomLevel = async (action, viewport, zoomTo) => {
   try {
-    zoomLock.value = false
     let newViewport = viewport.value.zoom
     let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
     if (currentStepIndex === -1) {
@@ -23,15 +22,10 @@ const setZoomLevel = async (action, zoomLock, viewport, zoomTo) => {
         newViewport = zoomSteps[0]
       }
     }
-    if (newViewport != undefined) {
-      zoomTo(newViewport, { duration: 500}).then(() => {
-        zoomLock.value = true
-      })
-    }
+      zoomTo(newViewport, { duration: 500})
     return newViewport
   } catch (error) {
     console.error("Error during zoom operation:", error)
-    zoomLock.value = true;
   }
 }
 

@@ -193,7 +193,6 @@ const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
 
@@ -231,12 +230,22 @@ onMounted(() => {
         watch(
           () => viewport.value.zoom,
           (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
+            const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+              zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', zoomLock, viewport, zoomTo)
-              } else if (newVal < oldVal) {
-                setZoomLevel('out', zoomLock, viewport, zoomTo)
+                setZoomLevel('in', viewport, zoomTo)
+              } else {
+                setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
             }
           },
           { deep: true }
@@ -309,6 +318,7 @@ function handleNodesIntersected({ intersecting }) {
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {
+  console.log('eorignfwo')
   event.preventDefault()
   if (event.dataTransfer) {
   event.dataTransfer.dropEffect = 'move'
@@ -560,7 +570,6 @@ async function onRemoveNode(data) {
 
 const onWheel = (event) => {
   const isScrollTarget = event.target.closest('.vue-flow__pane');
-
   if (isScrollTarget) {
     event.preventDefault();
     event.stopPropagation();
