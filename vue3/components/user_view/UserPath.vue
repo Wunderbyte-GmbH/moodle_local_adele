@@ -38,6 +38,7 @@
         class="mt-3"
       >
         {{ store.state.strings.user_view_user_path_for }}
+        {{ zoomstep }}
       </h2>
       <div
         v-if="user_learningpath"
@@ -73,8 +74,8 @@
             :edges="edges"
             :viewport="viewport"
             :default-viewport="viewport"
-            :max-zoom="1.5"
-            :min-zoom="0.2"
+            :max-zoom="1.55"
+            :min-zoom="0.15"
             :zoom-on-scroll="zoomLock"
             :zoom-on-pinch="zoomLock"
             class="learning-path-flow"
@@ -141,9 +142,8 @@ import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
-import outerGraphDisplay from '../../composables/flowHelper/outerGraphDisplay'
-import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
 import onNodeClick from '../../composables/flowHelper/onNodeClick';
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
 
 // Load Router
 const router = useRouter()
@@ -152,12 +152,13 @@ const route = useRoute()
 // Load Store
 const store = useStore()
 
-const { addNodes, addEdges, removeNodes, removeEdges,
-  findNode, zoomTo, viewport, setCenter } = useVueFlow()
+const {
+  addNodes, removeNodes, findNode,
+  zoomTo, viewport, setCenter
+} = useVueFlow()
 
-// Function to go back
 const goBack = () => {
-  router.go(-1) // Go back one step in the history
+  router.go(-1)
 }
 
 const props = defineProps({
@@ -196,7 +197,7 @@ onMounted( async () => {
   if(user_learningpath.value){
     setFlowchart()
     setTimeout(() => {
-      nextTick().then(() => {
+      nextTick().then(async() => {
         const topNode = nodes.value.reduce((top, node) => (node.position.y < top.position.y ? node : top), nodes.value[0]);
         const minX = Math.min(...nodes.value.map(node => node.position.x));
         const maxX = Math.max(...nodes.value.map(node => node.position.x));
@@ -207,12 +208,12 @@ onMounted( async () => {
           zoomLock.value = true
           watch(
             () => viewport.value.zoom,
-            (newVal, oldVal) => {
+            async(newVal, oldVal) => {
               if (newVal && oldVal && zoomLock.value) {
                 if (newVal > oldVal) {
-                  setZoomLevel('in', newVal)
+                  zoomstep.value = await setZoomLevel('in', zoomLock, viewport, zoomTo)
                 } else if (newVal < oldVal) {
-                  setZoomLevel('out', newVal)
+                  zoomstep.value = await setZoomLevel('out', zoomLock, viewport, zoomTo)
                 }
               }
             },
@@ -246,47 +247,6 @@ const handleExpandCards = async () => {
     await zoomTo(0.35, { duration: 500}).then(() => {
       zoomLock.value = true
     })
-}
-
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  const oldViewport = viewport.value.zoom
-  let newViewport = null
-  let currentStepIndex = zoomSteps.findIndex(step => oldViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 1]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport == 0.2) {
-    //edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
-    setTimeout(() => {
-      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
-    }, 50);
-  } else if (oldViewport < 0.25) {
-    //edges.value = innerGraphDisplay(edges.value, removeEdges)
-    setTimeout(() => {
-      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
-    }, 50);
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
 }
 
 watch(() => user_learningpath.value, () => {

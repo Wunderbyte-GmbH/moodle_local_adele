@@ -52,14 +52,15 @@
           <div
             class="dndflowcompletion"
             @drop="onDrop"
+            @wheel="onWheel"
           >
             <VueFlow
               class="completions"
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
               :class="{ dark }"
               :fit-view-on-init="true"
-              :max-zoom="1.5"
-              :min-zoom="0.2"
+              :max-zoom="1.55"
+              :min-zoom="0.15"
               :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
             >
@@ -162,6 +163,14 @@ const dark = ref(false)
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
     dark.value = !dark.value;
+}
+
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+  if (isScrollTarget) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 // Get all available restrictions

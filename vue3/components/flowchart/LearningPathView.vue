@@ -31,8 +31,8 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"
-        :max-zoom="1.5"
-        :min-zoom="0.2"
+        :max-zoom="1.55"
+        :min-zoom="0.15"
         :zoom-on-scroll="zoomLock"
         class="learning-path-flow"
         @node-click="onNodeClickCall"
@@ -95,6 +95,7 @@ import ModuleNode from '../nodes/ModuleNode.vue'
 import OrCourses from '../nodes/OrCourses.vue'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
 
 // Load Store
 const store = useStore()
@@ -144,9 +145,9 @@ onMounted(() => {
           (newVal, oldVal) => {
             if (newVal && oldVal && zoomLock.value) {
               if (newVal > oldVal) {
-                setZoomLevel('in')
+                setZoomLevel('in', zoomLock, viewport, zoomTo)
               } else if (newVal < oldVal) {
-                setZoomLevel('out')
+                setZoomLevel('out', zoomLock, viewport, zoomTo)
               }
             }
           },
@@ -163,34 +164,6 @@ const emit = defineEmits([
 
 const finishEdit = () => {
   emit('finish-edit');
-}
-
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 2]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
 }
 
 const onNodeClickCall = (event) => {

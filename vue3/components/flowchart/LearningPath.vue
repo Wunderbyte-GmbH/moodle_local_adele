@@ -43,8 +43,8 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"
-        :max-zoom="1.5"
-        :min-zoom="0.2"
+        :max-zoom="1.55"
+        :min-zoom="0.15"
         :zoom-on-scroll="zoomLock"
         class="learning-path-flow"
         @dragover="onDragOver"
@@ -155,6 +155,7 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import { debounce } from 'lodash';
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
 
 // Load Store and Router
 const store = useStore()
@@ -232,9 +233,9 @@ onMounted(() => {
           (newVal, oldVal) => {
             if (newVal && oldVal && zoomLock.value) {
               if (newVal > oldVal) {
-                setZoomLevel('in')
+                setZoomLevel('in', zoomLock, viewport, zoomTo)
               } else if (newVal < oldVal) {
-                setZoomLevel('out')
+                setZoomLevel('out', zoomLock, viewport, zoomTo)
               }
             }
           },
@@ -244,34 +245,6 @@ onMounted(() => {
     })
   }, 300)
 });
-
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 2]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
-}
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
