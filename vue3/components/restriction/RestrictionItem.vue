@@ -1,7 +1,7 @@
 <template>
   <component
     :is="dynamicComponent"
-    v-model="restriction.value"
+    v-model="restriction_value"
     :restriction="restriction"
     :learningpath="learningpath"
   />
@@ -26,6 +26,19 @@ const props = defineProps({
     type: Object,
     required: true,
   }
+});
+
+const emit = defineEmits([
+  'change-values'
+]);
+
+const restriction_value = computed({
+  get() {
+    return props.restriction?.value;
+  },
+  set(newValue) {
+    emit('changevalues', newValue);
+  },
 });
 
 const dynamicComponent = computed(() => {

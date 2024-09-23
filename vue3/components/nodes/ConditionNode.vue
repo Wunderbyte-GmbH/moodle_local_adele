@@ -54,6 +54,7 @@ const props = defineProps({
 const data_visibility = ref({});
 const emit = defineEmits([
   'updateVisibility',
+  'updateValues',
 ])
 
 onMounted(() => {
@@ -63,6 +64,10 @@ onMounted(() => {
 const toggleVisibility = () => {
   data_visibility.value.visibility = !data_visibility.value.visibility;
   emit('updateVisibility', data_visibility.value)
+};
+
+const handleChangedValues = (values) => {
+  emit('updateValues', {values, nodeid: props.data.node_id})
 };
 
 const deleteCondition = () => {
@@ -262,11 +267,13 @@ const shiftLeft = (deletedNode, edges) => {
           <RestrictionItem
             :restriction="data"
             :learningpath="learningpath"
+            @changevalues="handleChangedValues"
           />
         </div>
         <div v-else-if="props.type == 'completion'">
           <CompletionItem
             :completion="data"
+            @changevalues="handleChangedValues"
           />
         </div>
       </div>

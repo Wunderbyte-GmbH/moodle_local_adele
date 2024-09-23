@@ -1,7 +1,7 @@
 <template>
-  <component 
-    :is="dynamicComponent" 
-    v-model="completion.value" 
+  <component
+    :is="dynamicComponent"
+    v-model="completion_value"
     :completion="completion"
   />
 </template>
@@ -19,6 +19,20 @@ const props = defineProps({
     default: null,
   },
 });
+
+const emit = defineEmits([
+  'change-values'
+]);
+
+const completion_value = computed({
+  get() {
+    return props.completion?.value;
+  },
+  set(newValue) {
+    emit('changevalues', newValue);
+  },
+});
+
 
 const dynamicComponent = computed(() => {
   switch (getInputLabel()) {

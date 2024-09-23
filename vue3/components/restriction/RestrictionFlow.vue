@@ -73,6 +73,7 @@
                   :type="'Restriction'"
                   :learningpath="learningpathrestriction"
                   @update-visibility="handleVisibility"
+                  @update-values="handleValues"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -216,6 +217,12 @@ onMounted(async () => {
     })
   }, 300)
 });
+
+const handleValues = (handleValues) => {
+  let changedNode = findNode(handleValues.nodeid)
+  changedNode.data.value = handleValues.values
+}
+
 
 // Function to go back
 const goBack = () => {

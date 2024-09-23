@@ -74,6 +74,7 @@
                   :type="'completion'"
                   :learningpath="props.learningpath"
                   @update-visibility="handleVisibility"
+                  @update-values="handleValues"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -204,6 +205,11 @@ const handleVisibility = (visibility) => {
   if (visibilityNode) {
     visibilityNode.data.visibility = visibility.visibility
   }
+}
+
+const handleValues = (handleValues) => {
+  let changedNode = findNode(handleValues.nodeid)
+  changedNode.data.value = handleValues.values
 }
 
 const goBackConfirmation = (toggle) => {
