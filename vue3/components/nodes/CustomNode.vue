@@ -95,6 +95,11 @@ const get_cover_image = (data) => {
     return data.selected_image
   } else if (data.image_paths) {
     return data.image_paths
+  } else if (
+    store.state.learningpath &&
+    store.state.learningpath.image
+  ) {
+    return store.state.learningpath.image
   }
 }
 

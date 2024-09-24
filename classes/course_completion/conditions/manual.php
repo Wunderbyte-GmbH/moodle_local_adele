@@ -85,7 +85,7 @@ class manual implements course_completion {
      *
      * @return string
      */
-    private function get_description_string() {
+    public function get_description_string() {
         $description = get_string('course_description_condition_completion_manual', 'local_adele');
         return $description;
     }

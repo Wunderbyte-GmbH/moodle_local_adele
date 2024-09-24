@@ -71,7 +71,7 @@ class timed implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_restriction_description_before(),
+            'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
         ];
     }
@@ -119,7 +119,7 @@ class timed implements course_restriction {
                     $validstart = true;
                     $validtime = false;
                     $currenttimestamp = new DateTime();
-                    $startdate = self::isvaliddate($restrictionnode['data']['value']['start']);
+                    $startdate = $this->isvaliddate($restrictionnode['data']['value']['start']);
                     if ($startdate) {
                         if ($startdate <= $currenttimestamp) {
                             $validtime = true;
@@ -127,7 +127,7 @@ class timed implements course_restriction {
                             $validstart = false;
                         }
                     }
-                    $enddate = self::isvaliddate($restrictionnode['data']['value']['end']);
+                    $enddate = $this->isvaliddate($restrictionnode['data']['value']['end']);
                     if ($enddate) {
                         if (
                             $enddate >= $currenttimestamp &&
