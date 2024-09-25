@@ -225,11 +225,11 @@ onMounted(() => {
   }
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(() => {
+      fitView({ duration: 1000 }).then(async() => {
         zoomLock.value = true
         watch(
           () => viewport.value.zoom,
-          (newVal, oldVal) => {
+          async(newVal, oldVal) => {
             const abszoom = Math.abs(newVal - oldVal)
             if (
               newVal &&
@@ -239,9 +239,9 @@ onMounted(() => {
             ) {
               zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', viewport, zoomTo)
+                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
               } else {
-                setZoomLevel('out', viewport, zoomTo)
+                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
               }
               setTimeout(() => {
                 zoomLock.value = true

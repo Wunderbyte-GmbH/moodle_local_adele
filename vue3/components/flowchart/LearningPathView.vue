@@ -138,17 +138,27 @@ onMounted(() => {
   observer.observe(document.querySelector('.dndflow'));
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(() => {
+      fitView({ duration: 1000 }).then(async() => {
         zoomLock.value = true
         watch(
           () => viewport.value.zoom,
-          (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
+          async(newVal, oldVal) => {
+            const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+              zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', zoomLock, viewport, zoomTo)
-              } else if (newVal < oldVal) {
-                setZoomLevel('out', zoomLock, viewport, zoomTo)
+                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
+              } else {
+                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
             }
           },
           { deep: true }

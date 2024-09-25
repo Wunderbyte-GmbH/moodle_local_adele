@@ -185,7 +185,7 @@ const expandCourses = () => {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname || store.state.strings.nodes_collection }}
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
           </div>
         </div>

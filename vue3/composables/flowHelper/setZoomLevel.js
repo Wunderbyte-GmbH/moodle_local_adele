@@ -22,7 +22,7 @@ const setZoomLevel = async (action, viewport, zoomTo) => {
         newViewport = zoomSteps[0]
       }
     }
-      zoomTo(newViewport, { duration: 500})
+    zoomTo(newViewport, { duration: 500})
     return newViewport
   } catch (error) {
     console.error("Error during zoom operation:", error)

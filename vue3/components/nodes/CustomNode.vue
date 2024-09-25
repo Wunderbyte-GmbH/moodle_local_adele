@@ -190,7 +190,7 @@ const deleteCondition = () => {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 60) }}
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
             <button
               v-if="store.state.view!='teacher' && editorview"

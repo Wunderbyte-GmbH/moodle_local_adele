@@ -212,12 +212,22 @@ onMounted(async () => {
         watch(
           () => viewport.value.zoom,
           (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
+            const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+              zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', zoomLock, viewport, zoomTo)
-              } else if (newVal < oldVal) {
-                setZoomLevel('out', zoomLock, viewport, zoomTo)
+                setZoomLevel('in', viewport, zoomTo)
+              } else {
+                setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
             }
           },
           { deep: true }
