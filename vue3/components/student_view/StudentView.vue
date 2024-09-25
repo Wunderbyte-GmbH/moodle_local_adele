@@ -56,7 +56,7 @@ const store = useStore()
 const route = useRoute()
 const learningpath = ref(null)
 const userLearningpaths = ref(null)
-const selectedTab = ref(false)
+const selectedTab = ref(true)
 const userLearningpath = ref(null)
 
 

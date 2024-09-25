@@ -31,7 +31,7 @@ const toggleFeedbackarea = () => {
 watchEffect(() => {
   if (showFeedbackarea.value) {
     feedbackStyle.value = {
-      position: 'absolute',
+      position: props.mobile ? 'relative' : 'absolute',
       top: '100%',
       left: '0',
       width: '100%',
@@ -47,18 +47,22 @@ watchEffect(() => {
 });
 
 const cardStyle = ref({
-  zIndex: 2,
+  zIndex: props.mobile ? 1 : 2,
 });
 const handleFocus = () => {
-  if(showFeedbackarea.value) {
-    cardStyle.value.zIndex = 4;
-  } else {
-    cardStyle.value.zIndex = 2;
+  if (!props.mobile) {
+    if(showFeedbackarea.value) {
+      cardStyle.value.zIndex = 4;
+    } else {
+      cardStyle.value.zIndex = 2;
+    }
   }
 };
 
 const handleBlur = () => {
-  cardStyle.value.zIndex = 2;
+  if (!props.mobile) {
+    cardStyle.value.zIndex = 2;
+  }
 };
 </script>
 
