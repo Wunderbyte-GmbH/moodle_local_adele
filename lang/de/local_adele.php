@@ -214,6 +214,10 @@ $string['course_restricition_before_condition_to'] = 'bis ';
 $string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
 
+$string['course_master_conditions'] = 'Master Bedingungen';
+$string['course_master_condition_restriction'] = 'Master Zugangs-Checkbox';
+$string['course_master_condition_completion'] = 'Master Abschluss-Checkbox';
+
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';
 

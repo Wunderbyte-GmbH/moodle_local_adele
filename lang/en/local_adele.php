@@ -209,6 +209,10 @@ $string['course_restricition_before_condition_to'] = 'to ';
 $string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'finish the parent node(s) {parent_course_list}';
 
+$string['course_master_conditions'] = 'Master Conditions';
+$string['course_master_condition_restriction'] = 'Master restriction checkbox';
+$string['course_master_condition_completion'] = 'Master completion checkbox';
+
 $string['course_condition_concatination_or'] = "or";
 $string['course_condition_concatination_and'] = " and ";
 
