@@ -4,27 +4,27 @@
       {{ completion.description }}
     </div>
     <div v-else-if="course_node.course_node_id">
-      <label 
-        class="form-label" 
+      <label
+        class="form-label"
         for="courseSelect"
       >
-        Select the minimum amount of finished courses
+        {{ store.state.strings.course_completion_minimum_amount }}
       </label>
-      <select 
+      <select
         v-model="data.min_courses"
-        class="form-select" 
+        class="form-select"
         @change="emitSelectedParentCourse"
       >
-        <option 
-          disabled 
-          value="" 
+        <option
+          disabled
+          value=""
           selected
         >
-          Choose a number of courses
+          {{ store.state.strings.course_completion_choose_number }}
         </option>
-        <option 
-          v-for="number in nodeCourses" 
-          :key="number" 
+        <option
+          v-for="number in nodeCourses"
+          :key="number"
           :value="number"
         >
           {{ number }}

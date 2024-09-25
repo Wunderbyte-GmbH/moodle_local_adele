@@ -297,6 +297,8 @@ $string['completion_list_of_criteria'] = 'List of available ';
 $string['completion_criteria'] = ' criteria';
 $string['completion_edge_or'] = ' OR';
 $string['completion_edge_and'] = 'AND';
+$string['course_completion_choose_number'] = 'Choose a number of courses';
+$string['course_completion_minimum_amount'] = 'Select the minimum amount of finished courses';
 
 // Flowchart strings.
 $string['flowchart_add_learning'] = 'Add a learning module';

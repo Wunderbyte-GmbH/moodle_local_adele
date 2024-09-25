@@ -303,6 +303,8 @@ $string['completion_list_of_criteria'] = 'Liste der verfügbaren ';
 $string['completion_criteria'] = ' Kriterien';
 $string['completion_edge_or'] = ' ODER';
 $string['completion_edge_and'] = 'UND';
+$string['course_completion_choose_number'] = 'Bestimme eine Anzahl';
+$string['course_completion_minimum_amount'] = 'Bestimme die Mindestanzahl von Kursabschlüssen';
 
 // Flussdiagrammzeichenfolgen.
 $string['flowchart_add_learning'] = 'Ein Lernmodul hinzufügen';

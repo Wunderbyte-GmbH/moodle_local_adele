@@ -9,7 +9,7 @@
 <script setup>
 import { computed } from 'vue';
 import course_completed from './conditions/course_completed.vue'
-import manual from '../completion/conditions/manual_check.vue'
+import manual from './conditions/manual_check.vue'
 import catquiz from './conditions/catQuiz.vue'
 import modquiz from './conditions/modQuiz.vue'
 
@@ -21,7 +21,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  'change-values'
+  'changevalues'
 ]);
 
 const completion_value = computed({
