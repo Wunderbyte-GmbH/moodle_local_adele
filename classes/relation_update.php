@@ -140,7 +140,7 @@ class relation_update {
                         $validatenodecompletion = [
                             'completionnodepaths' => ['master'],
                             'singlecompletionnode' => 'master',
-                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria)
+                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
                         ];
                     } else if (isset($node['completion'])) {
                         $validatenodecompletion = self::validatenodecompletion(
