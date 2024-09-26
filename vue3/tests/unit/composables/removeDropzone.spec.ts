@@ -1,8 +1,24 @@
 import removeDropzones from '../../../composables/removeDropzones';
 
+interface Node {
+  id: string,
+  type: string;
+}
+
+interface Edge {
+  id: string,
+  target: string;
+  source: string;
+}
+
+interface Tree {
+  nodes: Node[];
+  edges: Edge[];
+}
+
 describe('removeDropzone', () => {
   it('should remove nodes and edges with "dropzone" in their type', () => {
-    const tree = {
+    const tree: Tree = {
         nodes: [
             { id: '1', type: 'custom' },
             { id: '2', type: 'dropzone' },

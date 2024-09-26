@@ -1,13 +1,13 @@
-var path = require('path');
-var webpack = require('webpack');
+const webpack = require('webpack');
 const { VueLoaderPlugin } = require('vue-loader');
 const TerserPlugin = require('terser-webpack-plugin');
-
-process.argv.find(v => v.includes('webpack-dev-server'));
+const path = require('path');
 
 module.exports = (env, options) => {
 
-    exports = {
+    const isProduction = options.mode === 'production';
+
+    const config = {
         entry: './main.js',
         output: {
             path: path.resolve(__dirname, '../amd/src'),
@@ -20,35 +20,39 @@ module.exports = (env, options) => {
             rules: [
                 {
                     test: /\.css$/,
-                    use: [
-                        'vue-style-loader',
-                        'css-loader'
-                    ],
+                    use: ['vue-style-loader', 'css-loader'],
                 },
                 {
                     test: /\.vue$/,
                     loader: 'vue-loader',
-                    options: {
-                        loaders: {}
-                        // Other vue-loader options go here
-                    }
                 },
                 {
+                    // Apply ts-loader only to Vue files with <script lang="ts">
+                    test: /\.ts$/,
+                    loader: 'ts-loader',
+                    exclude: /node_modules/,
+                    options: {
+                        appendTsSuffixTo: [/\.vue$/],
+                        transpileOnly: true,
+                    },
+                },
+                {
+                    // Apply babel-loader to JavaScript files and Vue files with <script lang="js">
                     test: /\.js$/,
                     loader: 'babel-loader',
-                    exclude: /node_modules/
+                    exclude: /node_modules/,
                 },
                 {
-                  test: /\.(png|jpe?g|gif|svg)$/i,
-                  use: [
-                    {
-                      loader: 'file-loader',
-                      options: {
-                        name: '[name].[ext]',
-                        outputPath: 'images/',
-                      },
-                    },
-                  ],
+                    test: /\.(png|jpe?g|gif|svg)$/i,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: '[name].[ext]',
+                                outputPath: 'images/',
+                            },
+                        },
+                    ],
                 }
             ]
         },
@@ -56,7 +60,7 @@ module.exports = (env, options) => {
             alias: {
                 'vue$': 'vue/dist/vue.esm-bundler.js'
             },
-            extensions: ['.*', '.js', '.vue', '.json']
+            extensions: ['.js', '.ts', '.vue', '.json']
         },
         devServer: {
             historyApiFallback: true,
@@ -75,63 +79,36 @@ module.exports = (env, options) => {
         },
         devtool: 'eval',
         plugins: [
-            new VueLoaderPlugin()
+            new VueLoaderPlugin(),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development')
+            })
         ],
         watchOptions: {
             ignored: /node_modules/
         },
         externals: {
-            'core/ajax': {
-                amd: 'core/ajax'
-            },
-            'core/str': {
-                amd: 'core/str'
-            },
-            'core/modal_factory': {
-                amd: 'core/modal_factory'
-            },
-            'core/modal_events': {
-                amd: 'core/modal_events'
-            },
-            'core/fragment': {
-                amd: 'core/fragment'
-            },
-            'core/yui': {
-                amd: 'core/yui'
-            },
-            'core/localstorage': {
-                amd: 'core/localstorage'
-            },
-            'core/notification': {
-                amd: 'core/notification'
-            }
+            'core/ajax': { amd: 'core/ajax' },
+            'core/localstorage': { amd: 'core/localstorage' },
+            'core/notification': { amd: 'core/notification' }
         }
     };
 
-    if (options.mode === 'production') {
-        exports.devtool = false;
-        // http://vue-loader.vuejs.org/en/workflow/production.html
-        exports.plugins = (exports.plugins || []).concat([
-            new webpack.DefinePlugin({
-                'process.env': {
-                    NODE_ENV: '"production"'
-                }
-            }),
+    if (isProduction) {
+        config.devtool = false;
+        config.plugins.push(
             new webpack.LoaderOptionsPlugin({
                 minimize: true
             })
-        ]);
-        exports.optimization = {
+        );
+        config.optimization = {
             minimizer: [
                 new TerserPlugin({
                     parallel: true,
-                    terserOptions: {
-                        // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
-                    }
                 }),
             ]
-        }
+        };
     }
 
-    return exports;
+    return config;
 };

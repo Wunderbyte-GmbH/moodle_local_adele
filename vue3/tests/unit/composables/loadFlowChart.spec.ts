@@ -1,7 +1,23 @@
 import loadFlowChart from '../../../composables/loadFlowChart';
 
+interface Node {
+  id: string,
+  draggable: boolean;
+  deletable: boolean;
+}
+
+interface Edge {
+  id: string,
+  deletable: boolean;
+}
+
+interface FlowChart {
+  nodes: Node[];
+  edges: Edge[];
+}
+
 describe('loadFlowChart', () => {
-  let flow;
+  let flow : FlowChart;
 
   beforeEach(() => {
     // Define the flow object that will be used in each test
@@ -17,8 +33,8 @@ describe('loadFlowChart', () => {
   });
 
   it('should load the view as teacher', () => {
-    const view = 'teacher';
-    const result = loadFlowChart(flow, view);
+    const view: string = 'teacher';
+    const result: FlowChart = loadFlowChart(flow, view);
     result.nodes.forEach(node => {
       expect(node.draggable).toBe(false);
       expect(node.deletable).toBe(false);
@@ -30,8 +46,8 @@ describe('loadFlowChart', () => {
     });
   });
   it('should load the view not as teacher', () => {
-    const view = 'student';
-    const result = loadFlowChart(flow, view);
+    const view: string = 'student';
+    const result: FlowChart = loadFlowChart(flow, view);
 
     // Check that nodes and edges remain unchanged
     result.nodes.forEach((node, index) => {

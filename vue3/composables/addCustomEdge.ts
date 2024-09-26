@@ -1,8 +1,22 @@
 // generate a new id
 import { MarkerType } from '@vue-flow/core'
 
-const  addCustomEdge = (source, target) => {
-    const previewEdge = {
+interface CustomEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle: string;
+  targetHandle: string;
+  style: {
+    'stroke-width': number;
+    'position': string;
+    'z-index': number;
+  };
+  markerEnd: MarkerType;
+}
+
+const  addCustomEdge = (source: string, target: string): CustomEdge => {
+    const previewEdge: CustomEdge = {
         id: source + target,
         source: target,
         target: source,

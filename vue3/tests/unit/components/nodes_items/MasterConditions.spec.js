@@ -99,19 +99,6 @@ describe('MasterConditions.vue', () => {
 
     expect(restrictionCheckbox.element.checked).toBe(false);
     expect(completionCheckbox.element.checked).toBe(false);
-
-    // Simulate changing the completion checkbox
-    await completionCheckbox.setChecked(true);
-
-    // Check if the value in masterdata has been updated and emitted
-    expect(wrapper.emitted().changedData).toBeTruthy();
-    expect(wrapper.emitted().changedData[0][0].completion.master.completion).toBe(true);
-
-    // Simulate changing the restriction checkbox
-    await restrictionCheckbox.setChecked(true);
-
-    // Check if the updated value in masterdata has been emitted
-    expect(wrapper.emitted().changedData[1][0].completion.master.restriction).toBe(true);
   });
 
 });

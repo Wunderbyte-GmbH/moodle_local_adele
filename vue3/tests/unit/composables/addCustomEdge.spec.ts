@@ -1,12 +1,26 @@
 import addCustomEdge from '../../../composables/addCustomEdge';
 import { MarkerType } from '@vue-flow/core';
 
+interface CustomEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle: string;
+  targetHandle: string;
+  style: {
+    'stroke-width': number;
+    'position': string;
+    'z-index': number;
+  };
+  markerEnd: MarkerType;
+}
+
 describe('addCustomEdge', () => {
   it('should generate a new edge with correct properties', () => {
-    const source = 'node1';
-    const target = 'node2';
+    const source: string = 'node1';
+    const target: string = 'node2';
 
-    const expectedEdge = {
+    const expectedEdge: CustomEdge = {
       id: 'node1node2',
       source: 'node2',
       target: 'node1',
