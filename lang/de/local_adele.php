@@ -138,6 +138,8 @@ $string['node_coursefullname'] = 'Knotenname:';
 $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
 // Conditions description.
+$string['course_description_master'] = 'Diese Kondition überschreibt alle anderen';
+$string['course_name_master'] = 'Master Kondition';
 $string['course_description_condition_completion_manual'] = 'Der Knoten wird manuell abgeschlossen';
 $string['course_description_condition_parent_courses'] = 'Der Knoten wird zugänglich, wenn eine bestimmte Anzahl übergeordneter Knoten abgeschlossen ist';
 $string['course_name_condition_completion_manual'] = 'Knotenabschluss-Kontrollkästchen';

@@ -318,7 +318,6 @@ function handleNodesIntersected({ intersecting }) {
 
 // Prevent default event if node has been dropped
 function onDragOver(event) {
-  console.log('eorignfwo')
   event.preventDefault()
   if (event.dataTransfer) {
   event.dataTransfer.dropEffect = 'move'

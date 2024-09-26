@@ -144,6 +144,8 @@ $string['node_coursefullname'] = 'Nodename:';
 $string['node_courseshortname'] = 'Short node name:';
 
 // Conditions description.
+$string['course_description_master'] = 'This condition overrules everything else';
+$string['course_name_master'] = 'Master condition';
 $string['course_description_condition_completion_manual'] = 'Node will be completed manually';
 $string['course_description_condition_parent_courses'] = 'Node will be accessible if a certain amount of parent nodes are completed';
 $string['course_name_condition_completion_manual'] = 'Node completion checkbox';

@@ -262,7 +262,6 @@ const iconClass = ref('fa-lock');
               v-if="store.state.view == 'teacher'"
               class="col-12"
               :data="data"
-              @changedmastercondition = changedData(data)
             />
           </div>
         </div>

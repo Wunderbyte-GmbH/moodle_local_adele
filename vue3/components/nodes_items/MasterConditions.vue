@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
-
 const store = useStore();
 const props = defineProps({
   data: {
@@ -10,9 +9,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-// Define the emit event
-const emit = defineEmits(['changedData']);
 
 // Create a reactive master data object with default values
 const masterdata = ref({});
@@ -23,11 +19,13 @@ const showmasterconditions = ref(false)
 onMounted(() => {
   masterdata.value = props.data
   masterdata.value = setDefaultValue(masterdata.value)
-
 });
 
 const setDefaultValue = (data) => {
-  if (data.completion.master === undefined) {
+  if (
+    data.completion.master === null ||
+    data.completion.master === undefined
+  ) {
     data.completion.master = {
       completion: false,
       restriction: false
@@ -41,10 +39,6 @@ const setDefaultValue = (data) => {
     }
   }
   return data;
-};
-
-const updateData = () => {
-  emit('changedData', masterdata.value);
 };
 
 const toggleVisibility = () => {
@@ -72,7 +66,6 @@ const toggleVisibility = () => {
           class="form-check-input"
           type="checkbox"
           v-model="masterdata.completion.master.restriction"
-          @change="updateData"
         >
         <label :for="masterdata.node_id + '_master_restriction'">
           {{ store.state.strings.course_master_condition_restriction }}
@@ -85,7 +78,6 @@ const toggleVisibility = () => {
           class="form-check-input"
           type="checkbox"
           v-model="masterdata.completion.master.completion"
-          @change="updateData"
         >
         <label :for="masterdata.node_id + '_master_completion'">
           {{ store.state.strings.course_master_condition_completion }}

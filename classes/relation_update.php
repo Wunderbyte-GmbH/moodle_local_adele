@@ -67,7 +67,16 @@ class relation_update {
                     $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
                     $restrictionnodepaths = [];
                     $singlerestrictionnode = [];
-                    if (isset($node['restriction'])) {
+                    if ($node['data']['completion']['master']) {
+                        $userpath->json['user_path_relation'][$node['id']]['master'] =
+                              $node['data']['completion']['master'];
+                    }
+                    if (
+                      isset($restrictioncriteria['master']) &&
+                      $restrictioncriteria['master']
+                    ) {
+                        $restrictionnodepaths[] = 'master';
+                    } else if (isset($node['restriction'])) {
                         foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
                             $failedrestriction = false;
                             $validationconditionstring = [];
@@ -123,7 +132,17 @@ class relation_update {
                             }
                         }
                     }
-                    if (isset($node['completion'])) {
+
+                    if (
+                      isset($completioncriteria['master']) &&
+                      $completioncriteria['master']
+                    ) {
+                        $validatenodecompletion = [
+                            'completionnodepaths' => ['master'],
+                            'singlecompletionnode' => 'master',
+                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria)
+                        ];
+                    } else if (isset($node['completion'])) {
                         $validatenodecompletion = self::validatenodecompletion(
                             $node,
                             $completioncriteria,
@@ -559,6 +578,7 @@ class relation_update {
             'before' => null,
           ],
         ];
+
         foreach ($node['completion']['nodes'] as $conditionnode) {
             if (
                 strpos($conditionnode['id'], '_feedback') !== false &&
@@ -573,7 +593,6 @@ class relation_update {
                         $node['completion']['nodes']
                       ) :
                       '';
-
                 $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
                     'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
                     'text' => isset($conditionnode['data']['feedback_after']) ?
@@ -608,6 +627,7 @@ class relation_update {
                 }
             }
         }
+
         if (isset($node['restriction'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
@@ -622,6 +642,14 @@ class relation_update {
                         '';
                 }
             }
+        }
+        if ($restrictioncriteria['master']) {
+            $feedbacks['restriction']['before'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status'] = 'accessible';
+        }
+        if ($completioncriteria['master']) {
+            $feedbacks['completion']['after'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status'] = 'completed';
         }
         return $feedbacks;
     }
