@@ -1,8 +1,26 @@
 import validateNodes from '../../../composables/validateNodes';
 
+interface Conditions {
+  nodes: Node[];
+}
+
+interface Node {
+  id: string;
+  data: NodeData;
+}
+
+interface NodeData {
+  label: string;
+  value?: {
+    testid?: string | null;
+    quizid?: string | null;
+  };
+  error?: boolean;
+}
+
 describe('validateNodes', () => {
-  let conditions;
-  let findNodeMock;
+  let conditions: Conditions;
+  let findNodeMock: (id: string) => Node;
 
   beforeEach(() => {
     // Initial conditions with some valid and invalid nodes
@@ -45,8 +63,12 @@ describe('validateNodes', () => {
     };
 
     // Mock function to simulate findNode
-    findNodeMock = jest.fn((id) => {
-      return conditions.nodes.find(node => node.id === id);
+    findNodeMock = jest.fn((id: string): Node => {
+      const node = conditions.nodes.find(node => node.id === id);
+      if (!node) {
+        throw new Error(`Node with id ${id} not found`);
+      }
+      return node;
     });
   });
 

@@ -1,5 +1,22 @@
-// generate a new id
-const  validateNodes = (conditions, findNode) => {
+interface Conditions {
+  nodes: Node[];
+}
+
+interface Node {
+  id: string;
+  data: NodeData;
+}
+
+interface NodeData {
+  label: string;
+  value?: {
+    testid?: string | null;
+    quizid?: string | null;
+  };
+  error?: boolean;
+}
+
+const  validateNodes = (conditions: Conditions, findNode: (id: string) => Node) => {
   let invalidNodes = false
   conditions.nodes.forEach((node) => {
     if (
@@ -16,8 +33,10 @@ const  validateNodes = (conditions, findNode) => {
       )
     ) {
       let invalidNode = findNode(node.id)
-      invalidNode.data.error = true
-      invalidNodes = true
+      if (invalidNode) {
+        invalidNode.data.error = true;
+        invalidNodes = true;
+      }
     } else if (node.data.error) {
       let invalidNode = findNode(node.id)
       delete(invalidNode.data.error)

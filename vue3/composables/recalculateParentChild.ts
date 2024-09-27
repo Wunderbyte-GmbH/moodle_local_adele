@@ -1,5 +1,27 @@
-// generate a new id
-const  recalculateParentChild = (tree, parentNode, childNode, startNode) => {
+interface Node {
+  id: string;
+  type: string;
+  data?: {
+    course_node_id: string | string[];
+  };
+  parentNodes?: string[];
+  childNodes?: string[];
+  [key: string]: any;
+}
+
+interface Edge {
+  id: string,
+  sourceHandle: string;
+  source: string;
+  target: string;
+}
+
+interface Tree {
+  nodes: Node[];
+  edges: Edge[];
+}
+
+const  recalculateParentChild = (tree: Tree, parentNode: string, childNode: string, startNode: string): Tree => {
     tree.nodes.forEach((node) => {
         if (
           node.type == 'custom' ||
@@ -23,8 +45,7 @@ const  recalculateParentChild = (tree, parentNode, childNode, startNode) => {
                 node[parentNode].push(startNode);
             }
             if (
-              node.data != undefined &&
-              node.data.course_node_id != undefined
+              node.data?.course_node_id
             ) {
               if (node.data.course_node_id.length > 1) {
                 node.type = 'orcourses'
