@@ -1,8 +1,30 @@
 import validateQuizGlobal from '../../../composables/validateQuizGlobal';
+interface NodeData {
+  label?: string;
+  value?: {
+    scales?: {
+      parent?: {
+        scale?: string;
+      };
+    };
+  };
+  error?: boolean;
+}
+
+interface Node {
+  id: string;
+  data: NodeData
+}
+
+interface Conditions {
+  nodes: Node[]
+}
+
+type FindNode = (id: string) => Node | undefined;
 
 describe('validateQuizGlobal', () => {
-  let conditions;
-  let findNodeMock;
+  let conditions: Conditions;
+  let findNodeMock: FindNode;
 
   beforeEach(() => {
     // Initial conditions and mock

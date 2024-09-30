@@ -1,7 +1,38 @@
 import formatIntersetingNodes from '../../../../composables/nodesHelper/formatIntersetingNodes';
 
+interface NodeData {
+  opacity?: string;
+  bgcolor?: string;
+  infotext?: string;
+}
+
+interface Node {
+  id: string;
+  data: NodeData
+}
+
+interface StoreState {
+  strings: {
+    completion_drop_here: string;
+    composables_new_node: string;
+    composables_drop_zone_parent: string;
+    composables_drop_zone_child: string;
+    composables_drop_zone_add: string;
+    composables_drop_zone_or: string;
+  };
+}
+
+interface Store {
+  state: StoreState;
+}
+
+interface IntersectingNode {
+  closestnode: string;
+  dropzone: Node;
+}
+
 describe('formatIntersetingNodes', () => {
-  let node, intersectingNode, closestNode, insideStartingNode, store;
+  let node: Node, intersectingNode: IntersectingNode | null, closestNode: string, insideStartingNode: boolean, store: Store;
 
   beforeEach(() => {
     node = {

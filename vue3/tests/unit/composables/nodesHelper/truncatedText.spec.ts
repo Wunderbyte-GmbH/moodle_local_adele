@@ -10,7 +10,7 @@ describe('truncatedText', () => {
     const result = truncatedText(short_text);
     expect(result).toEqual(short_text);
   });
-  it('should return the text as it is because it is excat the lenght', () => {
+  it('should return the text as it is because it is exact the lenght', () => {
     const result = truncatedText(exact_text);
     expect(result).toEqual(exact_text);
   });

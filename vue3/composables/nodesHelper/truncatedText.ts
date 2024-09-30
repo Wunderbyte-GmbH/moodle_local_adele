@@ -1,5 +1,5 @@
-// truncated Text
-function truncatedText(text, size=null) {
+
+function truncatedText(text: string, size: number | null = null): string {
   if (size == null) {
     size = 38;
   }

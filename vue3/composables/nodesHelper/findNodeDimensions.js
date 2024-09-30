@@ -1,7 +1,7 @@
-// generate a new id
+
 const  findNodeDimensions = (node, findNode) => {
   const element = document.getElementById(node.id);
-  if (element && element.height.animVal) {    
+  if (element && element.height.animVal) {
     return element.height.animVal.value;
   }
   const queryElement = document.querySelector('[data-id="' + node.id + '"]');

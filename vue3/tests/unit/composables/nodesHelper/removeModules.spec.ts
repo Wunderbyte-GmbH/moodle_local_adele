@@ -1,7 +1,15 @@
 import removeModules from '../../../../composables/nodesHelper/removeModules';
 
+interface Node {
+  id: string;
+  type: string
+}
+
+interface Tree {
+  nodes: Node[];
+}
 describe('removeModules', () => {
-  let tree, removeNodes;
+  let tree: Tree, removeNodes: jest.Mock<any, any>;
 
   beforeEach(() => {
     tree = {
@@ -17,14 +25,14 @@ describe('removeModules', () => {
   });
 
   it('should filter out nodes without "module" in their type when removeNodes is null', () => {
-    const expectedTree = {
+    const expectedTree: Tree = {
       nodes: [
         { id: 'node1', type: 'custom' },
         { id: 'node3', type: 'custom' },
       ],
     };
 
-    const result = removeModules(tree, null);
+    const result = removeModules(tree);
     expect(result).toEqual(expectedTree);
   });
 
@@ -32,12 +40,11 @@ describe('removeModules', () => {
     removeModules(tree, removeNodes);
 
     // Ensure removeNodes was called with the correct nodes
-    expect(removeNodes).toHaveBeenCalledWith([{ id: 'node2', type: 'moduleA' }]);
-    expect(removeNodes).toHaveBeenCalledWith([{ id: 'node4', type: 'moduleB' }]);
+    expect(removeNodes).toHaveBeenCalledWith([{ id: 'node2', type: 'moduleA' },{ id: 'node4', type: 'moduleB' }]);
   });
 
   it('should return 1 as nothing happens', () => {
-    const result =  removeModules(null, removeNodes);
+    const result =  removeModules(null as unknown as Tree, removeNodes);
     expect(result).toEqual(1);
   });
 });

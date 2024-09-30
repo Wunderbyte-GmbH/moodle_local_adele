@@ -1,10 +1,85 @@
-// generate a new id
-const  drawDropzone = (closestNode, store) => {
-    let newDrop = {
+interface StoreState {
+  strings: {
+    composables_drop_zone_parent: string;
+    composables_drop_zone_child: string;
+    composables_drop_zone_add: string;
+    composables_drop_zone_or: string;
+  };
+}
+
+interface Store {
+  state: StoreState;
+}
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface ClosestNode {
+  id: string;
+  position: Position;
+  dimensions: {
+    height: number;
+  };
+  childCourse?: string[];
+  parentCourse?: string[];
+  computedPosition: Position;
+}
+
+interface DropZoneNode {
+  id: string;
+  type: string;
+  position: Position;
+  label: string;
+  data: {
+    opacity: string;
+    bgcolor: string;
+    height: string;
+    infotext?: string;
+    width?: number;
+  };
+  style: {
+    zIndex: number;
+  };
+}
+
+interface DropZoneEdge {
+  id: string;
+  source: string;
+  sourceHandle: string;
+  target: string;
+  targetHandle: string;
+  type: string;
+}
+
+interface NewDrop {
+  nodes: DropZoneNode[];
+  edges: DropZoneEdge[];
+}
+
+interface NodeData {
+  opacity: string;
+  bgcolor: string;
+  height: string;
+  infotext?: string;
+  width?: number;
+}
+
+interface DropZoneCourseNode {
+  name: string;
+  positionY: number;
+  positionX: number;
+  type: string;
+  width?: number;
+}
+
+const  drawDropzone = (closestNode: ClosestNode, store: Store) => {
+    let newDrop: NewDrop = {
         nodes: [],
         edges: [],
     }
-    const dropZoneCourseNodes = {
+    const dropZoneCourseNodes:  { [key: string]: DropZoneCourseNode } = {
         parent: {
             name: store.state.strings.composables_drop_zone_parent,
             positionY: -250,
@@ -30,7 +105,7 @@ const  drawDropzone = (closestNode, store) => {
             type: 'conditionaldropzone',
         }
     }
-    let data = {
+    let data: NodeData = {
         opacity: '0.6',
         bgcolor: 'grey',
         height: '200px',
@@ -40,7 +115,7 @@ const  drawDropzone = (closestNode, store) => {
     for (const key in dropZoneCourseNodes){
         data.infotext = dropZoneCourseNodes[key].name
         data.width = dropZoneCourseNodes[key].width
-        let position = {
+        let position: Position = {
             x: 0,
             y: 0
         }
@@ -55,7 +130,7 @@ const  drawDropzone = (closestNode, store) => {
                 y: getOffsetY(closestNode)
             }
         }
-        const newNode = {
+        const newNode: DropZoneNode = {
             id: 'dropzone_' + key,
             type: dropZoneCourseNodes[key].type,
             position: position,
@@ -76,7 +151,7 @@ const  drawDropzone = (closestNode, store) => {
         }
 
         if (key != 'and' &&key != 'or') {
-            const newEdge = {
+            const newEdge: DropZoneEdge = {
                 id: `${closestNode.id}-${key}`,
                 source: closestNode.id,
                 sourceHandle: sourceHandle,
@@ -91,7 +166,7 @@ const  drawDropzone = (closestNode, store) => {
     return newDrop
 }
 
-function getOffsetX(closestNode, relation){
+const getOffsetX = (closestNode: ClosestNode, relation: string): number => {
     let relationHandle = closestNode.childCourse
     if(relation == 'parent'){
       relationHandle = closestNode.parentCourse
@@ -103,7 +178,7 @@ function getOffsetX(closestNode, relation){
     return closestNode.position.x + 500
 }
 
-function getOffsetY(closestNode){
+const getOffsetY = (closestNode: ClosestNode): number => {
     return closestNode.computedPosition.y + closestNode.dimensions.height/2 - 100
 }
 

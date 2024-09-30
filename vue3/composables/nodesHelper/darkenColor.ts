@@ -1,5 +1,10 @@
-// darken node color
-const  darkenColor = (color, darken) => {
+interface RgbColor {
+  r: number;
+  g: number;
+  b: number;
+}
+
+const  darkenColor = (color: string, darken: number): string => {
     let intensity = 0.2;
     let rgb = hexToRgb(color);
     rgb.r = Math.floor(rgb.r * intensity + 128 * darken);
@@ -8,7 +13,7 @@ const  darkenColor = (color, darken) => {
     return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
-const hexToRgb = (hex) => {
+const hexToRgb = (hex: string): RgbColor => {
     let bigint = parseInt(hex.slice(1), 16);
     let r = (bigint >> 16) & 255;
     let g = (bigint >> 8) & 255;
@@ -16,7 +21,11 @@ const hexToRgb = (hex) => {
     return { r, g, b };
 }
 
-const rgbToHex = (r, g, b) => {
+const rgbToHex = (
+  r: number,
+  g: number,
+  b: number
+): string => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }
 
