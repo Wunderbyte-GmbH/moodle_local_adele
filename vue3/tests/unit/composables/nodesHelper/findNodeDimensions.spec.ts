@@ -1,7 +1,16 @@
 import findNodeDimensions from '../../../../composables/nodesHelper/findNodeDimensions';
 
 describe('findNodeDimensions', () => {
-  let node, findNode;
+
+  interface Node {
+    id: string;
+    dimensions?: {
+      height: number;
+    };
+  }
+
+  let node: Node;
+  let findNode: jest.MockedFunction<(id: string) => Node>;
 
   beforeEach(() => {
     node = { id: 'node1' };
@@ -13,13 +22,13 @@ describe('findNodeDimensions', () => {
     });
 
     // Reset mocks
-    document.getElementById = jest.fn();
-    document.querySelector = jest.fn();
+    (document.getElementById as jest.Mock) = jest.fn();
+    (document.querySelector as jest.Mock) = jest.fn();
   });
 
   it('should return height from element if it has animVal', () => {
     // Mocking getElementById to return an element with animVal
-    document.getElementById.mockReturnValue({
+    (document.getElementById as jest.Mock).mockReturnValue({
       height: { animVal: { value: 100 } },
     });
 
@@ -31,10 +40,10 @@ describe('findNodeDimensions', () => {
 
   it('should return height from findNode if element does not have animVal but querySelector finds it', () => {
     // Simulate getElementById returning null
-    document.getElementById.mockReturnValue(null);
+    (document.getElementById as jest.Mock).mockReturnValue(null);
 
     // Mocking querySelector to return an element
-    document.querySelector.mockReturnValue({});
+    (document.querySelector as jest.Mock).mockReturnValue({});
 
     const result = findNodeDimensions(node, findNode);
 
@@ -44,8 +53,8 @@ describe('findNodeDimensions', () => {
 
   it('should return default height (200) if no element or dimensions are found', () => {
     // Simulate both getElementById and querySelector returning null
-    document.getElementById.mockReturnValue(null);
-    document.querySelector.mockReturnValue(null);
+    (document.getElementById as jest.Mock).mockReturnValue(null);
+    (document.querySelector as jest.Mock).mockReturnValue(null);
 
     const result = findNodeDimensions(node, findNode);
 
@@ -55,8 +64,8 @@ describe('findNodeDimensions', () => {
 
   it('should return default height (200) if findNode does not return dimensions', () => {
     // Simulate getElementById returning null
-    document.getElementById.mockReturnValue(null);
-    document.querySelector.mockReturnValue({});
+    (document.getElementById as jest.Mock).mockReturnValue(null);
+    (document.querySelector as jest.Mock).mockReturnValue({});
     findNode.mockReturnValue({ id: 'node1' });
 
     const result = findNodeDimensions(node, findNode);
