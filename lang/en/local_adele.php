@@ -104,6 +104,11 @@ $string['selectdefaultimage'] = 'Select learning path image';
 $string['deselectdefaultimage'] = 'Deselect';
 $string['uploadowndefaultimage'] = 'Or upload a new image:';
 $string['uploadanduseimage'] = 'Upload and use image';
+$string['onlysetaftersaved'] = 'Can only be set after learning path was saved';
+$string['searchuser'] = 'Search users...';
+$string['selectuser'] = 'Select Users';
+$string['removeuser'] = 'Remove';
+$string['nousersfound'] = 'No users were found';
 
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all learning paths';
