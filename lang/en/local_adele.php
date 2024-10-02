@@ -99,6 +99,11 @@ $string['placeholder_lp_search'] = 'Search learning path';
 $string['edit_course_node'] = 'Edit node';
 $string['edit_node_pretest'] = 'Edit completion criteria';
 $string['from_default_node_image'] = 'Default node image:';
+$string['uploaddefaultimage'] = 'Upload your default node image';
+$string['selectdefaultimage'] = 'Select learning path image';
+$string['deselectdefaultimage'] = 'Deselect';
+$string['uploadowndefaultimage'] = 'Or upload a new image:';
+$string['uploadanduseimage'] = 'Upload and use image';
 
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all learning paths';

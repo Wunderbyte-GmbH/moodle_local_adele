@@ -180,7 +180,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.from_default_node_image }}
           </h4>
           <div class="mb-2">
-            Upload your default node image
+            {{ store.state.strings.uploaddefaultimage }}
             <div
               v-if="store.state.lpimages && Object.keys(store.state.lpimages).length > 0"
               class="mb-2"
@@ -190,7 +190,7 @@ const editLearningpath = async (singlelearningpathid) => {
                 class="btn btn-info"
                 @click="showCourseImageSelection = !showCourseImageSelection"
               >
-                Select learning path image
+                {{ store.state.strings.selectdefaultimage }}
               </button>
               <div
                 v-if="selectedCourseImagePath"
@@ -205,7 +205,7 @@ const editLearningpath = async (singlelearningpathid) => {
                   class="deselect-btn"
                   @click="selectCourseImage()"
                 >
-                  Deselect
+                  {{ store.state.strings.deselectdefaultimage }}
                 </button>
               </div>
               <div
@@ -227,7 +227,9 @@ const editLearningpath = async (singlelearningpathid) => {
               </div>
             </div>
             <div>
-              <label for="newImage">Or upload a new image:</label>
+              <label for="newImage">
+                {{ store.state.strings.uploadowndefaultimage }}
+              </label>
               <input type="file" id="newImage" @change="onFileChange">
               <div
                 v-if="newImagePreview"
@@ -242,7 +244,7 @@ const editLearningpath = async (singlelearningpathid) => {
                   class="btn btn-info"
                   @click="uploadNewImage()"
                 >
-                  Upload and use image
+                  {{ store.state.strings.uploadowndefaultimage }}
                 </button>
               </div>
             </div>
@@ -283,7 +285,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.fromlearningdescription }}
           </h5>
         </div>
-        <div         style="padding: 1rem;">
+        <div style="padding: 1rem;">
           <p class="card-text">
             {{ goaldescription ? goaldescription : store.state.strings.charthelper_no_name }}
           </p>

@@ -99,6 +99,11 @@ $string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['edit_course_node'] = 'Knoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
 $string['from_default_node_image'] = 'Standard-Knotenbild:';
+$string['uploaddefaultimage'] = 'Lade das Standard-Knotenbild hoch';
+$string['selectdefaultimage'] = 'Wähle das Standard-Knotenbild aus';
+$string['deselectdefaultimage'] = 'Abwählen';
+$string['uploadowndefaultimage'] = 'Oder wähle ein eigenes Bild hoch:';
+$string['uploadanduseimage'] = 'Lade und benutze Bild';
 
 // Uebersichtszeichenfolge.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
