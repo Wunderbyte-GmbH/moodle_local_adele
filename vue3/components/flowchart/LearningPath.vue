@@ -127,7 +127,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick, onMounted, computed } from 'vue'
+import { ref, watch, nextTick, onMounted, computed, onUnmounted } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -195,6 +195,7 @@ const shouldShowMiniMap = computed(() => {
 
 const zoomLock = ref(false)
 const zoomstep = ref(0)
+const undoWatcher = ref(null);
 
 const finishEdit = () => {
   emit('finish-edit');
@@ -210,6 +211,9 @@ edges: [],
 
 onMounted(() => {
   store.state.undoNodes = []
+  nextTick(() => {
+    startUndoWatcher();
+  });
   const observer = new ResizeObserver(entries => {
   for (let entry of entries) {
       if (entry.target.classList.contains('dndflow')) {
@@ -547,6 +551,21 @@ watch(
   debouncedHandler,
   { deep: true }
 );
+const startUndoWatcher = () => {
+  if (!undoWatcher.value) {
+    undoWatcher.value = watch(
+      () => store.state.undoNodes,
+        debouncedHandler,
+    );
+  }
+};
+
+onUnmounted(() => {
+  if (undoWatcher.value) {
+    undoWatcher.value();
+    store.state.undoNodes = []
+  }
+});
 
 async function onRemoveNode(data) {
     let node = findNode(data.node_id)

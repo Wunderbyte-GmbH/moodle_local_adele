@@ -36,6 +36,7 @@ import ProgressBar from '../nodes_items/ProgressBar.vue'
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue'
 import NodeInformation from '../nodes_items/NodeInformation.vue'
 import truncatedText from '../../composables/nodesHelper/truncatedText'
+import MasterConditions from '../nodes_items/MasterConditions.vue';
 
 // Load Store
 const store = useStore();
@@ -259,7 +260,13 @@ const expandCourses = () => {
             @doneFolding="enableButton"
           />
         </div>
+        <MasterConditions
+            v-if="store.state.view == 'teacher'"
+            class="col-12"
+            :data="data"
+          />
       </div>
+
       <div
         v-if="data"
         class="card-footer"
