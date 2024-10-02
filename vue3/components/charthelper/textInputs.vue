@@ -133,7 +133,7 @@ const editLearningpath = async (singlelearningpathid) => {
               data-toggle="tooltip"
               data-placement="top"
               :title=store.state.strings.required
-              class="fas fa-exclamation-circle text-danger ml-2"
+              class="fa fa-exclamation-circle text-danger ml-2"
             />
           </span>
         </h4>
@@ -160,7 +160,7 @@ const editLearningpath = async (singlelearningpathid) => {
               data-toggle="tooltip"
               data-placement="top"
               :title=store.state.strings.required
-              class="fas fa-exclamation-circle text-danger ml-2"
+              class="fa fa-exclamation-circle text-danger ml-2"
             />
           </span>
         </h4>

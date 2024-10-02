@@ -353,14 +353,13 @@ function changeTab(index) {
           >
             <div
               class="col long-text"
-              data-toggle="tooltip"
-              data-placement="top"
-              :title="course.fullname"align-items-center justify-content-between
+              style="padding-left: 2rem;"
+              v-tooltip="course.fullname"
             >
               {{ truncatedText(course.fullname, 32) }}
               <a
                 :href="store.state.wwwroot + '/course/view.php?id=' + course.course_node_id[0]"
-                style="position: absolute; padding-left: 0.25rem;"
+                style="position: relative; padding-left: 0.25rem;"
                 target="_blank"
               >
                 <i class="fa fa-link" />
@@ -381,6 +380,7 @@ function changeTab(index) {
 </template>
 
 <style scoped>
+
 .long-text {
   padding: 0;
   white-space: nowrap;
@@ -394,6 +394,7 @@ function changeTab(index) {
   margin-top: 20px;
   max-height: 440px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .nav-item{
   margin-right: 2px;
