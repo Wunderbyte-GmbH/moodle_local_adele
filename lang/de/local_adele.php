@@ -29,6 +29,7 @@ $string['modulename_help'] = 'Lernpfad';
 $string['pluginadministration'] = 'Lernpfad-Verwaltung';
 $string['pluginname'] = 'Lernpfad';
 $string['not_found'] = 'Learning path wurde nicht gefunden! Bitte kontaktiere die verantwortliche Person für diesen Lernpfad!';
+$string['required'] = 'notwendig';
 
 // Fähigkeiten.
 $string['adele:edit'] = 'Lernpfad bearbeiten';

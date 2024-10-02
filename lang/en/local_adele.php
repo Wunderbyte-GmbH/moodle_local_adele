@@ -32,6 +32,7 @@ $string['modulename_help'] = 'learning path';
 $string['pluginadministration'] = 'learning path Administration';
 $string['pluginname'] = 'Learning path';
 $string['not_found'] = 'Learning path not found! Please contact person in charge!';
+$string['required'] = 'required';
 
 // Capabilities.
 $string['adele:edit'] = 'Edit learning path';

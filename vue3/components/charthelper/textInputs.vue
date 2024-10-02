@@ -125,6 +125,17 @@ const editLearningpath = async (singlelearningpathid) => {
       <div class="col-12">
         <h4 class="font-weight-bold">
           {{ store.state.strings.fromlearningtitel }}
+          <span
+            class="required-sign"
+            style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
+          >
+            <i
+              data-toggle="tooltip"
+              data-placement="top"
+              :title=store.state.strings.required
+              class="fas fa-exclamation-circle text-danger ml-2"
+            />
+          </span>
         </h4>
         <div class="mb-2">
           <input
@@ -141,6 +152,17 @@ const editLearningpath = async (singlelearningpathid) => {
       <div class="col-12">
         <h4 class="font-weight-bold">
           {{ store.state.strings.fromlearningdescription }}
+          <span
+            class="required-sign"
+            style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
+          >
+            <i
+              data-toggle="tooltip"
+              data-placement="top"
+              :title=store.state.strings.required
+              class="fas fa-exclamation-circle text-danger ml-2"
+            />
+          </span>
         </h4>
         <div class="mb-2">
           <textarea
@@ -272,6 +294,10 @@ const editLearningpath = async (singlelearningpathid) => {
 </template>
 
 <style scoped>
+
+.required-sign {
+  font-size: 1rem;
+}
 
 .image-option-img {
   height: 5rem;
