@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 // Required strings.
 $string['modulename'] = 'learning path';
 $string['modulenameplural'] = 'learning paths';
@@ -138,7 +136,6 @@ $string['image_title_save'] = 'Learning Path image has been saved/updated';
 $string['image_description_save'] = 'You have saved/updated the Learning Path image!';
 $string['title_change_visibility'] = 'Changed learning path visibility';
 $string['description_change_visibility'] = 'You have successfully changed the Learning Path visibility!';
-
 
 // Node Strings.
 $string['node_coursefullname'] = 'Nodename:';
@@ -404,7 +401,6 @@ $string['composables_drop_zone_parent'] = 'Drop zone Parent';
 $string['composables_drop_zone_child'] = 'Drop zone Child';
 $string['composables_drop_zone_add'] = 'And drop zone';
 $string['composables_drop_zone_or'] = 'Or drop zone';
-
 $string['composables_feedback_node'] = 'Feedback node';
 
 // Restriction strings.

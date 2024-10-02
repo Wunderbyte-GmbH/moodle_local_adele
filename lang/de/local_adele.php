@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ // Required strings.
 $string['modulename'] = 'Lernpfad';
 $string['modulenameplural'] = 'Lernpfade';
 $string['modulename_help'] = 'Lernpfad';
@@ -79,6 +80,7 @@ $string['btncreatecourse'] = 'Zur Seite gehen und einen Kurs erstellen';
 $string['btnsave'] = 'Speichern';
 $string['btncancel'] = 'Abbrechen';
 $string['btnupdate_positions'] = 'Positionen aktualisieren';
+$string['btntoggle'] = 'Ansicht wechseln';
 $string['btndarktoggle'] = 'Dunkle Ansicht';
 $string['btnlighttoggle'] = 'Helle Ansicht';
 $string['btnstudenttoggle'] = 'Student Ansicht';
@@ -96,6 +98,7 @@ $string['placeholder_search'] = 'Kurse suchen';
 $string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['edit_course_node'] = 'Knoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
+$string['from_default_node_image'] = 'Standard-Knotenbild:';
 
 // Uebersichtszeichenfolge.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
@@ -239,7 +242,6 @@ $string['event_node_finished'] = 'Knoten wurde abgeschlossen';
 $string['event_node_finished_description'] = 'Der Benutzer {$a->user} hat den Knoten {$a->node} abgeschlossen';
 $string['event_attempt_submitted'] = 'Quiz wurde abgeschlossen';
 $string['event_attempt_submitted_description'] = 'Der Benutzer {$a->user} hat das Quiz {$a->node} abgeschlossen';
-
 
 // Farbzeichenfolgen.
 $string['DARK_GREEN'] = '#063449';
