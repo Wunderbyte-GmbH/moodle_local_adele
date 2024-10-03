@@ -394,7 +394,7 @@ export function createAppStore() {
               }
             },
             async getFoundUsers(context, query) {
-              const result = await ajax('mod_booking_search_users', {
+              const result = await ajax('local_adele_search_users', {
                 query: query,
               });
               return result;
