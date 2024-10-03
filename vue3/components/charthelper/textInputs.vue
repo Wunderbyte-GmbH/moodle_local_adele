@@ -108,13 +108,8 @@ watch(() => store.state.learningpath, async () => {
 
 // Edit learning path deletion
 const editLearningpath = async (singlelearningpathid) => {
-  // '/local/adele/index.php#/learningpaths/edit/' +
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-    tooltip.remove()
-  });
   store.state.learningPathID = singlelearningpathid
-  window.open('/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
+  window.open( store.state.wwwroot + '/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
 };
 
 </script>
@@ -130,9 +125,7 @@ const editLearningpath = async (singlelearningpathid) => {
             style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
           >
             <i
-              data-toggle="tooltip"
-              data-placement="top"
-              :title=store.state.strings.required
+              v-tooltip="store.state.strings.required"
               class="fa fa-exclamation-circle text-danger ml-2"
             />
           </span>
@@ -157,9 +150,7 @@ const editLearningpath = async (singlelearningpathid) => {
             style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
           >
             <i
-              data-toggle="tooltip"
-              data-placement="top"
-              :title=store.state.strings.required
+              v-tooltip="store.state.strings.required"
               class="fa fa-exclamation-circle text-danger ml-2"
             />
           </span>

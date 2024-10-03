@@ -269,28 +269,40 @@ const deleteCondition = () => {
               v-if="store.state.view!='teacher' && editorview"
               class="overlay"
             >
-              <button
-                class="icon-link"
-                @click="setRestrictionView"
+              <span
+                v-tooltip="store.state.strings.nodes_edit_restriction"
               >
-                <i class="fa fa-lock" />
-              </button>
-              <button
-                class="icon-link"
-                @click="setPretestView"
+                <button
+                  class="icon-link"
+                  @click="setRestrictionView"
+                >
+                  <i class="fa fa-lock" />
+                </button>
+              </span>
+              <span
+                v-tooltip="store.state.strings.edit_node_pretest"
               >
-                <i
-                  class="fa fa-tasks"
-                />
-              </button>
-              <button
-                class="icon-link"
-                data-toggle="modal"
-                data-target="#nodeModal"
-                @click="setNodeModal"
+                <button
+                  class="icon-link"
+                  @click="setPretestView"
+                >
+                  <i
+                    class="fa fa-tasks"
+                  />
+                </button>
+              </span>
+              <span
+                v-tooltip="store.state.strings.edit_course_node"
               >
-                <i class="fa fa-pencil" />
-              </button>
+                <button
+                  class="icon-link"
+                  data-toggle="modal"
+                  data-target="#nodeModal"
+                  @click="setNodeModal"
+                >
+                  <i class="fa fa-pencil" />
+                </button>
+              </span>
             </div>
             <div
               v-else-if="!editorview"

@@ -332,9 +332,7 @@ const filteredConditions = computed(() => {
         >
           <div
             class="col-auto info-circle"
-            data-toggle="tooltip"
-            data-placement="left"
-            :title="condition.description"
+            v-tooltip="condition.description"
           >
             <i class="fa fa-circle-info fa-lg" />
           </div>

@@ -105,13 +105,11 @@ const get_cover_image = (data) => {
 
 // Set node data for the modal
 const setNodeModal = () => {
-  removeTooltips()
   store.state.node = props.data
 };
 
 // Set node data for the modal
 const setPretestView = () => {
-  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -120,7 +118,6 @@ const setPretestView = () => {
 
 // Set node data for the modal
 const setRestrictionView = () => {
-  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false
@@ -133,13 +130,6 @@ const setStartNode = (node_id) => {
     startnode: node_id,
   });
 };
-
-const removeTooltips = () => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
-}
 
 const emit = defineEmits([
   'change-module',
@@ -224,8 +214,7 @@ const deleteCondition = () => {
             class="overlay"
           >
             <span
-              :title="store.state.strings.nodes_edit_restriction"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.nodes_edit_restriction"
             >
               <button
                 class="icon-link"
@@ -235,8 +224,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.edit_node_pretest"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.edit_node_pretest"
             >
               <button
                 class="icon-link"
@@ -248,8 +236,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.edit_course_node"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.edit_course_node"
             >
               <button
                 class="icon-link"

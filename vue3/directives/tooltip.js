@@ -1,5 +1,5 @@
-let activeTooltip = null; // Global variable to track the currently active tooltip
-let showTimeout = null;   // Timeout for debouncing
+let activeTooltip = null;
+let showTimeout = null;
 
 export default {
   mounted(el, binding) {
@@ -101,6 +101,13 @@ export default {
       window.removeEventListener('scroll', hideOnScroll, true);
     };
   },
+
+  updated(el, binding) {
+    if (binding.value !== binding.oldValue && activeTooltip) {
+      activeTooltip.textContent = binding.value;
+    }
+  },
+
   unmounted(el) {
     // Remove the tooltip on unmount to prevent memory leaks
     el.cleanupTooltip();

@@ -81,10 +81,8 @@
               </h5>
               <a
                 class="icon-link position-absolute"
-                href="#"
-                data-toggle="tooltip"
-                data-placement="right"
-                :title="singlelearningpath.visibility ? 'Make Invisible' : 'Make Visible'"
+                href=""
+                v-tooltip="singlelearningpath.visibility == 1 ? 'Make Invisible' : 'Make Visible'"
                 @click.prevent="toggleVisibility(singlelearningpath)"
               >
                 <i
@@ -112,9 +110,7 @@
                   <a
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.duplicate"
+                    v-tooltip="store.state.strings.duplicate"
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
                     <i
@@ -124,9 +120,7 @@
                   <a
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.edit"
+                    v-tooltip="store.state.strings.edit"
                     @click.prevent="editLearningpath(singlelearningpath.id)"
                   >
                     <i
@@ -136,9 +130,7 @@
                   <a
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.delete"
+                    v-tooltip="store.state.strings.delete"
                     @click.prevent="showDeleteConfirm(singlelearningpath.id)"
                   >
                     <i
@@ -220,9 +212,7 @@
                   <a
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.view"
+                    v-tooltip="store.state.strings.view"
                     @click.prevent="viewLearningpath(viewablelearningpath.id)"
                   >
                     <i
@@ -291,7 +281,11 @@ onMounted(async () => {
 
 // Handle toggling of visibility
 const toggleVisibility = (learningPath) => {
-  learningPath.visibility = !learningPath.visibility;
+  if (learningPath.visibility == 0) {
+    learningPath.visibility = 1
+  } else {
+    learningPath.visibility = 0
+  }
   store.dispatch('updateLearningPathVisibility',
     {
       lpid: learningPath.id,
@@ -321,10 +315,6 @@ const showDeleteConfirm = (index) => {
 
 // Edit learning path deletion
 const viewLearningpath = async (singlelearningpathid) => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
   store.state.learningPathID = singlelearningpathid
   await store.dispatch('fetchLearningpath')
   router.push({
@@ -335,10 +325,6 @@ const viewLearningpath = async (singlelearningpathid) => {
 
 // Edit learning path deletion
 const editLearningpath = async (singlelearningpathid) => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
   store.state.learningPathID = singlelearningpathid
   await store.dispatch('fetchLearningpath')
   router.push({
