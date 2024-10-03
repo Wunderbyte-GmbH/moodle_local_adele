@@ -684,7 +684,7 @@ class relation_update {
                                 $tmptext .=
                                   get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
                             }
-                            $text = $tmptext;
+                            $text = '<ul>' . $tmptext . '</ul>';
                         } else if ($placeholder == 'quiz_attempts_best') {
                             if ($text != '') {
                                 $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
