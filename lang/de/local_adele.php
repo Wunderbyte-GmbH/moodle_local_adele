@@ -459,3 +459,9 @@ $string['mobile_view_detail_back'] = 'Zurück';
 $string['mobile_view_detail_description'] = 'Beschreibung:';
 $string['mobile_view_detail_estimate'] = 'Geschätzte Dauer:';
 $string['mobile_view_detail_course_link'] = 'Kurs öffnen';
+
+foreach ($string as $key => $val) {
+    if ($val[0] !== "#") {
+        $string[$key] = $val . " {$key}";
+    }
+}
