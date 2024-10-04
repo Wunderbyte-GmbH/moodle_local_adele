@@ -63,8 +63,9 @@ function init() {
             store.state.contextid = contextIdValue;
             const quizSettingValue = localAdeleAppElement.getAttribute('quizsetting');
             store.state.quizsetting = quizSettingValue;
-            const wwwrootValue = localAdeleAppElement.getAttribute('wwwroot');
-            store.state.wwwroot = wwwrootValue;
+            store.state.wwwroot = localAdeleAppElement.getAttribute('wwwroot');
+            const editablepathsValue = localAdeleAppElement.getAttribute('editablepaths');
+            store.state.editablepaths = JSON.parse(editablepathsValue);
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.directive('tooltip', tooltipDirective);
             app.mount(localAdeleAppElement);
