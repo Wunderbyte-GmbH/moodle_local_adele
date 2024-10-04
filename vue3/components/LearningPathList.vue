@@ -45,7 +45,11 @@
         <div
           v-if="
             store.state.editablepaths[singlelearningpath.id] != undefined ||
-            store.state.view != null
+            store.state.view == 'manager' ||
+            (
+              singlelearningpath.visibility == 1 &&
+              store.state.view != null
+            )
           "
           class="wrap"
         >
@@ -59,6 +63,10 @@
                 {{ singlelearningpath.name }}
               </h5>
               <a
+                v-if="
+                  store.state.editablepaths[singlelearningpath.id] != undefined ||
+                  store.state.view == 'manager'
+                "
                 class="icon-link position-absolute"
                 href=""
                 v-tooltip="singlelearningpath.visibility == 1 ? 'Make Invisible' : 'Make Visible'"
@@ -87,7 +95,13 @@
               >
                 <div class="overlay">
                   <a
-                    v-if="store.state.view != null"
+                    v-if="
+                      (
+                        store.state.view != null &&
+                        store.state.editablepaths[singlelearningpath.id] != undefined
+                      ) ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
                     v-tooltip="store.state.strings.duplicate"
@@ -98,6 +112,10 @@
                     />
                   </a>
                   <a
+                    v-if="
+                      store.state.editablepaths[singlelearningpath.id] != undefined ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
                     v-tooltip="store.state.strings.edit"
@@ -108,7 +126,13 @@
                     />
                   </a>
                   <a
-                    v-if="store.state.view != null"
+                    v-if="
+                      (
+                        store.state.view != null &&
+                        store.state.editablepaths[singlelearningpath.id] != undefined
+                      ) ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
                     v-tooltip="store.state.strings.delete"
