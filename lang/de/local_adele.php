@@ -439,9 +439,9 @@ $string['user_view_progress'] = 'Fortschritt';
 $string['user_view_nodes'] = 'Abgeschlossene Knoten';
 $string['user_view_go_back_overview'] = 'Zurück zur Übersicht';
 $string['user_view_user_path_for'] = 'Benutzerpfad für:';
-$string['nodes_feedback_before'] = 'Vorher';
-$string['nodes_feedback_inbetween'] = 'Zwischen';
-$string['nodes_feedback_after'] = 'Nachher';
+$string['nodes_feedback_before'] = 'Vor Beginn der Bearbeitung';
+$string['nodes_feedback_inbetween'] = 'Während der Bearbeitung';
+$string['nodes_feedback_after'] = 'Nach erfolgter Bearbeitung';
 $string['nodes_feedback_use_default'] = 'Standard-Feedback verwenden';
 
 // Main strings.
@@ -462,6 +462,6 @@ $string['mobile_view_detail_course_link'] = 'Kurs öffnen';
 
 foreach ($string as $key => $val) {
     if ($val[0] !== "#") {
-        $string[$key] = $val . " {$key}";
+        $string[$key] = $val . " \{$key\}";
     }
 }
