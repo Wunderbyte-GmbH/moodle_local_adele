@@ -15,6 +15,9 @@ describe('userSearch.vue', () => {
   beforeEach(() => {
     state = {
       learningPathID: 1,
+      strings: {
+        selectuser: 'select a user'
+      }
     };
 
     actions = {
