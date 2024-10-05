@@ -18,7 +18,7 @@
  * GDPR Provider
  *
  *
- * @package    mod_adele
+ * @package    local_adele
  * @copyright  2024 Wunderbyte GmbH
  * @author     Ralf Erlebach
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,7 +31,7 @@ namespace local_commander\privacy;
  *
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @package    mod_adele
+ * @package   local_adele
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 class provider implements \core_privacy\local\metadata\null_provider {
