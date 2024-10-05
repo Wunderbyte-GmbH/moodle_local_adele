@@ -458,7 +458,7 @@ $string['mobile_view_detail_description'] = 'Description:';
 $string['mobile_view_detail_estimate'] = 'Estimated duration:';
 $string['mobile_view_detail_course_link'] = 'Open course';
 
-// Privacy API
+// Privacy API.
 $string['privacy:metadata:local_adele_learning_paths'] = 'The table stores information about learning paths created by users.';
 $string['privacy:metadata:local_adele_learning_paths:createdby'] = 'The ID of the user who created the learning path.';
 $string['privacy:metadata:local_adele_learning_paths:json'] = 'Additional information about the learning path stored in JSON format.';

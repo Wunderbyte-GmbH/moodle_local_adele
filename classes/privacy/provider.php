@@ -50,7 +50,7 @@ class provider implements
     // This plugin currently implements the original plugin\provider interface.
     \core_privacy\local\request\plugin\provider,
 
-    // This plugin is capable of determining which users have data within it.
+    // This plugin is capable of providing data export for user related data.
     \core_privacy\local\request\user_provider
 {
     /**
@@ -98,21 +98,21 @@ class provider implements
     public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
 
-        // Add contexts for local_adele_learning_paths
+        // Add contexts for local_adele_learning_paths.
         $sql = "SELECT ctx.id
                   FROM {local_adele_learning_paths} lap
                   JOIN {context} ctx ON ctx.instanceid = lap.id
                  WHERE lap.createdby = :userid";
         $contextlist->add_from_sql($sql, ['userid' => $userid]);
 
-        // Add contexts for local_adele_path_user
+        // Add contexts for local_adele_path_user.
         $sql = "SELECT ctx.id
                   FROM {local_adele_path_user} lpu
                   JOIN {context} ctx ON ctx.instanceid = lpu.id
                  WHERE lpu.user_id = :userid";
         $contextlist->add_from_sql($sql, ['userid' => $userid]);
 
-        // Add contexts for local_adele_lp_editors
+        // Add contexts for local_adele_lp_editors.
         $sql = "SELECT ctx.id
                   FROM {local_adele_lp_editors} lpe
                   JOIN {context} ctx ON ctx.instanceid = lpe.id
