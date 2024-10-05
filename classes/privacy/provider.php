@@ -26,17 +26,19 @@
 
 namespace local_adele\privacy;
 
-use core_privacy\local\metadata\collection;
-use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\user_provider;
-use core_privacy\local\request\plugin\provider;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\deletion_criteria;
+use core_privacy\local\request\transform;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use core_privacy\manager;
 
 /**
  * Class provider
  *
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * @package   local_adele
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -45,11 +47,11 @@ class provider implements
     // This plugin has data.
     \core_privacy\local\metadata\provider,
 
-    // This plugin currently implements the original plugin\provider interface.
+    // This plugin currently implements the original plugin_provider interface.
     \core_privacy\local\request\plugin\provider,
 
-    // This plugin is capable of providing data export for user related data.
-    \core_privacy\local\request\user_provider
+    // This plugin is capable of determining which users have data within it.
+    \core_privacy\local\request\core_userlist_provider
 {
     /**
      * Returns metadata about the data stored by this plugin.
@@ -71,6 +73,7 @@ class provider implements
             'local_adele_path_user',
             [
                 'user_id' => 'privacy:metadata:local_adele_path_user:user_id',
+                'createdby' => 'privacy:metadata:local_adele_learning_paths:createdby',
                 'json' => 'privacy:metadata:local_adele_path_user:json',
             ],
             'privacy:metadata:local_adele_path_user'
