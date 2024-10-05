@@ -48,8 +48,8 @@ class provider implements
     \core_privacy\local\metadata\provider,
 
     // This plugin currently implements the original plugin_provider interface.
-    \core_privacy\local\request\plugin\provider
-{
+    \core_privacy\local\request\plugin\provider {
+    
     /**
      * Returns metadata about the data stored by this plugin.
      *
@@ -132,7 +132,7 @@ class provider implements
         $contexts = $contextlist->get_contexts();
 
         foreach ($contexts as $context) {
-            // Export data from local_adele_learning_paths
+            // Export data from local_adele_learning_paths.
             $learningpaths = $DB->get_records('local_adele_learning_paths', ['createdby' => $userid]);
             foreach ($learningpaths as $path) {
                 $data = (object) [
@@ -143,7 +143,7 @@ class provider implements
                 writer::with_context($context)->export_data(['Learning Paths'], $data);
             }
 
-            // Export data from local_adele_path_user
+            // Export data from local_adele_path_user.
             $pathusers = $DB->get_records('local_adele_path_user', ['user_id' => $userid]);
             foreach ($pathusers as $pathuser) {
                 $data = (object) [
@@ -154,7 +154,7 @@ class provider implements
                 writer::with_context($context)->export_data(['Path User Relations'], $data);
             }
 
-            // Export data from local_adele_lp_editors
+            // Export data from local_adele_lp_editors.
             $editors = $DB->get_records('local_adele_lp_editors', ['userid' => $userid]);
             foreach ($editors as $editor) {
                 $data = (object) [
