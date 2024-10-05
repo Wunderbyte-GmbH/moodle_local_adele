@@ -457,3 +457,15 @@ $string['mobile_view_detail_back'] = 'Back';
 $string['mobile_view_detail_description'] = 'Description:';
 $string['mobile_view_detail_estimate'] = 'Estimated duration:';
 $string['mobile_view_detail_course_link'] = 'Open course';
+
+// Privacy API
+$string['privacy:metadata:local_adele_learning_paths'] = 'The table stores information about learning paths created by users.';
+$string['privacy:metadata:local_adele_learning_paths:createdby'] = 'The ID of the user who created the learning path.';
+$string['privacy:metadata:local_adele_learning_paths:json'] = 'Additional information about the learning path stored in JSON format.';
+
+$string['privacy:metadata:local_adele_path_user'] = 'The table stores the relationship between users and their assigned learning paths.';
+$string['privacy:metadata:local_adele_path_user:user_id'] = 'The ID of the user assigned to the learning path.';
+$string['privacy:metadata:local_adele_path_user:json'] = 'Additional information about the assignment stored in JSON format.';
+
+$string['privacy:metadata:local_adele_lp_editors'] = 'The table stores information about users who are allowed to edit certain learning paths.';
+$string['privacy:metadata:local_adele_lp_editors:userid'] = 'The ID of the user who is allowed to edit the learning path.';

@@ -459,3 +459,15 @@ $string['mobile_view_detail_back'] = 'Zurück';
 $string['mobile_view_detail_description'] = 'Beschreibung:';
 $string['mobile_view_detail_estimate'] = 'Geschätzte Dauer:';
 $string['mobile_view_detail_course_link'] = 'Kurs öffnen';
+
+// Privacy API
+$string['privacy:metadata:local_adele_learning_paths'] = 'Die Tabelle speichert Informationen über Lernpfade, die von Nutzern erstellt wurden.';
+$string['privacy:metadata:local_adele_learning_paths:createdby'] = 'Die ID des Nutzers, der den Lernpfad erstellt hat.';
+$string['privacy:metadata:local_adele_learning_paths:json'] = 'Zusätzliche Informationen über den Lernpfad, gespeichert im JSON-Format.';
+
+$string['privacy:metadata:local_adele_path_user'] = 'Die Tabelle speichert die Beziehung zwischen Nutzern und ihren zugewiesenen Lernpfaden.';
+$string['privacy:metadata:local_adele_path_user:user_id'] = 'Die ID des Nutzers, der dem Lernpfad zugewiesen ist.';
+$string['privacy:metadata:local_adele_path_user:json'] = 'Zusätzliche Informationen über die Zuweisung, gespeichert im JSON-Format.';
+
+$string['privacy:metadata:local_adele_lp_editors'] = 'Die Tabelle speichert Informationen über Nutzer, die berechtigt sind, bestimmte Lernpfade zu bearbeiten.';
+$string['privacy:metadata:local_adele_lp_editors:userid'] = 'Die ID des Nutzers, der berechtigt ist, den Lernpfad zu bearbeiten.';
