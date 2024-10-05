@@ -43,8 +43,16 @@ use core_privacy\local\request\writer;
  * @package   local_adele
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-class provider implements provider, user_provider {
+class provider implements
+    // This plugin has data.
+    \core_privacy\local\metadata\provider,
 
+    // This plugin currently implements the original plugin\provider interface.
+    \core_privacy\local\request\plugin\provider,
+
+    // This plugin is capable of determining which users have data within it.
+    \core_privacy\local\request\user_provider
+{
     /**
      * Returns metadata about the data stored by this plugin.
      *
