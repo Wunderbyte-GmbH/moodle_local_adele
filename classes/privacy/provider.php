@@ -124,8 +124,9 @@ class provider implements
      * Export all user data for the specified contexts.
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
+     * @return void
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
+    public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
 
         $userid = $contextlist->get_user()->id;
@@ -163,5 +164,25 @@ class provider implements
                 writer::with_context($context)->export_data(['Learning Path Editors'], $data);
             }
         }
+    }
+
+    /**
+     * Delete all data for all users in the specified context.
+     * Should do nothing at the moment.
+     *
+     * @param   context                 $context   The specific context to delete data for.
+     * @return void
+     */
+    public static function delete_data_for_all_users_in_context(\context $context): void {
+    }
+
+    /**
+     * Delete all user data for the specified user, in the specified contexts.
+     * Should do nothing at the moment.
+     *
+     * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
+     * @return void
+     */
+    public static function delete_data_for_user(approved_contextlist $contextlist): void {
     }
 }
