@@ -83,7 +83,7 @@ class get_learningpath extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        // TODO proceed if editing teacher
+        // TODO proceed if editing teacher.
         if (
           !isset($_SESSION[SESSION_KEY_ADELE][$params['learningpathid']]) &&
           !has_capability('local/adele:canmanage', $context)
