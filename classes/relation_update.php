@@ -67,7 +67,7 @@ class relation_update {
                     $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
                     $restrictionnodepaths = [];
                     $singlerestrictionnode = [];
-                    if ($node['data']['completion']['master']) {
+                    if (isset($node['data']['completion']['master'])) {
                         $userpath->json['user_path_relation'][$node['id']]['master'] =
                               $node['data']['completion']['master'];
                     }
