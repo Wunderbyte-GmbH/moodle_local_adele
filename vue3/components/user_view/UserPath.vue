@@ -42,7 +42,7 @@
         </div>
         <div
           style="width: 100%; height: 600px;"
-          @wheel="onWheel"
+          @wheel="onWheel($event, zoomLockVaraible, viewport, zoomTo)"
         >
           <VueFlow
             :nodes="nodes"
@@ -51,8 +51,8 @@
             :default-viewport="viewport"
             :max-zoom="1.55"
             :min-zoom="0.15"
-            :zoom-on-scroll="zoomLock"
-            :zoom-on-pinch="zoomLock"
+            :zoom-on-scroll="false"
+            :zoom-on-pinch="false"
             class="learning-path-flow"
             @node-click="onNodeClickCall"
           >
@@ -118,7 +118,7 @@ import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import onNodeClick from '../../composables/flowHelper/onNodeClick';
-import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
+import onWheel from '../../composables/flowHelper/onWheel';
 
 // Load Router
 const router = useRouter()
@@ -146,8 +146,8 @@ const props = defineProps({
 // Declare reactive variable for nodes
 const nodes = ref([]);
 const edges = ref([]);
-const zoomLock = ref(false)
 const zoomstep = ref(0)
+const zoomLockVaraible = ref(false)
 const user_learningpath = ref({})
 
 onMounted( async () => {
@@ -176,35 +176,7 @@ onMounted( async () => {
         const minX = Math.min(...nodes.value.map(node => node.position.x));
         const maxX = Math.max(...nodes.value.map(node => node.position.x));
         const pathCenterX = (minX + maxX) / 2;
-        setCenter(pathCenterX, topNode.position.y + 800, { duration: 1000, zoom: 0.35 }).then(() => {
-          zoomLock.value = true;
-        }).then(async() => {
-          zoomLock.value = true
-          watch(
-            () => viewport.value.zoom,
-            async(newVal, oldVal) => {
-              const abszoom = Math.abs(newVal - oldVal)
-            if (
-              newVal &&
-              oldVal &&
-              !zoomLock.value &&
-              abszoom > 0.0005
-            ) {
-
-              zoomLock.value = false
-              if (newVal > oldVal) {
-                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
-              } else {
-                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
-              }
-              setTimeout(() => {
-                zoomLock.value = true
-              }, 500);
-            }
-            },
-            { deep: true }
-          );
-        });
+        setCenter(pathCenterX, topNode.position.y + 800, { duration: 1000, zoom: 0.35 })
       })
     }, 300)
   }
@@ -222,16 +194,13 @@ const handleZoomLock = (node) => {
     }
     event.node = findNode(node)
     if (event.node) {
-      zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+      zoomstep.value = onNodeClick(event, setCenter, store)
     }
   })
 }
 
 const handleExpandCards = async () => {
-    zoomLock.value = false
-    await zoomTo(0.35, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
+    await zoomTo(0.35, { duration: 500})
 }
 
 watch(() => user_learningpath.value, () => {
@@ -256,24 +225,7 @@ function setFlowchart() {
 
 // Zoom in node
 function onNodeClickCall(event) {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
-}
-
-const onWheel = (event) => {
-  const isScrollTarget = event.target.closest('.vue-flow__pane');
-  const isTrackpad = Math.abs(event.deltaY) < 10;
-  const isZooming = event.ctrlKey || event.metaKey;
-
-  if (
-    isScrollTarget &&
-    (
-      !isTrackpad ||
-      isZooming
-    )
-  ) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
+  zoomstep.value = onNodeClick(event, setCenter, store)
 }
 
 </script>

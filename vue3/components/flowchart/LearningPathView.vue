@@ -33,7 +33,7 @@
         :fit-view-on-init="true"
         :max-zoom="1.55"
         :min-zoom="0.15"
-        :zoom-on-scroll="zoomLock"
+        :zoom-on-scroll="false"
         class="learning-path-flow"
         @node-click="onNodeClickCall"
       >
@@ -113,8 +113,6 @@ const editor_view = ref(false)
 // check the page width
 const dndFlowWidth = ref(0);
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
-const zoomLock = ref(false)
 const zoomstep = ref(0)
 
 // load useVueFlow properties / functions
@@ -138,32 +136,7 @@ onMounted(() => {
   observer.observe(document.querySelector('.dndflow'));
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(async() => {
-        zoomLock.value = true
-        watch(
-          () => viewport.value.zoom,
-          async(newVal, oldVal) => {
-            const abszoom = Math.abs(newVal - oldVal)
-            if (
-              newVal &&
-              oldVal &&
-              zoomLock.value &&
-              abszoom > 0.0005
-            ) {
-              zoomLock.value = false
-              if (newVal > oldVal) {
-                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
-              } else {
-                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
-              }
-              setTimeout(() => {
-                zoomLock.value = true
-              }, 500);
-            }
-          },
-          { deep: true }
-        );
-      });
+      fitView({ duration: 1000 })
     })
   }, 300)
 });
@@ -177,7 +150,7 @@ const finishEdit = () => {
 }
 
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+  zoomstep.value = onNodeClick(event, setCenter, store)
 }
 
 </script>

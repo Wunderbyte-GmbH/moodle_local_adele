@@ -1,14 +1,10 @@
 // stepwise set the zomm level
-const onNodeClick = (event, zoomLock, setCenter, store) => {
-
-  zoomLock.value = false
+const onNodeClick = (event, setCenter, store) => {
   setCenter(
     event.node.position.x + event.node.dimensions.width/2,
     event.node.position.y + event.node.dimensions.height/2,
     { zoom: 1, duration: 500}
-  ).then(() => {
-    zoomLock.value = true
-  })
+  )
   if (event.node.data.animations  &&
     store.state.user == store.state.lpuserpathrelation.user_id
   ) {

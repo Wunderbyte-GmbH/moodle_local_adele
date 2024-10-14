@@ -275,9 +275,9 @@ onMounted(async () => {
             ) {
               zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', viewport, zoomTo)
+                setZoomLevel('in', viewport.value, zoomTo)
               } else {
-                setZoomLevel('out', viewport, zoomTo)
+                setZoomLevel('out', viewport.value, zoomTo)
               }
               setTimeout(() => {
                 zoomLock.value = true

@@ -1,10 +1,16 @@
-// stepwise set the zomm level
+const zoomSteps: number[] = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5];
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
+interface Viewport {
+  zoom: number;
+}
 
-const setZoomLevel = async (action, viewport, zoomTo) => {
+const setZoomLevel = async (
+  action: 'in' | 'out',
+  viewport: Viewport,
+  zoomTo: (zoomLevel: number, options: { duration: number }) => void
+): Promise<number | undefined> => {
   try {
-    let newViewport = viewport.value.zoom
+    let newViewport = parseFloat(viewport.zoom.toFixed(2))
     let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
     if (currentStepIndex === -1) {
       currentStepIndex = zoomSteps.length;
@@ -16,8 +22,8 @@ const setZoomLevel = async (action, viewport, zoomTo) => {
         newViewport = zoomSteps[currentStepIndex - 1]
       }
     } else if (action === 'out') {
-      if (currentStepIndex > 0) {
-        newViewport = zoomSteps[currentStepIndex-1];
+      if (currentStepIndex > 1) {
+        newViewport = zoomSteps[currentStepIndex-2];
       } else {
         newViewport = zoomSteps[0]
       }

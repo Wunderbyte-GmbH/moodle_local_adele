@@ -1,33 +1,10 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
 
 <template>
   <div>
     <div
       class="dndflow mt-4"
       @drop="onDrop"
-      @wheel="onWheel"
+      @wheel="onWheel($event, zoomLockVaraible, viewport, zoomTo)"
     >
       <Modal
         v-if="store.state.view != 'teacher'"
@@ -45,7 +22,8 @@
         :fit-view-on-init="true"
         :max-zoom="1.55"
         :min-zoom="0.15"
-        :zoom-on-scroll="zoomLock"
+        :zoom-on-scroll="false"
+        :zoom-on-pinch="false"
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
@@ -155,7 +133,7 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import { debounce } from 'lodash';
-import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
+import onWheel from '../../composables/flowHelper/onWheel'
 
 // Load Store and Router
 const store = useStore()
@@ -193,7 +171,7 @@ const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
 
-const zoomLock = ref(false)
+const zoomLockVaraible = ref(false)
 const zoomstep = ref(0)
 const undoWatcher = ref(null);
 
@@ -229,32 +207,7 @@ onMounted(() => {
   }
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(async() => {
-        zoomLock.value = true
-        watch(
-          () => viewport.value.zoom,
-          async(newVal, oldVal) => {
-            const abszoom = Math.abs(newVal - oldVal)
-            if (
-              newVal &&
-              oldVal &&
-              zoomLock.value &&
-              abszoom > 0.0005
-            ) {
-              zoomLock.value = false
-              if (newVal > oldVal) {
-                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
-              } else {
-                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
-              }
-              setTimeout(() => {
-                zoomLock.value = true
-              }, 500);
-            }
-          },
-          { deep: true }
-        );
-      });
+      fitView({ duration: 1000 })
     })
   }, 300)
 });
@@ -312,7 +265,7 @@ const onDrag = ($event) => {
 }
 
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store )
+  zoomstep.value = onNodeClick(event, setCenter, store )
 }
 
 // Prevent default event if node has been dropped
@@ -584,14 +537,6 @@ async function onRemoveNode(data) {
       removeNodes(data.node_id)
       emit('removeNodeConditions', data.node_id);
     }
-}
-
-const onWheel = (event) => {
-  const isScrollTarget = event.target.closest('.vue-flow__pane');
-  if (isScrollTarget) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
 }
 
 </script>
