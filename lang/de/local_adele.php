@@ -443,6 +443,9 @@ $string['nodes_feedback_before'] = 'Vorher';
 $string['nodes_feedback_inbetween'] = 'Zwischen';
 $string['nodes_feedback_after'] = 'Nachher';
 $string['nodes_feedback_use_default'] = 'Standard-Feedback verwenden';
+$string['user_view_user_list'] = 'Nutzerliste';
+$string['user_view_user_list_show'] = 'Zeige ';
+$string['user_view_user_list_hide'] = 'Verstecke ';
 
 // Main strings.
 $string['main_intro_slider'] = 'Einführungsslider';

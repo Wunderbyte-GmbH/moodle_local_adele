@@ -43,7 +43,7 @@ const props = defineProps({
 });
 
 const goToCourse = () => {
-  let course_link = '/course/view.php?id=' + props.data.course_id
+  let course_link = store.state.wwwroot + '/course/view.php?id=' + props.data.course_id
   window.open(course_link, '_blank');
 }
 

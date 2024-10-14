@@ -441,6 +441,9 @@ $string['user_view_progress'] = 'Progress';
 $string['user_view_nodes'] = 'Finished Nodes';
 $string['user_view_go_back_overview'] = 'Go Back to Overview';
 $string['user_view_user_path_for'] = 'User path for:';
+$string['user_view_user_list'] = 'User List';
+$string['user_view_user_list_show'] = 'Show ';
+$string['user_view_user_list_hide'] = 'Hide ';
 
 // Main strings.
 $string['main_intro_slider'] = 'Introduction slider';
