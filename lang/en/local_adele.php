@@ -440,6 +440,7 @@ $string['user_view_lastname'] = 'Lastname';
 $string['user_view_email'] = 'Email';
 $string['user_view_progress'] = 'Progress';
 $string['user_view_nodes'] = 'Finished Nodes';
+$string['userlistranking'] = 'Ranking';
 $string['user_view_go_back_overview'] = 'Go Back to Overview';
 $string['user_view_user_path_for'] = 'User path for:';
 $string['user_view_user_list'] = 'User List';

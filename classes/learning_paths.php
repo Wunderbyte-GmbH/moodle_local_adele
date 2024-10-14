@@ -343,6 +343,25 @@ class learning_paths {
                     'progress' => $progress ?? null,
                 ];
             }
+            usort($userpathlist, function($a, $b) {
+                if ($a['progress']['completed_nodes'] === $b['progress']['completed_nodes']) {
+                    return $b['progress']['progress'] <=> $a['progress']['progress'];
+                }
+                return $b['progress']['completed_nodes'] <=> $a['progress']['completed_nodes'];
+            });
+            $rank = 1;
+            $prevuser = null;
+            foreach ($userpathlist as $index => &$user) {
+                if ($prevuser &&
+                    $prevuser['progress']['completed_nodes'] === $user['progress']['completed_nodes'] &&
+                    $prevuser['progress']['progress'] === $user['progress']['progress']) {
+                    $user['rank'] = $prevuser['rank'];
+                } else {
+                    $user['rank'] = $rank;
+                }
+                $prevuser = $user;
+                $rank++;
+            }
             return $userpathlist;
         } catch (Exception $e) {
             debugging('Error in getnodeprogress: ' . $e->getMessage());

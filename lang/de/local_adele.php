@@ -438,6 +438,7 @@ $string['user_view_lastname'] = 'Nachname';
 $string['user_view_email'] = 'E-Mail';
 $string['user_view_progress'] = 'Fortschritt';
 $string['user_view_nodes'] = 'Abgeschlossene Knoten';
+$string['userlistranking'] = 'Rang';
 $string['user_view_go_back_overview'] = 'Zurück zur Übersicht';
 $string['user_view_user_path_for'] = 'Benutzerpfad für:';
 $string['nodes_feedback_before'] = 'Vorher';

@@ -33,6 +33,9 @@
               <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')" :style="{ width: columnWidth }">
                 {{ store.state.strings.user_view_nodes }}
               </th>
+              <th @click="sortTable('rank')" :class="getSortClass('rank')" :style="{ width: columnWidth }">
+                {{ store.state.strings.userlistranking }}
+              </th>
             </tr>
           </thead>
             <transition-group name="list" tag="tbody">
@@ -52,6 +55,7 @@
                   <ProgressBar :progress="relation.progress.progress" />
                 </td>
                 <td :style="{ width: columnWidth }">{{ relation.progress.completed_nodes }}</td>
+                <td :style="{ width: columnWidth }">{{ relation.rank }}</td>
               </tr>
             </transition-group>
         </table>
@@ -74,7 +78,7 @@ const focusEntry = ref(null);
 const isTableVisible = ref(true);
 
 // Computed column count and dynamic column width
-const columnCount = computed(() => (store.state.view === 'student' ? 6 : 5));
+const columnCount = computed(() => (store.state.view === 'student' ? 7 : 6));
 const columnWidth = computed(() => `${100 / columnCount.value}%`);
 
 watch(
