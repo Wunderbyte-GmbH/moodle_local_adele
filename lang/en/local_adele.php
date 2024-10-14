@@ -106,6 +106,7 @@ $string['uploadowndefaultimage'] = 'Or upload a new image:';
 $string['uploadanduseimage'] = 'Upload and use image';
 $string['onlysetaftersaved'] = 'Can only be set after learning path was saved';
 $string['searchuser'] = 'Search users...';
+$string['editordeleteconfirmation'] = 'Are you sure you want to remove this user as editor?';
 $string['selectuser'] = 'Select Users';
 $string['removeuser'] = 'Remove';
 $string['nousersfound'] = 'No users were found';

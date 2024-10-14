@@ -36,11 +36,17 @@ const addUser = (user) => {
 };
 
 const removeUser = (userId) => {
-  store.dispatch('removeLpEditUsers', {
-    lpid: store.state.learningPathID,
-    userid: userId,
-  });
-  selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+  const confirmation = confirm(store.state.strings.editordeleteconfirmation);
+  if (
+    confirmation &&
+    selectedUsers.value.length >= 2
+  ) {
+    store.dispatch('removeLpEditUsers', {
+      lpid: store.state.learningPathID,
+      userid: userId,
+    });
+    selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+  }
 };
 
 // Hide the list if clicking outside of the input or list
@@ -115,6 +121,7 @@ onBeforeUnmount(() => {
         <div class="card-body p-2 d-flex align-items-center justify-content-between">
           <span>{{ user.firstname }} {{ user.lastname }}</span>
           <button
+            v-if="selectedUsers.length > 1"
             class="btn btn-link text-danger p-0"
             @click="removeUser(user.id)"
             :title="store.state.strings.removeuser"

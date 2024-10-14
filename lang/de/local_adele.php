@@ -106,6 +106,7 @@ $string['uploadowndefaultimage'] = 'Oder wähle ein eigenes Bild hoch:';
 $string['uploadanduseimage'] = 'Lade und benutze Bild';
 $string['onlysetaftersaved'] = 'Kann erst nach dem ersten Speichern gesetzt werden';
 $string['searchuser'] = 'Suche User...';
+$string['editordeleteconfirmation'] = 'Den Nutzer als Bearbeiter für diesen Lernpfad wirklich entfernen?';
 $string['selectuser'] = 'Users auswählen';
 $string['removeuser'] = 'Entfernen';
 $string['nousersfound'] = 'Keine User gefunden';

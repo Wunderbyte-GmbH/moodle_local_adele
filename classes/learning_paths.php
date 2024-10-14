@@ -58,7 +58,7 @@ class learning_paths {
      * Save learning path.
      *
      * @param array $params
-     * @return bool
+     * @return mixed
      */
     public static function save_learning_path($params) {
         global $DB, $USER;
