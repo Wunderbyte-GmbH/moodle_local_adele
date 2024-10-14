@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div 
-      v-if="date.start" 
+    <div
+      v-if="date.start"
       class="row mb-2"
     >
       <div class="col-4 text-left">
         <b>
-          <i class="fa fa-calendar mr-2" /> 
+          <i class="fa fa-calendar mr-2" />
           {{ store.state.strings.nodes_items_start }}
         </b>
       </div>
@@ -14,8 +14,8 @@
         {{ formatDate(props.date.start) }}
       </div>
     </div>
-    <div 
-      v-if="date.end" 
+    <div
+      v-if="date.end"
       class="row mb-2"
     >
       <div class="col-4 text-left">
@@ -31,19 +31,29 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { useStore } from 'vuex';
   const store = useStore();
 
-  const props = defineProps({
-    date: {
-      type: Object,
-      required: true,
-    },
-  });
+  interface StartEndDate {
+    start: string;
+    end: string;
+  }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
+  const props = defineProps<{
+    date: StartEndDate;
+  }>();
+
+  const formatDate = (dateString: string): string  => {
+    const options: Intl.DateTimeFormatOptions =
+      {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+      };
     const formattedDate = new Date(dateString).toLocaleString('en-US', options);
     return formattedDate;
   }

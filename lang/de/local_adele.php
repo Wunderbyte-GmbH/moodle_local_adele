@@ -23,12 +23,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ // Required strings.
 $string['modulename'] = 'Lernpfad';
 $string['modulenameplural'] = 'Lernpfade';
 $string['modulename_help'] = 'Lernpfad';
 $string['pluginadministration'] = 'Lernpfad-Verwaltung';
 $string['pluginname'] = 'Lernpfad';
 $string['not_found'] = 'Learning path wurde nicht gefunden! Bitte kontaktiere die verantwortliche Person für diesen Lernpfad!';
+$string['required'] = 'notwendig';
 
 // Fähigkeiten.
 $string['adele:edit'] = 'Lernpfad bearbeiten';
@@ -78,6 +80,7 @@ $string['btncreatecourse'] = 'Zur Seite gehen und einen Kurs erstellen';
 $string['btnsave'] = 'Speichern';
 $string['btncancel'] = 'Abbrechen';
 $string['btnupdate_positions'] = 'Positionen aktualisieren';
+$string['btntoggle'] = 'Ansicht wechseln';
 $string['btndarktoggle'] = 'Dunkle Ansicht';
 $string['btnlighttoggle'] = 'Helle Ansicht';
 $string['btnstudenttoggle'] = 'Student Ansicht';
@@ -95,6 +98,17 @@ $string['placeholder_search'] = 'Kurse suchen';
 $string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['edit_course_node'] = 'Knoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
+$string['from_default_node_image'] = 'Standard-Knotenbild:';
+$string['uploaddefaultimage'] = 'Lade das Standard-Knotenbild hoch';
+$string['selectdefaultimage'] = 'Wähle das Standard-Knotenbild aus';
+$string['deselectdefaultimage'] = 'Abwählen';
+$string['uploadowndefaultimage'] = 'Oder wähle ein eigenes Bild hoch:';
+$string['uploadanduseimage'] = 'Lade und benutze Bild';
+$string['onlysetaftersaved'] = 'Kann erst nach dem ersten Speichern gesetzt werden';
+$string['searchuser'] = 'Suche User...';
+$string['selectuser'] = 'Users auswählen';
+$string['removeuser'] = 'Entfernen';
+$string['nousersfound'] = 'Keine User gefunden';
 
 // Uebersichtszeichenfolge.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
@@ -138,6 +152,8 @@ $string['node_coursefullname'] = 'Knotenname:';
 $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
 // Conditions description.
+$string['course_description_master'] = 'Diese Kondition überschreibt alle anderen';
+$string['course_name_master'] = 'Master Kondition';
 $string['course_description_condition_completion_manual'] = 'Der Knoten wird manuell abgeschlossen';
 $string['course_description_condition_parent_courses'] = 'Der Knoten wird zugänglich, wenn eine bestimmte Anzahl übergeordneter Knoten abgeschlossen ist';
 $string['course_name_condition_completion_manual'] = 'Knotenabschluss-Kontrollkästchen';
@@ -196,7 +212,7 @@ $string['course_description_after_condition_course_completed'] = 'du hast genug 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
 $string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen{quiz_attempts_best}';
 $string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
-$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
+$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'beende das Quiz {quiz_name_link}';
@@ -213,6 +229,10 @@ $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';
 $string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
+
+$string['course_master_conditions'] = 'Master Bedingungen';
+$string['course_master_condition_restriction'] = 'Master Zugangs-Checkbox';
+$string['course_master_condition_completion'] = 'Master Abschluss-Checkbox';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';
@@ -232,7 +252,6 @@ $string['event_node_finished'] = 'Knoten wurde abgeschlossen';
 $string['event_node_finished_description'] = 'Der Benutzer {$a->user} hat den Knoten {$a->node} abgeschlossen';
 $string['event_attempt_submitted'] = 'Quiz wurde abgeschlossen';
 $string['event_attempt_submitted_description'] = 'Der Benutzer {$a->user} hat das Quiz {$a->node} abgeschlossen';
-
 
 // Farbzeichenfolgen.
 $string['DARK_GREEN'] = '#063449';
@@ -285,6 +304,16 @@ $string['completion_course_title'] = 'Knotentitel:';
 $string['completion_course_tags'] = 'Tags:';
 $string['completion_node_refused_title'] = 'Knotenabwurf abgelehnt';
 $string['completion_node_refused_text'] = 'Bitte lassen Sie den Knoten in den Ablagezonen fallen, die angezeigt werden, wenn Sie einen Knoten zu einem vorhandenen Knoten ziehen.';
+$string['completion_description_feedback'] = 'Beschreibung';
+$string['completion_dates_duration_feedback'] = 'Daten und Dauer';
+$string['completion_estimated_duration_feedback'] = 'Geschätzte Dauer:';
+$string['completion_start_date_feedback'] = 'Startdatum:';
+$string['completion_end_date_feedback'] = 'Enddatum:';
+$string['completion_first_subscription_feedback'] = 'Zuerst angemeldet bei Knoten:';
+$string['completion_restriction_feedback'] = 'Einschränkung';
+$string['completion_nothing_defined_feedback'] = 'Nichts definiert';
+$string['completion_completion_inbetween_feedback'] = 'Zwischenzeitliche Erledigung';
+$string['completion_completion_feedback'] = 'Abschluss';
 $string['completion_feedback_node'] = 'Rückmeldungen zum Knoten';
 $string['completion_loading_completion'] = 'Abschluss wird geladen...';
 $string['completion_drop_here'] = 'Hier ablegen, um zu verbinden';
@@ -293,6 +322,8 @@ $string['completion_list_of_criteria'] = 'Liste der verfügbaren ';
 $string['completion_criteria'] = ' Kriterien';
 $string['completion_edge_or'] = ' ODER';
 $string['completion_edge_and'] = 'UND';
+$string['course_completion_choose_number'] = 'Bestimme eine Anzahl';
+$string['course_completion_minimum_amount'] = 'Bestimme die Mindestanzahl von Kursabschlüssen';
 
 // Flussdiagrammzeichenfolgen.
 $string['flowchart_add_learning'] = 'Ein Lernmodul hinzufügen';
@@ -412,6 +443,9 @@ $string['nodes_feedback_before'] = 'Vorher';
 $string['nodes_feedback_inbetween'] = 'Zwischen';
 $string['nodes_feedback_after'] = 'Nachher';
 $string['nodes_feedback_use_default'] = 'Standard-Feedback verwenden';
+$string['user_view_user_list'] = 'Nutzerliste';
+$string['user_view_user_list_show'] = 'Zeige ';
+$string['user_view_user_list_hide'] = 'Verstecke ';
 
 // Main strings.
 $string['main_intro_slider'] = 'Einführungsslider';

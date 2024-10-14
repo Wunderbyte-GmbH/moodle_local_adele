@@ -1,27 +1,3 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
-
 <template>
   <div>
     <notifications width="100%" />
@@ -66,14 +42,15 @@
         </div>
         <div
           style="width: 100%; height: 600px;"
+          @wheel="onWheel"
         >
           <VueFlow
             :nodes="nodes"
             :edges="edges"
             :viewport="viewport"
             :default-viewport="viewport"
-            :max-zoom="1.5"
-            :min-zoom="0.2"
+            :max-zoom="1.55"
+            :min-zoom="0.15"
             :zoom-on-scroll="zoomLock"
             :zoom-on-pinch="zoomLock"
             class="learning-path-flow"
@@ -140,9 +117,8 @@ import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
-import outerGraphDisplay from '../../composables/flowHelper/outerGraphDisplay'
-import innerGraphDisplay from '../../composables/flowHelper/innerGraphDisplay'
 import onNodeClick from '../../composables/flowHelper/onNodeClick';
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
 
 // Load Router
 const router = useRouter()
@@ -151,12 +127,13 @@ const route = useRoute()
 // Load Store
 const store = useStore()
 
-const { addNodes, addEdges, removeNodes, removeEdges,
-  findNode, zoomTo, viewport, setCenter } = useVueFlow()
+const {
+  addNodes, removeNodes, findNode,
+  zoomTo, viewport, setCenter
+} = useVueFlow()
 
-// Function to go back
 const goBack = () => {
-  router.go(-1) // Go back one step in the history
+  router.go(-1)
 }
 
 const props = defineProps({
@@ -169,7 +146,6 @@ const props = defineProps({
 // Declare reactive variable for nodes
 const nodes = ref([]);
 const edges = ref([]);
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
 const user_learningpath = ref({})
@@ -202,18 +178,29 @@ onMounted( async () => {
         const pathCenterX = (minX + maxX) / 2;
         setCenter(pathCenterX, topNode.position.y + 800, { duration: 1000, zoom: 0.35 }).then(() => {
           zoomLock.value = true;
-        }).then(() => {
+        }).then(async() => {
           zoomLock.value = true
           watch(
             () => viewport.value.zoom,
-            (newVal, oldVal) => {
-              if (newVal && oldVal && zoomLock.value) {
-                if (newVal > oldVal) {
-                  setZoomLevel('in', newVal)
-                } else if (newVal < oldVal) {
-                  setZoomLevel('out', newVal)
-                }
+            async(newVal, oldVal) => {
+              const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              !zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+
+              zoomLock.value = false
+              if (newVal > oldVal) {
+                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
+              } else {
+                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
+            }
             },
             { deep: true }
           );
@@ -247,47 +234,6 @@ const handleExpandCards = async () => {
     })
 }
 
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  const oldViewport = viewport.value.zoom
-  let newViewport = null
-  let currentStepIndex = zoomSteps.findIndex(step => oldViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 1]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport == 0.2) {
-    //edges.value = outerGraphDisplay(edges.value, findNode, addEdges)
-    setTimeout(() => {
-      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
-    }, 50);
-  } else if (oldViewport < 0.25) {
-    //edges.value = innerGraphDisplay(edges.value, removeEdges)
-    setTimeout(() => {
-      drawModules(user_learningpath.value, addNodes, removeNodes, findNode)
-    }, 50);
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
-}
-// Watch for changes in the nodes
 watch(() => user_learningpath.value, () => {
   setFlowchart()
 }, { deep: true } )
@@ -311,6 +257,23 @@ function setFlowchart() {
 // Zoom in node
 function onNodeClickCall(event) {
   zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+}
+
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+  const isTrackpad = Math.abs(event.deltaY) < 10;
+  const isZooming = event.ctrlKey || event.metaKey;
+
+  if (
+    isScrollTarget &&
+    (
+      !isTrackpad ||
+      isZooming
+    )
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 </script>

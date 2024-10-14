@@ -79,6 +79,14 @@ interface course_completion {
      *
      * @return int Information array of importancy.
      */
+    public function get_description_string();
+
+    /**
+     * It returns a indicator of how important the criteria is in
+     * order to visualize it for the user.
+     *
+     * @return int Information array of importancy.
+     */
     public function get_completion_priority();
 
     /**

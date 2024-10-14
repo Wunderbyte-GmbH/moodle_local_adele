@@ -74,10 +74,10 @@ class course_completed implements course_completion {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_completion_description_before(),
-            'description_after' => self::get_completion_description_after(),
-            'description_inbetween' => self::get_completion_description_inbetween(),
-            'priority' => self::get_completion_priority(),
+            'description_before' => $this->get_completion_description_before(),
+            'description_after' => $this->get_completion_description_after(),
+            'description_inbetween' => $this->get_completion_description_inbetween(),
+            'priority' => $this->get_completion_priority(),
             'label' => $label,
         ];
     }
@@ -87,7 +87,7 @@ class course_completed implements course_completion {
      *
      * @return string
      */
-    private function get_description_string() {
+    public function get_description_string() {
         $description = get_string('course_description_condition_course_completed', 'local_adele');
         return $description;
     }
@@ -180,7 +180,7 @@ class course_completed implements course_completion {
             }
         }
 
-        $coursecompletion['inbetween_info'] = self::get_node_progress($progresses, $minvalue);
+        $coursecompletion['inbetween_info'] = $this->get_node_progress($progresses, $minvalue);
         return $coursecompletion;
     }
 

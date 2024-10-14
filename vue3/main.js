@@ -27,6 +27,7 @@ import VueInputAutowidth from 'vue-input-autowidth';
 import { createAppStore } from './store';
 import Notifications from '@kyvg/vue3-notification'
 import router from './router/router'
+import tooltipDirective from './directives/tooltip';
 
 
 // Enables the Composition API
@@ -62,7 +63,11 @@ function init() {
             store.state.contextid = contextIdValue;
             const quizSettingValue = localAdeleAppElement.getAttribute('quizsetting');
             store.state.quizsetting = quizSettingValue;
+            store.state.wwwroot = localAdeleAppElement.getAttribute('wwwroot');
+            const editablepathsValue = localAdeleAppElement.getAttribute('editablepaths');
+            store.state.editablepaths = JSON.parse(editablepathsValue);
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
+            app.directive('tooltip', tooltipDirective);
             app.mount(localAdeleAppElement);
         }
     });

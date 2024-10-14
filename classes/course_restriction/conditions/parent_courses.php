@@ -70,7 +70,7 @@ class parent_courses implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_restriction_description_before(),
+            'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
         ];
     }

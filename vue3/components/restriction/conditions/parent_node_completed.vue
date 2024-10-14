@@ -47,7 +47,10 @@ const emit = defineEmits(['update:modelValue'])
 
 onMounted(() => {
   props.learningpath.json.tree.nodes.forEach(node => {
-    if (node.childCourse.includes(store.state.node.node_id)) {
+    if (
+      node.childCourse &&
+      node.childCourse.includes(store.state.node.node_id)
+    ) {
       let fullname = node.data.fullname
       if (fullname == '') {
         fullname = store.state.strings.nodes_collection

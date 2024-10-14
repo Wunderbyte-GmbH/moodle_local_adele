@@ -27,6 +27,7 @@
     <div
       class="dndflow mt-4"
       @drop="onDrop"
+      @wheel="onWheel"
     >
       <Modal
         v-if="store.state.view != 'teacher'"
@@ -42,8 +43,8 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"
-        :max-zoom="1.5"
-        :min-zoom="0.2"
+        :max-zoom="1.55"
+        :min-zoom="0.15"
         :zoom-on-scroll="zoomLock"
         class="learning-path-flow"
         @dragover="onDragOver"
@@ -126,7 +127,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick, onMounted, computed } from 'vue'
+import { ref, watch, nextTick, onMounted, computed, onUnmounted } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -154,6 +155,7 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import { debounce } from 'lodash';
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel'
 
 // Load Store and Router
 const store = useStore()
@@ -191,9 +193,9 @@ const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
 const zoomLock = ref(false)
 const zoomstep = ref(0)
+const undoWatcher = ref(null);
 
 const finishEdit = () => {
   emit('finish-edit');
@@ -208,6 +210,10 @@ edges: [],
 })
 
 onMounted(() => {
+  store.state.undoNodes = []
+  nextTick(() => {
+    startUndoWatcher();
+  });
   const observer = new ResizeObserver(entries => {
   for (let entry of entries) {
       if (entry.target.classList.contains('dndflow')) {
@@ -223,17 +229,27 @@ onMounted(() => {
   }
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(() => {
+      fitView({ duration: 1000 }).then(async() => {
         zoomLock.value = true
         watch(
           () => viewport.value.zoom,
-          (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
+          async(newVal, oldVal) => {
+            const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+              zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in')
-              } else if (newVal < oldVal) {
-                setZoomLevel('out')
+                zoomstep.value = await setZoomLevel('in', viewport, zoomTo)
+              } else {
+                zoomstep.value = await setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
             }
           },
           { deep: true }
@@ -242,34 +258,6 @@ onMounted(() => {
     })
   }, 300)
 });
-
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 2]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
-}
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
@@ -554,19 +542,34 @@ const debouncedHandler = debounce((newVal, oldVal) => {
     const lastEdgesVal = store.state.undoEdges[store.state.undoEdges.length - 1];
     edges.value = [...lastEdgesVal]
     store.commit('unsetUndoEdges');
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
   }
 }, 300);
 
 watch(
-  () => store.state.undoNodes,  // The source (undoNodes)
+  () => store.state.undoNodes,
   debouncedHandler,
-  { deep: true }  // Deep watch to track nested changes (if needed)
+  { deep: true }
 );
+const startUndoWatcher = () => {
+  if (!undoWatcher.value) {
+    undoWatcher.value = watch(
+      () => store.state.undoNodes,
+        debouncedHandler,
+    );
+  }
+};
+
+onUnmounted(() => {
+  if (undoWatcher.value) {
+    undoWatcher.value();
+    store.state.undoNodes = []
+  }
+});
 
 async function onRemoveNode(data) {
     let node = findNode(data.node_id)
     let confirmation = true;
-
     if (node.type != 'module') {
       confirmation = window.confirm(store.state.strings.flowchart_delete_confirmation + node.data.fullname + '?');
     }
@@ -581,6 +584,14 @@ async function onRemoveNode(data) {
       removeNodes(data.node_id)
       emit('removeNodeConditions', data.node_id);
     }
+}
+
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+  if (isScrollTarget) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 }
 
 </script>

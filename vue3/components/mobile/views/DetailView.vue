@@ -72,7 +72,7 @@ const props = defineProps({
 
 const node = ref(null)
 const feedback = ref(null)
-const link = ref('/course/view.php?id=')
+const link = ref(store.state.wwwroot + '/course/view.php?id=')
 
 onMounted(() => {
   const json = store.state.lpuserpathrelation.json

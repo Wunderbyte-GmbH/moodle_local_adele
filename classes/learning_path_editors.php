@@ -25,17 +25,10 @@
 
 namespace local_adele;
 
-use local_adele\event\learnpath_created;
-use local_adele\event\learnpath_updated;
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/accesslib.php');
+
 use stdClass;
-use context_system;
-use context_course;
-use local_adele\event\learnpath_deleted;
-use local_adele\event\user_path_updated;
-use local_adele\helper\user_path_relation;
-use core_completion\progress;
-use Exception;
-use moodle_url;
 
 /**
  * Class learning_paths
@@ -80,6 +73,38 @@ class learning_path_editors {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Create a new editor for a field.
+     *
+     * @return array
+     */
+    public static function get_editors_teacher() {
+        global $DB, $USER;
+        $enrolledcourses = enrol_get_users_courses($USER->id, true, 'id, shortname');
+        $courseids = [];
+        foreach ($enrolledcourses as $course) {
+            $context = \context_course::instance($course->id);
+            if (has_capability('moodle/course:manageactivities', $context, $USER->id)) {
+                $haseditingteacher = true;
+                $courseids[] = $course->id;
+            }
+        }
+        if (!empty($courseids)) {
+            if (!isset($_SESSION[SESSION_KEY_ADELE_ROLE])) {
+                $_SESSION[SESSION_KEY_ADELE_ROLE] = [];
+            }
+            list($insql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $sql = "SELECT a.id, a.course, a.learningpathid FROM {adele} a WHERE course $insql";
+            $records = $DB->get_records_sql($sql, $params);
+            foreach ($records as $record) {
+                $_SESSION[SESSION_KEY_ADELE][$record->learningpathid] = (object)[
+                    'role' => 'editor',
+                ];
+            }
+        }
+        return $haseditingteacher;
     }
 
     /**

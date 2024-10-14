@@ -70,8 +70,11 @@ class course_info {
             $path = pathinfo($filepath);
             $filename = 'local_adele\\course_completion\\conditions\\' . $path['filename'];
             if (
-              $path['filename'] == 'catquiz' &&
-              !array_key_exists('catquiz', $plugins)
+              (
+                $path['filename'] == 'catquiz' &&
+                !array_key_exists('catquiz', $plugins)
+              ) ||
+              $path['filename'] == 'master'
             ) {
                 $addcondition = false;
             }

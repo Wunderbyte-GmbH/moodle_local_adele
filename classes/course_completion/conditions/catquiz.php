@@ -85,7 +85,7 @@ class catquiz implements course_completion {
      *
      * @return string
      */
-    private function get_description_string() {
+    public function get_description_string() {
         $description = get_string('course_description_condition_catquiz', 'local_adele');
         return $description;
     }
@@ -135,7 +135,7 @@ class catquiz implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        global $DB;
+        global $DB, $CFG;
         $catquizzes = [];
         if (!class_exists('local_catquiz\catquiz')) {
             return [];
@@ -181,7 +181,7 @@ class catquiz implements course_completion {
                     if ($test != null) {
                         $coursemoduleid = get_coursemodule_from_instance('adaptivequiz', $componentid, $test->course);
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
-                        '<a href="/mod/adaptivequiz/view.php?id=' .
+                        '<a href="' . $CFG->wwwroot . '/mod/adaptivequiz/view.php?id=' .
                         $coursemoduleid->id .
                         '" target="_blank">' . $test->name .'</a>';
                     } else {
@@ -276,7 +276,7 @@ class catquiz implements course_completion {
                         if ($bestresult) {
                             $result = $this->get_attempt_information($bestresult['attemptid']);
                             $result->time = date("j.n.y", $result->endtime);
-                            $result->link = '/mod/adaptivequiz/attemptfinished.php?attempt=' .
+                            $result->link = $CFG->wwwroot . '/mod/adaptivequiz/attemptfinished.php?attempt=' .
                               $result->attemptid .
                               '&instance=' .
                               $result->instanceid;
@@ -335,6 +335,7 @@ class catquiz implements course_completion {
       $percentageofrightanswersbyscalekeyid,
       $subscaleids
     ) {
+        global $CFG;
         $recordlist = [];
         $attemptsentries = $this->get_attempts_information($attemptids);
         $scalemap = [];
@@ -362,7 +363,7 @@ class catquiz implements course_completion {
               'time' => date("j.n.y", $attemptsentries[$attempt['attemptid']]->endtime),
               'scale' => $scalemap[$scale],
               'link' =>
-                '/mod/adaptivequiz/attemptfinished.php?attempt=' .
+                $CFG->wwwroot . '/mod/adaptivequiz/attemptfinished.php?attempt=' .
                 $attempt['attemptid'] .
                 '&instance=' .
                 $attemptsentries[$attempt['attemptid']]->instanceid,

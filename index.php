@@ -53,11 +53,21 @@ $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/loc
 
 $output = $PAGE->get_renderer('local_adele');
 echo $OUTPUT->header();
-
+$view = null;
+if (has_capability('local/adele:canmanage', $context)) {
+    $view = 'manager';
+} else if (
+    $_SESSION[SESSION_KEY_ADELE]
+) {
+    $view = 'teacheredit';
+}
 echo $OUTPUT->render_from_template('local_adele/initview', [
   'userid' => $USER->id,
   'contextid' => $context->id,
   'quizsetting' => get_config('local_adele', 'quizsettings'),
+  'wwwroot' => $CFG->wwwroot,
+  'view' => $view,
+  'editablepaths' => json_encode($_SESSION[SESSION_KEY_ADELE]),
   'version' => $CFG->version,
 ]);
 

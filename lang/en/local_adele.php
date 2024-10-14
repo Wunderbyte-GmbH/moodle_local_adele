@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 // Required strings.
 $string['modulename'] = 'learning path';
 $string['modulenameplural'] = 'learning paths';
@@ -32,6 +30,7 @@ $string['modulename_help'] = 'learning path';
 $string['pluginadministration'] = 'learning path Administration';
 $string['pluginname'] = 'Learning path';
 $string['not_found'] = 'Learning path not found! Please contact person in charge!';
+$string['required'] = 'required';
 
 // Capabilities.
 $string['adele:edit'] = 'Edit learning path';
@@ -100,6 +99,16 @@ $string['placeholder_lp_search'] = 'Search learning path';
 $string['edit_course_node'] = 'Edit node';
 $string['edit_node_pretest'] = 'Edit completion criteria';
 $string['from_default_node_image'] = 'Default node image:';
+$string['uploaddefaultimage'] = 'Upload your default node image';
+$string['selectdefaultimage'] = 'Select learning path image';
+$string['deselectdefaultimage'] = 'Deselect';
+$string['uploadowndefaultimage'] = 'Or upload a new image:';
+$string['uploadanduseimage'] = 'Upload and use image';
+$string['onlysetaftersaved'] = 'Can only be set after learning path was saved';
+$string['searchuser'] = 'Search users...';
+$string['selectuser'] = 'Select Users';
+$string['removeuser'] = 'Remove';
+$string['nousersfound'] = 'No users were found';
 
 // Overview String.
 $string['overviewlearningpaths'] = 'Overview of all learning paths';
@@ -138,12 +147,13 @@ $string['image_description_save'] = 'You have saved/updated the Learning Path im
 $string['title_change_visibility'] = 'Changed learning path visibility';
 $string['description_change_visibility'] = 'You have successfully changed the Learning Path visibility!';
 
-
 // Node Strings.
 $string['node_coursefullname'] = 'Nodename:';
 $string['node_courseshortname'] = 'Short node name:';
 
 // Conditions description.
+$string['course_description_master'] = 'This condition overrules everything else';
+$string['course_name_master'] = 'Master condition';
 $string['course_description_condition_completion_manual'] = 'Node will be completed manually';
 $string['course_description_condition_parent_courses'] = 'Node will be accessible if a certain amount of parent nodes are completed';
 $string['course_name_condition_completion_manual'] = 'Node completion checkbox';
@@ -191,7 +201,7 @@ $string['course_description_after_condition_course_completed'] = 'you finished e
 $string['course_description_before_condition_catquiz'] = 'complete the catquiz {quiz_name}';
 $string['course_description_inbetween_condition_catquiz'] = 'your results in the „{quiz_name}” test were not sufficient{quiz_attempts_best}';
 $string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Click here for your best result from {$a->time}</a>';
-$string['course_description_after_condition_catquiz'] = 'your results in the "{quiz_name}" test. Through this, you have sufficiently demonstrated the competencies to be acquired in the course in: <ul>{quiz_attempts_list}</ul>';
+$string['course_description_after_condition_catquiz'] = 'your results in the "{quiz_name}" test. Through this, you have sufficiently demonstrated the competencies to be acquired in the course in: {quiz_attempts_list}';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">best result on {$a->time}</a>)</li>';
 
 $string['course_description_before_condition_modquiz'] = 'complete the quiz {quiz_name_link}';
@@ -208,6 +218,10 @@ $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';
 $string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = 'finish the parent node(s) {parent_course_list}';
+
+$string['course_master_conditions'] = 'Master Conditions';
+$string['course_master_condition_restriction'] = 'Master restriction checkbox';
+$string['course_master_condition_completion'] = 'Master completion checkbox';
 
 $string['course_condition_concatination_or'] = "or";
 $string['course_condition_concatination_and'] = " and ";
@@ -280,6 +294,16 @@ $string['completion_course_tags'] = 'Tags:';
 $string['completion_node_refused_title'] = 'Node drop refused';
 $string['completion_node_refused_text'] = 'Please drop the node in the dropzones, which will be shown if you drag a node to an exsisting node.';
 $string['completion_feedback_node'] = 'Feedback node';
+$string['completion_description_feedback'] = 'Description';
+$string['completion_dates_duration_feedback'] = 'Dates and Duration';
+$string['completion_estimated_duration_feedback'] = 'Estimated Duration:';
+$string['completion_start_date_feedback'] = 'Start Date:';
+$string['completion_end_date_feedback'] = 'End Date:';
+$string['completion_first_subscription_feedback'] = 'First subscribbed to node:';
+$string['completion_restriction_feedback'] = 'Restriction';
+$string['completion_nothing_defined_feedback'] = 'Nothing is defined';
+$string['completion_completion_inbetween_feedback'] = 'Completion Inbetween';
+$string['completion_completion_feedback'] = 'Completion';
 $string['completion_loading_completion'] = 'Loading completion...';
 $string['completion_drop_here'] = 'Drop to connect here';
 $string['completion_drop_zone'] = 'Drop zone';
@@ -287,6 +311,8 @@ $string['completion_list_of_criteria'] = 'List of available ';
 $string['completion_criteria'] = ' criteria';
 $string['completion_edge_or'] = ' OR';
 $string['completion_edge_and'] = 'AND';
+$string['course_completion_choose_number'] = 'Choose a number of courses';
+$string['course_completion_minimum_amount'] = 'Select the minimum amount of finished courses';
 
 // Flowchart strings.
 $string['flowchart_add_learning'] = 'Add a learning module';
@@ -385,7 +411,6 @@ $string['composables_drop_zone_parent'] = 'Drop zone Parent';
 $string['composables_drop_zone_child'] = 'Drop zone Child';
 $string['composables_drop_zone_add'] = 'And drop zone';
 $string['composables_drop_zone_or'] = 'Or drop zone';
-
 $string['composables_feedback_node'] = 'Feedback node';
 
 // Restriction strings.
@@ -416,6 +441,9 @@ $string['user_view_progress'] = 'Progress';
 $string['user_view_nodes'] = 'Finished Nodes';
 $string['user_view_go_back_overview'] = 'Go Back to Overview';
 $string['user_view_user_path_for'] = 'User path for:';
+$string['user_view_user_list'] = 'User List';
+$string['user_view_user_list_show'] = 'Show ';
+$string['user_view_user_list_hide'] = 'Hide ';
 
 // Main strings.
 $string['main_intro_slider'] = 'Introduction slider';

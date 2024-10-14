@@ -1,7 +1,7 @@
 <template>
-  <component 
-    :is="dynamicComponent" 
-    v-model="completion.value" 
+  <component
+    :is="dynamicComponent"
+    v-model="completion_value"
     :completion="completion"
   />
 </template>
@@ -9,7 +9,7 @@
 <script setup>
 import { computed } from 'vue';
 import course_completed from './conditions/course_completed.vue'
-import manual from '../completion/conditions/manual_check.vue'
+import manual from './conditions/manual_check.vue'
 import catquiz from './conditions/catQuiz.vue'
 import modquiz from './conditions/modQuiz.vue'
 
@@ -19,6 +19,20 @@ const props = defineProps({
     default: null,
   },
 });
+
+const emit = defineEmits([
+  'changevalues'
+]);
+
+const completion_value = computed({
+  get() {
+    return props.completion?.value;
+  },
+  set(newValue) {
+    emit('changevalues', newValue);
+  },
+});
+
 
 const dynamicComponent = computed(() => {
   switch (getInputLabel()) {

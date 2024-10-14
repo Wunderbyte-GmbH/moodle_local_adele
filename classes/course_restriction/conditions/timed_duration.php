@@ -83,7 +83,7 @@ class timed_duration implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_restriction_description_before(),
+            'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
         ];
     }
@@ -135,10 +135,10 @@ class timed_duration implements course_restriction {
                     $endtime = null;
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
                         if ($restrictionnode['data']['value']['selectedOption'] == '1') {
-                            if ($node['data']['first_enrolled']) {
+                            if (isset($node['data']['first_enrolled'])) {
                                 $starttime->setTimestamp($node['data']['first_enrolled']);
                             } else {
-                                $starttime = 'Testing String';
+                                $starttime = get_string('course_condition_timed_duration_start', 'local_adele');
                             }
                         } else {
                             $starttime->setTimestamp($userpath->timecreated);
@@ -162,7 +162,7 @@ class timed_duration implements course_restriction {
                     }
                     if (is_string($starttime)) {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
-                          get_string('course_condition_timed_duration_start', 'local_adele');
+                          $starttime;
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
                           'starttime' => $starttime,
                           'endtime' => $endtime,

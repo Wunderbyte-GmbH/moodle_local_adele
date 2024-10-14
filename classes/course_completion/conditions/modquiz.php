@@ -84,7 +84,7 @@ class modquiz implements course_completion {
      *
      * @return string
      */
-    private function get_description_string() {
+    public function get_description_string() {
         $description = get_string('course_description_condition_modquiz', 'local_adele');
         return $description;
     }
@@ -134,7 +134,7 @@ class modquiz implements course_completion {
      * @return boolean
      */
     public function get_completion_status($node, $userid) {
-        global $DB;
+        global $DB, $CFG;
         $modquizzes = [
           'completed' => [],
           'inbetween_info' => '',
@@ -156,10 +156,16 @@ class modquiz implements course_completion {
                     $record = $DB->get_record_sql($sql, ['quizid' => $quizid]);
                     if ($record) {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
-                          '<a href="/mod/quiz/view.php?id=' . $record->cmid . '" target="_blank">' . $record->name .'</a>';
+                          '<a href="' .
+                          $CFG->wwwroot .
+                          '/mod/quiz/view.php?id=' .
+                          $record->cmid .
+                          '" target="_blank">' .
+                          $record->name .
+                          '</a>';
                     } else {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
-                          'Mod Quiu';
+                          'Mod Quiz';
                     }
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
                     // Get grade and check if valid.

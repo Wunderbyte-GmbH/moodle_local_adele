@@ -25,7 +25,8 @@
  <template>
   <div>
     <button @click="toggleTable" class="btn-primary toggle-button">
-      {{ isTableVisible ? 'Hide ' : 'Show ' }} User List
+      {{ isTableVisible ? store.state.strings.user_view_user_list_show : store.state.strings.user_view_user_list_show }}
+      {{ store.state.strings.user_view_user_list }}
     </button>
     <transition name="slide-fade">
       <div

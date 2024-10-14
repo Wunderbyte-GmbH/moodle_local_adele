@@ -1,10 +1,11 @@
-<script setup>
-  const props = defineProps({
-    courses: {
-      type: Object,
-      required: true,
-    },
-  });
+<script setup lang="ts">
+
+  interface CourseProps {
+    course_node_id: string[];
+  }
+  const props = defineProps<{
+    courses: CourseProps;
+  }>();
 
 </script>
 
@@ -15,9 +16,9 @@
     <div
       class="col-12 text-center"
     >
-      <span 
+      <span
         v-for="course_node_id in props.courses.course_node_id"
-        :key="course_node_id" 
+        :key="course_node_id"
         class="dot"
       />
     </div>

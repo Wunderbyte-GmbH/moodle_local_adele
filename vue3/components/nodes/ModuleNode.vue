@@ -26,6 +26,7 @@
 import { Handle, Position } from '@vue-flow/core'
 import { computed, onMounted, ref } from 'vue';
 import darkenColor from '../../composables/nodesHelper/darkenColor'
+import truncatedText from '../../composables/nodesHelper/truncatedText';
 
 const props = defineProps({
   data: {
@@ -84,9 +85,16 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
       }"
     >
       <span
-        :class="zoomstep == '0.2' ? 'bold-outer' : 'bold'"
+        v-if="zoomstep == '0.2'"
+        class="bold-outer"
       >
-        {{ data.name }}
+        {{ truncatedText(data.name, 15) }}
+      </span>
+      <span
+        v-else
+        class="bold"
+      >
+        {{ truncatedText(data.name, 30) }}
       </span>
     </div>
     <Handle

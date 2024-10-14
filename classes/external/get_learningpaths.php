@@ -83,7 +83,7 @@ class get_learningpaths extends external_api {
         require_login();
         $context = context::instance_by_id($contextid);
 
-        $hascapability = has_capability('local/adele:canmanage', $context);
+        $hascapability = has_capability('local/adele:edit', $context);
         $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
 
         // If the user doesn't have the capability and the session value is empty, handle the error.

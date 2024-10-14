@@ -52,6 +52,7 @@
           <div
             class="dndflowcompletion"
             @drop="onDrop"
+            @wheel="onWheel"
           >
             <FeedbackModal :learningpath="learningpathcompletion" />
             <VueFlow
@@ -59,8 +60,8 @@
               :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
               :class="{ dark }"
               :fit-view-on-init="true"
-              :max-zoom="1.5"
-              :min-zoom="0.2"
+              :max-zoom="1.55"
+              :min-zoom="0.15"
               :zoom-on-scroll="zoomLock"
               @dragover="onDragOver"
             >
@@ -74,6 +75,7 @@
                   :type="'completion'"
                   :learningpath="props.learningpath"
                   @update-visibility="handleVisibility"
+                  @update-values="handleValues"
                 />
               </template>
               <template #node-dropzone="{ data }">
@@ -167,6 +169,14 @@ function toggleClass() {
     dark.value = !dark.value;
 }
 
+const onWheel = (event) => {
+  const isScrollTarget = event.target.closest('.vue-flow__pane');
+  if (isScrollTarget) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}
+
 // Function to go back
 const goBack = () => {
   const condition = toObject()
@@ -204,6 +214,11 @@ const handleVisibility = (visibility) => {
   if (visibilityNode) {
     visibilityNode.data.visibility = visibility.visibility
   }
+}
+
+const handleValues = (handleValues) => {
+  let changedNode = findNode(handleValues.nodeid)
+  changedNode.data.value = handleValues.values
 }
 
 const goBackConfirmation = (toggle) => {
@@ -251,12 +266,22 @@ onMounted(async () => {
         watch(
           () => viewport.value.zoom,
           (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
+            const abszoom = Math.abs(newVal - oldVal)
+            if (
+              newVal &&
+              oldVal &&
+              zoomLock.value &&
+              abszoom > 0.0005
+            ) {
+              zoomLock.value = false
               if (newVal > oldVal) {
-                setZoomLevel('in', zoomLock, viewport, zoomTo)
-              } else if (newVal < oldVal) {
-                setZoomLevel('out', zoomLock, viewport, zoomTo)
+                setZoomLevel('in', viewport, zoomTo)
+              } else {
+                setZoomLevel('out', viewport, zoomTo)
               }
+              setTimeout(() => {
+                zoomLock.value = true
+              }, 500);
             }
           },
           { deep: true }

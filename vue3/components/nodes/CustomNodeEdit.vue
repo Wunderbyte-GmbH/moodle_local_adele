@@ -33,6 +33,7 @@ import UserInformation from '../nodes_items/UserInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
+import MasterConditions from '../nodes_items/MasterConditions.vue';
 
 // Load Store
 const store = useStore();
@@ -169,8 +170,10 @@ const parentStyle = {
 };
 
 const goToCourse = () => {
-  let course_link = '/course/view.php?id=' + props.data.course_node_id
-  window.open(course_link, '_blank');
+  if (iconClass.value == 'fa-play') {
+    let course_link = store.state.wwwroot + '/course/view.php?id=' + props.data.course_node_id
+    window.open(course_link, '_blank');
+  }
 }
 const iconState = ref('initial');
 const iconClass = ref('fa-lock');
@@ -194,7 +197,7 @@ const iconClass = ref('fa-lock');
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ data.fullname || store.state.strings.nodes_collection }}
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
           </div>
         </div>
@@ -253,8 +256,15 @@ const iconClass = ref('fa-lock');
               />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualcompletion">
-              <CompletionOutPutItem :data="data" />
+              <CompletionOutPutItem
+                :data="data"
+              />
             </div>
+            <MasterConditions
+              v-if="store.state.view == 'teacher'"
+              class="col-12"
+              :data="data"
+            />
           </div>
         </div>
       </div>

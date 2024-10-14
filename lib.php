@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_adele\learning_path_editors;
+
+define('COURSES_COND_MASTER', 200);
 define('COURSES_COND_NODE_FINISHED', 190);
 define('COURSES_COND_PARENT_NODE', 180);
 define('COURSES_COND_CATQUIZ', 170);
@@ -34,6 +37,7 @@ define('COURSES_PRIORITY_SECOND', 2);
 define('COURSES_PRIORITY_THIRD', 3);
 
 define('SESSION_KEY_ADELE', 'LOCAL_ADELE_EDITOR');
+define('SESSION_KEY_ADELE_ROLE', 'LOCAL_ADELE_ROLE');
 
 /**
  * Renders the popup Link.
@@ -54,6 +58,9 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
             WHERE lpe.userid = :userid";
         $_SESSION[SESSION_KEY_ADELE] = $DB->get_records_sql($sql, $params);
     }
+    if (isset($_SESSION[SESSION_KEY_ADELE_ROLE])) {
+        $_SESSION[SESSION_KEY_ADELE_ROLE] = learning_path_editors::get_editors_teacher();
+    }
     if (
         !isloggedin() ||
         isguestuser()
@@ -63,7 +70,8 @@ function local_adele_render_navbar_output(\renderer_base $renderer) {
 
     if (
         has_capability('local/adele:canmanage', context_system::instance()) ||
-        !empty($_SESSION[SESSION_KEY_ADELE])
+        !empty($_SESSION[SESSION_KEY_ADELE]) ||
+        !empty($_SESSION[SESSION_KEY_ADELE_ROLE])
     ) {
         $output = '<div class="popover-region nav-link icon-no-margin dropdown">
             <a class="btn btn-secondary"
