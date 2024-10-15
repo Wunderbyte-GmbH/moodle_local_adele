@@ -162,8 +162,6 @@ class learning_paths {
     /**
      * Get all learning paths.
      *
-     * @param bool $hascapability
-     * @param array $sessionvalue
      * @return array
      */
     public static function get_editable_learning_paths() {

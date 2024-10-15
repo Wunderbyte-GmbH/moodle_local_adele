@@ -24,6 +24,7 @@
  */
 
 use local_adele\admin_setting_course_tags;
+use local_adele\helper\role_names;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,6 +37,9 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
     $ADMIN->add($componentname, $settings);
 
+    $rolenamesclass = new role_names();
+    $rolenames = $rolenamesclass->get_role_names();
+
     // Select options.
     $settings->add(
         new admin_setting_configselect($componentname . '/selectconfig',
@@ -43,7 +47,7 @@ if ($hassiteconfig) {
                 get_string('activefilter_desc', $componentname),
                 'only_subscribed',
                 [
-                    'only_subscribed' => get_string('settings_only_subscribed', $componentname),
+                    'only_subscribed' => get_string('settings_only_subscribed', $componentname, $rolenames),
                     'all_courses' => get_string('settings_all_courses', $componentname),
                 ]));
 
