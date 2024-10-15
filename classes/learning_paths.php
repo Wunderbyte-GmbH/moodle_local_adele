@@ -160,6 +160,25 @@ class learning_paths {
     }
 
     /**
+     * Get all learning paths.
+     *
+     * @param bool $hascapability
+     * @param array $sessionvalue
+     * @return array
+     */
+    public static function get_editable_learning_paths() {
+        global $DB, $USER;
+        $sql = "SELECT lpe.id, lpe.learningpathid, lp.name
+            FROM {local_adele_lp_editors} lpe
+            JOIN {local_adele_learning_paths} lp ON lp.id = lpe.learningpathid
+            WHERE lpe.userid = :userid";
+
+        $params = ['userid' => $USER->id];
+        $learningpaths = $DB->get_records_sql($sql, $params);
+        return $learningpaths;
+    }
+
+    /**
      * Get one specific learning path.
      *
      * @param array $params
