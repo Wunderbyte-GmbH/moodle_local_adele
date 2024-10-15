@@ -29,3 +29,6 @@ $plugin->release = '0.2.1';
 $plugin->version = 2024101500;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
+$plugin->dependencies = [
+    'mod_adele' => 2024060300,
+];
