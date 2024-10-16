@@ -1,7 +1,16 @@
-// stepwise set the zomm level
+type removeEdges = (id: string) =>void;
 
-const innerGraphDisplay = (edges, removeEdges) => {
-  let newedges = []
+interface Edge {
+  id: string;
+  data: EdgeData;
+}
+
+interface EdgeData {
+  hidden: boolean;
+}
+
+const innerGraphDisplay = (edges: Edge[], removeEdges: removeEdges): Edge[] => {
+  let newedges: Edge[] = []
   edges.forEach(
     (edge) => {
       if (edge.data == undefined) {

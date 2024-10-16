@@ -1,5 +1,46 @@
-// stepwise set the zomm level
-const onNodeClick = (event, setCenter, store) => {
+interface Event {
+  node: EventNode;
+}
+
+interface EventNode {
+  id: string;
+  position: Position;
+  dimensions: Dimensions;
+  data: EventNodeData;
+}
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface Dimensions {
+  width: number;
+  height: number;
+}
+
+interface EventNodeData {
+  animations: AnimationsData;
+}
+
+interface AnimationsData {
+  seenrestriction: boolean;
+  seencompletion: boolean;
+}
+
+type SetCenter = (x: number, y: number, options: { zoom: number; duration: number }) => void;
+
+interface Store {
+  state: {
+    user: number;
+    lpuserpathrelation: {
+      user_id: number;
+    };
+  };
+  dispatch: (action: string, payload: any) => void;
+}
+
+const onNodeClick = (event: Event, setCenter: SetCenter, store: Store) => {
   setCenter(
     event.node.position.x + event.node.dimensions.width/2,
     event.node.position.y + event.node.dimensions.height/2,

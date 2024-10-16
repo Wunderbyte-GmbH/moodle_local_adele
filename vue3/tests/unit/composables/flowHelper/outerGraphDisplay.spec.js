@@ -1,5 +1,4 @@
 import outerGraphDisplay from '../../../../composables/flowHelper/outerGraphDisplay';
-import { MarkerType } from '@vue-flow/core';
 
 describe('outerGraphDisplay', () => {
   let edges, findNode, addEdges;
