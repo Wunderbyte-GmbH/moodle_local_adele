@@ -1,8 +1,7 @@
 import textInputs from '../../../../components/charthelper/textInputs.vue';
-import { mount } from '@vue/test-utils';
+import { mount} from '@vue/test-utils';
 import { createStore } from 'vuex';
 import { nextTick } from 'vue';
-import { notify } from '@kyvg/vue3-notification';
 
 jest.mock('../../../../components/charthelper/userSearch.vue', () => ({
   template: '<div></div>',

@@ -11,6 +11,7 @@ const setZoomLevel = async (
 ): Promise<number | undefined> => {
   try {
     let newViewport = parseFloat(viewport.zoom.toFixed(2))
+
     let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
     if (currentStepIndex === -1) {
       currentStepIndex = zoomSteps.length;
@@ -28,6 +29,7 @@ const setZoomLevel = async (
         newViewport = zoomSteps[0]
       }
     }
+
     zoomTo(newViewport, { duration: 500})
     return newViewport
   } catch (error) {

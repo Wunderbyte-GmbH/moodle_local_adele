@@ -1,3 +1,10 @@
+/**
+ * @jest-environment jsdom
+ */
+const path = require('path');
+const resolvedPath = require.resolve('@vue/test-utils');
+console.log(resolvedPath);
+import { createApp } from 'vue';
 import NotFound from '../../../components/NotFound.vue';
 import { mount } from '@vue/test-utils';
 import { createStore } from 'vuex';
