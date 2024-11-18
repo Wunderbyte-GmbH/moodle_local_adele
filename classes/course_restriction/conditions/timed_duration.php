@@ -155,6 +155,8 @@ class timed_duration implements course_restriction {
                             $endtime->modify("+{$totalseconds} seconds");
                             // Check if the current timestamp is between the start and end timestamps.
                             $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
+                            $isafterrange = $currenttime > $endtime;
+                            $isbeforerange = $currenttime < $starttime;
                         }
                     }
                     if ($endtime) {
@@ -179,6 +181,10 @@ class timed_duration implements course_restriction {
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
                         $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
+                    $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
+
                 } else {
                     $timed[$restrictionnode['id']] = [
                       'completed' => false,

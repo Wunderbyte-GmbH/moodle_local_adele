@@ -118,11 +118,14 @@ class timed implements course_restriction {
                 if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
                     $validstart = true;
                     $validtime = false;
+                    $isbeforerange = true;
+                    $isafterrange = false;
                     $currenttimestamp = new DateTime();
                     $startdate = $this->isvaliddate($restrictionnode['data']['value']['start']);
                     if ($startdate) {
                         if ($startdate <= $currenttimestamp) {
                             $validtime = true;
+                            $isbeforerange = false;
                         } else {
                             $validstart = false;
                         }
@@ -136,6 +139,7 @@ class timed implements course_restriction {
                             $validtime = true;
                         } else {
                             $validtime = false;
+                            $isafterrange = true;
                         }
                     }
                     if ($startdate) {
@@ -149,6 +153,9 @@ class timed implements course_restriction {
                             get_string('course_restricition_before_condition_to', 'local_adele') . $enddate;
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
+                    $timed[$restrictionnode['id']]['inbetween'] = $validtime;
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
                       'starttime' => $startdate,
                       'endtime' => $enddate,

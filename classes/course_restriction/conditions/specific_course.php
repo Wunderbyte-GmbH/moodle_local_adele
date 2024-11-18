@@ -127,6 +127,7 @@ class specific_course implements course_restriction {
                                     $usernode['data']['completion']['feedback']['status'] == 'completed'
                                 ) {
                                     $specificcourses[$restriction['id']]['completed'] = $usernode;
+                                    $specificcourses[$restriction['id']]['intbetween'] = $usernode;
                                 }
                             }
                         }

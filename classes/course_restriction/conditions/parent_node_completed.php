@@ -137,6 +137,7 @@ class parent_node_completed implements course_restriction {
                                 $usernode['data']['completion']['feedback']['status'] == 'completed'
                             ) {
                                 $courserestriction[$restriction['id']]['completed'] = $usernode;
+                                $courserestriction[$restriction['id']]['inbetween'] = $usernode;
                             }
                         }
                     }

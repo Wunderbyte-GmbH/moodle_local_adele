@@ -162,6 +162,10 @@ class catquiz implements course_completion {
                       $testidcourseid,
                       $userid
                     );
+                    $catquizzes['inbetween'][$complitionnode['id']] = false;
+                    if (count($records) > 0) {
+                        $catquizzes['inbetween'][$complitionnode['id']] = true;
+                    }
                     $allpassedrecords = [];
                     $partialpassedrecords = [];
                     $partialpassedattemptids = [];

@@ -134,7 +134,7 @@ class course_completed implements course_completion {
      *
      * @param array $node
      * @param int $userid
-     * @return boolean
+     * @return array
      */
     public function get_completion_status($node, $userid) {
         $courses = $node['data']['course_node_id'];
@@ -146,6 +146,7 @@ class course_completed implements course_completion {
         if (is_int($courses)) {
             return $coursecompletion;
         }
+        $isinbetween = false;
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;
@@ -153,6 +154,9 @@ class course_completed implements course_completion {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
                 $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
+                if ($progess !== null) {
+                    $isinbetween = true;
+                }
                 // Check if the user has completed the course.
                 $coursecompleted = $completion->is_course_complete($userid);
                 if ($coursecompleted) {
@@ -176,6 +180,7 @@ class course_completed implements course_completion {
                     $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses'] = $minvalue;
                     $coursecompletion[$complitionnode['id']]['placeholders']['course_list'] = $courseprogresslist;
                     $coursecompletion['completed'][$complitionnode['id']] = $finished >= $minvalue ? true : false;
+                    $coursecompletion['inbetween'][$complitionnode['id']] = $isinbetween;
                 }
             }
         }

@@ -131,7 +131,7 @@ class modquiz implements course_completion {
      * TODO check if get_strategy_selectcontext suits.
      * @param array $node
      * @param int $userid
-     * @return boolean
+     * @return array
      */
     public function get_completion_status($node, $userid) {
         global $DB, $CFG;
@@ -170,6 +170,11 @@ class modquiz implements course_completion {
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
                     // Get grade and check if valid.
                     $data = $this->get_modquiz_records($completion, $userid);
+                    $modquizzes['inbetween'][$completion['id']] = false;
+                    if (count($data) > 0) {
+                        $modquizzes['inbetween'][$completion['id']] = true;
+                    }
+                    $modquizzes['completed'][$completion['id']] = false;
                     foreach ($data as $key => $lastgrade) {
                         if ((float)$key >= $bestgrade) {
                             $bestgrade = (float)$key;
@@ -200,9 +205,9 @@ class modquiz implements course_completion {
 
     /**
      * Helper function to return localized description strings.
-     * @param int $completion
+     * @param array $completion
      * @param int $userid
-     * @return object
+     * @return array
      */
     protected function get_modquiz_records($completion, $userid) {
         global $DB;

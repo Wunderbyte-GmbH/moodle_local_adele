@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use core_analytics\local\time_splitting\before_now;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\user_path_relation;
@@ -359,11 +360,24 @@ class relation_update {
             }
         }
         unset($feedback['completion']['after_all']);
+        $feedback['status_restriction'] = self::getnodestatusforrestriciton(
+            $feedback,
+            $restrictionnodepaths,
+            $restrictioncriteria,
+            $node,
+        );
+        $feedback['status_completion'] = self::getnodestatusforcompletion(
+            $feedback,
+            $completionnodepaths,
+            $completioncriteria,
+            $node['completion']['nodes']
+        );
         $feedback['status'] = self::getnodestatus(
             $feedback,
             $restrictionnodepaths,
             $node
         );
+        $feedback = self::getfeedback($node, $completioncriteria, $restrictioncriteria);
         $node = self::set_animation_data($node, $feedback['status']);
 
         if (!$mode) {
@@ -399,6 +413,84 @@ class relation_update {
         }
         return $node;
     }
+
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $node
+     * @return string
+     */
+    public static function getnodestatusforcompletion($feedback, $completionnodepaths, $completioncriteria, $node) {
+
+        if (count($completionnodepaths) > 0) {
+            return 'after';
+        }
+        foreach ($completioncriteria as $singlecriteria) {
+            foreach ($singlecriteria['inbetween'] as $inbetween) {
+                if ($inbetween) {
+                    return 'inbetween';
+                }
+            }
+        }
+        return 'before';
+
+    }
+
+
+    public static function istypetimedandcolumnvalid($node, $restrictioncriteria) {
+        switch ($node['data']['label']) {
+            case 'timed':
+            case 'timed_duration':
+                if (isset($restrictioncriteria[$node['data']['label']][$node['id']]) && $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']) {
+                    return false;
+                } else {
+                    return true;
+                }
+                break;
+            default:
+                return true;
+                break;
+        }
+    }
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $node
+     * @return string
+     */
+    public static function getnodestatusforrestriciton($feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
+
+        if (count($restrictionnodepaths) > 0) {
+            return 'inbetween';
+        }
+        foreach ($node['restriction']['nodes'] as $restnode) {
+            if ($restnode['parentCondition'][0] === "starting_condition") {
+                $isvalid = false;
+                if (self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                    $isvalid = true;
+                    $childcondition = $restnode['childCondition'][1];
+                    while (self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                        $childcondition = $node['restriction']['nodes'][$childcondition]['childCondition'][0];
+                    }
+                    if ($childcondition !== null) {
+                        $isvalid = false;
+                    }
+                }
+                if ($isvalid) {
+                    $feedback['restriciton']['before_valid'][] = $node['restriction']['nodes'][$restnode['childCondition'][0]]['data']['feedback_before'];
+                }
+            }
+        }
+            return 'before';   
+
+    }
+
 
     /**
      * Return node status for display purpose.
@@ -645,10 +737,12 @@ class relation_update {
         }
         if ($restrictioncriteria['master']) {
             $feedbacks['restriction']['before'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status_restriction'] = 'accessible';
             $feedbacks['status'] = 'accessible';
         }
         if ($completioncriteria['master']) {
             $feedbacks['completion']['after'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status_completion'] = 'completed';
             $feedbacks['status'] = 'completed';
         }
         return $feedbacks;
