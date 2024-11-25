@@ -51,7 +51,7 @@ const cardStyle = ref({
 });
 const handleFocus = () => {
   if (!props.mobile) {
-    if(showFeedbackarea.value) {
+    if (showFeedbackarea.value) {
       cardStyle.value.zIndex = 4;
     } else {
       cardStyle.value.zIndex = 2;
@@ -67,27 +67,43 @@ const handleBlur = () => {
 </script>
 
 <template>
-  <div
-    class="card-container"
-    tabindex="0"
-    :style="cardStyle"
-    :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }"
-    @click.stop
-    @focus="handleFocus"
-    @blur="handleBlur"
-  >
-    <div
-      class="toggle-button"
-      :class="{ 'no-bottom-radius': showFeedbackarea }"
-      @click.stop="toggleFeedbackarea"
-    >
-      <i
-        class="fa fa-comment"
-        :class="{'fa-comment-mobile' : mobile}"
-      />
+  <div class="card-container" tabindex="0" :style="cardStyle"
+    :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }" @click.stop
+    @focus="handleFocus" @blur="handleBlur">
+    <div class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }" @click.stop="toggleFeedbackarea">
+      <i class="fa fa-comment" :class="{ 'fa-comment-mobile': mobile }" />
     </div>
     <transition name="fade">
-      <div v-if="showFeedbackarea"
+      <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
+        @mouseup.stop>
+        <!-- Render status for feedback. -->
+        <div v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid" class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
+            }}</span>
+        </div>
+        <div v-if="data.completion && data.completion.feedback.status_restriction !== 'inbetween' && !data.completion.feedback.restriction.before_valid" class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_restriction_after']
+            }}</span>
+        </div>
+        <!-- Render before restriction feedback. -->
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'before'">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_valid)" title="restriction_before" />
+        </div>
+        <!-- Render between restriction feedback. -->
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'inbetween'">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_inbetween)" title="restriction_before" />
+        </div>
+
+
+
+
+      </div>
+
+      <!-- <div v-if="showFeedbackarea"
         :style="feedbackStyle"
         class="selectable"
         @mousedown.stop
@@ -139,7 +155,8 @@ const handleBlur = () => {
         >
           {{ store.state.strings.node_access_nothing_defined }}
         </div>
-      </div>
+      </div> -->
+
     </transition>
   </div>
 </template>
@@ -192,7 +209,8 @@ const handleBlur = () => {
 
 .toggle-button {
   cursor: pointer;
-  border-radius: 8px; /* This is the default state */
+  border-radius: 8px;
+  /* This is the default state */
   transition: background-color 0.3s ease, border-radius 0.3s ease;
 }
 
@@ -222,11 +240,13 @@ const handleBlur = () => {
   cursor: text;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 

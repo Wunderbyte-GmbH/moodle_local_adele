@@ -188,6 +188,9 @@ $string['node_access_accessible'] = 'The node is accessible. Current node state:
 $string['node_access_not_accessible'] = 'The node is not accessible yet. The restrictions are:';
 $string['node_access_closed'] = 'The node is no longer accessible. Please contact your admin for help. The restriction were:';
 $string['node_access_nothing_defined'] = 'No user feedback available';
+$string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
+$string['node_access_restriction_inbetween'] = 'Der Kurs/Der Stapel ist freigeschaltet:';
+$string['node_access_restriction_after'] = 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = 'One course inside this node has to be completed';
 
 $string['course_description_before_completion_manual'] = 'completion will be granted manually';
@@ -209,16 +212,18 @@ $string['course_description_before_condition_modquiz'] = 'complete the quiz {qui
 $string['course_description_inbetween_condition_modquiz'] = 'quiz {quiz_name_link} has to be finished with scale of {scale_min}. Last result is {current_best}';
 $string['course_description_after_condition_modquiz'] = 'quiz {quiz_name_link} was successfully finished';
 
-$string['course_restricition_before_condition_manual'] = 'access will be granted manually';
-$string['course_restricition_before_condition_parent_courses'] = 'finish {numb_courses} course(s) of parent node {node_name}';
+$string['course_restricition_before_condition_manual'] = 'eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
+$string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
 $string['course_restricition_before_condition_specific_course'] = 'finish the course {course_list}';
 $string['course_condition_timed_duration_start'] = 'from the moment of subscription to this node';
 $string['course_condition_timed_duration_since'] = 'since ';
-$string['course_restricition_before_condition_timed'] = 'accessible {start_date} {end_date}';
+$string['course_restricition_before_condition_timed'] = 'der {start_date} erreicht wird';
 $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';
-$string['course_restricition_before_condition_timed_duration'] = 'accessible for {duration_period} {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'finish the parent node(s) {parent_course_list}';
+$string['course_restricition_before_condition_timed_duration'] = 'der {start_date} erreicht wird';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
+
+$string['node_restriction_inbetween_timed'] = 'Sie haben bis zum {$a} Zugang zu diesem Kurs/ diesem Stapel.';
 
 $string['course_master_conditions'] = 'Master Conditions';
 $string['course_master_condition_restriction'] = 'Master restriction checkbox';

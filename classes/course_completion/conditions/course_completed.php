@@ -154,7 +154,7 @@ class course_completed implements course_completion {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
                 $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
-                if ($progess !== null) {
+                if ($progress !== null) {
                     $isinbetween = true;
                 }
                 // Check if the user has completed the course.

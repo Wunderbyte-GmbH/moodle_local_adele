@@ -128,6 +128,7 @@ class parent_node_completed implements course_restriction {
                     $parentnodes = $node['parentCourse'];
                     $courserestriction[$restriction['id']]['completed'] = false;
                     $courserestriction[$restriction['id']]['inbetween_info'] = null;
+                    $courserestriction[$restriction['id']]['placeholders']['parent_course_list'] = [];
                     foreach ($userpath->json['tree']['nodes'] as $usernode) {
                         if (in_array($usernode['id'], $parentnodes)) {
                             $courserestriction[$restriction['id']]['placeholders']['parent_course_list'][] =

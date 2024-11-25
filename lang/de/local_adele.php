@@ -198,6 +198,9 @@ $string['node_access_accessible'] = 'Der Knoten ist zugänglich. Um ihn abzuschl
 $string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Um ihn freizuschalten musst du:';
 $string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Dozenten für weitere Schritte. Die Zugangskriterien waren:';
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
+$string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
+$string['node_access_restriction_inbetween'] = 'Der Kurs/Der Stapel ist freigeschaltet:';
+$string['node_access_restriction_after'] = 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
 $string['course_description_before_completion_manual'] = 'der Abschluss wird manuell gewährt';
@@ -220,16 +223,18 @@ $string['course_description_before_condition_modquiz'] = 'beende das Quiz {quiz_
 $string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Bewertung von {scale_min} abgeschlossen werden. Letztes Ergebnis ist {current_best}';
 $string['course_description_after_condition_modquiz'] = 'das Quiz {quiz_name_link} wurde erfolgreich abgeschlossen';
 
-$string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
-$string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
+$string['course_restricition_before_condition_manual'] = 'eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
+$string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
 $string['course_restricition_before_condition_specific_course'] = 'den Kurs {course_list} abschließen';
 $string['course_condition_timed_duration_start'] = 'ab dem Moment der Einschreibung in diesen Knoten';
 $string['course_condition_timed_duration_since'] = 'seit ';
-$string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
+$string['course_restricition_before_condition_timed'] = 'der {start_date} erreicht wird ';
 $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';
-$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
+$string['course_restricition_before_condition_timed_duration'] = 'der {start_date} erreicht wird';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
+
+$string['node_restriction_inbetween_timed'] = 'Sie haben bis zum {$a} Zugang zu diesem Kurs/ diesem Stapel.';
 
 $string['course_master_conditions'] = 'Master Bedingungen';
 $string['course_master_condition_restriction'] = 'Master Zugangs-Checkbox';

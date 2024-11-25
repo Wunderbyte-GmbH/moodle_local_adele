@@ -108,7 +108,7 @@ class parent_courses implements course_restriction {
      * Helper function to return localized description strings.
      * @param array $node
      * @param object $userpath
-     * @return boolean
+     * @return array
      */
     public function get_restriction_status($node, $userpath) {
         $parentcourses = [];
@@ -147,6 +147,8 @@ class parent_courses implements course_restriction {
                     $parentcourses[$restriction['id']] = [
                       'completed' => false,
                       'inbetween_info' => null,
+                      'node_name' => '',
+                      'numb_courses' => 0,
                     ];
                 }
             }

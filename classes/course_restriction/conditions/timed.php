@@ -132,6 +132,9 @@ class timed implements course_restriction {
                     }
                     $enddate = $this->isvaliddate($restrictionnode['data']['value']['end']);
                     if ($enddate) {
+                        if ($enddate < $currenttimestamp) {
+                            $isafterrange = true;
+                        }
                         if (
                             $enddate >= $currenttimestamp &&
                             $validstart
@@ -139,13 +142,12 @@ class timed implements course_restriction {
                             $validtime = true;
                         } else {
                             $validtime = false;
-                            $isafterrange = true;
                         }
                     }
                     if ($startdate) {
                         $startdate = $startdate->format('Y-m-d H:i:s');
                         $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                            get_string('course_restricition_before_condition_from', 'local_adele') . $startdate;
+                            $startdate;
                     }
                     if ($enddate) {
                         $enddate = $enddate->format('Y-m-d H:i:s');

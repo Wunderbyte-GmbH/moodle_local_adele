@@ -377,7 +377,6 @@ class relation_update {
             $restrictionnodepaths,
             $node
         );
-        $feedback = self::getfeedback($node, $completioncriteria, $restrictioncriteria);
         $node = self::set_animation_data($node, $feedback['status']);
 
         if (!$mode) {
@@ -429,9 +428,11 @@ class relation_update {
             return 'after';
         }
         foreach ($completioncriteria as $singlecriteria) {
-            foreach ($singlecriteria['inbetween'] as $inbetween) {
-                if ($inbetween) {
-                    return 'inbetween';
+            if (isset($singlecriteria['inbetween'])) {
+                foreach ($singlecriteria['inbetween'] as $inbetween) {
+                    if ($inbetween) {
+                        return 'inbetween';
+                    }
                 }
             }
         }
@@ -449,10 +450,38 @@ class relation_update {
                 } else {
                     return true;
                 }
-                break;
             default:
                 return true;
-                break;
+        }
+    }
+
+    public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
+        $latestdate = 0;
+        foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
+            $smallestenddate = false;
+            $istimerestricted = false;
+            foreach ($signlerestrictionpatharray as $restrictionlabelid) {
+                if (strpos($restrictionlabelid, 'time') === 0) {
+                    $nodelabelid = explode('_condition_', $restrictionlabelid);
+                    $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]];
+                    if (isset($restnode['inbetween_info']['endtime'])) {
+                        if (!$smallestenddate || strtotime($restnode['inbetween_info']['endtime']) < $smallestenddate) {
+                            $smallestenddate = strtotime($restnode['inbetween_info']['endtime']);
+                        }
+                    }
+                    $istimerestricted = true;
+                }
+            }
+            if ($latestdate == 0 ||  $smallestenddate > $latestdate) {
+                $latestdate = $smallestenddate;
+            }
+
+            if (!$istimerestricted) {
+                return;
+            }
+        }
+        if ($latestdate !== 0) {
+            $feedback['restriction']['inbetween'][] = get_string('node_restriction_inbetween_timed', 'local_adele', date('Y-m-d H:i:s', $latestdate));
         }
     }
 
@@ -464,30 +493,43 @@ class relation_update {
      * @param array $node
      * @return string
      */
-    public static function getnodestatusforrestriciton($feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
+    public static function getnodestatusforrestriciton(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
 
         if (count($restrictionnodepaths) > 0) {
+            self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node);
             return 'inbetween';
         }
         foreach ($node['restriction']['nodes'] as $restnode) {
-            if ($restnode['parentCondition'][0] === "starting_condition") {
+            if (isset($restnode['parentCondition']) && $restnode['parentCondition'][0] === "starting_condition") {
                 $isvalid = false;
-                if (self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                if (self::istypetimedandcolumnvalid($restnode, $restrictioncriteria)) {
                     $isvalid = true;
-                    $childcondition = $restnode['childCondition'][1];
-                    while (self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
-                        $childcondition = $node['restriction']['nodes'][$childcondition]['childCondition'][0];
+                    $childconditionid = $restnode['childCondition'][1];
+                    $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                        return isset($item['id']) && $item['id'] === $childconditionid;
+                    });
+                    $childcondition = reset($filterednodes);
+                    while ($childcondition !== null && $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                        $childconditionid = $childcondition['childCondition'][0];
+                        $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                            return isset($item['id']) && $item['id'] === $childconditionid;
+                        });
+                        $childcondition = $filterednodes[0];
                     }
-                    if ($childcondition !== null) {
+                    if ($childcondition !== null && $childcondition !== false) {
                         $isvalid = false;
                     }
                 }
                 if ($isvalid) {
-                    $feedback['restriciton']['before_valid'][] = $node['restriction']['nodes'][$restnode['childCondition'][0]]['data']['feedback_before'];
+                    $childconditionid = $restnode['childCondition'][0];
+                    $filterfeedback = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                        return isset($item['id']) && $item['id'] === $childconditionid;
+                    });
+                    $feedback['restriction']['before_valid'][$childconditionid] = $feedback['restriction']['before'][$childconditionid];
                 }
             }
         }
-            return 'before';   
+            return 'before';
 
     }
 
@@ -650,6 +692,11 @@ class relation_update {
         ];
     }
 
+
+    public static function rendervalidfeedback(&$feedback) {
+
+    }
+
     /**
      * Observer for course completed
      *
@@ -723,7 +770,7 @@ class relation_update {
         if (isset($node['restriction'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
-                    $feedbacks['restriction']['before'][] =
+                    $feedbacks['restriction']['before'][$restrictionnode['id']] =
                       isset($restrictionnode['data']['feedback_before']) ?
                         self::render_placeholders(
                             $restrictionnode['data']['feedback_before'],
