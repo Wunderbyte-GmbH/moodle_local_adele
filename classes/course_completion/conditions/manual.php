@@ -146,6 +146,7 @@ class manual implements course_completion {
         $coursecompletion['placeholders']['checkbox_status'] =
           $coursecompletion['completed'] ? '' :
           get_string('course_name_condition_completion_manual_checkbox_status', 'local_adele');
+          // TODO: Get name of role "dozent" and append to placeholders. 
         return $coursecompletion;
     }
 

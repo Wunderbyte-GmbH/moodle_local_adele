@@ -77,12 +77,23 @@ const handleBlur = () => {
       <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
         @mouseup.stop>
         <!-- Render status for feedback. -->
-        <div v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid" class="status-text">
+        <div
+          v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid"
+          class="status-text">
           <i class="fa fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
             }}</span>
         </div>
-        <div v-if="data.completion && data.completion.feedback.status_restriction !== 'inbetween' && !data.completion.feedback.restriction.before_valid" class="status-text">
+        <div
+          v-if="data.completion && data.completion.feedback.status_restriction === 'inbetween'"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
+            }}</span>
+        </div>
+        <div
+          v-if="data.completion && data.completion.feedback.status_restriction !== 'inbetween' && !data.completion.feedback.restriction.before_valid"
+          class="status-text">
           <i class="fa fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_restriction_after']
             }}</span>
@@ -90,15 +101,29 @@ const handleBlur = () => {
         <!-- Render before restriction feedback. -->
         <div v-if="data.completion &&
           data.completion.feedback.status_restriction == 'before'">
-          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_valid)" title="restriction_before" />
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_valid)"
+            title="restriction_before" />
         </div>
         <!-- Render between restriction feedback. -->
         <div v-if="data.completion &&
           data.completion.feedback.status_restriction == 'inbetween'">
-          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_inbetween)" title="restriction_before" />
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.inbetween)"
+            title="restriction_before" />
         </div>
 
-
+        <!-- Render status for feedback. -->
+        <div
+          v-if="data.completion && data.completion.feedback.status_completion"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_completion_' + data.completion.feedback.status_completion]
+            }}</span>
+        </div>
+        <div v-if="data.completion &&
+          data.completion.feedback.completion">
+          <UserFeedbackBlock :data="data.completion.feedback.completion[data.completion.feedback.status_completion]"
+            title="restriction_before" />
+        </div>
 
 
       </div>

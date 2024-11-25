@@ -529,6 +529,9 @@ class relation_update {
                 }
             }
         }
+        if (empty($feedback['restriction']['before_valid'])) {
+            return 'after';
+        }
             return 'before';
 
     }

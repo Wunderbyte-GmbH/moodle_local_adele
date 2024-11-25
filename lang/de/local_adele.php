@@ -198,30 +198,33 @@ $string['node_access_accessible'] = 'Der Knoten ist zugänglich. Um ihn abzuschl
 $string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Um ihn freizuschalten musst du:';
 $string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Dozenten für weitere Schritte. Die Zugangskriterien waren:';
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
+$string['node_access_completion_before'] = 'Um diesen Kurs/diesen Stapel abzuschließen, musst du:';
+$string['node_access_completion_inbetween'] = 'Um diesen Kurs/diesen Stapel abzuschließen, müssen Sie noch:';
+$string['node_access_completion_after'] = 'Dieser Kurs/dieser Stapel gilt als abgeschlossen, weil Sie:';
 $string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
 $string['node_access_restriction_inbetween'] = 'Der Kurs/Der Stapel ist freigeschaltet:';
 $string['node_access_restriction_after'] = 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
-$string['course_description_before_completion_manual'] = 'der Abschluss wird manuell gewährt';
-$string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {checkbox_status} manuell gewährt';
-$string['course_description_after_completion_manual'] = 'der Abschluss wurde manuell gewährt';
+$string['course_description_before_completion_manual'] = 'durch den {Dozenten} ein manueller Abschluss verbucht werden';
+$string['course_description_inbetween_completion_manual'] = 'durch den {Dozenten} ein manueller Abschluss verbucht werden';
+$string['course_description_after_completion_manual'] = 'ihn erfolgreich bearbeitet haben';
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
 
-$string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen. Aktuelle Abschlussnoten: {course_list}';
+$string['course_description_before_condition_course_completed'] = 'ihn erfolgreich bearbeiten ';
+$string['course_description_inbetween_condition_course_completed'] = 'den Kurs erfolgreich bearbeiten';
 $string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
 
-$string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen{quiz_attempts_best}';
+$string['course_description_before_condition_catquiz'] = 'den Test {name_catquiz} mit einem Wert höher als {logit} bis zum {date}  bestehen.';
+$string['course_description_inbetween_condition_catquiz'] = 'deine Kompetenzen mit dem Test zu  {name_catquiz} bis zum {date}  mit einem Wert höher als {logit} (aktuell bestes Ergebnis) nachweisen';
 $string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
-$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
+$string['course_description_after_condition_catquiz'] = 'mit dem Test {name_catquiz} die im Kurs zu erwerbenden Kompetenzen mit einem Wert höher als {logit} (bestes Ergebnis vom xx.xx.xxxx)nachgewiesen haben.';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
 
-$string['course_description_before_condition_modquiz'] = 'beende das Quiz {quiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Bewertung von {scale_min} abgeschlossen werden. Letztes Ergebnis ist {current_best}';
-$string['course_description_after_condition_modquiz'] = 'das Quiz {quiz_name_link} wurde erfolgreich abgeschlossen';
+$string['course_description_before_condition_modquiz'] = 'das Quiz mit {numb} von {numb} bis zum {date}  bestehen';
+$string['course_description_inbetween_condition_modquiz'] = 'das Quiz mit {numb} von {numb} (aktuell bestes Ergebnis) bis zum {date}  bestehen';
+$string['course_description_after_condition_modquiz'] = 'das Quiz mit {numb} von {numb} bestanden haben';
 
 $string['course_restricition_before_condition_manual'] = 'eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
 $string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';

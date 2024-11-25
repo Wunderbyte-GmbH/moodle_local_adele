@@ -179,6 +179,7 @@ class course_completed implements course_completion {
                     $minvalue = $complitionnode['data']['value']['min_courses'] ?? 1;
                     $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses'] = $minvalue;
                     $coursecompletion[$complitionnode['id']]['placeholders']['course_list'] = $courseprogresslist;
+                    $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses_total'] = count($courseprogresslist);
                     $coursecompletion['completed'][$complitionnode['id']] = $finished >= $minvalue ? true : false;
                     $coursecompletion['inbetween'][$complitionnode['id']] = $isinbetween;
                 }
