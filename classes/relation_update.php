@@ -440,7 +440,13 @@ class relation_update {
 
     }
 
-
+    /**
+     * Returns true is conditiontype is time based
+     *
+     * @param array $restrictioncriteria
+     * @param array $node
+     * @return boolean
+     */
     public static function istypetimedandcolumnvalid($node, $restrictioncriteria) {
         switch ($node['data']['label']) {
             case 'timed':
@@ -455,6 +461,14 @@ class relation_update {
         }
     }
 
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $restrictioncriteria
+     * @param array $node
+     */
     public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
         $latestdate = 0;
         foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
@@ -490,8 +504,8 @@ class relation_update {
      *
      * @param array $feedback
      * @param array $restrictionnodepaths
+     * @param array $restrictioncriteria
      * @param array $node
-     * @return string
      */
     public static function getnodestatusforrestriciton(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node) {
 
@@ -692,11 +706,6 @@ class relation_update {
             'priority' => $priority,
             'conditions' => $conditionnodepaths,
         ];
-    }
-
-
-    public static function rendervalidfeedback(&$feedback) {
-
     }
 
     /**
