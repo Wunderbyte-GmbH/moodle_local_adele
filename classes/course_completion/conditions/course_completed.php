@@ -182,6 +182,22 @@ class course_completed implements course_completion {
                     $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses_total'] = count($courseprogresslist);
                     $coursecompletion['completed'][$complitionnode['id']] = $finished >= $minvalue ? true : false;
                     $coursecompletion['inbetween'][$complitionnode['id']] = $isinbetween;
+                    if (count($courses) > 1) {
+                        $counttodo = $minvalue;
+                        $numbcourses = count($courses);
+                        if ($finished <= $minvalue) {
+                            $counttodo -= $finished;
+                        }
+                        if ($isinbetween) {
+                            $string = $counttodo . '-' . $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                        } else {
+                            $string = $counttodo . get_string('course_description_before_condition_course_completed_aus', 'local_adele') .
+                            $numbcourses . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                        }
+                        $coursecompletion[$complitionnode['id']]['placeholders']['item'] = $string;
+                    } else {
+                        $coursecompletion[$complitionnode['id']]['placeholders']['item'] = get_string('course_description_before_condition_course_completed_item', 'local_adele');
+                    }
                 }
             }
         }

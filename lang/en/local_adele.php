@@ -159,6 +159,7 @@ $string['course_description_condition_completion_manual'] = 'Node will be comple
 $string['course_description_condition_parent_courses'] = 'Node will be accessible if a certain amount of parent nodes are completed';
 $string['course_name_condition_completion_manual'] = 'Node completion checkbox';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'not';
+$string['course_name_condition_completion_manual_role_teacher'] = 'Dozenten';
 $string['course_name_condition_parent_courses'] = 'According to parent nodes';
 $string['course_description_condition_restriction_manual'] = 'Access will be granted manually';
 $string['course_name_condition_restriction_manual'] = 'Node restriction checkbox';
@@ -201,30 +202,35 @@ $string['course_description_inbetween_completion_manual'] = 'durch den {Dozenten
 $string['course_description_after_completion_manual'] = 'ihn erfolgreich bearbeitet haben';
 $string['course_description_placeholder_checkbox_status'] = 'not';
 
-$string['course_description_before_condition_course_completed'] = 'ihn erfolgreich bearbeiten ';
-$string['course_description_inbetween_condition_course_completed'] = 'den Kurs erfolgreich bearbeiten';
-$string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
+$string['course_description_before_condition_course_completed_kurse'] = 'Kurse';
+$string['course_description_before_condition_course_completed_kursen'] = 'Kursen';
+$string['course_description_before_condition_course_completed_item'] = 'Den Kurs';
+$string['course_description_before_condition_course_completed_aus'] = 'aus';
+$string['course_description_before_condition_course_completed'] = '{item} erfolgreich bearbeiten ';
+$string['course_description_inbetween_condition_course_completed'] = '{item} erfolgreich bearbeiten';
+$string['course_description_after_condition_course_completed'] = '{item} erfolgreich bearbeitet haben';
 
 $string['course_description_before_condition_catquiz'] = 'den Test {name_catquiz} mit einem Wert höher als {logit} bis zum {date}  bestehen.';
 $string['course_description_inbetween_condition_catquiz'] = 'deine Kompetenzen mit dem Test zu  {name_catquiz} bis zum {date}  mit einem Wert höher als {logit} (aktuell bestes Ergebnis) nachweisen';
 $string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
 $string['course_description_after_condition_catquiz'] = 'mit dem Test {name_catquiz} die im Kurs zu erwerbenden Kompetenzen mit einem Wert höher als {logit} (bestes Ergebnis vom xx.xx.xxxx)nachgewiesen haben.';
 $string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
+$string['course_description_after_condition_modquiz_best'] = 'Beste Note:';
 
-$string['course_description_before_condition_modquiz'] = 'das Quiz mit {numb} von {numb} bis zum {date}  bestehen';
-$string['course_description_inbetween_condition_modquiz'] = 'das Quiz mit {numb} von {numb} (aktuell bestes Ergebnis) bis zum {date}  bestehen';
-$string['course_description_after_condition_modquiz'] = 'das Quiz mit {numb} von {numb} bestanden haben';
+$string['course_description_before_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} bestehen';
+$string['course_description_inbetween_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} {currentbest} bestehen';
+$string['course_description_after_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} bestanden haben';
 
 $string['course_restricition_before_condition_manual'] = 'eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
-$string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
-$string['course_restricition_before_condition_specific_course'] = 'finish the course {course_list}';
+$string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name} abgeschlossen haben';
+$string['course_restricition_before_condition_specific_course'] = 'Sie {node_name} abgeschlossen haben';
 $string['course_condition_timed_duration_start'] = 'from the moment of subscription to this node';
 $string['course_condition_timed_duration_since'] = 'since ';
 $string['course_restricition_before_condition_timed'] = 'der {start_date} erreicht wird';
 $string['course_restricition_before_condition_from'] = 'from ';
 $string['course_restricition_before_condition_to'] = 'to ';
-$string['course_restricition_before_condition_timed_duration'] = 'der {start_date} erreicht wird';
-$string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name}, {course_list}, {parent_course_list}  abgeschlossen haben';
+$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name} abgeschlossen haben';
 
 $string['node_restriction_inbetween_timed'] = 'Sie haben bis zum {$a} Zugang zu diesem Kurs/ diesem Stapel.';
 
@@ -425,7 +431,7 @@ $string['composables_feedback_node'] = 'Feedback node';
 // Restriction strings.
 $string['restriction_select_number'] = 'Select a Number:';
 $string['restriction_no_select_number'] = 'No parent courses where found';
-$string['restriction_select_course'] = 'Select a Course:';
+$string['restriction_select_course'] = 'Select a Node:';
 $string['restriction_choose_number'] = 'Choose a number';
 $string['restriction_parents_found'] = 'Found following parent nodes:';
 $string['restriction_access_manually'] = 'Grant access to node manually';

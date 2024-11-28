@@ -120,7 +120,7 @@ class specific_course implements course_restriction {
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         foreach ($userpath->json['tree']['nodes'] as $usernode) {
                             if ($usernode['id'] == $restriction['data']['value']['courseid']) {
-                                $specificcourses[$restriction['id']]['placeholders']['course_list'] =
+                                $specificcourses[$restriction['id']]['placeholders']['node_name'] =
                                     [$usernode['data']['fullname']];
                                 if (
                                     isset($usernode['data']['completion']) &&

@@ -140,6 +140,7 @@ class modquiz implements course_completion {
           'inbetween_info' => '',
         ];
         $bestgrade = 0;
+        // Maxgrade is now minvalue zum Bestehen;
         $maxgrade = 0;
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             $completions = $node['completion']['nodes'];
@@ -147,7 +148,7 @@ class modquiz implements course_completion {
                 if ( isset($completion['data']) && isset($completion['data']['label'])
                   && $completion['data']['label'] == 'modquiz') {
                     $validcatquiz = false;
-                    $sql = "SELECT q.name, cm.id AS cmid
+                    $sql = "SELECT q.name, q.sumgrades, q.grade, cm.id AS cmid
                         FROM {quiz} q
                         JOIN {course_modules} cm ON cm.instance = q.id
                         JOIN {modules} m ON m.id = cm.module
@@ -163,11 +164,14 @@ class modquiz implements course_completion {
                           '" target="_blank">' .
                           $record->name .
                           '</a>';
+                        $modquizzes[$completion['id']]['placeholders']['minnumb'] = $completion['data']['value']['grade'] ?? $record->sumgrades ?? 0;
+                        $modquizzes[$completion['id']]['placeholders']['maxnumb'] = $record->grade ?? 0;
                     } else {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
                           'Mod Quiz';
                     }
                     $modquizzes[$completion['id']]['placeholders']['scale_min'] = $completion['data']['value']['grade'] ?? 0;
+
                     // Get grade and check if valid.
                     $data = $this->get_modquiz_records($completion, $userid);
                     $modquizzes['inbetween'][$completion['id']] = false;
@@ -184,7 +188,7 @@ class modquiz implements course_completion {
                             $validcatquiz = true;
                         }
                     }
-                    $modquizzes[$completion['id']]['placeholders']['current_best'] = $bestgrade;
+                    $modquizzes[$completion['id']]['placeholders']['currentbest'] = '('. get_string('course_description_after_condition_modquiz_best', 'local_adele') . $bestgrade . ')';
                     $modquizzes['completed'][$completion['id']] = $validcatquiz;
                 } else {
                     $modquizzes['completed'][$completion['id']] = false;
