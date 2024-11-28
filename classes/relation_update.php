@@ -504,17 +504,17 @@ class relation_update {
                 $isvalid = false;
                 if (self::istypetimedandcolumnvalid($restnode, $restrictioncriteria)) {
                     $isvalid = true;
-                    $childconditionid = $restnode['childCondition'][1];
+                    $childconditionid = $restnode['childCondition'][1] ?? null;
                     $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
                         return isset($item['id']) && $item['id'] === $childconditionid;
                     });
                     $childcondition = reset($filterednodes);
                     while ($childcondition !== null && $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
-                        $childconditionid = $childcondition['childCondition'][0];
+                        $childconditionid = $childcondition['childCondition'][0] ?? null;
                         $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
                             return isset($item['id']) && $item['id'] === $childconditionid;
                         });
-                        $childcondition = $filterednodes[0];
+                        $childcondition = $filterednodes[0] ?? null;
                     }
                     if ($childcondition !== null && $childcondition !== false) {
                         $isvalid = false;
@@ -668,7 +668,6 @@ class relation_update {
      * @return array
      */
     public static function getconditionnode($conditionnodepaths, $type) {
-        // TODO sort the valid completion paths.
         $valid = count($conditionnodepaths) ? true : false;
         $priority = 0;
         if ($valid) {
