@@ -174,6 +174,8 @@ class learning_paths {
                     JOIN  {local_adele_lp_editors} lpe ON lp.id = lpe.learningpathid
                     WHERE lpe.userid = :userid ";
             $params = ['userid' => $USER->id];
+        } else {
+            $params = [];
         }
 
         $learningpaths = $DB->get_records_sql($sql, $params);
