@@ -166,12 +166,16 @@ class learning_paths {
      */
     public static function get_editable_learning_paths() {
         global $DB, $USER;
-        $sql = "SELECT lp.id, lpe.learningpathid, lp.name
-            FROM {local_adele_lp_editors} lpe
-            JOIN {local_adele_learning_paths} lp ON lp.id = lpe.learningpathid
-            WHERE lpe.userid = :userid";
+        $sql = "SELECT lp.id, lp.id as learningpathid, lp.name
+            FROM {local_adele_learning_paths} lp";
 
-        $params = ['userid' => $USER->id];
+        if (!is_siteadmin()) {
+            $sql .= "
+                    JOIN  {local_adele_lp_editors} lpe ON lp.id = lpe.learningpathid
+                    WHERE lpe.userid = :userid ";
+            $params = ['userid' => $USER->id];
+        }
+
         $learningpaths = $DB->get_records_sql($sql, $params);
         return $learningpaths;
     }
