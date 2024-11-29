@@ -72,15 +72,16 @@ class learning_path_courses {
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            $userquery = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
-                JOIN {role_assignments} ra ON ra.contextid = ctx.id
-                JOIN {role} r ON r.id = ra.roleid
-                JOIN {user} u ON u.id = ra.userid";
-
-            $wherestatement .= "AND u.id = :userid AND r.shortname IN ('editingteacher', 'teacher') ";
-
-            $whereparamsquery['params']["userid"] = $USER->id;
+            $userquery = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50";
+            if (!is_siteadmin()) {
+                $userquery .= "JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                  JOIN {role} r ON r.id = ra.roleid
+                  JOIN {user} u ON u.id = ra.userid";
+                  $wherestatement .= "AND u.id = :userid AND r.shortname IN ('editingteacher', 'teacher') ";
+                  $whereparamsquery['params']["userid"] = $USER->id;
+            }
         }
+
         $select = "SELECT s1.*
         FROM (
             SELECT DISTINCT c.id AS course_node_id, c.fullname, c.shortname, c.category, c.summary, " . $selectagg . "
