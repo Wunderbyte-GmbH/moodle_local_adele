@@ -1,4 +1,6 @@
 <?php
+
+use local_adele\learning_paths;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -54,10 +56,13 @@ $PAGE->navbar->add(get_string('pluginname', 'local_adele'), new moodle_url('/loc
 $output = $PAGE->get_renderer('local_adele');
 echo $OUTPUT->header();
 $view = null;
+
+$hasaccess = learning_paths::check_access();
+
 if (has_capability('local/adele:canmanage', $context)) {
     $view = 'manager';
 } else if (
-    $_SESSION[SESSION_KEY_ADELE]
+    $hasaccess
 ) {
     $view = 'teacheredit';
 }
@@ -67,7 +72,7 @@ echo $OUTPUT->render_from_template('local_adele/initview', [
   'quizsetting' => get_config('local_adele', 'quizsettings'),
   'wwwroot' => $CFG->wwwroot,
   'view' => $view,
-  'editablepaths' => json_encode($_SESSION[SESSION_KEY_ADELE]),
+  'editablepaths' => json_encode($learningpaths ?? []),
   'version' => $CFG->version,
 ]);
 

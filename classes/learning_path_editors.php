@@ -78,38 +78,6 @@ class learning_path_editors {
     /**
      * Create a new editor for a field.
      *
-     * @return array
-     */
-    public static function get_editors_teacher() {
-        global $DB, $USER;
-        $enrolledcourses = enrol_get_users_courses($USER->id, true, 'id, shortname');
-        $courseids = [];
-        foreach ($enrolledcourses as $course) {
-            $context = \context_course::instance($course->id);
-            if (has_capability('moodle/course:manageactivities', $context, $USER->id)) {
-                $haseditingteacher = true;
-                $courseids[] = $course->id;
-            }
-        }
-        if (!empty($courseids)) {
-            if (!isset($_SESSION[SESSION_KEY_ADELE_ROLE])) {
-                $_SESSION[SESSION_KEY_ADELE_ROLE] = [];
-            }
-            list($insql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
-            $sql = "SELECT a.id, a.course, a.learningpathid FROM {adele} a WHERE course $insql";
-            $records = $DB->get_records_sql($sql, $params);
-            foreach ($records as $record) {
-                $_SESSION[SESSION_KEY_ADELE][$record->learningpathid] = (object)[
-                    'role' => 'editor',
-                ];
-            }
-        }
-        return $haseditingteacher;
-    }
-
-    /**
-     * Create a new editor for a field.
-     *
      * @param int $lpid
      * @param int $userid
      * @return array

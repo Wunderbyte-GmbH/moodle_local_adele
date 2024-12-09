@@ -34,6 +34,7 @@ use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use local_adele\asset_handler;
+use local_adele\learning_paths;
 use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -73,7 +74,7 @@ class get_image_paths extends external_api {
 
         $context = context::instance_by_id($contextid);
         $hascapability = has_capability('local/adele:canmanage', $context);
-        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+        $sessionvalue = learning_paths::check_access();
 
         // If the user doesn't have the capability and the session value is empty, handle the error.
         if (!$hascapability && empty($sessionvalue)) {

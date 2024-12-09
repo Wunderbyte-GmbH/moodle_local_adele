@@ -50,7 +50,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_learningpaths extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -61,8 +60,7 @@ class get_learningpaths extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathd', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -84,20 +82,20 @@ class get_learningpaths extends external_api {
         $context = context::instance_by_id($contextid);
 
         $hascapability = has_capability('local/adele:edit', $context);
-        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+        $learningpaths = learning_paths::return_learningpaths();
 
         // If the user doesn't have the capability and the session value is empty, handle the error.
         if (!$hascapability && empty($sessionvalue)) {
             throw new required_capability_exception(
-              $context,
-              'local/adele:canmanage',
-              'nopermission',
-              'You do not have the required capability and the session key is not set.'
+                $context,
+                'local/adele:canmanage',
+                'nopermission',
+                'You do not have the required capability and the session key is not set.'
             );
         }
         return learning_paths::get_learning_paths(
-          $hascapability,
-          $sessionvalue
+            $hascapability,
+            $learningpaths
         );
     }
 
@@ -127,7 +125,7 @@ class get_learningpaths extends external_api {
                     'visibility' => new external_value(PARAM_TEXT, 'visibility'),
                 ]),
                 VALUE_OPTIONAL
-              ),
+            ),
         ]);
     }
 }

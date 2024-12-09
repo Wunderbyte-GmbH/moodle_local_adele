@@ -83,8 +83,11 @@ class get_learningpath extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
+
+        $learningpaths = learning_paths::return_learningpaths();
+
         if (
-          !isset($_SESSION[SESSION_KEY_ADELE][$params['learningpathid']]) &&
+          !isset($learningpaths[$params['learningpathid']]) &&
           !has_capability('local/adele:canmanage', $context)
         ) {
             throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', 'error');

@@ -72,7 +72,7 @@ class learning_path_courses {
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            $userquery = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50";
+            $userquery = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50 ";
             if (!is_siteadmin()) {
                 $userquery .= "JOIN {role_assignments} ra ON ra.contextid = ctx.id
                   JOIN {role} r ON r.id = ra.roleid

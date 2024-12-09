@@ -62,7 +62,7 @@ class learning_paths {
      */
     public static function save_learning_path($params) {
         global $DB, $USER;
-        $data = new stdClass;
+        $data = new stdClass();
         $data->name = $params['name'];
         $data->description = $params['description'];
         $data->image = $params['image'];
@@ -89,7 +89,7 @@ class learning_paths {
             $DB->update_record('local_adele_learning_paths', $data);
             // Trigger catscale created event.
             $event = learnpath_updated::create([
-                'objectid' => $data->id ,
+                'objectid' => $data->id,
                 'context' => context_system::instance(),
                 'other' => [
                     'learningpathname' => $data->name,
@@ -118,7 +118,7 @@ class learning_paths {
      */
     public static function update_learning_path($params) {
         global $DB;
-        $data = new stdClass;
+        $data = new stdClass();
         $data->id = $params['id'];
         $data->json = $params['json'];
         $data->createdby = '100';
@@ -654,5 +654,54 @@ class learning_paths {
         $DB->update_record('local_adele_path_user', $record);
 
         return ['last_seen' => $record->last_seen_by_owner];
+    }
+
+    /**
+     * Central function to check access to learning path.
+     *
+     * @return array
+     *
+     */
+    public static function return_learningpaths() {
+
+        global $USER, $DB;
+
+        $cache = \cache::make('local_adele', 'navisteacher');
+        $records = $cache->get('localadeleeditor');
+
+        if ($records === false) {
+            // If we don't have the capability, we check with cache if we are editor.
+            $params = [
+                'userid' => (int)$USER->id,
+            ];
+
+            $sql = "SELECT lpe.learningpathid
+                FROM {local_adele_lp_editors} lpe
+                WHERE lpe.userid = :userid";
+            $records = $DB->get_records_sql($sql, $params);
+
+            $cache->set('localadeleeditor', $records);
+        }
+
+        return $records ?? [];
+    }
+
+    /**
+     * Just checks access.
+     *
+     * @return bool
+     *
+     */
+    public static function check_access() {
+
+        // First fast check if we show the button in the navbar.
+        if (has_capability('local/adele:canmanage', context_system::instance())) {
+            $iseditor = true;
+        } else {
+            $learningpaths = self::return_learningpaths();
+            $iseditor = !empty($learningpaths);
+        }
+
+        return $iseditor;
     }
 }
