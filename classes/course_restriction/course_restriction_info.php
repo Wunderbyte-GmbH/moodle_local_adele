@@ -51,7 +51,7 @@ class course_restriction_info {
      *
      * @return array
      */
-    public static function get_restrictions(): array {
+    public static function get_restrictions($applyfilter = false): array {
         global $CFG;
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_restriction/conditions/*.php';
@@ -72,6 +72,21 @@ class course_restriction_info {
             }
         }
         $conditions = array_reverse($conditions);
+        $configadele = get_config('local_adele');
+        if ($applyfilter) {
+            $selectedconditions = $configadele->restrictionfilter;
+            $selectedarray = explode(',', $selectedconditions);
+            $filteredconditions = [];
+            foreach ($selectedarray as $key => $value) {
+                foreach ($conditions as $condition) {
+                    if ($condition['label'] == $value) {
+                        $filteredconditions[] = $condition;
+                        break;
+                    }
+                }
+            }
+            return $filteredconditions;
+        }
         return $conditions;
     }
 }

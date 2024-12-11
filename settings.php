@@ -25,7 +25,7 @@
 
 use local_adele\admin_setting_course_tags;
 use local_adele\helper\role_names;
-
+use local_adele\course_restriction\course_restriction_info;
 defined('MOODLE_INTERNAL') || die();
 
 $componentname = 'local_adele';
@@ -81,6 +81,23 @@ if ($hassiteconfig) {
                 get_string('categories_desc', $componentname),
                 [],
                 $categories)
+    );
+
+    // Restrict restrictions.
+    $restrictions = course_restriction_info::get_restrictions();
+    $matchedrestrictions = [];
+    foreach ($restrictions as $key => $value) {
+        $matchedrestrictions[$value['label']] = $value['name'];
+    }
+    $restnames = array_map(function($item) {
+        return $item['name'];
+    }, $restrictions);
+    $settings->add(new admin_setting_configmultiselect(
+                $componentname . '/restrictionfilter',
+                get_string('nodes_restriction', $componentname),
+                get_string('nodes_edit_restriction', $componentname),
+                [],
+                $matchedrestrictions)
     );
 
     // Alise quiz settings.

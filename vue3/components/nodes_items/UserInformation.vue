@@ -114,6 +114,10 @@ const handleBlur = () => {
           <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.inbetween)"
             title="restriction_before" />
         </div>
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'inbetween' && data.completion.feedback.restriction.inbetween_timed">
+         <span>{{ data.completion.feedback.restriction.inbetween_timed }} </span>
+        </div>
         <!-- Render status for feedback. -->
         <div
           v-if="data.completion && data.completion.feedback.status_completion"
@@ -127,64 +131,19 @@ const handleBlur = () => {
           <UserFeedbackBlock :data="data.completion.feedback.completion[data.completion.feedback.status_completion]"
             title="restriction_before" />
         </div>
-
-
-      </div>
-
-      <!-- <div v-if="showFeedbackarea"
-        :style="feedbackStyle"
-        class="selectable"
-        @mousedown.stop
-        @mousemove.stop
-        @mouseup.stop>
-        <div v-if="data.completion && data.completion.feedback.status" class="status-text">
+         <!-- Render status for after completion feedback. -->
+         <div
+          v-if="data.completion && data.completion.feedback.status_completion === 'after' && data.completion.feedback.completion.after_all  && Object.values(data.completion.feedback.completion.after_all).length > 0"
+          class="status-text">
           <i class="fa fa-info-circle"></i>
-          <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
+          <span>{{ store.state.strings['node_access_completion_after_all']
+            }}</span>
         </div>
-        <div v-if="data.completion &&
-            (data.completion.feedback.status == 'closed' || data.completion.feedback.status == 'not_accessible')">
-          <UserFeedbackBlock
-            :data="data.completion.feedback.restriction.before"
-            title="restriction_before"
-          />
+        <div v-if="data.completion && data.completion.feedback.status_completion === 'after' && data.completion.feedback.completion.after_all  && Object.values(data.completion.feedback.completion.after_all).length > 0">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.completion.after_all)"
+            title="restriction_before" />
         </div>
-        <div v-if="data.completion &&
-            (data.completion.feedback.status == 'not_accessible')">
-          <UserFeedbackBlock
-            :data="data.completion.feedback.completion.before"
-            title="restriction_completion_before"
-          />
-        </div>
-        <div v-else>
-          <UserFeedbackBlock
-            v-if="data.completion && data.completion.feedback.status == 'not_accessible'"
-            :data="data.completion.feedback.completion.before"
-            title="completion_before"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion && data.completion.feedback.status != 'completed' &&
-              data.completion.feedback.status != 'closed'"
-            :data="data.completion.feedback.completion.inbetween"
-            title="completion_inbetween"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion"
-            :data="data.completion.feedback.completion.after"
-            title="completion_after"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion"
-            :data="data.completion.feedback.completion.higher"
-            title="completion_higher"
-          />
-        </div>
-        <div
-          v-if="!data.completion"
-        >
-          {{ store.state.strings.node_access_nothing_defined }}
-        </div>
-      </div> -->
-
+      </div>
     </transition>
   </div>
 </template>

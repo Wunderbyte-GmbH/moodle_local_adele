@@ -131,10 +131,10 @@ class relation_update {
                                     if (!$validationcondition) {
                                         $failedrestriction = true;
                                         $activecolumnfeedback[] = self::render_placeholders_single_restriction(
-                                            $currentcondition['data']['description_before'], $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']], $currentcondition['id'], $node['restriction']['nodes']);
-                                        // self::createfeedback($activecolumnfeedback, $currentcondition['data']);
-                                    } else {
-                                        $test = 'dadad';
+                                            $currentcondition['data']['description_before'],
+                                            $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']],
+                                            $currentcondition['id'],
+                                            $node['restriction']['nodes']);
                                     }
                                     // Get next Condition and return null if no child node exsists.
                                     $currentcondition = self::searchnestedarray(
@@ -218,12 +218,6 @@ class relation_update {
                 }
             }
         }
-    }
-
-
-    public static function createfeedback(&$activecolumnfeedback, $conditiondata) {
-        $activecolumnfeedback[] = $conditiondata['description_before'];
-
     }
 
     /**
@@ -362,13 +356,14 @@ class relation_update {
                         return true;
                     } else {
                         $completionnodepaths[] = $validationconditionstring;
-                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']]['text'];
-                        if (
-                            !$priority ||
-                            $priority > $feedback['completion']['after_all'][$completionnode['id']]['priority']
-                        ) {
-                            $priority = $feedback['completion']['after_all'][$completionnode['id']]['priority'];
-                        }
+                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
+                        unset($feedback['completion']['after_all'][$completionnode['id']]);
+                        // if (
+                        //     !$priority ||
+                        //     $priority > $feedback['completion']['after_all'][$completionnode['id']]['priority']
+                        // ) {
+                        //     $priority = $feedback['completion']['after_all'][$completionnode['id']]['priority'];
+                        // }
                         $nodefinished = node_finished::create([
                             'objectid' => $userpath->id,
                             'context' => context_system::instance(),
@@ -382,17 +377,6 @@ class relation_update {
                 }
             }
         }
-        $feedback['completion']['higher'] = [];
-        if ($priority) {
-            $i = 0;
-            foreach ($feedback['completion']['after_all'] as $condition => $completionpriority) {
-                if ($completionpriority['priority'] < $priority) {
-                    $feedback['completion']['higher'][] = $feedback['completion']['inbetween'][$i];
-                }
-                $i++;
-            }
-        }
-        unset($feedback['completion']['after_all']);
         $feedback['status_restriction'] = self::getnodestatusforrestriciton(
             $feedback,
             $restrictionnodepaths,
@@ -541,8 +525,8 @@ class relation_update {
      * @param array $restrictioncriteria
      * @param array $node
      */
-    public static function getnodestatusforrestriciton(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $restrictionnodepathsall) {
-        
+    public static function getnodestatusforrestriciton
+    (&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $restrictionnodepathsall) {
         if (count($restrictionnodepaths) > 0 || $node['restriction'] === null) {
             self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
             return 'inbetween';
@@ -580,7 +564,7 @@ class relation_update {
         }
         if (empty($feedback['restriction']['before_valid'])) {
             return 'after';
-        }   
+        }
             self::inbetweenfeedback($feedback, $restrictionnodepathsall, $restrictioncriteria, $node, 'before');
             return 'before';
 
@@ -780,17 +764,14 @@ class relation_update {
                         $node['completion']['nodes']
                       ) :
                       '';
-                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
-                    'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
-                    'text' => isset($conditionnode['data']['feedback_after']) ?
+                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = isset($conditionnode['data']['feedback_after']) ?
                         self::render_placeholders(
                             $conditionnode['data']['feedback_after'],
                             $completioncriteria,
                             $conditionnode['id'],
                             $node['completion']['nodes']
                         ) :
-                        '',
-                ];
+                        '';
 
                 if ($conditionnode['data']['feedback_inbetween_checkmark']) {
                     $feedbacks['completion']['inbetween'][] = isset($conditionnode['data']['feedback_inbetween']) ?
@@ -853,7 +834,7 @@ class relation_update {
      * @param array $nodes
      * @return string
      */
-    public static function  render_placeholders_single_restriction($string, $condition = [] , $id, $nodes) {
+    public static function render_placeholders_single_restriction($string, $condition = [] , $id, $nodes) {
         if (isset($condition['placeholders'])) {
             foreach ($condition['placeholders'] as $placeholder => $text) {
                 if (is_array($text)) {

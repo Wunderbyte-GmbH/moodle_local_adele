@@ -192,6 +192,7 @@ $string['node_access_nothing_defined'] = 'No user feedback available';
 $string['node_access_completion_before'] = 'Um diesen Kurs/diesen Stapel abzuschließen, musst du:';
 $string['node_access_completion_inbetween'] = 'Um diesen Kurs/diesen Stapel abzuschließen, müssen Sie noch:';
 $string['node_access_completion_after'] = 'Dieser Kurs/dieser Stapel gilt als abgeschlossen, weil Sie:';
+$string['node_access_completion_after_all'] = 'Du kannst einen höheren Kursabschluss erreichen, wenn du:';
 $string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
 $string['node_access_restriction_inbetween'] = 'Der Kurs/Der Stapel ist freigeschaltet:';
 $string['node_access_restriction_after'] = 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
