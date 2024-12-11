@@ -210,11 +210,13 @@ $string['course_description_before_condition_course_completed'] = '{item} erfolg
 $string['course_description_inbetween_condition_course_completed'] = '{item} erfolgreich bearbeiten';
 $string['course_description_after_condition_course_completed'] = '{item} erfolgreich bearbeitet haben';
 
-$string['course_description_before_condition_catquiz'] = 'den Test {name_catquiz} mit einem Wert höher als {logit} bis zum {date}  bestehen.';
-$string['course_description_inbetween_condition_catquiz'] = 'deine Kompetenzen mit dem Test zu  {name_catquiz} bis zum {date}  mit einem Wert höher als {logit} (aktuell bestes Ergebnis) nachweisen';
-$string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
-$string['course_description_after_condition_catquiz'] = 'mit dem Test {name_catquiz} die im Kurs zu erwerbenden Kompetenzen mit einem Wert höher als {logit} (bestes Ergebnis vom xx.xx.xxxx)nachgewiesen haben.';
-$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
+$string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
+$string['course_description_inbetween_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
+$string['course_description_inbetween_condition_catquiz_best'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
+$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
+
+$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}  Logit {$a->currentlogit} / {$a->targetlogit} Percentage {$a->currentperc} / {$a->targetperc}</a>)</li>';
+
 $string['course_description_after_condition_modquiz_best'] = 'Beste Note:';
 
 $string['course_description_before_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} bestehen';
@@ -233,6 +235,7 @@ $string['course_restricition_before_condition_timed_duration'] = 'zugänglich f�
 $string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name} abgeschlossen haben';
 
 $string['node_restriction_inbetween_timed'] = 'Sie haben bis zum {$a} Zugang zu diesem Kurs/ diesem Stapel.';
+$string['node_restriction_before_timed'] = 'Nach der Freischaltung haben Sie maximal bis zum {$a} Zugang.';
 
 $string['course_master_conditions'] = 'Master Conditions';
 $string['course_master_condition_restriction'] = 'Master restriction checkbox';

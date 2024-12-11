@@ -101,16 +101,19 @@ const handleBlur = () => {
         <!-- Render before restriction feedback. -->
         <div v-if="data.completion &&
           data.completion.feedback.status_restriction == 'before'">
-          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_valid)"
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_active)"
             title="restriction_before" />
         </div>
-        <!-- Render between restriction feedback. -->
         <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'before' && data.completion.feedback.restriction.before_timed">
+         <span>{{ data.completion.feedback.restriction.before_timed }} </span>
+        </div>
+        <!-- Render between restriction feedback. -->
+        <div v-if="data.completion && data.completion.feedback.restriction.inbetween &&
           data.completion.feedback.status_restriction == 'inbetween'">
           <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.inbetween)"
             title="restriction_before" />
         </div>
-
         <!-- Render status for feedback. -->
         <div
           v-if="data.completion && data.completion.feedback.status_completion"

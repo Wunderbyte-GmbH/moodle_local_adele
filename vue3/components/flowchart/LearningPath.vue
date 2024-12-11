@@ -395,7 +395,7 @@ function onDrop(event) {
             }
             if (dropzoneNode.data.course_node_id.length == 2 &&
               dropzoneNode.data.fullname == dropzoneNode.data.shortname ) {
-              dropzoneNode.data.fullname = ''
+              dropzoneNode.data.fullname = store.state.strings.nodes_collection;
             }
             node = dropzoneNode
             node = addStagCompletions(node)
