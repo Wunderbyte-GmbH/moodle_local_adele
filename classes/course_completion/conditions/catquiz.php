@@ -362,8 +362,8 @@ class catquiz implements course_completion {
         foreach ($scales['sub'] as $subscale) {
             $scalemap[$subscale['id']] = [
                 'name' => $subscale['name'],
-                'scale' => $subscale['scale'],
-                'attempts' => $subscale['attempts'],
+                'scale' => $subscale['scale'] ?? '',
+                'attempts' => $subscale['attempts'] ?? '',
             ];
         }
 

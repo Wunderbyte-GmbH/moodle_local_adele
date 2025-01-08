@@ -132,9 +132,11 @@ class relation_update {
                                         $failedrestriction = true;
                                         $activecolumnfeedback[] = self::render_placeholders_single_restriction(
                                             $currentcondition['data']['description_before'],
-                                            $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']],
                                             $currentcondition['id'],
-                                            $node['restriction']['nodes']);
+                                            $node['restriction']['nodes'],
+                                            $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']]
+                                            ?? null
+                                        );
                                     }
                                     // Get next Condition and return null if no child node exsists.
                                     $currentcondition = self::searchnestedarray(
@@ -150,9 +152,9 @@ class relation_update {
                                 $activefeedbackfornode =
                                 implode(get_string('course_condition_concatination_and', 'local_adele'), $activecolumnfeedback);
                                 $restrictionnodepathsall[] = $allconditions;
+                                $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
+                                $activefeedbackfornode;
                             }
-                            $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
-                            $activefeedbackfornode;
                         }
                     }
 
@@ -181,7 +183,7 @@ class relation_update {
                     $getoldcompletion =
                       self::checkcondition($completionnode, $userpath->json, $node['id'], 'completionnode');
                     $getoldrestriction =
-                      self::checkcondition($restrictionnode, $userpath->json, $node['id'], 'restrictionnode');
+                      false;
                     if (!$getoldrestriction) {
                         $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
                         $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall;
@@ -495,7 +497,7 @@ class relation_update {
             foreach ($signlerestrictionpatharray as $restrictionlabelid) {
                 if (strpos($restrictionlabelid, 'time') === 0) {
                     $nodelabelid = explode('_condition_', $restrictionlabelid);
-                    $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]];
+                    $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]] ?? [];
                     if (isset($restnode['inbetween_info']['endtime'])) {
                         if (!$smallestenddate || strtotime($restnode['inbetween_info']['endtime']) < $smallestenddate) {
                             $smallestenddate = strtotime($restnode['inbetween_info']['endtime']);
@@ -555,9 +557,9 @@ class relation_update {
                 }
                 if ($isvalid) {
                     $childconditionid = $restnode['childCondition'][0];
-                    $filterfeedback = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
-                        return isset($item['id']) && $item['id'] === $childconditionid;
-                    });
+                    // $filterfeedback = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                    //     return isset($item['id']) && $item['id'] === $childconditionid;
+                    // });
                     $feedback['restriction']['before_valid'][$childconditionid] = $feedback['restriction']['before'][$childconditionid];
                 }
             }
@@ -834,7 +836,7 @@ class relation_update {
      * @param array $nodes
      * @return string
      */
-    public static function render_placeholders_single_restriction($string, $condition = [] , $id, $nodes) {
+    public static function render_placeholders_single_restriction($string, $id, $nodes, $condition = [] ) {
         if (isset($condition['placeholders'])) {
             foreach ($condition['placeholders'] as $placeholder => $text) {
                 if (is_array($text)) {
