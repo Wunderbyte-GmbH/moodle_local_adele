@@ -492,3 +492,5 @@ $string['privacy:metadata:local_adele_path_user:json'] = 'Zusätzliche Informati
 
 $string['privacy:metadata:local_adele_lp_editors'] = 'Die Tabelle speichert Informationen über Nutzer, die berechtigt sind, bestimmte Lernpfade zu bearbeiten.';
 $string['privacy:metadata:local_adele_lp_editors:userid'] = 'Die ID des Nutzers, der berechtigt ist, den Lernpfad zu bearbeiten.';
+
+$string['cachedef_navisteacher'] = 'Ist Lehrer cache';
