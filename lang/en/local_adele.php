@@ -34,6 +34,7 @@ $string['required'] = 'required';
 
 // Capabilities.
 $string['adele:edit'] = 'Edit learning path';
+$string['adele:teacheredit'] = 'Teacher edit';
 $string['adele:view'] = 'View learning path';
 $string['adele:canmanage'] = 'Is allowed to manage Learning path Plugins';
 

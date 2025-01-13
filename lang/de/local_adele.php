@@ -34,6 +34,7 @@ $string['required'] = 'notwendig';
 
 // Fähigkeiten.
 $string['adele:edit'] = 'Lernpfad bearbeiten';
+$string['adele:teacheredit'] = 'TrainerIn bearbeiten';
 $string['adele:view'] = 'Lernpfad anzeigen';
 $string['adele:canmanage'] = 'Darf Lernpfad-Plugins verwalten';
 
