@@ -70,6 +70,37 @@ class learning_path_update {
     }
 
     /**
+     * Observer for course completed
+     *
+     * @param object $event
+     */
+    public static function user_views_learning_path($event) {
+
+        $userpathrelation = new user_path_relation();
+        $eventdata = $event->get_data();
+        $records = $userpathrelation->get_active_user_path_relation($eventdata['userid'], $eventdata['courseid']);
+        foreach ($records as $userpath) {
+            self::trigger_user_path_update($userpath);
+        }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param object $event
+     */
+    public static function trigger_user_path_update($userpath) {
+        $eventsingle = user_path_updated::create([
+            'objectid' => $userpath->id,
+            'context' => context_system::instance(),
+            'other' => [
+                'userpath' => $userpath,
+            ],
+        ]);
+        $eventsingle->trigger();
+    }
+
+    /**
      * Finished quiz.
      *
      * @param object $event

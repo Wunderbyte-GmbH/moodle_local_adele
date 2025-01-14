@@ -177,13 +177,15 @@ class timed implements course_restriction {
      * Helper function to return localized description strings.
      * @param string $datestring
      * @param string $format
-     * @return object
+     * @return boolean
      */
     public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
-        $datetime = DateTime::createFromFormat($format, $datestring);
-        if ($datetime && $datetime->format($format) === $datestring) {
-            $datetime->format('Y-m-d H:i:s');
-            return $datetime;
+        if ($datestring !== null) {
+            $datetime = DateTime::createFromFormat($format, $datestring);
+            if ($datetime && $datetime->format($format) === $datestring) {
+                $datetime->format('Y-m-d H:i:s');
+                return $datetime;
+            }
         }
         return false;
     }

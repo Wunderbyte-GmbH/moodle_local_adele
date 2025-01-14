@@ -30,6 +30,7 @@ namespace local_adele;
 use core_analytics\local\time_splitting\before_now;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
+use local_adele\helper\adhoc_task_helper;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
@@ -360,12 +361,6 @@ class relation_update {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
                         unset($feedback['completion']['after_all'][$completionnode['id']]);
-                        // if (
-                        //     !$priority ||
-                        //     $priority > $feedback['completion']['after_all'][$completionnode['id']]['priority']
-                        // ) {
-                        //     $priority = $feedback['completion']['after_all'][$completionnode['id']]['priority'];
-                        // }
                         $nodefinished = node_finished::create([
                             'objectid' => $userpath->id,
                             'context' => context_system::instance(),
@@ -557,9 +552,6 @@ class relation_update {
                 }
                 if ($isvalid) {
                     $childconditionid = $restnode['childCondition'][0];
-                    // $filterfeedback = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
-                    //     return isset($item['id']) && $item['id'] === $childconditionid;
-                    // });
                     $feedback['restriction']['before_valid'][$childconditionid] = $feedback['restriction']['before'][$childconditionid];
                 }
             }
@@ -992,6 +984,7 @@ class relation_update {
                             }
                             if (!isset($node['data']['first_enrolled'])) {
                                 $node['data']['first_enrolled'] = time();
+                                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                                 $firstenrollededit = true;
                             }
                             $instances = $DB->get_records('enrol', [

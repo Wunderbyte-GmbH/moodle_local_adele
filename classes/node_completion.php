@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use local_adele\helper\adhoc_task_helper;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -77,6 +78,7 @@ class node_completion {
 
                     if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
+                        adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                         $firstenrollededit = true;
                     }
                     $enrol->enrol_user($instance, $event->other['userpath']->user_id, null);

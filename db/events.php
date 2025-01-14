@@ -62,4 +62,8 @@
       'eventname' => '\mod_adaptivequiz\event\attempt_completed',
       'callback' => 'local_adele_observer::catquiz_attempt_finished',
     ],
+    [
+      'eventname' => '\core\event\course_viewed',
+      'callback' => 'local_adele_observer::user_views_learning_path',
+    ],
  ];
