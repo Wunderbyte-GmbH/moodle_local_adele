@@ -46,28 +46,30 @@ class adhoc_task_helper {
      */
     public static function set_scheduled_adhoc_tasks($node, $userpath) {
 
-        foreach ($node['restriction']['nodes'] as $restrictionnode) {
-            $dates = [];
-            if (isset($restrictionnode['data']['value']['start'])) {
-                $dates[] = $restrictionnode['data']['value']['start'];
-            }
-            if (isset($restrictionnode['data']['value']['end'])) {
-                $dates[] = $restrictionnode['data']['value']['end'];
-            }
+        if (isset($node['restriction'])) {
+            foreach ($node['restriction']['nodes'] as $restrictionnode) {
+                $dates = [];
+                if (isset($restrictionnode['data']['value']['start'])) {
+                    $dates[] = $restrictionnode['data']['value']['start'];
+                }
+                if (isset($restrictionnode['data']['value']['end'])) {
+                    $dates[] = $restrictionnode['data']['value']['end'];
+                }
 
-            foreach ($dates as $date) {
-                $taskdata = new stdClass();
-                $taskdata->userpath = $userpath;
-                $taskdata->userid = $userpath->user_id;
-                $timestamp = strtotime($date);
-                $runtime = strtotime('+2 minutes', $timestamp);
-                $taskdata->time = $runtime . $userpath->id;
-                $updateuserpathtask = new update_user_path();
-                        // Set details for the task.
-                $updateuserpathtask->set_userid($taskdata->userid);
-                $updateuserpathtask->set_custom_data($taskdata);
-                $updateuserpathtask->set_next_run_time($runtime);
-                \core\task\manager::reschedule_or_queue_adhoc_task($updateuserpathtask);
+                foreach ($dates as $date) {
+                    $taskdata = new stdClass();
+                    $taskdata->userpath = $userpath;
+                    $taskdata->userid = $userpath->user_id;
+                    $timestamp = strtotime($date);
+                    $runtime = strtotime('+2 minutes', $timestamp);
+                    $taskdata->time = $runtime . $userpath->id;
+                    $updateuserpathtask = new update_user_path();
+                            // Set details for the task.
+                    $updateuserpathtask->set_userid($taskdata->userid);
+                    $updateuserpathtask->set_custom_data($taskdata);
+                    $updateuserpathtask->set_next_run_time($runtime);
+                    \core\task\manager::reschedule_or_queue_adhoc_task($updateuserpathtask);
+                }
             }
         }
     }
