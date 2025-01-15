@@ -44,11 +44,11 @@ function createRestriction (node_id, parent_node_id, store) {
       {
         "childCondition": [],
         "data": {
-          "description": store.state.strings.course_description_condition_parent_node_completed,
-          "description_before": store.state.strings.course_restricition_before_condition_parent_node_completed,
+          "description": store.state.strings.course_description_condition_parent_courses,
+          "description_before": store.state.strings.course_restricition_before_condition_parent_courses,
           "id": 150,
-          "label": "parent_node_completed",
-          "name": store.state.strings.course_name_condition_parent_node_completed,
+          "label": "parent_courses",
+          "name": store.state.strings.course_name_condition_parent_courses,
           "node_id": 'condition_1',
           "value": {
             "node_id": parent_node_id
@@ -73,7 +73,7 @@ function createRestriction (node_id, parent_node_id, store) {
         "data": {
           "childCondition": 'condition_1',
           "visibility": true,
-          "feedback_before": store.state.strings.course_restricition_before_condition_parent_node_completed,
+          "feedback_before": store.state.strings.course_restricition_before_condition_parent_courses,
           "feedback_before_checkmark": true,
         },
         "draggable": false,

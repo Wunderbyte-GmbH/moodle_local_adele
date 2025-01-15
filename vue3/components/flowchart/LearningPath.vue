@@ -134,6 +134,7 @@ import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import { debounce } from 'lodash';
 import onWheel from '../../composables/flowHelper/onWheel'
+import recalculateParentChild from '../../composables/recalculateParentChild'
 
 // Load Store and Router
 const store = useStore()
@@ -282,7 +283,7 @@ function onDragOver(event) {
 }
 
 // Adjust and add edges if connection was made
-function handleConnect(params) {
+async function handleConnect(params) {
 if (params.source !== store.state.startnode) {
  // Swap source and target positions
  params.target = params.source;
@@ -291,6 +292,10 @@ if (params.source !== store.state.startnode) {
 
 addEdges(addCustomEdge( params.target, params.source));
 emit('add-edge', addCustomEdge( params.target, params.source));
+
+props.learningpath.json.tree =
+recalculateParentChild(props.learningpath.json.tree, 'parentCourse', 'childCourse', 'starting_node')
+await store.dispatch('saveLearningpath', props.learningpath);
 }
 
 function handleSaveEdit(params){
