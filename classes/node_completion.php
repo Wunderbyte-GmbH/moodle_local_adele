@@ -82,7 +82,7 @@ class node_completion {
                         $firstenrollededit = true;
                     }
                     $selectedrole = get_config('local_adele', 'enroll_as_setting');
-                    $context = context_course::instance($subscribecourse);
+                    $context = \context_course::instance($subscribecourse);
                     $isenrolled = is_enrolled($context, $event->other['userpath']->user_id);
                     if (!$isenrolled) {
                         $enrol->enrol_user($instance, $event->other['userpath']->user_id, $selectedrole);

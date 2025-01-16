@@ -996,7 +996,7 @@ class relation_update {
                             }
 
                             $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                            $context = context_course::instance($courseid);
+                            $context = \context_course::instance($courseid);
 
                             $isenrolled = is_enrolled($context, $userpath->user_id);
                             if (!$isenrolled) {
