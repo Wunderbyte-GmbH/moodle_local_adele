@@ -112,4 +112,29 @@ if ($hassiteconfig) {
                     'all_quiz_global' => get_string('all_quiz_global', $componentname),
                     'all_quiz' => get_string('all_quiz', $componentname),
                 ]));
+
+    // Learning Path Enrollment setting.
+    $studentroleid = [];
+    $allrolenames = role_get_names();
+    $assignableroles = get_roles_for_contextlevels(CONTEXT_COURSE);
+    $defaultroleid = null;
+
+    foreach ($allrolenames as $value) {
+        if (in_array($value->id, $assignableroles)) {
+            $studentroleid[$value->id] = $value->localname;
+            if ($value->shortname === 'student') {
+                $defaultroleid = $value->id;
+            }
+        }
+    }
+    $settings->add(
+        new admin_setting_configselect(
+            $componentname . '/enroll_as_setting',
+            get_string('enroll_as_setting', $componentname),
+            get_string('enroll_as_setting_desc', $componentname),
+            $defaultroleid,
+            $studentroleid
+        )
+    );
+
 }

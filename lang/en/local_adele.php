@@ -136,6 +136,8 @@ $string['all_quiz'] = 'Among all attempts, all scales have to be fullfilled at l
 $string['all_quiz_global'] = 'Among all attempts with a given global value, all scales have to be fullfilled at least once.';
 $string['quiz_settings'] = 'Quiz settings';
 $string['quiz_settings_desc'] = 'The settings define how the quiz attempts will be verified';
+$string['enroll_as_setting'] = 'Enrollment Settings';
+$string['enroll_as_setting_desc'] = 'Define with which role a user is enrolled through a learning path.';
 
 // Notifications.
 $string['title_duplicate'] = 'Learning Path duplicated';

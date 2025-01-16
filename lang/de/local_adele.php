@@ -136,6 +136,9 @@ $string['all_quiz'] = 'Über alle Versuche hinweg muss jede Skala mindestens ein
 $string['all_quiz_global'] = 'Über alle Versuche mit einem bestimmten globalen Wert hinweg muss jede Skala mindestens einmal erfüllt werden.';
 $string['quiz_settings'] = 'Quiz Einstellungen';
 $string['quiz_settings_desc'] = 'Die Quizeinstellungen definieren die Validierung korrekter Versuche.';
+$string['enroll_as_setting'] = 'Einschreibung Einstellungen';
+$string['enroll_as_setting_desc'] = 'Definiere mit welcher Rolle ein Nutzer durch einen Lernpfad eingeschrieben wird.';
+
 
 // Benachrichtigungen.
 $string['title_duplicate'] = 'Lernpfad dupliziert';

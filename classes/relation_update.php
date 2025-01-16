@@ -994,8 +994,16 @@ class relation_update {
                             if (!$instances) {
                                 break;
                             }
+
                             $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                            $enrol->enrol_user($instance, $userpath->user_id, null);
+                            $context = context_course::instance($courseid);
+
+                            $isenrolled = is_enrolled($context, $userpath->user_id);
+                            if (!$isenrolled) {
+                                $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                                $selectedrole = get_config('local_adele', 'enroll_as_setting');
+                                $enrol->enrol_user($instance, $userpath->user_id, $selectedrole);
+                            }
                         }
                     }
                 }

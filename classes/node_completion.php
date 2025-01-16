@@ -81,7 +81,12 @@ class node_completion {
                         adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                         $firstenrollededit = true;
                     }
-                    $enrol->enrol_user($instance, $event->other['userpath']->user_id, null);
+                    $selectedrole = get_config('local_adele', 'enroll_as_setting');
+                    $context = context_course::instance($subscribecourse);
+                    $isenrolled = is_enrolled($context, $event->other['userpath']->user_id);
+                    if (!$isenrolled) {
+                        $enrol->enrol_user($instance, $event->other['userpath']->user_id, $selectedrole);
+                    }
                     self::enrol_user_group(
                       $userpath->tree->nodes,
                       $subscribecourse,
