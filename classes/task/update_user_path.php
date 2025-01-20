@@ -73,7 +73,5 @@ class update_user_path extends \core\task\adhoc_task {
             return true;
         }
 
-        mtrace('Update Status ' . $taskdata->itemid . ' from ' . $taskdata->component . ' for user: ' . $taskdata->userid);
-
     }
 }

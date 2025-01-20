@@ -170,7 +170,7 @@ class relation_update {
                         ];
                     } else if (isset($node['completion'])) {
                         $validatenodecompletion = self::validatenodecompletion(
-                            $restrictionnodepathsall,
+                            $restrictionnodepathsall ?? [],
                             $node,
                             $completioncriteria,
                             $userpath,
@@ -487,7 +487,7 @@ class relation_update {
     public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $wheretoput) {
         $latestdate = 0;
         foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
-            $smallestenddate = false;
+            $smallestenddate = 0;
             $istimerestricted = false;
             foreach ($signlerestrictionpatharray as $restrictionlabelid) {
                 if (strpos($restrictionlabelid, 'time') === 0) {
@@ -740,7 +740,8 @@ class relation_update {
           ],
           'restriction' => [
             'before' => null,
-            'before_active' => $node["data"]["completion"]["feedback"]["restriction"]["before_active"],
+            'before_active' => isset($node["data"]["completion"]) ?
+            $node["data"]["completion"]["feedback"]["restriction"]["before_active"] : '',
           ],
         ];
 

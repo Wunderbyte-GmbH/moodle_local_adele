@@ -82,6 +82,15 @@ class local_adele_observer {
     }
 
     /**
+     * Observer for the user_views_learning_path
+     *
+     * @param base $event
+     */
+    public static function node_finished(base $event) {
+        $observer = node_completion::enrol_child_courses($event);
+    }
+
+    /**
      * Observer for the update_catscale event
      *
      * @param base $event
