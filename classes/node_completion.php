@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use context_system;
+use local_adele\event\user_path_updated;
 use local_adele\helper\adhoc_task_helper;
 use stdClass;
 
@@ -97,22 +99,36 @@ class node_completion {
             }
         }
         if ($firstenrollededit) {
-            $latestrecord = $DB->get_record(
-                'local_adele_path_user',
-                [
-                  'status' => 'active',
-                  'user_id' => $event->other['userpath']->user_id,
-                  'learning_path_id' => $event->other['userpath']->learning_path_id,
-                ],
-                'id'
-              );
-
-            $updatedparams = [
-                'id' => $latestrecord->id,
-                'json' => json_encode($userpath),
-            ];
-            $DB->update_record('local_adele_path_user', $updatedparams);
+            self::trigger_user_path_update_new_enrollments($event, $userpath);
         }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param object $event
+     * @param object $userpath
+     */
+    private static function trigger_user_path_update_new_enrollments($event, $userpath) {
+        global $DB;
+        $latestrecord = $DB->get_record(
+            'local_adele_path_user',
+            [
+              'status' => 'active',
+              'user_id' => $event->other['userpath']->user_id,
+              'learning_path_id' => $event->other['userpath']->learning_path_id,
+            ]
+        );
+
+        $latestrecord->json = json_decode(json_encode($userpath), true);
+        $eventsingle = user_path_updated::create([
+            'objectid' => $userpath->id,
+            'context' => context_system::instance(),
+            'other' => [
+                'userpath' => $latestrecord,
+            ],
+        ]);
+        $eventsingle->trigger();
     }
 
     /**
