@@ -67,7 +67,7 @@ class adhoc_task_helper {
                     $taskdata->time = $runtime . $userpath->id;
                     $updateuserpathtask = new update_user_path();
                             // Set details for the task.
-                    $updateuserpathtask->set_userid($taskdata->userid);
+                    $updateuserpathtask->set_userid($taskdata->user_id);
                     $updateuserpathtask->set_custom_data($taskdata);
                     $updateuserpathtask->set_next_run_time($runtime);
                     \core\task\manager::reschedule_or_queue_adhoc_task($updateuserpathtask);
