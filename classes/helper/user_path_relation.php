@@ -162,13 +162,21 @@ class user_path_relation {
      */
     public function revision_user_path_relation($userpath) {
         global $DB;
-        $data = [
-            'id' => $userpath->id,
-            'status' => 'revision',
-            'timemodified' => time(),
+        $conditionsarray = [
+            'user_id' => $userpath->user_id,
+            'course_id' => $userpath->course_id,
+            'learning_path_id' => $userpath->learning_path_id,
+            'status' => 'active',
         ];
-        $DB->update_record('local_adele_path_user', $data);
-
+        $allactive = $DB->get_records('local_adele_path_user', $conditionsarray);
+        foreach ($allactive as $singelactive) {
+            $data = [
+                'id' => $singelactive->id,
+                'status' => 'revision',
+                'timemodified' => time(),
+            ];
+            $DB->update_record('local_adele_path_user', $data);
+        }
         // Update nodes and save new user path relation.
         $userpath->json = json_encode($userpath->json, true);
 
