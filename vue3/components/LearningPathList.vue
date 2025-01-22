@@ -1,33 +1,10 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
-
 <template>
   <div>
     <HelpingSlider />
     <h3>{{ store.state.strings.pluginname }}</h3>
     <div class="col-lg-2">
       <button
+        v-if="store.state.view != null"
         type="button"
         class="btn btn-primary mt-4 mb-4 btn-block"
         @click.prevent="addNewLearningpath()"
@@ -46,7 +23,6 @@
         />
       </button>
     </div>
-
     <h2>
       {{ store.state.strings.overviewlearningpaths }}
     </h2>
@@ -67,7 +43,14 @@
         class="learningcard"
       >
         <div
-          v-if="singlelearningpath.name !== 'not found'"
+          v-if="
+            store.state.editablepaths[singlelearningpath.id] != undefined ||
+            store.state.view == 'manager' ||
+            (
+              singlelearningpath.visibility == 1 &&
+              store.state.view != null
+            )
+          "
           class="wrap"
         >
           <div
@@ -80,11 +63,13 @@
                 {{ singlelearningpath.name }}
               </h5>
               <a
+                v-if="
+                  store.state.editablepaths[singlelearningpath.id] != undefined ||
+                  store.state.view == 'manager'
+                "
                 class="icon-link position-absolute"
-                href="#"
-                data-toggle="tooltip"
-                data-placement="right"
-                :title="singlelearningpath.visibility ? 'Make Invisible' : 'Make Visible'"
+                href=""
+                v-tooltip="singlelearningpath.visibility == 1 ? 'Make Invisible' : 'Make Visible'"
                 @click.prevent="toggleVisibility(singlelearningpath)"
               >
                 <i
@@ -110,11 +95,16 @@
               >
                 <div class="overlay">
                   <a
+                    v-if="
+                      (
+                        store.state.view != null &&
+                        store.state.editablepaths[singlelearningpath.id] != undefined
+                      ) ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.duplicate"
+                    v-tooltip="store.state.strings.duplicate"
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
                     <i
@@ -122,11 +112,13 @@
                     />
                   </a>
                   <a
+                    v-if="
+                      store.state.editablepaths[singlelearningpath.id] != undefined ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.edit"
+                    v-tooltip="store.state.strings.edit"
                     @click.prevent="editLearningpath(singlelearningpath.id)"
                   >
                     <i
@@ -134,11 +126,16 @@
                     />
                   </a>
                   <a
+                    v-if="
+                      (
+                        store.state.view != null &&
+                        store.state.editablepaths[singlelearningpath.id] != undefined
+                      ) ||
+                      store.state.view == 'manager'
+                    "
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.delete"
+                    v-tooltip="store.state.strings.delete"
                     @click.prevent="showDeleteConfirm(singlelearningpath.id)"
                   >
                     <i
@@ -220,9 +217,7 @@
                   <a
                     class="icon-link"
                     href=""
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    :title="store.state.strings.view"
+                    v-tooltip="store.state.strings.view"
                     @click.prevent="viewLearningpath(viewablelearningpath.id)"
                   >
                     <i
@@ -272,6 +267,7 @@ let learningPaths = [];
 let filteredLp = [];
 
 onMounted(async () => {
+  store.state.undoNodes = []
   await store.dispatch('fetchImagePaths')
   watch(() => store.state.learningpaths, async () => {
     if (store.state.learningpaths) {
@@ -290,7 +286,11 @@ onMounted(async () => {
 
 // Handle toggling of visibility
 const toggleVisibility = (learningPath) => {
-  learningPath.visibility = !learningPath.visibility;
+  if (learningPath.visibility == 0) {
+    learningPath.visibility = 1
+  } else {
+    learningPath.visibility = 0
+  }
   store.dispatch('updateLearningPathVisibility',
     {
       lpid: learningPath.id,
@@ -320,10 +320,6 @@ const showDeleteConfirm = (index) => {
 
 // Edit learning path deletion
 const viewLearningpath = async (singlelearningpathid) => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
   store.state.learningPathID = singlelearningpathid
   await store.dispatch('fetchLearningpath')
   router.push({
@@ -334,10 +330,6 @@ const viewLearningpath = async (singlelearningpathid) => {
 
 // Edit learning path deletion
 const editLearningpath = async (singlelearningpathid) => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
   store.state.learningPathID = singlelearningpathid
   await store.dispatch('fetchLearningpath')
   router.push({
@@ -390,11 +382,6 @@ const duplicateLearningpath = (learningpathid) => {
 
 </script>
 
-<style>
-.vue-flow__edges{
-  z-index: 1 !important;
-}
-</style>
 <style scoped>
   .position-relative {
     position: relative;

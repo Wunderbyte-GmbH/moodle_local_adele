@@ -22,12 +22,16 @@ const props = defineProps({
 
 const toggleFeedbackarea = () => {
   showFeedbackarea.value = !showFeedbackarea.value;
+  if (!showFeedbackarea.value) {
+    cardStyle.value.zIndex = 2;
+  }
+  handleFocus()
 };
 
 watchEffect(() => {
   if (showFeedbackarea.value) {
     feedbackStyle.value = {
-      position: 'absolute',
+      position: props.mobile ? 'relative' : 'absolute',
       top: '100%',
       left: '0',
       width: '100%',
@@ -36,82 +40,108 @@ watchEffect(() => {
       borderBottomLeftRadius: '8px',
       borderBottomRightRadius: '8px',
       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-      zIndex: 100,
     };
   } else {
     feedbackStyle.value = {};
   }
 });
+
+const cardStyle = ref({
+  zIndex: props.mobile ? 1 : 2,
+});
+const handleFocus = () => {
+  if (!props.mobile) {
+    if (showFeedbackarea.value) {
+      cardStyle.value.zIndex = 4;
+    } else {
+      cardStyle.value.zIndex = 2;
+    }
+  }
+};
+
+const handleBlur = () => {
+  if (!props.mobile) {
+    cardStyle.value.zIndex = 2;
+  }
+};
 </script>
 
 <template>
-  <div
-    class="card-container"
-    :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }"
-    @click.stop
-  >
-    <div
-      class="toggle-button"
-      :class="{ 'no-bottom-radius': showFeedbackarea }"
-      @click.stop="toggleFeedbackarea"
-    >
-      <i
-        class="fa fa-comment"
-        :class="{'fa-comment-mobile' : mobile}"
-      />
+  <div class="card-container" tabindex="0" :style="cardStyle"
+    :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }" @click.stop
+    @focus="handleFocus" @blur="handleBlur">
+    <div class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }" @click.stop="toggleFeedbackarea">
+      <i class="fa fa-comment" :class="{ 'fa-comment-mobile': mobile }" />
     </div>
     <transition name="fade">
-      <div v-if="showFeedbackarea"
-        :style="feedbackStyle"
-        class="selectable"
-        @mousedown.stop
-        @mousemove.stop
+      <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
         @mouseup.stop>
-        <div v-if="data.completion && data.completion.feedback.status" class="status-text">
+        <!-- Render status for feedback. -->
+        <div
+          v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid"
+          class="status-text">
           <i class="fa fa-info-circle"></i>
-          <span>{{ store.state.strings['node_access_' + data.completion.feedback.status] }}</span>
-        </div>
-        <div v-if="data.completion &&
-            (data.completion.feedback.status == 'closed' || data.completion.feedback.status == 'not_accessible')">
-          <UserFeedbackBlock
-            :data="data.completion.feedback.restriction.before"
-            title="restriction_before"
-          />
-        </div>
-        <div v-if="data.completion &&
-            (data.completion.feedback.status == 'not_accessible')">
-          <UserFeedbackBlock
-            :data="data.completion.feedback.completion.before"
-            title="restriction_completion_before"
-          />
-        </div>
-        <div v-else>
-          <UserFeedbackBlock
-            v-if="data.completion && data.completion.feedback.status == 'not_accessible'"
-            :data="data.completion.feedback.completion.before"
-            title="completion_before"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion && data.completion.feedback.status != 'completed' &&
-              data.completion.feedback.status != 'closed'"
-            :data="data.completion.feedback.completion.inbetween"
-            title="completion_inbetween"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion"
-            :data="data.completion.feedback.completion.after"
-            title="completion_after"
-          />
-          <UserFeedbackBlock
-            v-if="data.completion"
-            :data="data.completion.feedback.completion.higher"
-            title="completion_higher"
-          />
+          <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
+            }}</span>
         </div>
         <div
-          v-if="!data.completion"
-        >
-          {{ store.state.strings.node_access_nothing_defined }}
+          v-if="data.completion && data.completion.feedback.status_restriction === 'inbetween'"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
+            }}</span>
+        </div>
+        <div
+          v-if="data.completion && data.completion.feedback.status_restriction !== 'inbetween' && !data.completion.feedback.restriction.before_valid"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_restriction_after']
+            }}</span>
+        </div>
+        <!-- Render before restriction feedback. -->
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'before'">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.before_active)"
+            title="restriction_before" />
+        </div>
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'before' && data.completion.feedback.restriction.before_timed">
+         <span>{{ data.completion.feedback.restriction.before_timed }} </span>
+        </div>
+        <!-- Render between restriction feedback. -->
+        <div v-if="data.completion && data.completion.feedback.restriction.inbetween &&
+          data.completion.feedback.status_restriction == 'inbetween'">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.restriction.inbetween)"
+            title="restriction_before" />
+        </div>
+        <div v-if="data.completion &&
+          data.completion.feedback.status_restriction == 'inbetween' && data.completion.feedback.restriction.inbetween_timed">
+         <span>{{ data.completion.feedback.restriction.inbetween_timed }} </span>
+        </div>
+        <!-- Render status for feedback. -->
+        <div
+          v-if="data.completion && data.completion.feedback.status_completion"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_completion_' + data.completion.feedback.status_completion]
+            }}</span>
+        </div>
+        <div v-if="data.completion &&
+          data.completion.feedback.completion">
+          <UserFeedbackBlock :data="data.completion.feedback.completion[data.completion.feedback.status_completion]"
+            title="restriction_before" />
+        </div>
+         <!-- Render status for after completion feedback. -->
+         <div
+          v-if="data.completion && data.completion.feedback.status_completion === 'after' && data.completion.feedback.completion.after_all  && Object.values(data.completion.feedback.completion.after_all).length > 0"
+          class="status-text">
+          <i class="fa fa-info-circle"></i>
+          <span>{{ store.state.strings['node_access_completion_after_all']
+            }}</span>
+        </div>
+        <div v-if="data.completion && data.completion.feedback.status_completion === 'after' && data.completion.feedback.completion.after_all  && Object.values(data.completion.feedback.completion.after_all).length > 0">
+          <UserFeedbackBlock :data="Object.values(data.completion.feedback.completion.after_all)"
+            title="restriction_before" />
         </div>
       </div>
     </transition>
@@ -155,6 +185,7 @@ watchEffect(() => {
   border-radius: 8px;
   background-color: #EAEAEA;
   text-align: center;
+  z-index: 3,
 }
 
 .card-container.no-bottom-radius {
@@ -165,7 +196,8 @@ watchEffect(() => {
 
 .toggle-button {
   cursor: pointer;
-  border-radius: 8px; /* This is the default state */
+  border-radius: 8px;
+  /* This is the default state */
   transition: background-color 0.3s ease, border-radius 0.3s ease;
 }
 
@@ -195,11 +227,13 @@ watchEffect(() => {
   cursor: text;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 

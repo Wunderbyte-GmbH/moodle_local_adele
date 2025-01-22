@@ -1,31 +1,9 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
 
  <template>
   <div>
     <button @click="toggleTable" class="btn-primary toggle-button">
-      {{ isTableVisible ? 'Hide ' : 'Show ' }} User List
+      {{ isTableVisible ? store.state.strings.user_view_user_list_hide : store.state.strings.user_view_user_list_show }}
+      {{ store.state.strings.user_view_user_list }}
     </button>
     <transition name="slide-fade">
       <div
@@ -55,6 +33,9 @@
               <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')" :style="{ width: columnWidth }">
                 {{ store.state.strings.user_view_nodes }}
               </th>
+              <th @click="sortTable('rank')" :class="getSortClass('rank')" :style="{ width: columnWidth }">
+                {{ store.state.strings.userlistranking }}
+              </th>
             </tr>
           </thead>
             <transition-group name="list" tag="tbody">
@@ -74,6 +55,7 @@
                   <ProgressBar :progress="relation.progress.progress" />
                 </td>
                 <td :style="{ width: columnWidth }">{{ relation.progress.completed_nodes }}</td>
+                <td :style="{ width: columnWidth }">{{ relation.rank }}</td>
               </tr>
             </transition-group>
         </table>
@@ -96,7 +78,7 @@ const focusEntry = ref(null);
 const isTableVisible = ref(true);
 
 // Computed column count and dynamic column width
-const columnCount = computed(() => (store.state.view === 'student' ? 6 : 5));
+const columnCount = computed(() => (store.state.view === 'student' ? 7 : 6));
 const columnWidth = computed(() => `${100 / columnCount.value}%`);
 
 watch(

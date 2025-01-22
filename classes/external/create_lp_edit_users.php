@@ -33,6 +33,7 @@ use external_function_parameters;
 use external_value;
 use external_single_structure;
 use local_adele\learning_path_editors;
+use local_adele\learning_paths;
 use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -76,7 +77,7 @@ class create_lp_edit_users extends external_api {
         require_login();
         $context = context::instance_by_id($contextid);
         $hascapability = has_capability('local/adele:canmanage', $context);
-        $sessionvalue = isset($_SESSION[SESSION_KEY_ADELE]) ? $_SESSION[SESSION_KEY_ADELE] : null;
+        $sessionvalue = learning_paths::check_access();
 
         // If the user doesn't have the capability and the session value is empty, handle the error.
         if (!$hascapability && empty($sessionvalue)) {

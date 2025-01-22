@@ -15,11 +15,21 @@ describe('userSearch.vue', () => {
   beforeEach(() => {
     state = {
       learningPathID: 1,
+      strings: {
+        selectuser: 'select a user',
+        editordeleteconfirmation: 'Are you sure you want to delete this user?',
+        nousersfound: 'No users found',
+        searchuser: 'Search user',
+        onlysetaftersaved: 'Set only after saved',
+      }
     };
 
     actions = {
       getFoundUsers: jest.fn().mockResolvedValue({ list: [{ id: 1, firstname: 'John', lastname: 'Doe' }], warnings: '' }),
-      getLpEditUsers: jest.fn().mockResolvedValue([{ id: 2, firstname: 'Jane', lastname: 'Smith' }]),
+      getLpEditUsers: jest.fn().mockResolvedValue([
+        { id: 2, firstname: 'Jane', lastname: 'Smith' },
+        { id: 3, firstname: 'Jack', lastname: 'White' }
+      ]),
       createLpEditUsers: jest.fn(),
       removeLpEditUsers: jest.fn(),
     };
@@ -80,10 +90,12 @@ describe('userSearch.vue', () => {
       lpid: state.learningPathID,
       userid: 1,
     });
-    expect(wrapper.findAll('.card-user').length).toBe(2); // Now 2 users should be selected
+    expect(wrapper.findAll('.card-user').length).toBe(3); // Now 3 users should be selected
   });
 
   it('removes a user when the remove button is clicked', async () => {
+    window.confirm = jest.fn(() => true);
+
     const wrapper = mount(userSearch, {
       global: {
         plugins: [store],
@@ -93,14 +105,45 @@ describe('userSearch.vue', () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
 
-    const removeButton = wrapper.find('.btn-link');
-    await removeButton.trigger('click');
+    const userCards = wrapper.findAll('.card-user');
+    expect(userCards.length).toBe(2);
+
+    const removeButtons = wrapper.findAll('.btn-link');
+    expect(removeButtons.length).toBe(2);
+
+    await removeButtons[0].trigger('click');
 
     expect(actions.removeLpEditUsers).toHaveBeenCalledWith(expect.anything(), {
       lpid: state.learningPathID,
       userid: 2,
     });
-    expect(wrapper.find('.card-user').exists()).toBe(false);
+
+    expect(wrapper.findAll('.card-user').length).toBe(1);
+    expect(wrapper.find('.card-user').text()).not.toContain('Jane Smith');
+  });
+
+  it('removes no user when confirmation is cancelled', async () => {
+    window.confirm = jest.fn(() => false);
+
+    const wrapper = mount(userSearch, {
+      global: {
+        plugins: [store],
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+    await flushPromises();
+
+    const userCards = wrapper.findAll('.card-user');
+    expect(userCards.length).toBe(2);
+
+    const removeButtons = wrapper.findAll('.btn-link');
+    expect(removeButtons.length).toBe(2);
+
+    await removeButtons[0].trigger('click');
+
+    expect(actions.removeLpEditUsers).not.toHaveBeenCalled();
+    expect(wrapper.findAll('.card-user').length).toBe(2);
   });
 
   it('hides the user list when clicking outside', async () => {

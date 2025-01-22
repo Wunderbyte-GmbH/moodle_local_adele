@@ -38,30 +38,32 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
+interface Test {
+  id: string;
+  name: string;
+  coursename: string;
+}
+
 const store = useStore();
-const showDropdown = ref(false);
-const selectedTest = ref(null);
-const emit = defineEmits(['update:value']);
-const testSearch = ref('');
+const showDropdown = ref<boolean>(false);
+const selectedTest = ref<Test | null>(null);
+const emit = defineEmits<{
+  (event: 'update:value', value: Test | null): void;
+}>();
+const testSearch = ref<string | null>('');
 let dropdownClicked = false;
 
-const props = defineProps({
-  selectedTestId: {
-    type: String,
-    default: null,
-  },
-  tests: {
-    type: Object,
-    required: true,
-  }
-});
+const props = defineProps<{
+  selectedTestId: string | null;
+  tests: Test[];
+}>();
 
 // Handle blur only if the click is outside the dropdown
-const handleBlur = (event) => {
+const handleBlur = () => {
   setTimeout(() => {
     if (!dropdownClicked) {
       showDropdown.value = false;
@@ -100,17 +102,15 @@ watch(() => selectedTest.value, () => {
 }, { deep: true });
 
 const filteredTests = computed(() => {
-  let searchTerm = '';
-  if (testSearch.value != undefined) {
-    searchTerm = testSearch.value.toLowerCase();
-  }
-  return props.tests.filter((test) =>
-    test.name.toLowerCase().includes(searchTerm) ||
-    test.coursename.toLowerCase().includes(searchTerm)
-  );
+  const searchTerm = testSearch.value ? testSearch.value.toLowerCase() : '';
+  return props.tests.filter((test) => {
+    const testName = test.name ? test.name.toLowerCase() : '';
+    const courseName = test.coursename ? test.coursename.toLowerCase() : '';
+    return testName.includes(searchTerm) || courseName.includes(searchTerm);
+  });
 });
 
-const selectOption = (option) => {
+const selectOption = (option: Test | null) => {
   selectedTest.value = option;
   if (option) {
     testSearch.value = option.name;
@@ -120,8 +120,8 @@ const selectOption = (option) => {
   showDropdown.value = false;
 };
 
-const preventScroll = (event) => {
-  const element = event.target;
+const preventScroll = (event: Event) => {
+  const element = event.target as HTMLElement;
   if (element.scrollHeight > element.clientHeight) {
     event.preventDefault();
   }

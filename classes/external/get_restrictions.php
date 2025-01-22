@@ -72,7 +72,7 @@ class get_restrictions extends external_api {
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return course_restriction_info::get_restrictions();
+        return course_restriction_info::get_restrictions(true);
     }
 
     /**

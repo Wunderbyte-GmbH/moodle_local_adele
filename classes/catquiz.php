@@ -51,6 +51,9 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_tests() {
+        if (!class_exists('local_catquiz\testenvironment')) {
+            return [];
+        }
         $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2, true);
         $records = array_map(function ($record) {
             $record = (array)$record;
@@ -71,6 +74,9 @@ class catquiz {
      */
     public static function get_catquiz_scales($params) {
         global $DB;
+        if (!class_exists('local_catquiz\catquiz')) {
+            return [];
+        }
         $catquiz = $DB->get_record('local_catquiz_tests', ['id' => $params['testid']]);
         $scales = [];
         if ($catquiz) {
@@ -100,6 +106,9 @@ class catquiz {
      * @return array
      */
     public static function get_catquiz_parent_scales() {
+        if (!class_exists('local_catquiz\catquiz')) {
+            return [];
+        }
         $records = Local_catquizCatquiz::get_all_parent_catscales();
         return $records;
     }

@@ -1,32 +1,10 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
 
 <template>
   <div>
     <div
       class="dndflow mt-4"
       @drop="onDrop"
+      @wheel="onWheel($event, zoomLockVaraible, viewport, zoomTo)"
     >
       <Modal
         v-if="store.state.view != 'teacher'"
@@ -42,9 +20,10 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"
-        :max-zoom="1.5"
-        :min-zoom="0.2"
-        :zoom-on-scroll="zoomLock"
+        :max-zoom="1.55"
+        :min-zoom="0.15"
+        :zoom-on-scroll="false"
+        :zoom-on-pinch="false"
         class="learning-path-flow"
         @dragover="onDragOver"
         @node-drag="onDrag"
@@ -126,7 +105,7 @@
 
 <script setup>
 // Import needed libraries
-import { ref, watch, nextTick, onMounted, computed } from 'vue'
+import { ref, watch, nextTick, onMounted, computed, onUnmounted } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
@@ -154,6 +133,8 @@ import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import { debounce } from 'lodash';
+import onWheel from '../../composables/flowHelper/onWheel'
+import recalculateParentChild from '../../composables/recalculateParentChild'
 
 // Load Store and Router
 const store = useStore()
@@ -191,9 +172,9 @@ const shouldShowMiniMap = computed(() => {
   return dndFlowWidth.value > 768;
 });
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
-const zoomLock = ref(false)
+const zoomLockVaraible = ref(false)
 const zoomstep = ref(0)
+const undoWatcher = ref(null);
 
 const finishEdit = () => {
   emit('finish-edit');
@@ -208,6 +189,10 @@ edges: [],
 })
 
 onMounted(() => {
+  store.state.undoNodes = []
+  nextTick(() => {
+    startUndoWatcher();
+  });
   const observer = new ResizeObserver(entries => {
   for (let entry of entries) {
       if (entry.target.classList.contains('dndflow')) {
@@ -223,53 +208,10 @@ onMounted(() => {
   }
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(() => {
-        zoomLock.value = true
-        watch(
-          () => viewport.value.zoom,
-          (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
-              if (newVal > oldVal) {
-                setZoomLevel('in')
-              } else if (newVal < oldVal) {
-                setZoomLevel('out')
-              }
-            }
-          },
-          { deep: true }
-        );
-      });
+      fitView({ duration: 1000 })
     })
   }, 300)
 });
-
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 2]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
-}
 
 // Toggle the dark mode fi child component emits event
 function toggleClass() {
@@ -324,7 +266,7 @@ const onDrag = ($event) => {
 }
 
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store )
+  zoomstep.value = onNodeClick(event, setCenter, store )
 }
 
 // Prevent default event if node has been dropped
@@ -341,14 +283,19 @@ function onDragOver(event) {
 }
 
 // Adjust and add edges if connection was made
-function handleConnect(params) {
+async function handleConnect(params) {
 if (params.source !== store.state.startnode) {
  // Swap source and target positions
  params.target = params.source;
  params.source = store.state.startnode;
 }
+
 addEdges(addCustomEdge( params.target, params.source));
 emit('add-edge', addCustomEdge( params.target, params.source));
+
+props.learningpath.json.tree =
+recalculateParentChild(props.learningpath.json.tree, 'parentCourse', 'childCourse', 'starting_node')
+await store.dispatch('saveLearningpath', props.learningpath);
 }
 
 function handleSaveEdit(params){
@@ -453,7 +400,7 @@ function onDrop(event) {
             }
             if (dropzoneNode.data.course_node_id.length == 2 &&
               dropzoneNode.data.fullname == dropzoneNode.data.shortname ) {
-              dropzoneNode.data.fullname = ''
+              dropzoneNode.data.fullname = store.state.strings.nodes_collection;
             }
             node = dropzoneNode
             node = addStagCompletions(node)
@@ -553,19 +500,34 @@ const debouncedHandler = debounce((newVal, oldVal) => {
     const lastEdgesVal = store.state.undoEdges[store.state.undoEdges.length - 1];
     edges.value = [...lastEdgesVal]
     store.commit('unsetUndoEdges');
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
   }
 }, 300);
 
 watch(
-  () => store.state.undoNodes,  // The source (undoNodes)
+  () => store.state.undoNodes,
   debouncedHandler,
-  { deep: true }  // Deep watch to track nested changes (if needed)
+  { deep: true }
 );
+const startUndoWatcher = () => {
+  if (!undoWatcher.value) {
+    undoWatcher.value = watch(
+      () => store.state.undoNodes,
+        debouncedHandler,
+    );
+  }
+};
+
+onUnmounted(() => {
+  if (undoWatcher.value) {
+    undoWatcher.value();
+    store.state.undoNodes = []
+  }
+});
 
 async function onRemoveNode(data) {
     let node = findNode(data.node_id)
     let confirmation = true;
-
     if (node.type != 'module') {
       confirmation = window.confirm(store.state.strings.flowchart_delete_confirmation + node.data.fullname + '?');
     }
@@ -584,6 +546,15 @@ async function onRemoveNode(data) {
 
 </script>
 
+<style>
+.vue-flow__edge-layer {
+  z-index: 0; /* Ensure edges are below */
+}
+
+.vue-flow__node-layer {
+  z-index: 10; /* Ensure nodes are above */
+}
+</style>
 <style scoped>
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
  @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';

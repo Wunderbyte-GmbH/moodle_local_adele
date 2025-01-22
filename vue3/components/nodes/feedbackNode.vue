@@ -227,6 +227,7 @@ const renderFeedback = (action, emitting) => {
                 id="exampleFormControlTextarea1"
                 v-model="feedback.feedback_inbetween"
                 class="form-control"
+                style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
                 rows="5"
                 :disabled="feedback.feedback_inbetween_checkmark ||!feedback.visibility"

@@ -1,165 +1,170 @@
 <template>
   <div class="form-check">
-    {{ completion.description }}
-    <DropdownInput
-      :selected-test-id="selectedTest"
-      :tests="tests"
-      @update:value="updatedTest"
-    />
-    <div v-if="parentscales.length > 0">
-      <select
-        v-model="selectedparentscale"
-        @change="updateScales"
-      >
-        <option
-          v-for="parentScale in parentscales"
-          :key="parentScale.id"
-          :value="parentScale.id"
-        >
-          {{ parentScale.name }}
-        </option>
-      </select>
+    <div v-if="tests.length == 0">
+        {{ store.state.strings.no_catquiz_class }}
     </div>
-    <div v-if="scales.parent">
-      <table class="table table-bordered table-striped bg-white">
-          <thead class="thead-light">
-            <tr>
-              <th>
-                {{ store.state.strings.conditions_parent_scale_name }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              :class="[
-                scales.parent && (scales.parent.scale || scales.parent.attempts > 0) ? 'green-row' : 'empty-row'
-              ]"
-            >
-              <td class="position-relative">
-                <div
-                  class="item-container"
-                  @click="showDetails(scales.parent.name, ['parent'])"
-                >
-                  {{ scales.parent.name }}
-                  <div
-                    v-if="scales.parent.showDetails"
-                    class="icon-container"
-                  >
-                    <i class="fa-solid fa-arrow-right" />
-                  </div>
-                </div>
-                <div
-                  v-if="scales.parent && scales.parent.showDetails"
-                  class="dynamic-content-container"
-                >
-                  <label for="scalevalue">
-                    {{ store.state.strings.conditions_scale_value }}
-                  </label>
-                  <input
-                    id="scalevalue"
-                    v-model="scalevalue"
-                    class="form-control"
-                  >
-                  <label
-                    for="attempts"
-                    class="mt-3"
-                  >
-                    {{ store.state.strings.conditions_attempts }}
-                  </label>
-                  <input
-                    id="attempts"
-                    v-model="attempts"
-                    class="form-control"
-                  >
-                  <button
-                    class="btn btn-primary rounded-pill"
-                    @click="setValues(scales.parent.id, 'parent')"
-                  >
-                    {{ store.state.strings.conditions_set_values }}
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-      </table>
-      <button
-        v-if="scales.sub && scales.sub.length > 0"
-        class="btn btn-primary rounded-pill"
-        @click="toggleTable"
-      >
-        {{ showTable ? 'Hide Table' : 'Show Table' }}
-      </button>
-
-      <div v-else>
-        {{ store.state.strings.conditions_no_scales }}
+    <div v-else>
+      {{ completion.description }}
+      <DropdownInput
+        :selected-test-id="selectedTest"
+        :tests="tests"
+        @update:value="updatedTest"
+      />
+      <div v-if="parentscales.length > 0">
+        <select
+          v-model="selectedparentscale"
+          @change="updateScales"
+        >
+          <option
+            v-for="parentScale in parentscales"
+            :key="parentScale.id"
+            :value="parentScale.id"
+          >
+            {{ parentScale.name }}
+          </option>
+        </select>
       </div>
-      <div
-        v-if="showTable"
-        class="mt-3"
-      >
+      <div v-if="scales.parent">
         <table class="table table-bordered table-striped bg-white">
-          <thead class="thead-light">
-            <tr>
-              <th>
-                {{ store.state.strings.conditions_name }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="scale in scales.sub"
-              :key="scale.id"
-              :class="[
-                (scale.scale || scale.attempts > 0) ? 'green-row' : 'empty-row'
-              ]"
-            >
-              <td class="position-relative">
-                <div
-                  class="item-container"
-                  @click="showDetails(scale.name, ['sub'])"
-                >
-                  {{ scale.name }}
+            <thead class="thead-light">
+              <tr>
+                <th>
+                  {{ store.state.strings.conditions_parent_scale_name }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                :class="[
+                  scales.parent && (scales.parent.scale || scales.parent.attempts > 0) ? 'green-row' : 'empty-row'
+                ]"
+              >
+                <td class="position-relative">
+                  <div
+                    class="item-container"
+                    @click="showDetails(scales.parent.name, ['parent'])"
+                  >
+                    {{ scales.parent.name }}
+                    <div
+                      v-if="scales.parent.showDetails"
+                      class="icon-container"
+                    >
+                      <i class="fa-solid fa-arrow-right" />
+                    </div>
+                  </div>
+                  <div
+                    v-if="scales.parent && scales.parent.showDetails"
+                    class="dynamic-content-container"
+                  >
+                    <label for="scalevalue">
+                      {{ store.state.strings.conditions_scale_value }}
+                    </label>
+                    <input
+                      id="scalevalue"
+                      v-model="scalevalue"
+                      class="form-control"
+                    >
+                    <label
+                      for="attempts"
+                      class="mt-3"
+                    >
+                      {{ store.state.strings.conditions_attempts }}
+                    </label>
+                    <input
+                      id="attempts"
+                      v-model="attempts"
+                      class="form-control"
+                    >
+                    <button
+                      class="btn btn-primary rounded-pill"
+                      @click="setValues(scales.parent.id, 'parent')"
+                    >
+                      {{ store.state.strings.conditions_set_values }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+        </table>
+        <button
+          v-if="scales.sub && scales.sub.length > 0"
+          class="btn btn-primary rounded-pill"
+          @click="toggleTable"
+        >
+          {{ showTable ? 'Hide Table' : 'Show Table' }}
+        </button>
+
+        <div v-else>
+          {{ store.state.strings.conditions_no_scales }}
+        </div>
+        <div
+          v-if="showTable"
+          class="mt-3"
+        >
+          <table class="table table-bordered table-striped bg-white">
+            <thead class="thead-light">
+              <tr>
+                <th>
+                  {{ store.state.strings.conditions_name }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="scale in scales.sub"
+                :key="scale.id"
+                :class="[
+                  (scale.scale || scale.attempts > 0) ? 'green-row' : 'empty-row'
+                ]"
+              >
+                <td class="position-relative">
+                  <div
+                    class="item-container"
+                    @click="showDetails(scale.name, ['sub'])"
+                  >
+                    {{ scale.name }}
+                    <div
+                      v-if="scale.showDetails"
+                      class="icon-container"
+                    >
+                      <i class="fa-solid fa-arrow-right" />
+                    </div>
+                  </div>
                   <div
                     v-if="scale.showDetails"
-                    class="icon-container"
+                    class="dynamic-content-container"
                   >
-                    <i class="fa-solid fa-arrow-right" />
+                    <label for="scalevalue">
+                      {{ store.state.strings.conditions_scale_value }}
+                    </label>
+                    <input
+                      id="scalevalue"
+                      v-model="scalevalue"
+                      class="form-control"
+                    >
+                    <label
+                      for="attempts"
+                      class="mt-3"
+                    >
+                      {{ store.state.strings.conditions_attempts }}
+                    </label>
+                    <input
+                      id="attempts"
+                      v-model="attempts"
+                      class="form-control"
+                    >
+                    <button
+                      class="btn btn-primary rounded-pill"
+                      @click="setValues(scale.id, 'sub')"
+                    >
+                      {{ store.state.strings.conditions_set_values }}
+                    </button>
                   </div>
-                </div>
-                <div
-                  v-if="scale.showDetails"
-                  class="dynamic-content-container"
-                >
-                  <label for="scalevalue">
-                    {{ store.state.strings.conditions_scale_value }}
-                  </label>
-                  <input
-                    id="scalevalue"
-                    v-model="scalevalue"
-                    class="form-control"
-                  >
-                  <label
-                    for="attempts"
-                    class="mt-3"
-                  >
-                    {{ store.state.strings.conditions_attempts }}
-                  </label>
-                  <input
-                    id="attempts"
-                    v-model="attempts"
-                    class="form-control"
-                  >
-                  <button
-                    class="btn btn-primary rounded-pill"
-                    @click="setValues(scale.id, 'sub')"
-                  >
-                    {{ store.state.strings.conditions_set_values }}
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

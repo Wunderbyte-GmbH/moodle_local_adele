@@ -43,7 +43,7 @@
           :disabled="showBackConfirmation"
           @click="goBack"
         >
-          <i class="fa fa-arrow-left" /> Go Back to Overview
+          <i class="fa fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
         </button>
         <div
           class="card p-4"
@@ -84,7 +84,7 @@
           :disabled="showBackConfirmation"
           @click="goBackConfirmation(false)"
         >
-          <i class="fa fa-arrow-left" /> Go Back to Overview
+          <i class="fa fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
         </button>
         <div
           v-if="showBackConfirmation"

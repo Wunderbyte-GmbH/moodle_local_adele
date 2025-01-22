@@ -23,15 +23,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ // Required strings.
 $string['modulename'] = 'Lernpfad';
 $string['modulenameplural'] = 'Lernpfade';
 $string['modulename_help'] = 'Lernpfad';
 $string['pluginadministration'] = 'Lernpfad-Verwaltung';
 $string['pluginname'] = 'Lernpfad';
 $string['not_found'] = 'Learning path wurde nicht gefunden! Bitte kontaktiere die verantwortliche Person für diesen Lernpfad!';
+$string['required'] = 'notwendig';
 
 // Fähigkeiten.
 $string['adele:edit'] = 'Lernpfad bearbeiten';
+$string['adele:teacheredit'] = 'TrainerIn bearbeiten';
 $string['adele:view'] = 'Lernpfad anzeigen';
 $string['adele:canmanage'] = 'Darf Lernpfad-Plugins verwalten';
 
@@ -78,6 +81,7 @@ $string['btncreatecourse'] = 'Zur Seite gehen und einen Kurs erstellen';
 $string['btnsave'] = 'Speichern';
 $string['btncancel'] = 'Abbrechen';
 $string['btnupdate_positions'] = 'Positionen aktualisieren';
+$string['btntoggle'] = 'Ansicht wechseln';
 $string['btndarktoggle'] = 'Dunkle Ansicht';
 $string['btnlighttoggle'] = 'Helle Ansicht';
 $string['btnstudenttoggle'] = 'Student Ansicht';
@@ -95,6 +99,18 @@ $string['placeholder_search'] = 'Kurse suchen';
 $string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['edit_course_node'] = 'Knoten bearbeiten';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
+$string['from_default_node_image'] = 'Standard-Knotenbild:';
+$string['uploaddefaultimage'] = 'Lade das Standard-Knotenbild hoch';
+$string['selectdefaultimage'] = 'Wähle das Standard-Knotenbild aus';
+$string['deselectdefaultimage'] = 'Abwählen';
+$string['uploadowndefaultimage'] = 'Oder wähle ein eigenes Bild hoch:';
+$string['uploadanduseimage'] = 'Lade und benutze Bild';
+$string['onlysetaftersaved'] = 'Kann erst nach dem ersten Speichern gesetzt werden';
+$string['searchuser'] = 'Suche User...';
+$string['editordeleteconfirmation'] = 'Den Nutzer als Bearbeiter für diesen Lernpfad wirklich entfernen?';
+$string['selectuser'] = 'Users auswählen';
+$string['removeuser'] = 'Entfernen';
+$string['nousersfound'] = 'Keine User gefunden';
 
 // Uebersichtszeichenfolge.
 $string['overviewlearningpaths'] = 'Übersicht aller Lernpfade';
@@ -113,13 +129,16 @@ $string['categories'] = 'Kategorieebene definieren';
 $string['categories_desc'] = 'Definieren Sie, auf welcher Kursebene Kurse enthalten sein sollen';
 $string['tag_invalid'] = 'Folgende Tags wurden nicht gefunden: {$a}';
 $string['warning_empty_space'] = 'Achten Sie bitte auf Leerzeichen und enden Sie nicht mit einem Komma';
-$string['settings_only_subscribed'] = 'Nur Kurse, für die der Lehrer angemeldet ist.';
+$string['settings_only_subscribed'] = 'Nur Kurse, für die {$a} angemeldet ist.';
 $string['settings_all_courses'] = 'Alle Kurse, die den anderen Kriterien entsprechen.';
 $string['single_quiz'] = 'Ein Versuch muss alle Skalen erfüllen.';
 $string['all_quiz'] = 'Über alle Versuche hinweg muss jede Skala mindestens einmal erfüllt werden.';
 $string['all_quiz_global'] = 'Über alle Versuche mit einem bestimmten globalen Wert hinweg muss jede Skala mindestens einmal erfüllt werden.';
 $string['quiz_settings'] = 'Quiz Einstellungen';
 $string['quiz_settings_desc'] = 'Die Quizeinstellungen definieren die Validierung korrekter Versuche.';
+$string['enroll_as_setting'] = 'Einschreibung Einstellungen';
+$string['enroll_as_setting_desc'] = 'Definiere mit welcher Rolle ein Nutzer durch einen Lernpfad eingeschrieben wird.';
+
 
 // Benachrichtigungen.
 $string['title_duplicate'] = 'Lernpfad dupliziert';
@@ -138,10 +157,13 @@ $string['node_coursefullname'] = 'Knotenname:';
 $string['node_courseshortname'] = 'Kurzbezeichnung des Knoten:';
 
 // Conditions description.
+$string['course_description_master'] = 'Diese Kondition überschreibt alle anderen';
+$string['course_name_master'] = 'Master Kondition';
 $string['course_description_condition_completion_manual'] = 'Der Knoten wird manuell abgeschlossen';
 $string['course_description_condition_parent_courses'] = 'Der Knoten wird zugänglich, wenn eine bestimmte Anzahl übergeordneter Knoten abgeschlossen ist';
 $string['course_name_condition_completion_manual'] = 'Knotenabschluss-Kontrollkästchen';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'not';
+$string['course_name_condition_completion_manual_role_teacher'] = 'Dozenten';
 $string['course_name_condition_parent_courses'] = 'Entsprechend der übergeordneten Knoten';
 $string['course_description_condition_restriction_manual'] = 'Der Zugang wird manuell gewährt';
 $string['course_name_condition_restriction_manual'] = 'Knotenzugang-Kontrollkästchen';
@@ -152,6 +174,7 @@ $string['course_name_condition_timed'] = 'Knotenstart-/Enddatum';
 $string['course_name_condition_course_completed'] = 'Kurs(e) abgeschlossen';
 $string['course_description_condition_catquiz'] = 'Entsprechend den Catquiz-Ergebnissen/-Versuchen';
 $string['course_name_condition_catquiz'] = 'Catquiz-Quiz';
+$string['no_catquiz_class'] = 'Kein Catquiz gefunden';
 $string['course_description_condition_modquiz'] = 'Entsprechend dem Mod-Quiz-Ergebnis';
 $string['course_name_condition_modquiz'] = 'Mod-Quiz';
 $string['course_description_condition_parent_node_completed'] = 'Wenn ein übergeordneter Knoten abgeschlossen ist';
@@ -180,36 +203,57 @@ $string['node_access_accessible'] = 'Der Knoten ist zugänglich. Um ihn abzuschl
 $string['node_access_not_accessible'] = 'Der Knoten ist noch nicht zugänglich. Um ihn freizuschalten musst du:';
 $string['node_access_closed'] = 'Der Knoten ist nicht mehr zugänglich. Bitte kontaktiere deinen Dozenten für weitere Schritte. Die Zugangskriterien waren:';
 $string['node_access_nothing_defined'] = 'Kein Benutzerfeedback verfügbar';
+$string['node_access_completion_before'] = 'Um diesen Kurs/diesen Stapel abzuschließen, musst du:';
+$string['node_access_completion_inbetween'] = 'Um diesen Kurs/diesen Stapel abzuschließen, müssen Sie noch:';
+$string['node_access_completion_after'] = 'Dieser Kurs/dieser Stapel gilt als abgeschlossen, weil Sie:';
+$string['node_access_completion_after_all'] = 'Du kannst einen höheren Kursabschluss erreichen, wenn du:';
+$string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
+$string['node_access_restriction_inbetween'] = 'Der Kurs/Der Stapel ist freigeschaltet:';
+$string['node_access_restriction_after'] = 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = 'Ein Kurs in diesem Knoten muss abgeschlossen werden';
 
-$string['course_description_before_completion_manual'] = 'der Abschluss wird manuell gewährt';
-$string['course_description_inbetween_completion_manual'] = 'Abschluss wurde {checkbox_status} manuell gewährt';
-$string['course_description_after_completion_manual'] = 'der Abschluss wurde manuell gewährt';
+$string['course_description_before_completion_manual'] = 'durch den {Dozenten} ein manueller Abschluss verbucht werden';
+$string['course_description_inbetween_completion_manual'] = 'durch den {Dozenten} ein manueller Abschluss verbucht werden';
+$string['course_description_after_completion_manual'] = 'ihn erfolgreich bearbeitet haben';
 $string['course_description_placeholder_checkbox_status'] = 'nicht';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
 
-$string['course_description_before_condition_course_completed'] = '{numb_courses} Kurs(e) dieses Knotens müssen abgeschlossen werden';
-$string['course_description_inbetween_condition_course_completed'] = 'du musst {numb_courses} Kurs(e) abschließen.';
-$string['course_description_after_condition_course_completed'] = 'du hast genug Kurse dieses Knotens abgeschlossen';
+$string['course_description_before_condition_course_completed_kurse'] = 'Kurse';
+$string['course_description_before_condition_course_completed_kursen'] = 'Kursen';
+$string['course_description_before_condition_course_completed_item'] = 'Den Kurs';
+$string['course_description_before_condition_course_completed_aus'] = 'aus';
+$string['course_description_before_condition_course_completed'] = '{item} erfolgreich bearbeiten ';
+$string['course_description_inbetween_condition_course_completed'] = '{item} erfolgreich bearbeiten';
+$string['course_description_after_condition_course_completed'] = '{item} erfolgreich bearbeitet haben';
 
 $string['course_description_before_condition_catquiz'] = 'beende das Quiz {quiz_name}';
-$string['course_description_inbetween_condition_catquiz'] = 'der {quiz_name} Test wurde noch nicht ausreichend abgeschlossen{quiz_attempts_best}';
-$string['course_description_inbetween_condition_catquiz_best'] = '. <a href="{$a->link}" target="_blank">Klicke hier um das beste Ergebnis vom {$a->time} zu sehen</a>';
-$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:<ul>{quiz_attempts_list}</ul> in ausreichender Form nachgewiesen.';
-$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
+$string['course_description_inbetween_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
+$string['course_description_inbetween_condition_catquiz_best'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}</a>)</li>';
+$string['course_description_after_condition_catquiz'] = 'deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.';
+$string['course_description_after_condition_modquiz_list'] = '<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time}  Logit {$a->currentlogit} / {$a->targetlogit} Percentage {$a->currentperc} / {$a->targetperc}</a>)</li>';
 
-$string['course_description_before_condition_modquiz'] = 'beende das Quiz {catquiz_name_link}';
-$string['course_description_inbetween_condition_modquiz'] = 'das Quiz {quiz_name_link} muss mit einer Skala von {scale_min} abgeschlossen werden. Aktuelles bestes Ergebnis ist {current_best}.';
-$string['course_description_after_condition_modquiz'] = 'das Quiz {catquiz_name_link} wurde erfolgreich abgeschlossen';
+$string['course_description_after_condition_modquiz_best'] = 'Beste Note:';
+$string['course_description_before_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} bestehen';
+$string['course_description_inbetween_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} {currentbest} bestehen';
+$string['course_description_after_condition_modquiz'] = 'das Quiz mit {minnumb} von {maxnumb} bestanden haben';
 
-$string['course_restricition_before_condition_manual'] = 'der Zugang wird manuell gewährt';
-$string['course_restricition_before_condition_parent_courses'] = 'schließe {numb_courses} Kurs(e) des übergeordneten Knotens {node_name} ab';
-$string['course_restricition_before_condition_specific_course'] = 'den Kurs {course_list} abschließen';
-$string['course_restricition_before_condition_timed'] = 'zugänglich {start_date} {end_date}';
+$string['course_restricition_before_condition_manual'] = 'eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
+$string['course_restricition_before_condition_parent_courses'] = 'Sie {node_name} abgeschlossen haben';
+$string['course_restricition_before_condition_specific_course'] = 'Sie {node_name} abgeschlossen haben';
+$string['course_condition_timed_duration_start'] = 'ab dem Moment der Einschreibung in diesen Knoten';
+$string['course_condition_timed_duration_since'] = 'seit ';
+$string['course_restricition_before_condition_timed'] = 'der {start_date} erreicht wird ';
 $string['course_restricition_before_condition_from'] = 'von ';
 $string['course_restricition_before_condition_to'] = 'bis ';
-$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} seit {timed_condition}';
-$string['course_restricition_before_condition_parent_node_completed'] = 'den übergeordneten Knoten {parent_course_list} abschließen';
+$string['course_restricition_before_condition_timed_duration'] = 'zugänglich für {duration_period} {timed_condition}';
+$string['course_restricition_before_condition_parent_node_completed'] = 'Sie {node_name} abgeschlossen haben';
+
+$string['node_restriction_inbetween_timed'] = 'Sie haben bis zum {$a} Zugang zu diesem Kurs/ diesem Stapel.';
+$string['node_restriction_before_timed'] = 'Nach der Freischaltung haben Sie maximal bis zum {$a} Zugang.';
+
+$string['course_master_conditions'] = 'Master Bedingungen';
+$string['course_master_condition_restriction'] = 'Master Zugangs-Checkbox';
+$string['course_master_condition_completion'] = 'Master Abschluss-Checkbox';
 
 $string['course_condition_concatination_or'] = 'oder';
 $string['course_condition_concatination_and'] = ' und ';
@@ -227,6 +271,8 @@ $string['event_user_path_updated'] = 'Benutzerpfad-Beziehung wurde aktualisiert'
 $string['event_user_path_updated_description'] = 'Die Benutzerpfad-Beziehung für Benutzer {$a->user} und Lernpfad {$a->path} wurde aktualisiert';
 $string['event_node_finished'] = 'Knoten wurde abgeschlossen';
 $string['event_node_finished_description'] = 'Der Benutzer {$a->user} hat den Knoten {$a->node} abgeschlossen';
+$string['event_attempt_submitted'] = 'Quiz wurde abgeschlossen';
+$string['event_attempt_submitted_description'] = 'Der Benutzer {$a->user} hat das Quiz {$a->node} abgeschlossen';
 
 // Farbzeichenfolgen.
 $string['DARK_GREEN'] = '#063449';
@@ -279,12 +325,26 @@ $string['completion_course_title'] = 'Knotentitel:';
 $string['completion_course_tags'] = 'Tags:';
 $string['completion_node_refused_title'] = 'Knotenabwurf abgelehnt';
 $string['completion_node_refused_text'] = 'Bitte lassen Sie den Knoten in den Ablagezonen fallen, die angezeigt werden, wenn Sie einen Knoten zu einem vorhandenen Knoten ziehen.';
+$string['completion_description_feedback'] = 'Beschreibung';
+$string['completion_dates_duration_feedback'] = 'Daten und Dauer';
+$string['completion_estimated_duration_feedback'] = 'Geschätzte Dauer:';
+$string['completion_start_date_feedback'] = 'Startdatum:';
+$string['completion_end_date_feedback'] = 'Enddatum:';
+$string['completion_first_subscription_feedback'] = 'Zuerst angemeldet bei Knoten:';
+$string['completion_restriction_feedback'] = 'Einschränkung';
+$string['completion_nothing_defined_feedback'] = 'Nichts definiert';
+$string['completion_completion_inbetween_feedback'] = 'Zwischenzeitliche Erledigung';
+$string['completion_completion_feedback'] = 'Abschluss';
 $string['completion_feedback_node'] = 'Rückmeldungen zum Knoten';
 $string['completion_loading_completion'] = 'Abschluss wird geladen...';
 $string['completion_drop_here'] = 'Hier ablegen, um zu verbinden';
 $string['completion_drop_zone'] = 'Ablagezone';
 $string['completion_list_of_criteria'] = 'Liste der verfügbaren ';
 $string['completion_criteria'] = ' Kriterien';
+$string['completion_edge_or'] = ' ODER';
+$string['completion_edge_and'] = 'UND';
+$string['course_completion_choose_number'] = 'Bestimme eine Anzahl';
+$string['course_completion_minimum_amount'] = 'Bestimme die Mindestanzahl von Kursabschlüssen';
 
 // Flussdiagrammzeichenfolgen.
 $string['flowchart_add_learning'] = 'Ein Lernmodul hinzufügen';
@@ -333,7 +393,7 @@ $string['nodes_select_module'] = 'Modul auswählen';
 $string['nodes_deselect_module'] = 'Modul abwählen';
 $string['nodes_included_courses'] = 'Enthaltene Kurse';
 $string['nodes_edit_restriction'] = 'Einschränkung bearbeiten';
-$string['nodes_edit_completion'] = 'Abschluss bearbeiten';
+$string['nodes_edit_completion'] = 'Abschlusskriterien bearbeiten';
 $string['nodes_completion'] = 'Abschluss';
 $string['nodes_restriction'] = 'Einschränkung';
 $string['nodes_potential_start'] = 'Möglicher Startknoten';
@@ -375,7 +435,7 @@ $string['composables_feedback_node'] = 'Feedbackknoten';
 
 // Einschränkungszeichenfolgen.
 $string['restriction_select_number'] = 'Eine Zahl auswählen:';
-$string['restriction_select_course'] = 'Einen Kurs auswählen:';
+$string['restriction_select_course'] = 'Einen Knoten auswählen:';
 $string['restriction_choose_number'] = 'Eine Zahl wählen';
 $string['restriction_parents_found'] = 'Folgende übergeordnete Knoten gefunden:';
 $string['restriction_access_manually'] = 'Zugriff auf Knoten manuell gewähren';
@@ -398,12 +458,16 @@ $string['user_view_lastname'] = 'Nachname';
 $string['user_view_email'] = 'E-Mail';
 $string['user_view_progress'] = 'Fortschritt';
 $string['user_view_nodes'] = 'Abgeschlossene Knoten';
+$string['userlistranking'] = 'Rang';
 $string['user_view_go_back_overview'] = 'Zurück zur Übersicht';
 $string['user_view_user_path_for'] = 'Benutzerpfad für:';
 $string['nodes_feedback_before'] = 'Vorher';
 $string['nodes_feedback_inbetween'] = 'Zwischen';
 $string['nodes_feedback_after'] = 'Nachher';
 $string['nodes_feedback_use_default'] = 'Standard-Feedback verwenden';
+$string['user_view_user_list'] = 'Nutzerliste';
+$string['user_view_user_list_show'] = 'Zeige ';
+$string['user_view_user_list_hide'] = 'Verstecke ';
 
 // Main strings.
 $string['main_intro_slider'] = 'Einführungsslider';
@@ -420,3 +484,17 @@ $string['mobile_view_detail_back'] = 'Zurück';
 $string['mobile_view_detail_description'] = 'Beschreibung:';
 $string['mobile_view_detail_estimate'] = 'Geschätzte Dauer:';
 $string['mobile_view_detail_course_link'] = 'Kurs öffnen';
+
+// Privacy API.
+$string['privacy:metadata:local_adele_learning_paths'] = 'Die Tabelle speichert Informationen über Lernpfade, die von Nutzern erstellt wurden.';
+$string['privacy:metadata:local_adele_learning_paths:createdby'] = 'Die ID des Nutzers, der den Lernpfad erstellt hat.';
+$string['privacy:metadata:local_adele_learning_paths:json'] = 'Zusätzliche Informationen über den Lernpfad, gespeichert im JSON-Format.';
+
+$string['privacy:metadata:local_adele_path_user'] = 'Die Tabelle speichert die Beziehung zwischen Nutzern und ihren zugewiesenen Lernpfaden.';
+$string['privacy:metadata:local_adele_path_user:user_id'] = 'Die ID des Nutzers, der dem Lernpfad zugewiesen ist.';
+$string['privacy:metadata:local_adele_path_user:json'] = 'Zusätzliche Informationen über die Zuweisung, gespeichert im JSON-Format.';
+
+$string['privacy:metadata:local_adele_lp_editors'] = 'Die Tabelle speichert Informationen über Nutzer, die berechtigt sind, bestimmte Lernpfade zu bearbeiten.';
+$string['privacy:metadata:local_adele_lp_editors:userid'] = 'Die ID des Nutzers, der berechtigt ist, den Lernpfad zu bearbeiten.';
+
+$string['cachedef_navisteacher'] = 'Ist Lehrer cache';

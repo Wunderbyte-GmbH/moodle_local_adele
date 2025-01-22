@@ -68,6 +68,16 @@ class modquiz_test extends advanced_testcase {
      * @covers \local_adele\course_completion\conditions\modquiz::get_completion_status
      */
     public function test_get_completion_status() {
+        global $DB;
+
+        // Mock the global $DB object.
+        $DB = $this->createMock(\moodle_database::class);
+        $DB->expects($this->any())
+            ->method('get_record_sql')
+            ->willReturn((object)[
+                'name' => 'Sample Quiz Name',
+                'cmid' => 65,
+            ]);
         $modquiz = $this->getMockBuilder(modquiz::class)
             ->onlyMethods(['get_modquiz_records'])
             ->getMock();
@@ -85,6 +95,7 @@ class modquiz_test extends advanced_testcase {
                             'label' => 'modquiz',
                             'value' => [
                               'grade' => 70,
+                              'quizid' => 1,
                             ],
                         ],
                     ],
@@ -96,6 +107,7 @@ class modquiz_test extends advanced_testcase {
         $statusincomplete = $modquiz->get_completion_status($nodeincomplete, 3);
         $this->assertFalse($statusincomplete['completed'][10]);
         $this->assertStringContainsString('65/70', $statusincomplete['inbetween_info']);
+        $this->assertStringContainsString('/mod/quiz/view', $statusincomplete[10]['placeholders']['quiz_name_link']);
 
         // Test complete node data (expecting completion).
         $nodecomplete = [

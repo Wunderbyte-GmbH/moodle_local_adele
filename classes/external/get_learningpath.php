@@ -33,10 +33,13 @@ use external_function_parameters;
 use external_value;
 use external_single_structure;
 use local_adele\learning_paths;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/local/adele/lib.php');
+
 
 /**
  * External Service for local adele.
@@ -80,7 +83,15 @@ class get_learningpath extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:view', $context);
+
+        $learningpaths = learning_paths::return_learningpaths();
+
+        if (
+          !isset($learningpaths[$params['learningpathid']]) &&
+          !has_capability('local/adele:edit', $context)
+        ) {
+            throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', 'error');
+        }
         $learningpath = learning_paths::get_learning_path($params);
         if (isset($learningpath[0]) && $learningpath[0] == false) {
             return [

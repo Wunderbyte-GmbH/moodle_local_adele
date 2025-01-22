@@ -130,4 +130,25 @@ describe('removeNodeConditions', () => {
 
     expect(result).toEqual(node); // Node should remain unchanged
   });
+
+  it('should handle node id strings', () => {
+    const node = {
+      name: 'Simple node',
+      restriction: {
+        nodes: [
+          {
+            id: 'node_3',
+            data: {
+              value: {
+                node_id: 7
+              }
+            }
+          }
+        ]
+      }
+    };
+    const removedid = 6;
+    const result = removeNodeConditions(node, removedid);
+    expect(result).toEqual(node);
+  });
 });

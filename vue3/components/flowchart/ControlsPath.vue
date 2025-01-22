@@ -279,7 +279,7 @@ const onCancelConfirmation = (toggle) => {
       Undo last node deletion
     </button>
     <a
-      href="/backup/restorefile.php?contextid=1"
+      :href="store.state.wwwroot + '/backup/restorefile.php?contextid=1'"
       target="_blank"
       rel="noreferrer noopener"
     >

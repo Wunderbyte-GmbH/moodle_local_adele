@@ -62,7 +62,7 @@ class update_user_path_relation extends external_api {
     }
 
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Webservice for the local adele plugin to get next question.
      *
      * @param int $lpuserpathid
      * @param int $contextid

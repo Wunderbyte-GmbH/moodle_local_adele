@@ -16,6 +16,8 @@
 
 namespace local_adele\course_completion;
 
+use core_plugin_manager;
+
 /**
  *
  * @package     local_adele
@@ -59,12 +61,25 @@ class course_info {
         $filelist = glob($path);
         $conditions = [];
 
+        $pluginman = core_plugin_manager::instance();
+        $plugins = $pluginman->get_installed_plugins('local');
+
         // We just want filenames, as they are also the classnames.
         foreach ($filelist as $filepath) {
+            $addcondition = true;
             $path = pathinfo($filepath);
             $filename = 'local_adele\\course_completion\\conditions\\' . $path['filename'];
+            if (
+              (
+                $path['filename'] == 'catquiz' &&
+                !array_key_exists('catquiz', $plugins)
+              ) ||
+              $path['filename'] == 'master'
+            ) {
+                $addcondition = false;
+            }
             // We instantiate all the classes, because we need some information.
-            if (class_exists($filename)) {
+            if (class_exists($filename) && $addcondition) {
                 $conditionclass = new $filename();
                 $conditions[] = $conditionclass->get_description();
             }

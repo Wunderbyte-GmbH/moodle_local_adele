@@ -36,11 +36,17 @@ const addUser = (user) => {
 };
 
 const removeUser = (userId) => {
-  store.dispatch('removeLpEditUsers', {
-    lpid: store.state.learningPathID,
-    userid: userId,
-  });
-  selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+  const confirmation = confirm(store.state.strings.editordeleteconfirmation);
+  if (
+    confirmation &&
+    selectedUsers.value.length >= 2
+  ) {
+    store.dispatch('removeLpEditUsers', {
+      lpid: store.state.learningPathID,
+      userid: userId,
+    });
+    selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+  }
 };
 
 // Hide the list if clicking outside of the input or list
@@ -55,7 +61,9 @@ const handleClickOutside = (event) => {
 const isLearningPathIDZero = computed(() => store.state.learningPathID === 0);
 
 const inputPlaceholder = computed(() =>
-  isLearningPathIDZero.value ? 'Can only be set after learning path was saved' : 'Search users...'
+  isLearningPathIDZero.value ?
+    store.state.strings.onlysetaftersaved :
+    store.state.strings.searchuser
 );
 
 onMounted(async () => {
@@ -71,7 +79,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="col-6">
-    <h4>Select Users</h4>
+    <h4>
+      {{ store.state.strings.selectuser }}
+    </h4>
     <input
       v-model="searchQuery"
       class="form-control mb-2 user-search-input"
@@ -99,7 +109,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div v-else class="alert alert-warning">
-        No users were found
+        {{ store.state.strings.nousersfound }}
       </div>
     </div>
     <div v-if="selectedUsers.length" class="d-flex flex-wrap mt-2">
@@ -111,9 +121,10 @@ onBeforeUnmount(() => {
         <div class="card-body p-2 d-flex align-items-center justify-content-between">
           <span>{{ user.firstname }} {{ user.lastname }}</span>
           <button
+            v-if="selectedUsers.length > 1"
             class="btn btn-link text-danger p-0"
             @click="removeUser(user.id)"
-            title="Remove"
+            :title="store.state.strings.removeuser"
           >
             &times;
           </button>

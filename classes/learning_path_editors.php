@@ -25,17 +25,10 @@
 
 namespace local_adele;
 
-use local_adele\event\learnpath_created;
-use local_adele\event\learnpath_updated;
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/accesslib.php');
+
 use stdClass;
-use context_system;
-use context_course;
-use local_adele\event\learnpath_deleted;
-use local_adele\event\user_path_updated;
-use local_adele\helper\user_path_relation;
-use core_completion\progress;
-use Exception;
-use moodle_url;
 
 /**
  * Class learning_paths

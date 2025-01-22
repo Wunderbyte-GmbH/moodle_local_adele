@@ -46,4 +46,24 @@
       'eventname' => '\local_adele\event\node_finished',
       'callback' => 'local_adele_observer::node_finished',
     ],
+    [
+      'eventname' => '\mod_quiz\event\attempt_submitted',
+      'callback' => 'local_adele_observer::attempt_submitted',
+    ],
+    [
+      'eventname' => '\mod_quiz\event\attempt_finished',
+      'callback' => 'local_adele_observer::quiz_attempt_finished',
+    ],
+    [
+      'eventname' => '\mod_quiz\event\attempt_reviewed',
+      'callback' => 'local_adele_observer::quiz_attempt_finished',
+    ],
+    [
+      'eventname' => '\mod_adaptivequiz\event\attempt_completed',
+      'callback' => 'local_adele_observer::catquiz_attempt_finished',
+    ],
+    [
+      'eventname' => '\core\event\course_viewed',
+      'callback' => 'local_adele_observer::user_views_learning_path',
+    ],
  ];

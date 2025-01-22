@@ -18,7 +18,10 @@
   function capitalize(text, index, length) {
     if (!text) return ''
     else if (index == 0) text.charAt(0).toUpperCase() + text.slice(1);
-    if (index == length - 1) {
+    if (
+      index == length - 1 &&
+      !text.endsWith('</ul>')
+    ) {
         return text + '.'
     }
     return text
@@ -27,7 +30,7 @@
 </script>
 
 <template>
-  <div v-if="data && data.length > 0 && data[0] !== ''">
+  <div v-if="data && data[0] !== ''">
     <div
       v-if="title == 'completion_higher'"
       class="feedback-title"

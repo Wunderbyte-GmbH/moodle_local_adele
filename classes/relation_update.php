@@ -27,8 +27,10 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use core_analytics\local\time_splitting\before_now;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
+use local_adele\helper\adhoc_task_helper;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
@@ -67,7 +69,16 @@ class relation_update {
                     $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
                     $restrictionnodepaths = [];
                     $singlerestrictionnode = [];
-                    if (isset($node['restriction'])) {
+                    if (isset($node['data']['completion']['master'])) {
+                        $userpath->json['user_path_relation'][$node['id']]['master'] =
+                              $node['data']['completion']['master'];
+                    }
+                    if (
+                      isset($restrictioncriteria['master']) &&
+                      $restrictioncriteria['master']
+                    ) {
+                        $restrictionnodepaths[] = 'master';
+                    } else if (isset($node['restriction'])) {
                         foreach ($node['restriction']['nodes'] as $restrictionnodepath) {
                             $failedrestriction = false;
                             $validationconditionstring = [];
@@ -76,9 +87,20 @@ class relation_update {
                                 $restrictionnodepath['parentCondition'][0] == 'starting_condition'
                             ) {
                                 $currentcondition = $restrictionnodepath;
+                                $feedback = self::searchnestedarray(
+                                    $node['restriction']['nodes'],
+                                    $currentcondition['childCondition'],
+                                    'id',
+                                    true
+                                );
+                                $activecolumnfeedback = [];
+                                $activefeedbackfornode = [];
                                 $validationcondition = false;
+                                $allconditions = [];
                                 while ($currentcondition) {
                                     $currlabel = $currentcondition['data']['label'];
+                                    $allconditions[] = $currentcondition['data']['label']
+                                    . '_' . $currentcondition['id'];
                                     if (
                                         $currentcondition['data']['label'] == 'timed' ||
                                         $currentcondition['data']['label'] == 'timed_duration' ||
@@ -109,6 +131,13 @@ class relation_update {
                                     // Check if the conditon is true and break if one condition is not met.
                                     if (!$validationcondition) {
                                         $failedrestriction = true;
+                                        $activecolumnfeedback[] = self::render_placeholders_single_restriction(
+                                            $currentcondition['data']['description_before'],
+                                            $currentcondition['id'],
+                                            $node['restriction']['nodes'],
+                                            $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']]
+                                            ?? null
+                                        );
                                     }
                                     // Get next Condition and return null if no child node exsists.
                                     $currentcondition = self::searchnestedarray(
@@ -120,11 +149,28 @@ class relation_update {
                                 if ($validationcondition && !$failedrestriction) {
                                     $restrictionnodepaths[] = $validationconditionstring;
                                 }
+
+                                $activefeedbackfornode =
+                                implode(get_string('course_condition_concatination_and', 'local_adele'), $activecolumnfeedback);
+                                $restrictionnodepathsall[] = $allconditions;
+                                $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
+                                $activefeedbackfornode;
                             }
                         }
                     }
-                    if (isset($node['completion'])) {
+
+                    if (
+                      isset($completioncriteria['master']) &&
+                      $completioncriteria['master']
+                    ) {
+                        $validatenodecompletion = [
+                            'completionnodepaths' => ['master'],
+                            'singlecompletionnode' => 'master',
+                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
+                        ];
+                    } else if (isset($node['completion'])) {
                         $validatenodecompletion = self::validatenodecompletion(
+                            $restrictionnodepathsall ?? [],
                             $node,
                             $completioncriteria,
                             $userpath,
@@ -138,10 +184,11 @@ class relation_update {
                     $getoldcompletion =
                       self::checkcondition($completionnode, $userpath->json, $node['id'], 'completionnode');
                     $getoldrestriction =
-                      self::checkcondition($restrictionnode, $userpath->json, $node['id'], 'restrictionnode');
+                      false;
                     if (!$getoldrestriction) {
                         $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
-                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnode;
+                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall;
+                        $userpath->json['user_path_relation'][$node['id']]['allrestrictioncriteria'] = $restrictionnode;
                         $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
                     }
                     if (!$getoldcompletion) {
@@ -150,6 +197,8 @@ class relation_update {
                         $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
                           $validatenodecompletion['singlecompletionnode'];
                         $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
+                        // $userpath->json['user_path_relation'][$node['id']]['feedback']
+
                     }
                     $node['data']['completion'] = $userpath->json['user_path_relation'][$node['id']];
                 }
@@ -224,6 +273,7 @@ class relation_update {
      * @return array
      */
     public static function validatenodecompletion(
+        $restrictionnodepathsall,
         &$node,
         $completioncriteria,
         $userpath,
@@ -247,9 +297,12 @@ class relation_update {
                 while ($currentcondition) {
                     $label = $currentcondition['data']['label'];
                     if (
-                        $label == 'catquiz' ||
-                        $label == 'modquiz' ||
-                        $label == 'course_completed'
+                        isset($completioncriteria[$label]['completed'][$currentcondition['id']]) &&
+                        (
+                            $label == 'catquiz' ||
+                            $label == 'modquiz' ||
+                            $label == 'course_completed'
+                        )
                     ) {
                         $validationcondition =
                             $completioncriteria[$label]['completed'][$currentcondition['id']];
@@ -259,7 +312,9 @@ class relation_update {
                             . '_' . $currentcondition['id'];
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
-                        if (isset($completioncriteria[$label])) {
+                        if (
+                          isset($completioncriteria[$label]['completed'])
+                        ) {
                             foreach ($completioncriteria[$label]['completed'] as $coursecompleted) {
                                 if ($coursecompleted) {
                                     $completednodecourses += 1;
@@ -304,13 +359,8 @@ class relation_update {
                         return true;
                     } else {
                         $completionnodepaths[] = $validationconditionstring;
-                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']]['text'];
-                        if (
-                            !$priority ||
-                            $priority > $feedback['completion']['after_all'][$completionnode['id']]['priority']
-                        ) {
-                            $priority = $feedback['completion']['after_all'][$completionnode['id']]['priority'];
-                        }
+                        $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
+                        unset($feedback['completion']['after_all'][$completionnode['id']]);
                         $nodefinished = node_finished::create([
                             'objectid' => $userpath->id,
                             'context' => context_system::instance(),
@@ -324,17 +374,19 @@ class relation_update {
                 }
             }
         }
-        $feedback['completion']['higher'] = [];
-        if ($priority) {
-            $i = 0;
-            foreach ($feedback['completion']['after_all'] as $condition => $completionpriority) {
-                if ($completionpriority['priority'] < $priority) {
-                    $feedback['completion']['higher'][] = $feedback['completion']['inbetween'][$i];
-                }
-                $i++;
-            }
-        }
-        unset($feedback['completion']['after_all']);
+        $feedback['status_restriction'] = self::getnodestatusforrestriciton(
+            $feedback,
+            $restrictionnodepaths,
+            $restrictioncriteria,
+            $node,
+            $restrictionnodepathsall,
+        );
+        $feedback['status_completion'] = self::getnodestatusforcompletion(
+            $feedback,
+            $completionnodepaths,
+            $completioncriteria,
+            $node['completion']['nodes']
+        );
         $feedback['status'] = self::getnodestatus(
             $feedback,
             $restrictionnodepaths,
@@ -376,6 +428,143 @@ class relation_update {
         return $node;
     }
 
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $completioncriteria
+     * @param array $node
+     */
+    public static function getnodestatusforcompletion($feedback, $completionnodepaths, $completioncriteria, $node) {
+
+        if (count($completionnodepaths) > 0) {
+            return 'after';
+        }
+        foreach ($completioncriteria as $singlecriteria) {
+            if (isset($singlecriteria['inbetween'])) {
+                foreach ($singlecriteria['inbetween'] as $inbetween) {
+                    if ($inbetween) {
+                        return 'inbetween';
+                    }
+                }
+            }
+        }
+        return 'before';
+
+    }
+
+    /**
+     * Returns true is conditiontype is time based
+     *
+     * @param array $restrictioncriteria
+     * @param array $node
+     * @return boolean
+     */
+    public static function istypetimedandcolumnvalid($node, $restrictioncriteria) {
+        switch ($node['data']['label']) {
+            case 'timed':
+            case 'timed_duration':
+                if (isset($restrictioncriteria[$node['data']['label']][$node['id']]) && $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']) {
+                    return false;
+                } else {
+                    return true;
+                }
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $restrictioncriteria
+     * @param array $node
+     */
+    public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $wheretoput) {
+        $latestdate = 0;
+        foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
+            $smallestenddate = 0;
+            $istimerestricted = false;
+            foreach ($signlerestrictionpatharray as $restrictionlabelid) {
+                if (strpos($restrictionlabelid, 'time') === 0) {
+                    $nodelabelid = explode('_condition_', $restrictionlabelid);
+                    $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]] ?? [];
+                    if (isset($restnode['inbetween_info']['endtime'])) {
+                        if (!$smallestenddate || strtotime($restnode['inbetween_info']['endtime']) < $smallestenddate) {
+                            $smallestenddate = strtotime($restnode['inbetween_info']['endtime']);
+                        }
+                    }
+                    $istimerestricted = true;
+                }
+            }
+            if ($latestdate == 0 ||  $smallestenddate > $latestdate) {
+                $latestdate = $smallestenddate;
+            }
+
+            if (!$istimerestricted) {
+                return;
+            }
+        }
+        if ($latestdate !== 0) {
+            $feedback['restriction'][$wheretoput . '_timed'] = get_string('node_restriction_' . $wheretoput . '_timed', 'local_adele', date('Y-m-d H:i:s', $latestdate));
+        }
+    }
+
+    /**
+     * Return node status for display purpose.
+     *
+     * @param array $feedback
+     * @param array $restrictionnodepaths
+     * @param array $restrictioncriteria
+     * @param array $node
+     */
+    public static function getnodestatusforrestriciton
+    (&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $restrictionnodepathsall) {
+        if (count($restrictionnodepaths) > 0 || $node['restriction'] === null) {
+            self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
+            return 'inbetween';
+        }
+
+        foreach ($node['restriction']['nodes'] as $restnode) {
+            if (isset($restnode['parentCondition']) && $restnode['parentCondition'][0] === "starting_condition") {
+                $isvalid = false;
+                if (self::istypetimedandcolumnvalid($restnode, $restrictioncriteria)) {
+                    $isvalid = true;
+                    $childconditionid = $restnode['childCondition'][1] ?? null;
+                    $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                        return isset($item['id']) && $item['id'] === $childconditionid;
+                    });
+                    $childcondition = reset($filterednodes);
+                    while ($childcondition !== null && $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                        $childconditionid = $childcondition['childCondition'][0] ?? null;
+                        $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                            return isset($item['id']) && $item['id'] === $childconditionid;
+                        });
+                        $childcondition = $filterednodes[0] ?? null;
+                    }
+                    if ($childcondition !== null && $childcondition !== false) {
+                        $isvalid = false;
+                    }
+                }
+                if ($isvalid) {
+                    $childconditionid = $restnode['childCondition'][0];
+                    $feedback['restriction']['before_valid'][$childconditionid] = $feedback['restriction']['before'][$childconditionid];
+                }
+            }
+        }
+        if (empty($feedback['restriction']['before_valid'])) {
+            return 'after';
+        }
+            self::inbetweenfeedback($feedback, $restrictionnodepathsall, $restrictioncriteria, $node, 'before');
+            return 'before';
+
+    }
+
+
     /**
      * Return node status for display purpose.
      *
@@ -411,7 +600,7 @@ class relation_update {
                                     $starttime = new \DateTime();
                                     if (
                                       $node['data'] &&
-                                      $node['data']['first_enrolled']
+                                      isset($node['data']['first_enrolled'])
                                     ) {
                                         $starttime->setTimestamp($node['data']['first_enrolled']);
                                     }
@@ -507,7 +696,6 @@ class relation_update {
      * @return array
      */
     public static function getconditionnode($conditionnodepaths, $type) {
-        // TODO sort the valid completion paths.
         $valid = count($conditionnodepaths) ? true : false;
         $priority = 0;
         if ($valid) {
@@ -552,10 +740,16 @@ class relation_update {
           ],
           'restriction' => [
             'before' => null,
+            'before_active' => isset($node["data"]["completion"]) ?
+            $node["data"]["completion"]["feedback"]["restriction"]["before_active"] : '',
           ],
         ];
+
         foreach ($node['completion']['nodes'] as $conditionnode) {
-            if (strpos($conditionnode['id'], '_feedback') !== false && $conditionnode['data']['visibility']) {
+            if (
+                strpos($conditionnode['id'], '_feedback') !== false &&
+                isset($conditionnode['data']['visibility'])
+              ) {
                 $feedbacks['completion']['before'][] =
                   isset($conditionnode['data']['feedback_before']) ?
                       self::render_placeholders(
@@ -565,18 +759,14 @@ class relation_update {
                         $node['completion']['nodes']
                       ) :
                       '';
-
-                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = [
-                    'priority' => $conditionnode['data']['feedback_priority'] ?? 3,
-                    'text' => isset($conditionnode['data']['feedback_after']) ?
+                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = isset($conditionnode['data']['feedback_after']) ?
                         self::render_placeholders(
                             $conditionnode['data']['feedback_after'],
                             $completioncriteria,
                             $conditionnode['id'],
                             $node['completion']['nodes']
                         ) :
-                        '',
-                ];
+                        '';
 
                 if ($conditionnode['data']['feedback_inbetween_checkmark']) {
                     $feedbacks['completion']['inbetween'][] = isset($conditionnode['data']['feedback_inbetween']) ?
@@ -600,10 +790,11 @@ class relation_update {
                 }
             }
         }
+
         if (isset($node['restriction'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (strpos($restrictionnode['id'], '_feedback') !== false && $restrictionnode['data']['visibility']) {
-                    $feedbacks['restriction']['before'][] =
+                    $feedbacks['restriction']['before'][$restrictionnode['id']] =
                       isset($restrictionnode['data']['feedback_before']) ?
                         self::render_placeholders(
                             $restrictionnode['data']['feedback_before'],
@@ -615,8 +806,68 @@ class relation_update {
                 }
             }
         }
+        if ($restrictioncriteria['master']) {
+            $feedbacks['restriction']['before'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status_restriction'] = 'accessible';
+            $feedbacks['status'] = 'accessible';
+        }
+        if ($completioncriteria['master']) {
+            $feedbacks['completion']['after'] = [get_string('course_description_master', 'local_adele')];
+            $feedbacks['status_completion'] = 'completed';
+            $feedbacks['status'] = 'completed';
+        }
         return $feedbacks;
     }
+
+
+    /**
+     * Observer for course completed
+     *
+     * @param string $string
+     * @param array $condition
+     * @param string $id
+     * @param array $nodes
+     * @return string
+     */
+    public static function render_placeholders_single_restriction($string, $id, $nodes, $condition = [] ) {
+        if (isset($condition['placeholders'])) {
+            foreach ($condition['placeholders'] as $placeholder => $text) {
+                if (is_array($text)) {
+                    $text = implode(', ', $text);
+                }
+                $string = str_replace(
+                    '{' . $placeholder . '}',
+                    (string)$text,
+                    $string
+                );
+            }
+        } else if (isset($condition[$id]['placeholders'])) {
+            foreach ($condition[$id]['placeholders'] as $placeholder => $text) {
+                if ($placeholder == 'quiz_attempts_list') {
+                    $tmptext = '';
+                    foreach ($text as $textelement) {
+                        $textelement = (object) $textelement;
+                        $tmptext .=
+                            get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
+                    }
+                    $text = '<ul>' . $tmptext . '</ul>';
+                } else if ($placeholder == 'quiz_attempts_best') {
+                    if ($text != '') {
+                        $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
+                    }
+                } else if (is_array($text)) {
+                    $text = implode(', ', $text);
+                }
+                $needle = '{' . $placeholder . '}';
+                $pos = strpos($string, $needle);
+                if ($pos !== false) {
+                    $string = substr_replace($string, strval($text), $pos, strlen($needle));
+                }
+            }
+        }
+        return $string;
+    }
+
 
     /**
      * Observer for course completed
@@ -648,7 +899,7 @@ class relation_update {
                                 $tmptext .=
                                   get_string('course_description_after_condition_modquiz_list', 'local_adele', $textelement);
                             }
-                            $text = $tmptext;
+                            $text = '<ul>' . $tmptext . '</ul>';
                         } else if ($placeholder == 'quiz_attempts_best') {
                             if ($text != '') {
                                 $text = get_string('course_description_inbetween_condition_catquiz_best', 'local_adele', $text);
@@ -697,10 +948,10 @@ class relation_update {
      * @param string $key
      * @return mixed
      */
-    public static function searchnestedarray($haystack, $needle, $key) {
+    public static function searchnestedarray($haystack, $needle, $key, $returnfeedack = false) {
         foreach ($haystack as $item) {
             foreach ($needle as $need) {
-                if (!strpos($need, '_feedback')) {
+                if (strpos($need, '_feedback') == $returnfeedack) {
                     if (isset($item[$key]) && $item[$key] === $need) {
                         return $item;
                     }
@@ -720,27 +971,41 @@ class relation_update {
         $firstenrollededit = false;
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
-                if (in_array('starting_node', $node['parentCourse'])) {
-                    foreach ($node['data']['course_node_id'] as $courseid) {
-                        if (!enrol_is_enabled('manual')) {
-                            break; // Manual enrolment not enabled.
+                if (
+                  $node['type'] != 'dropzone' &&
+                  in_array('starting_node', $node['parentCourse'])
+                ) {
+                    if (!is_int($node['data']['course_node_id'])) {
+                        foreach ($node['data']['course_node_id'] as $courseid) {
+                            if (!enrol_is_enabled('manual')) {
+                                break; // Manual enrolment not enabled.
+                            }
+                            if (!$enrol = enrol_get_plugin('manual')) {
+                                break; // No manual enrolment plugin.
+                            }
+                            if (!isset($node['data']['first_enrolled'])) {
+                                $node['data']['first_enrolled'] = time();
+                                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
+                                $firstenrollededit = true;
+                            }
+                            $instances = $DB->get_records('enrol', [
+                              'courseid' => $courseid,
+                              'enrol' => 'manual',
+                            ]);
+                            if (!$instances) {
+                                break;
+                            }
+
+                            $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                            $context = \context_course::instance($courseid);
+
+                            $isenrolled = is_enrolled($context, $userpath->user_id);
+                            if (!$isenrolled) {
+                                $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                                $selectedrole = get_config('local_adele', 'enroll_as_setting');
+                                $enrol->enrol_user($instance, $userpath->user_id, $selectedrole);
+                            }
                         }
-                        if (!$enrol = enrol_get_plugin('manual')) {
-                            break; // No manual enrolment plugin.
-                        }
-                        if (!isset($node['data']['first_enrolled'])) {
-                            $node['data']['first_enrolled'] = time();
-                            $firstenrollededit = true;
-                        }
-                        $instances = $DB->get_records('enrol', [
-                          'courseid' => $courseid,
-                          'enrol' => 'manual',
-                        ]);
-                        if (!$instances) {
-                            break;
-                        }
-                        $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-                        $enrol->enrol_user($instance, $userpath->user_id, null);
                     }
                 }
             }

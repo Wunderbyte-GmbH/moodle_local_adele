@@ -108,13 +108,8 @@ watch(() => store.state.learningpath, async () => {
 
 // Edit learning path deletion
 const editLearningpath = async (singlelearningpathid) => {
-  // '/local/adele/index.php#/learningpaths/edit/' +
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-    tooltip.remove()
-  });
   store.state.learningPathID = singlelearningpathid
-  window.open('/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
+  window.open( store.state.wwwroot + '/local/adele/index.php#/learningpaths/edit/' + singlelearningpathid, '_blank');
 };
 
 </script>
@@ -125,6 +120,15 @@ const editLearningpath = async (singlelearningpathid) => {
       <div class="col-12">
         <h4 class="font-weight-bold">
           {{ store.state.strings.fromlearningtitel }}
+          <span
+            class="required-sign"
+            style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
+          >
+            <i
+              v-tooltip="store.state.strings.required"
+              class="fa fa-exclamation-circle text-danger ml-2"
+            />
+          </span>
         </h4>
         <div class="mb-2">
           <input
@@ -141,6 +145,15 @@ const editLearningpath = async (singlelearningpathid) => {
       <div class="col-12">
         <h4 class="font-weight-bold">
           {{ store.state.strings.fromlearningdescription }}
+          <span
+            class="required-sign"
+            style="display: inline-flex; align-items: center; line-height: 1; width: auto;"
+          >
+            <i
+              v-tooltip="store.state.strings.required"
+              class="fa fa-exclamation-circle text-danger ml-2"
+            />
+          </span>
         </h4>
         <div class="mb-2">
           <textarea
@@ -158,7 +171,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.from_default_node_image }}
           </h4>
           <div class="mb-2">
-            Upload your default node image
+            {{ store.state.strings.uploaddefaultimage }}
             <div
               v-if="store.state.lpimages && Object.keys(store.state.lpimages).length > 0"
               class="mb-2"
@@ -168,7 +181,7 @@ const editLearningpath = async (singlelearningpathid) => {
                 class="btn btn-info"
                 @click="showCourseImageSelection = !showCourseImageSelection"
               >
-                Select learning path image
+                {{ store.state.strings.selectdefaultimage }}
               </button>
               <div
                 v-if="selectedCourseImagePath"
@@ -183,7 +196,7 @@ const editLearningpath = async (singlelearningpathid) => {
                   class="deselect-btn"
                   @click="selectCourseImage()"
                 >
-                  Deselect
+                  {{ store.state.strings.deselectdefaultimage }}
                 </button>
               </div>
               <div
@@ -205,7 +218,9 @@ const editLearningpath = async (singlelearningpathid) => {
               </div>
             </div>
             <div>
-              <label for="newImage">Or upload a new image:</label>
+              <label for="newImage">
+                {{ store.state.strings.uploadowndefaultimage }}
+              </label>
               <input type="file" id="newImage" @change="onFileChange">
               <div
                 v-if="newImagePreview"
@@ -220,7 +235,7 @@ const editLearningpath = async (singlelearningpathid) => {
                   class="btn btn-info"
                   @click="uploadNewImage()"
                 >
-                  Upload and use image
+                  {{ store.state.strings.uploadowndefaultimage }}
                 </button>
               </div>
             </div>
@@ -261,7 +276,7 @@ const editLearningpath = async (singlelearningpathid) => {
             {{ store.state.strings.fromlearningdescription }}
           </h5>
         </div>
-        <div         style="padding: 1rem;">
+        <div style="padding: 1rem;">
           <p class="card-text">
             {{ goaldescription ? goaldescription : store.state.strings.charthelper_no_name }}
           </p>
@@ -272,6 +287,10 @@ const editLearningpath = async (singlelearningpathid) => {
 </template>
 
 <style scoped>
+
+.required-sign {
+  font-size: 1rem;
+}
 
 .image-option-img {
   height: 5rem;

@@ -60,6 +60,7 @@ export function createAppStore() {
                 nodecourse: 0,
                 undoNodes: [],
                 undoEdges: [],
+                wwwroot: '',
             };
         },
         getters: {
@@ -152,10 +153,18 @@ export function createAppStore() {
               }
             },
             unsetUndoNodes(state) {
+              const lastElement = state.undoNodes[state.undoNodes.length - 1];
               state.undoNodes = state.undoNodes.slice(0, -1);
+              if (state.learningpath.json.tree.nodes) {
+                state.learningpath.json.tree.nodes = lastElement
+              }
             },
             unsetUndoEdges(state) {
+              const lastElement = state.undoEdges[state.undoEdges.length - 1];
               state.undoEdges = state.undoEdges.slice(0, -1);
+              if (state.learningpath.json.tree.edges) {
+                state.learningpath.json.tree.edges = lastElement
+              }
             },
         },
         actions: {
@@ -385,7 +394,7 @@ export function createAppStore() {
               }
             },
             async getFoundUsers(context, query) {
-              const result = await ajax('mod_booking_search_users', {
+              const result = await ajax('local_adele_search_users', {
                 query: query,
               });
               return result;

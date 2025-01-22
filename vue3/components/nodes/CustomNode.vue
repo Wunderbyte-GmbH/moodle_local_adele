@@ -95,18 +95,21 @@ const get_cover_image = (data) => {
     return data.selected_image
   } else if (data.image_paths) {
     return data.image_paths
+  } else if (
+    store.state.learningpath &&
+    store.state.learningpath.image
+  ) {
+    return store.state.learningpath.image
   }
 }
 
 // Set node data for the modal
 const setNodeModal = () => {
-  removeTooltips()
   store.state.node = props.data
 };
 
 // Set node data for the modal
 const setPretestView = () => {
-  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = true
   store.state.editingadding = false
@@ -115,7 +118,6 @@ const setPretestView = () => {
 
 // Set node data for the modal
 const setRestrictionView = () => {
-  removeTooltips()
   store.state.node = props.data
   store.state.editingpretest = false
   store.state.editingadding = false
@@ -128,13 +130,6 @@ const setStartNode = (node_id) => {
     startnode: node_id,
   });
 };
-
-const removeTooltips = () => {
-  const tooltips = document.querySelectorAll('.tooltip');
-  tooltips.forEach(tooltip => {
-      tooltip.style.display = 'none';
-  });
-}
 
 const emit = defineEmits([
   'change-module',
@@ -185,7 +180,7 @@ const deleteCondition = () => {
         <div class="row align-items-center">
           <div class="col">
             <h5>
-              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 60) }}
+              {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
             <button
               v-if="store.state.view!='teacher' && editorview"
@@ -219,8 +214,7 @@ const deleteCondition = () => {
             class="overlay"
           >
             <span
-              :title="store.state.strings.nodes_edit_restriction"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.nodes_edit_restriction"
             >
               <button
                 class="icon-link"
@@ -230,8 +224,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.nodes_edit_completion"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.edit_node_pretest"
             >
               <button
                 class="icon-link"
@@ -243,8 +236,7 @@ const deleteCondition = () => {
               </button>
             </span>
             <span
-              :title="store.state.strings.edit"
-              data-toggle="tooltip"
+              v-tooltip="store.state.strings.edit_course_node"
             >
               <button
                 class="icon-link"
@@ -311,7 +303,7 @@ const deleteCondition = () => {
             class="card-text"
           >
             <div class="fullname-container">
-              {{ value.fullname }}
+              {{ truncatedText(value.fullname, 35) }}
             </div>
           </div>
         </div>
@@ -401,9 +393,12 @@ const deleteCondition = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f0f0f0; /* Set your desired background color */
-  padding: 10px; /* Adjust padding as needed */
-  border-radius: 10px; /* Set your desired border-radius */
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .form-select {

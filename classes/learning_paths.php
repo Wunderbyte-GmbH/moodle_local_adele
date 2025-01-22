@@ -58,11 +58,11 @@ class learning_paths {
      * Save learning path.
      *
      * @param array $params
-     * @return bool
+     * @return mixed
      */
     public static function save_learning_path($params) {
         global $DB, $USER;
-        $data = new stdClass;
+        $data = new stdClass();
         $data->name = $params['name'];
         $data->description = $params['description'];
         $data->image = $params['image'];
@@ -89,7 +89,7 @@ class learning_paths {
             $DB->update_record('local_adele_learning_paths', $data);
             // Trigger catscale created event.
             $event = learnpath_updated::create([
-                'objectid' => $data->id ,
+                'objectid' => $data->id,
                 'context' => context_system::instance(),
                 'other' => [
                     'learningpathname' => $data->name,
@@ -118,7 +118,7 @@ class learning_paths {
      */
     public static function update_learning_path($params) {
         global $DB;
-        $data = new stdClass;
+        $data = new stdClass();
         $data->id = $params['id'];
         $data->json = $params['json'];
         $data->createdby = '100';
@@ -156,6 +156,29 @@ class learning_paths {
                 }
             }
         }
+        return $learningpaths;
+    }
+
+    /**
+     * Get all learning paths.
+     *
+     * @return array
+     */
+    public static function get_editable_learning_paths() {
+        global $DB, $USER;
+        $sql = "SELECT lp.id, lp.id as learningpathid, lp.name
+            FROM {local_adele_learning_paths} lp";
+
+        if (!is_siteadmin()) {
+            $sql .= "
+                    JOIN  {local_adele_lp_editors} lpe ON lp.id = lpe.learningpathid
+                    WHERE lpe.userid = :userid ";
+            $params = ['userid' => $USER->id];
+        } else {
+            $params = [];
+        }
+
+        $learningpaths = $DB->get_records_sql($sql, $params);
         return $learningpaths;
     }
 
@@ -342,6 +365,25 @@ class learning_paths {
                     'lastname' => $record->lastname ?? null,
                     'progress' => $progress ?? null,
                 ];
+            }
+            usort($userpathlist, function($a, $b) {
+                if ($a['progress']['completed_nodes'] === $b['progress']['completed_nodes']) {
+                    return $b['progress']['progress'] <=> $a['progress']['progress'];
+                }
+                return $b['progress']['completed_nodes'] <=> $a['progress']['completed_nodes'];
+            });
+            $rank = 1;
+            $prevuser = null;
+            foreach ($userpathlist as $index => &$user) {
+                if ($prevuser &&
+                    $prevuser['progress']['completed_nodes'] === $user['progress']['completed_nodes'] &&
+                    $prevuser['progress']['progress'] === $user['progress']['progress']) {
+                    $user['rank'] = $prevuser['rank'];
+                } else {
+                    $user['rank'] = $rank;
+                }
+                $prevuser = $user;
+                $rank++;
             }
             return $userpathlist;
         } catch (Exception $e) {
@@ -612,5 +654,54 @@ class learning_paths {
         $DB->update_record('local_adele_path_user', $record);
 
         return ['last_seen' => $record->last_seen_by_owner];
+    }
+
+    /**
+     * Central function to check access to learning path.
+     *
+     * @return array
+     *
+     */
+    public static function return_learningpaths() {
+
+        global $USER, $DB;
+
+        $cache = \cache::make('local_adele', 'navisteacher');
+        $records = $cache->get('localadeleeditor');
+
+        if ($records === false) {
+            // If we don't have the capability, we check with cache if we are editor.
+            $params = [
+                'userid' => (int)$USER->id,
+            ];
+
+            $sql = "SELECT lpe.learningpathid
+                FROM {local_adele_lp_editors} lpe
+                WHERE lpe.userid = :userid";
+            $records = $DB->get_records_sql($sql, $params);
+
+            $cache->set('localadeleeditor', $records);
+        }
+
+        return $records ?? [];
+    }
+
+    /**
+     * Just checks access.
+     *
+     * @return bool
+     *
+     */
+    public static function check_access() {
+
+        // First fast check if we show the button in the navbar.
+        if (has_capability('local/adele:canmanage', context_system::instance())) {
+            $iseditor = true;
+        } else {
+            $learningpaths = self::return_learningpaths();
+            $iseditor = !empty($learningpaths);
+        }
+
+        return $iseditor;
     }
 }

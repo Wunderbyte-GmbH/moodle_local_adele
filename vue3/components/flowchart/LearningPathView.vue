@@ -31,9 +31,9 @@
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"
-        :max-zoom="1.5"
-        :min-zoom="0.2"
-        :zoom-on-scroll="zoomLock"
+        :max-zoom="1.55"
+        :min-zoom="0.15"
+        :zoom-on-scroll="false"
         class="learning-path-flow"
         @node-click="onNodeClickCall"
       >
@@ -95,6 +95,7 @@ import ModuleNode from '../nodes/ModuleNode.vue'
 import OrCourses from '../nodes/OrCourses.vue'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
+import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
 
 // Load Store
 const store = useStore()
@@ -112,8 +113,6 @@ const editor_view = ref(false)
 // check the page width
 const dndFlowWidth = ref(0);
 
-const zoomSteps = [ 0.2, 0.25, 0.35, 0.55, 0.85, 1.15, 1.5]
-const zoomLock = ref(false)
 const zoomstep = ref(0)
 
 // load useVueFlow properties / functions
@@ -137,22 +136,7 @@ onMounted(() => {
   observer.observe(document.querySelector('.dndflow'));
   setTimeout(() => {
     nextTick().then(() => {
-      fitView({ duration: 1000 }).then(() => {
-        zoomLock.value = true
-        watch(
-          () => viewport.value.zoom,
-          (newVal, oldVal) => {
-            if (newVal && oldVal && zoomLock.value) {
-              if (newVal > oldVal) {
-                setZoomLevel('in')
-              } else if (newVal < oldVal) {
-                setZoomLevel('out')
-              }
-            }
-          },
-          { deep: true }
-        );
-      });
+      fitView({ duration: 1000 })
     })
   }, 300)
 });
@@ -165,36 +149,8 @@ const finishEdit = () => {
   emit('finish-edit');
 }
 
-const setZoomLevel = async (action) => {
-  zoomLock.value = false
-  let newViewport = viewport.value.zoom
-  let currentStepIndex = zoomSteps.findIndex(step => newViewport < step);
-  if (currentStepIndex === -1) {
-    currentStepIndex = zoomSteps.length;
-  }
-  if (action === 'in') {
-    if (currentStepIndex < zoomSteps.length) {
-      newViewport = zoomSteps[currentStepIndex];
-    } else {
-      newViewport = zoomSteps[currentStepIndex - 2]
-    }
-  } else if (action === 'out') {
-    if (currentStepIndex > 0) {
-      newViewport = zoomSteps[currentStepIndex - 1];
-    } else {
-      newViewport = zoomSteps[zoomSteps.length - 2]
-    }
-  }
-  if (newViewport != undefined) {
-    zoomstep.value = newViewport
-    await zoomTo(newViewport, { duration: 500}).then(() => {
-      zoomLock.value = true
-    })
-  }
-}
-
 const onNodeClickCall = (event) => {
-  zoomstep.value = onNodeClick(event, zoomLock, setCenter, store)
+  zoomstep.value = onNodeClick(event, setCenter, store)
 }
 
 </script>

@@ -32,6 +32,7 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
+use local_adele\learning_path_editors;
 use local_adele\learning_paths;
 
 defined('MOODLE_INTERNAL') || die();
@@ -98,11 +99,14 @@ class save_learningpath extends external_api {
         ]);
 
         require_login();
-
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return ['learningpath' => learning_paths::save_learning_path($params)];
+        $result = learning_paths::save_learning_path($params);
+        if (!learning_path_editors::get_editors($result->id)) {
+            learning_path_editors::create_editors($result->id, $userid);
+        }
+        return ['learningpath' => $result];
     }
 
     /**

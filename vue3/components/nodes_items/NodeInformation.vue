@@ -27,7 +27,6 @@
   const showCard = ref(false);
   const iconState = ref('initial');
   const iconClass = ref('fa-info');
-  const isRotatingBackward = ref(false);
 
   const toggleCard = () => {
     showCard.value = !showCard.value
@@ -155,6 +154,17 @@
       }
     }
   };
+
+  const cardStyle = ref({
+    zIndex: 3,
+  });
+  const handleFocus = () => {
+    cardStyle.value.zIndex = 4;
+  };
+
+  const handleBlur = () => {
+    cardStyle.value.zIndex = 3;
+  };
 </script>
 
 <template>
@@ -165,6 +175,10 @@
       'icon-container': !mobile,
       'card-container': mobile
     }"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    tabindex="0"
+    :style="cardStyle"
   >
     <div
       class="information"
@@ -202,7 +216,7 @@
           >
             <i class="fa fa-pencil" />
             <b>
-              Description
+              {{ store.state.strings.completion_description_feedback}}
             </b>
             <div
               class="list-group-text"
@@ -224,7 +238,7 @@
           >
             <i class="fa fa-spinner" />
             <b>
-              Dates and Duration
+              {{ store.state.strings.completion_dates_duration_feedback }}
             </b>
             <div
               class="list-group-text"
@@ -234,7 +248,7 @@
               @mouseup.stop
             >
               <b>
-                Estimated Duration:
+                {{ store.state.strings.completion_estimated_duration_feedback }}
               </b>
               {{ estimate_duration }}
             </div>
@@ -247,7 +261,7 @@
               @mouseup.stop
             >
               <b>
-                Start Date:
+                {{ store.state.strings.completion_start_date_feedback }}
               </b>
               {{ ending_date.start_date }}
             </div>
@@ -260,7 +274,7 @@
               @mouseup.stop
             >
               <b>
-                End Date:
+                {{ store.state.strings.completion_end_date_feedback }}
               </b>
               {{ ending_date.end_date }}
             </div>
@@ -273,7 +287,7 @@
               @mouseup.stop
             >
               <b>
-                First subscribbed to node:
+                {{ store.state.strings.completion_first_subscription_feedback }}
               </b>
               {{ subscribbed_date }}
             </div>
@@ -287,7 +301,7 @@
           >
             <i class="fa fa-lock" />
             <b>
-              Restriction
+              {{ store.state.strings.completion_restriction_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.restriction && restriction">
@@ -303,7 +317,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+               {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -318,7 +332,7 @@
               class="fa fa-tasks"
             />
             <b>
-              Completion
+              {{ store.state.strings.completion_completion_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.parentnode && props.parentnode.completion && completion">
@@ -336,7 +350,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+                {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -351,7 +365,7 @@
               class="fa-solid fa-play-circle"
             />
             <b>
-              Completion Inbetween
+              {{ store.state.strings.completion_completion_inbetween_feedback }}
             </b>
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="completion_inbetween && completion_inbetween.length > 0 && completion_inbetween != ''">
@@ -369,7 +383,7 @@
                 </div>
               </div>
               <div v-else>
-                Nothing is defined
+                {{ store.state.strings.completion_nothing_defined_feedback }}
               </div>
             </div>
           </li>
@@ -378,7 +392,6 @@
     </transition>
   </div>
 </template>
-
 
 <style scoped>
 
@@ -405,9 +418,9 @@
   border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
-  z-index: 3;
   transform-style: preserve-3d; /* Preserve 3D context */
   perspective: 1000px; /* Hides the back side during rotation */
+  z-index: 5;
 }
 
 .information-rotating {
@@ -494,7 +507,6 @@
   position: absolute;
   top: 20px;
   text-align: start;
-  z-index: 2;
   cursor: default;
   user-select: text;
 }

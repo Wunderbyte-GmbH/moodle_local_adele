@@ -71,7 +71,7 @@ class timed implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_restriction_description_before(),
+            'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
         ];
     }
@@ -118,17 +118,23 @@ class timed implements course_restriction {
                 if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
                     $validstart = true;
                     $validtime = false;
+                    $isbeforerange = true;
+                    $isafterrange = false;
                     $currenttimestamp = new DateTime();
-                    $startdate = self::isvaliddate($restrictionnode['data']['value']['start']);
+                    $startdate = $this->isvaliddate($restrictionnode['data']['value']['start']);
                     if ($startdate) {
                         if ($startdate <= $currenttimestamp) {
                             $validtime = true;
+                            $isbeforerange = false;
                         } else {
                             $validstart = false;
                         }
                     }
-                    $enddate = self::isvaliddate($restrictionnode['data']['value']['end']);
+                    $enddate = $this->isvaliddate($restrictionnode['data']['value']['end']);
                     if ($enddate) {
+                        if ($enddate < $currenttimestamp) {
+                            $isafterrange = true;
+                        }
                         if (
                             $enddate >= $currenttimestamp &&
                             $validstart
@@ -141,7 +147,7 @@ class timed implements course_restriction {
                     if ($startdate) {
                         $startdate = $startdate->format('Y-m-d H:i:s');
                         $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                            get_string('course_restricition_before_condition_from', 'local_adele') . $startdate;
+                            $startdate;
                     }
                     if ($enddate) {
                         $enddate = $enddate->format('Y-m-d H:i:s');
@@ -149,6 +155,9 @@ class timed implements course_restriction {
                             get_string('course_restricition_before_condition_to', 'local_adele') . $enddate;
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
+                    $timed[$restrictionnode['id']]['inbetween'] = $validtime;
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
                       'starttime' => $startdate,
                       'endtime' => $enddate,
@@ -168,13 +177,15 @@ class timed implements course_restriction {
      * Helper function to return localized description strings.
      * @param string $datestring
      * @param string $format
-     * @return object
+     * @return boolean
      */
     public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
-        $datetime = DateTime::createFromFormat($format, $datestring);
-        if ($datetime && $datetime->format($format) === $datestring) {
-            $datetime->format('Y-m-d H:i:s');
-            return $datetime;
+        if ($datestring !== null) {
+            $datetime = DateTime::createFromFormat($format, $datestring);
+            if ($datetime && $datetime->format($format) === $datestring) {
+                $datetime->format('Y-m-d H:i:s');
+                return $datetime;
+            }
         }
         return false;
     }

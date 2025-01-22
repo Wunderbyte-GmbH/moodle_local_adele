@@ -23,6 +23,7 @@ describe('ExpandNodeEdit.vue', () => {
         strings: {
           LIGHT_GRAY: 'ffffff',
         },
+        wwwroot: 'wwwroot',
       },
     };
 
@@ -72,7 +73,7 @@ describe('ExpandNodeEdit.vue', () => {
 
     window.open = jest.fn();
     await wrapper.find('.icon-link').trigger('click');
-    expect(window.open).toHaveBeenCalledWith('/course/view.php?id=1', '_blank');
+    expect(window.open).toHaveBeenCalledWith('wwwroot/course/view.php?id=1', '_blank');
   });
 
 });

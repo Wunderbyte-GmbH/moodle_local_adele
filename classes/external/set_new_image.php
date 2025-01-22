@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 
 /**
- * External Service for local catquiz.
+ * External Service for local adele.
  *
  * @package     local_adele
  * @author      Jacob Viertel
@@ -63,7 +63,7 @@ class set_new_image extends external_api {
     }
 
     /**
-     * Webservice for the local catquiz plugin to get next question.
+     * Webservice for the local adele plugin to get next question.
      *
      * @param int $contextid
      * @param int $learningpathid

@@ -1,27 +1,3 @@
-<!-- // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Validate if the string does excist.
- *
- * @package     local_adele
- * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ -->
-
 <script setup>
 // Import needed libraries
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
@@ -30,6 +6,7 @@ import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
 import LearningModule from './LearningModule.vue'
 import { useStore } from 'vuex';
+import truncatedText from '../../composables/nodesHelper/truncatedText';
 const store = useStore()
 const { project, vueFlowRef, findNode, nodes, addNodes, removeNodes, addEdges } = useVueFlow()
 
@@ -369,30 +346,20 @@ function changeTab(index) {
             class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
             :draggable="true"
             :data="course"
-            style="width: 95%; padding-left: 1rem; margin-left: 0.025rem; height: 3rem"
+            style="width: 100%; padding: 0rem; margin-left: 0.025rem; height: 3rem"
             @dragstart="onDragStart($event, course)"
             @drag="onDrag($event)"
             @dragend="onDragEnd()"
           >
             <div
-              class="col-auto"
-              data-toggle="tooltip"
-              data-placement="left"
-              :title="store.state.strings.flowchart_hover_darg_drop"
+              class="col long-text"
+              style="padding-left: 2rem;"
+              v-tooltip="course.fullname"
             >
-              <i class="fa fa-info-circle fa-lg" />
-            </div>
-            <div class="col long-text">
-              {{ course.fullname }}
-            </div>
-            <div
-              class="col-auto"
-              data-toggle="tooltip"
-              data-placement="right"
-              :title="store.state.strings.flowchart_hover_click_here"
-            >
+              {{ truncatedText(course.fullname, 32) }}
               <a
-                :href="'/course/view.php?id=' + course.course_node_id[0]"
+                :href="store.state.wwwroot + '/course/view.php?id=' + course.course_node_id[0]"
+                style="position: relative; padding-left: 0.25rem;"
                 target="_blank"
               >
                 <i class="fa fa-link" />
@@ -413,8 +380,9 @@ function changeTab(index) {
 </template>
 
 <style scoped>
+
 .long-text {
-  padding-left: 0 !important;
+  padding: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -426,6 +394,7 @@ function changeTab(index) {
   margin-top: 20px;
   max-height: 440px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .nav-item{
   margin-right: 2px;

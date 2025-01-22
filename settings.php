@@ -24,7 +24,8 @@
  */
 
 use local_adele\admin_setting_course_tags;
-
+use local_adele\helper\role_names;
+use local_adele\course_restriction\course_restriction_info;
 defined('MOODLE_INTERNAL') || die();
 
 $componentname = 'local_adele';
@@ -36,6 +37,9 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
     $ADMIN->add($componentname, $settings);
 
+    $rolenamesclass = new role_names();
+    $rolenames = $rolenamesclass->get_role_names();
+
     // Select options.
     $settings->add(
         new admin_setting_configselect($componentname . '/selectconfig',
@@ -43,7 +47,7 @@ if ($hassiteconfig) {
                 get_string('activefilter_desc', $componentname),
                 'only_subscribed',
                 [
-                    'only_subscribed' => get_string('settings_only_subscribed', $componentname),
+                    'only_subscribed' => get_string('settings_only_subscribed', $componentname, $rolenames),
                     'all_courses' => get_string('settings_all_courses', $componentname),
                 ]));
 
@@ -79,6 +83,23 @@ if ($hassiteconfig) {
                 $categories)
     );
 
+    // Restrict restrictions.
+    $restrictions = course_restriction_info::get_restrictions();
+    $matchedrestrictions = [];
+    foreach ($restrictions as $key => $value) {
+        $matchedrestrictions[$value['label']] = $value['name'];
+    }
+    $restnames = array_map(function($item) {
+        return $item['name'];
+    }, $restrictions);
+    $settings->add(new admin_setting_configmultiselect(
+                $componentname . '/restrictionfilter',
+                get_string('nodes_restriction', $componentname),
+                get_string('nodes_edit_restriction', $componentname),
+                [],
+                $matchedrestrictions)
+    );
+
     // Alise quiz settings.
     $settings->add(
         new admin_setting_configselect(
@@ -91,4 +112,29 @@ if ($hassiteconfig) {
                     'all_quiz_global' => get_string('all_quiz_global', $componentname),
                     'all_quiz' => get_string('all_quiz', $componentname),
                 ]));
+
+    // Learning Path Enrollment setting.
+    $studentroleid = [];
+    $allrolenames = role_get_names();
+    $assignableroles = get_roles_for_contextlevels(CONTEXT_COURSE);
+    $defaultroleid = null;
+
+    foreach ($allrolenames as $value) {
+        if (in_array($value->id, $assignableroles)) {
+            $studentroleid[$value->id] = $value->localname;
+            if ($value->shortname === 'student') {
+                $defaultroleid = $value->id;
+            }
+        }
+    }
+    $settings->add(
+        new admin_setting_configselect(
+            $componentname . '/enroll_as_setting',
+            get_string('enroll_as_setting', $componentname),
+            get_string('enroll_as_setting_desc', $componentname),
+            $defaultroleid,
+            $studentroleid
+        )
+    );
+
 }

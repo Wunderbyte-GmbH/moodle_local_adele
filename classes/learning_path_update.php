@@ -72,6 +72,89 @@ class learning_path_update {
     /**
      * Observer for course completed
      *
+     * @param object $event
+     */
+    public static function user_views_learning_path($event) {
+
+        $userpathrelation = new user_path_relation();
+        $eventdata = $event->get_data();
+        $records = $userpathrelation->get_active_user_path_relation($eventdata['userid'], $eventdata['courseid']);
+        foreach ($records as $userpath) {
+            self::trigger_user_path_update($userpath);
+        }
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param object $event
+     */
+    public static function trigger_user_path_update($userpath) {
+        $eventsingle = user_path_updated::create([
+            'objectid' => $userpath->id,
+            'context' => context_system::instance(),
+            'other' => [
+                'userpath' => $userpath,
+            ],
+        ]);
+        $eventsingle->trigger();
+    }
+
+    /**
+     * Finished quiz.
+     *
+     * @param object $event
+     */
+    public static function quiz_finished($event) {
+        // Get the user path relations.
+        $userpathrelation = new user_path_relation();
+        $records = $userpathrelation->get_learning_paths(
+          $event->userid,
+          null,
+          '"quizid":"' . $event->other['quizid'] . '"'
+        );
+        foreach ($records as $userpath) {
+            $userpath->json = json_decode($userpath->json, true);
+            $eventsingle = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
+        }
+    }
+
+    /**
+     * Finished quiz.
+     *
+     * @param object $event
+     */
+    public static function catquiz_finished($event) {
+        // Get the user path relations.
+        $cm = get_coursemodule_from_id(null, $event->contextinstanceid);
+        $userpathrelation = new user_path_relation();
+        $records = $userpathrelation->get_learning_paths(
+          $event->userid,
+          '"componentid":"' . $cm->instance . '"'
+        );
+        foreach ($records as $userpath) {
+            $userpath->json = json_decode($userpath->json, true);
+            $eventsingle = user_path_updated::create([
+                'objectid' => $userpath->id,
+                'context' => context_system::instance(),
+                'other' => [
+                    'userpath' => $userpath,
+                ],
+            ]);
+            $eventsingle->trigger();
+        }
+    }
+
+    /**
+     * Observer for course completed
+     *
      * @param string $newtree
      * @param string $oldtree
      * @param string $userid
@@ -218,4 +301,5 @@ class learning_path_update {
         );
         return ['success' => true];
     }
+
 }

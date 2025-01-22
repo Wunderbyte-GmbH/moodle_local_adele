@@ -67,18 +67,21 @@ class learning_path_courses {
         $configtags['exclude'] = explode(',', str_replace(' ', '', $configadele->excludetags));
         $configtags['category'] = self::get_categories($configadele->catfilter);
         $whereparamsquery = self::build_where_query($configtags);
+        $wherestatement  = " WHERE c.visible=1 ";
 
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
             global $USER;
-            $userquery = "LEFT JOIN (SELECT DISTINCT e.courseid
-                FROM {enrol} e
-                LEFT JOIN {user_enrolments} ue ON
-                (ue.enrolid = e.id AND ue.userid = :userid)
-                ) en ON (en.courseid = c.id) ";
-
-            $whereparamsquery['params']["userid"] = $USER->id;
+            $userquery = "JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50 ";
+            if (!is_siteadmin()) {
+                $userquery .= "JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                  JOIN {role} r ON r.id = ra.roleid
+                  JOIN {user} u ON u.id = ra.userid";
+                  $wherestatement .= "AND u.id = :userid AND r.shortname IN ('editingteacher', 'teacher') ";
+                  $whereparamsquery['params']["userid"] = $USER->id;
+            }
         }
+
         $select = "SELECT s1.*
         FROM (
             SELECT DISTINCT c.id AS course_node_id, c.fullname, c.shortname, c.category, c.summary, " . $selectagg . "
@@ -86,8 +89,8 @@ class learning_path_courses {
             LEFT JOIN {tag_instance} ti ON ti.itemid = c.id AND ti.itemtype = 'course'
             LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
             $userquery .
-            " WHERE c.visible=1
-            GROUP BY ti.itemid, c.id
+            $wherestatement .
+            "GROUP BY ti.itemid, c.id
         ) AS s1 " . $whereparamsquery['wherequery'];
         $entries = $DB->get_records_sql($select, $whereparamsquery['params']);
         foreach ($entries as $entry) {

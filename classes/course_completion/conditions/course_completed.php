@@ -74,10 +74,10 @@ class course_completed implements course_completion {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_completion_description_before(),
-            'description_after' => self::get_completion_description_after(),
-            'description_inbetween' => self::get_completion_description_inbetween(),
-            'priority' => self::get_completion_priority(),
+            'description_before' => $this->get_completion_description_before(),
+            'description_after' => $this->get_completion_description_after(),
+            'description_inbetween' => $this->get_completion_description_inbetween(),
+            'priority' => $this->get_completion_priority(),
             'label' => $label,
         ];
     }
@@ -87,7 +87,7 @@ class course_completed implements course_completion {
      *
      * @return string
      */
-    private function get_description_string() {
+    public function get_description_string() {
         $description = get_string('course_description_condition_course_completed', 'local_adele');
         return $description;
     }
@@ -134,7 +134,7 @@ class course_completed implements course_completion {
      *
      * @param array $node
      * @param int $userid
-     * @return boolean
+     * @return array
      */
     public function get_completion_status($node, $userid) {
         $courses = $node['data']['course_node_id'];
@@ -143,6 +143,10 @@ class course_completed implements course_completion {
         $courseprogresslist = [];
         $progresses = [];
         $minvalue = 1;
+        if (is_int($courses)) {
+            return $coursecompletion;
+        }
+        $isinbetween = false;
         foreach ($courses as $courseid) {
             $course = get_course($courseid);
             $completed = false;
@@ -150,6 +154,9 @@ class course_completed implements course_completion {
                 // Get the course completion instance.
                 $completion = new completion_info($course);
                 $progress = progress::get_course_progress_percentage($course, $userid) ?? 0;
+                if ($progress !== null) {
+                    $isinbetween = true;
+                }
                 // Check if the user has completed the course.
                 $coursecompleted = $completion->is_course_complete($userid);
                 if ($coursecompleted) {
@@ -172,12 +179,30 @@ class course_completed implements course_completion {
                     $minvalue = $complitionnode['data']['value']['min_courses'] ?? 1;
                     $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses'] = $minvalue;
                     $coursecompletion[$complitionnode['id']]['placeholders']['course_list'] = $courseprogresslist;
+                    $coursecompletion[$complitionnode['id']]['placeholders']['numb_courses_total'] = count($courseprogresslist);
                     $coursecompletion['completed'][$complitionnode['id']] = $finished >= $minvalue ? true : false;
+                    $coursecompletion['inbetween'][$complitionnode['id']] = $isinbetween;
+                    if (count($courses) > 1) {
+                        $counttodo = $minvalue;
+                        $numbcourses = count($courses);
+                        if ($finished <= $minvalue) {
+                            $counttodo -= $finished;
+                        }
+                        if ($isinbetween) {
+                            $string = $counttodo . '-' . $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                        } else {
+                            $string = $counttodo . get_string('course_description_before_condition_course_completed_aus', 'local_adele') .
+                            $numbcourses . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                        }
+                        $coursecompletion[$complitionnode['id']]['placeholders']['item'] = $string;
+                    } else {
+                        $coursecompletion[$complitionnode['id']]['placeholders']['item'] = get_string('course_description_before_condition_course_completed_item', 'local_adele');
+                    }
                 }
             }
         }
 
-        $coursecompletion['inbetween_info'] = self::get_node_progress($progresses, $minvalue);
+        $coursecompletion['inbetween_info'] = $this->get_node_progress($progresses, $minvalue);
         return $coursecompletion;
     }
 

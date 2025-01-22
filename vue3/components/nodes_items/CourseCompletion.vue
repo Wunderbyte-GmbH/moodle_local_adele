@@ -1,19 +1,17 @@
-<script setup>
-    // Import needed libraries
+<script setup lang="ts">
     import { computed } from 'vue';
     import { useStore } from 'vuex';
 
+    interface FinishedCourses {
+      [key: string]: boolean;
+    }
+
+
     const store = useStore();
-    const props = defineProps({
-      minCourses: {
-        type: Number,
-        required: true,
-      },
-      finishedCourses: {
-        type: Object,
-        required: true,
-      },
-    });
+    const props = defineProps<{
+      minCourses: number;
+      finishedCourses: FinishedCourses;
+    }>();
 
     const backgroundColor = computed(() => store.state.strings.DARK_RED);
     const minCoursesArray = computed(() => Array.from({ length: props.minCourses }, (_, i) => i));
@@ -27,20 +25,20 @@
   <div
     class="icon-container"
   >
-    <div 
+    <div
       class="row"
       style="margin-right: -5px !important;"
     >
-      <span 
+      <span
         v-for="index in minCoursesArray"
-        :key="index" 
+        :key="index"
         class="coursecompletion"
         :style="{ backgroundColor: backgroundColor }"
       >
         <div v-if="finishedCoursesCount > index">
-          <i 
-            class="fa fa-check" 
-          /> 
+          <i
+            class="fa fa-check"
+          />
         </div>
       </span>
     </div>

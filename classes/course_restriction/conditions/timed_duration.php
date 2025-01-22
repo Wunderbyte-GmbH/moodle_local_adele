@@ -47,6 +47,19 @@ class timed_duration implements course_restriction {
     public $id = COURSES_COND_TIMED;
     /** @var string $type of the redered condition in frontend. */
     public $label = 'timed_duration';
+    /** @var array $time span array. */
+    private $durationplaceholder;
+
+    /**
+     * Entities constructor.
+     */
+    public function __construct() {
+        $this->durationplaceholder = [
+            '0' => get_string('course_select_condition_timed_duration_days', 'local_adele'), // Days.
+            '1' => get_string('course_select_condition_timed_duration_weeks', 'local_adele'), // Weeks.
+            '2' => get_string('course_select_condition_timed_duration_months', 'local_adele'), // Months.
+        ];
+    }
 
     /**
      * Obtains a string describing this restriction (whether or not
@@ -70,7 +83,7 @@ class timed_duration implements course_restriction {
             'id' => $this->id,
             'name' => $name,
             'description' => $description,
-            'description_before' => self::get_restriction_description_before(),
+            'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
         ];
     }
@@ -121,33 +134,57 @@ class timed_duration implements course_restriction {
                     $starttime = new DateTime();
                     $endtime = null;
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
-                        if ($restrictionnode['data']['value']['selectedOption'] == '1' && $node['data']['first_enrolled']) {
-                            $starttime->setTimestamp($node['data']['first_enrolled']);
+                        if ($restrictionnode['data']['value']['selectedOption'] == '1') {
+                            if (isset($node['data']['first_enrolled'])) {
+                                $starttime->setTimestamp($node['data']['first_enrolled']);
+                            } else {
+                                $starttime = get_string('course_condition_timed_duration_start', 'local_adele');
+                            }
                         } else {
                             $starttime->setTimestamp($userpath->timecreated);
                         }
                         $durationvalue = $restrictionnode['data']['value']['durationValue'];
                         $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
                         // Check if the duration type is valid and calculate the end time.
-                        if (isset($this->durationvaluearray[$durationvalue])) {
+                        if (
+                            isset($this->durationvaluearray[$durationvalue]) &&
+                            !is_string($starttime)
+                          ) {
                             $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
                             $endtime = clone $starttime;
                             $endtime->modify("+{$totalseconds} seconds");
                             // Check if the current timestamp is between the start and end timestamps.
                             $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
+                            $isafterrange = $currenttime > $endtime;
+                            $isbeforerange = $currenttime < $starttime;
                         }
                     }
                     if ($endtime) {
                         $endtime = $endtime->format('Y-m-d H:i:s');
                     }
-                    $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $starttime->format('Y-m-d H:i:s');
+                    if (is_string($starttime)) {
+                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
+                          $starttime;
+                        $timed[$restrictionnode['id']]['inbetween_info'] = [
+                          'starttime' => $starttime,
+                          'endtime' => $endtime,
+                        ];
+                    } else {
+                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
+                          get_string('course_condition_timed_duration_since', 'local_adele') .
+                          $starttime->format('Y-m-d H:i:s');
+                        $timed[$restrictionnode['id']]['inbetween_info'] = [
+                          'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
+                          'endtime' => $endtime,
+                        ];
+                    }
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
-                        $selectedduration . ' ' .$this->durationplaceholder[$durationvalue];
+                        $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['inbetween_info'] = [
-                      'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
-                      'endtime' => $endtime,
-                    ];
+                    $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
+
                 } else {
                     $timed[$restrictionnode['id']] = [
                       'completed' => false,
@@ -171,19 +208,5 @@ class timed_duration implements course_restriction {
         '0' => 86400, // Days.
         '1' => 604800, // Weeks.
         '2' => 2629746, // Months.
-    ];
-
-    /**
-     * Maps duration types to their equivalent durations in seconds.
-     *
-     * @var array The keys represent the duration types as follows:
-     *            '0' for days, with each day being 86400 seconds;
-     *            '1' for weeks, with each week being 604800 seconds;
-     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
-     */
-    private $durationplaceholder = [
-        '0' => 'Days', // Days.
-        '1' => 'Weeks', // Weeks.
-        '2' => 'Months', // Months.
     ];
 }

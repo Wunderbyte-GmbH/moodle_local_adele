@@ -53,7 +53,7 @@ const props = defineProps({
   }
 });
 const data = ref({
-  min_courses: 0,
+  min_courses: 1,
   courses_id: [],
 });
 const parentCourses = ref(0)
