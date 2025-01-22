@@ -58,8 +58,9 @@ class adhoc_task_helper {
 
                 foreach ($dates as $date) {
                     $taskdata = new stdClass();
-                    $taskdata->userpath = $userpath;
-                    $taskdata->userid = $userpath->user_id;
+                    $taskdata->learning_path_id = $userpath->learning_path_id;
+                    $taskdata->user_id = $userpath->user_id;
+                    $taskdata->course_id = $userpath->course_id;
                     $timestamp = strtotime($date);
                     $runtime = strtotime('+2 minutes', $timestamp);
                     $taskdata->time = $runtime . $userpath->id;

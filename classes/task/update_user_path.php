@@ -63,9 +63,8 @@ class update_user_path extends \core\task\adhoc_task {
 
         $taskdata = $this->get_custom_data();
 
-        $userpath = $taskdata->userpath;
         $helper = new user_path_relation();
-        $currentuserpath = $helper->get_user_path_relation($userpath->learning_path_id, $userpath->user_id, $userpath->course_id);
+        $currentuserpath = $helper->get_user_path_relation($taskdata->learning_path_id, $taskdata->user_id, $taskdata->course_id);
         try {
             $currentuserpath->json = json_decode($currentuserpath->json, true);
             learning_path_update::trigger_user_path_update($currentuserpath);
