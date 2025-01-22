@@ -81,7 +81,7 @@ class node_completion {
                     if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
 
-                        adhoc_task_helper::set_scheduled_adhoc_tasks(json_decode(json_encode($node), true), $userpath);
+                        // adhoc_task_helper::set_scheduled_adhoc_tasks(json_decode(json_encode($node), true), $userpath);
                         $firstenrollededit = true;
                     }
                     $selectedrole = get_config('local_adele', 'enroll_as_setting');

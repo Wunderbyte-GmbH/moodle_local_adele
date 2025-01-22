@@ -985,7 +985,7 @@ class relation_update {
                             }
                             if (!isset($node['data']['first_enrolled'])) {
                                 $node['data']['first_enrolled'] = time();
-                                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
+                                // adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                                 $firstenrollededit = true;
                             }
                             $instances = $DB->get_records('enrol', [
