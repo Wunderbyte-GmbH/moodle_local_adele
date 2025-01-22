@@ -96,6 +96,8 @@ onMounted(() => {
     active.value = true
   } else if (props.data.completion.restrictionnode.valid) {
     active.value = true
+  } else if (props.data.completion.feedback.status == 'accessible') {
+    active.value = true
   }
   if (props.data.completion.completioncriteria.course_completed.inbetween_info) {
     progress.value = props.data.completion.completioncriteria.course_completed.inbetween_info
