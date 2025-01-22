@@ -61,6 +61,7 @@ class adhoc_task_helper {
                     $taskdata->learning_path_id = $userpath->learning_path_id;
                     $taskdata->user_id = $userpath->user_id;
                     $taskdata->course_id = $userpath->course_id;
+                    $taskdata->userpath = $userpath;
                     $timestamp = strtotime($date);
                     $runtime = strtotime('+2 minutes', $timestamp);
                     $taskdata->time = $runtime . $userpath->id;
