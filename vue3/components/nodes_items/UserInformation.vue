@@ -49,6 +49,9 @@ watchEffect(() => {
 const cardStyle = ref({
   zIndex: props.mobile ? 1 : 2,
 });
+
+const emit = defineEmits(['focusChanged']);
+
 const handleFocus = () => {
   if (!props.mobile) {
     if (showFeedbackarea.value) {
@@ -56,6 +59,7 @@ const handleFocus = () => {
     } else {
       cardStyle.value.zIndex = 2;
     }
+    emit('focusChanged', {});
   }
 };
 

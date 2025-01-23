@@ -134,6 +134,7 @@ const setStartNode = (node_id) => {
 const emit = defineEmits([
   'change-module',
   'delete-node',
+  'zoomOnParent'
 ]);
 
 const changeModule = (data) => {
@@ -162,6 +163,10 @@ const deleteCondition = () => {
   emit('delete-node', props.data);
 }
 
+const zoomOnParent = () => {
+  emit('zoomOnParent', {});
+}
+
 
 </script>
 
@@ -173,6 +178,7 @@ const deleteCondition = () => {
     >
       <div class="card-header text-center">
         <NodeInformation
+         @focusChanged="zoomOnParent"
           v-if="!editorview"
           :data
           :parentnode

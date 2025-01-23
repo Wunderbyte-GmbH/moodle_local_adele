@@ -135,6 +135,37 @@ onMounted(() => {
   triggerAnimation();
 })
 
+const customNodeEdit = ref(null); 
+const emit = defineEmits([
+
+  'zoomOnParent'
+]);
+
+const zoomOnParent = () => {
+  if (customNodeEdit.value) {
+    // Starting from the custom node, traverse the DOM upwards
+    let parentElement = customNodeEdit.value.parentElement;
+
+    // Traversing up until the desired parent is found or root is reached
+    while (parentElement) {
+      // Check if this is the parent you wish to style (adjust condition as needed)
+      if (parentElement.classList.contains('vue-flow__node')) {
+        let containerElement = parentElement.parentElement;
+        if (containerElement) {
+          const siblings = Array.from(containerElement.children);
+
+          siblings.forEach((sibling) => {
+            sibling.style.zIndex = '10';
+          });
+        }
+        parentElement.style.zIndex = '1001'
+        break; // Exit once the desired parent is styled
+      }
+      parentElement = parentElement.parentElement;
+    }
+  }
+  emit('zoomOnParent', {});
+}
 const cover_image = computed(() => get_cover_image(props.data));
 
 const get_cover_image = (data) => {
@@ -184,6 +215,7 @@ const iconClass = ref('fa-lock');
 <template>
   <div
     @click="handleNodeClick"
+    ref="customNodeEdit"
   >
     <div
       v-if="zoomstep != '0.2'"
@@ -276,6 +308,7 @@ const iconClass = ref('fa-lock');
       >
         <UserInformation
           :data="data"
+          @focusChanged="zoomOnParent"
         />
       </div>
     </div>
