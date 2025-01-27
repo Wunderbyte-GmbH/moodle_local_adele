@@ -295,7 +295,7 @@ emit('add-edge', addCustomEdge( params.target, params.source));
 
 props.learningpath.json.tree =
 recalculateParentChild(props.learningpath.json.tree, 'parentCourse', 'childCourse', 'starting_node')
-await store.dispatch('saveLearningpath', props.learningpath);
+// await store.dispatch('saveLearningpath', props.learningpath);
 }
 
 function handleSaveEdit(params){
