@@ -51,7 +51,8 @@ function createRestriction (node_id, parent_node_id, store) {
           "name": store.state.strings.course_name_condition_parent_courses,
           "node_id": 'condition_1',
           "value": {
-            "node_id": parent_node_id
+            "courses_id": [parent_node_id],
+            "min_courses" : 1
           },
           "visibility": true
         },
