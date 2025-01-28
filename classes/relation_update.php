@@ -493,7 +493,8 @@ class relation_update {
                 if (strpos($restrictionlabelid, 'time') === 0) {
                     $nodelabelid = explode('_condition_', $restrictionlabelid);
                     $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]] ?? [];
-                    if (isset($restnode['inbetween_info']['endtime'])) {
+                    if (isset($restnode['inbetween_info']['endtime']) &&
+                    $restnode['inbetween_info']['endtime'] !== false) {
                         if (!$smallestenddate || strtotime($restnode['inbetween_info']['endtime']) < $smallestenddate) {
                             $smallestenddate = strtotime($restnode['inbetween_info']['endtime']);
                         }
