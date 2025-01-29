@@ -30,6 +30,7 @@ namespace local_adele\course_completion\conditions;
 use completion_info;
 use core_completion\progress;
 use local_adele\course_completion\course_completion;
+use local_adele\learning_path_update;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -148,7 +149,8 @@ class course_completed implements course_completion {
         }
         $isinbetween = false;
         foreach ($courses as $courseid) {
-            $course = get_course($courseid);
+            $course = learning_path_update::get_course($courseid);
+            // $course = get_course($courseid);
             $completed = false;
             if ($course->enablecompletion) {
                 // Get the course completion instance.

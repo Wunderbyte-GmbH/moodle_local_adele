@@ -47,6 +47,26 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_path_update {
+
+    /**
+     * All courses
+     * @var array
+     */
+    public static $courses = [];
+
+    /**
+     * Return single course from id
+     *
+     * @param int $courseid
+     */
+    public static function get_course($courseid) {
+        if (!isset(self::$courses[$courseid])) {
+            $course = get_course($courseid);
+            self::$courses[$courseid] = $course;
+        }
+        return self::$courses[$courseid];
+    }
+
     /**
      * Observer for course completed
      *
