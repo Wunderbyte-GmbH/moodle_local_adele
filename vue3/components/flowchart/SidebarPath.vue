@@ -354,7 +354,7 @@ function changeTab(index) {
             <div
               class="col long-text"
               style="padding-left: 2rem;"
-              v-tooltip="course.fullname"
+              :title="course.fullname"
             >
               {{ truncatedText(course.fullname, 32) }}
               <a
