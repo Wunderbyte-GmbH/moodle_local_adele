@@ -232,7 +232,7 @@ class learning_path_update {
     public static function checknodeprogression($node, $userid) {
         $progress = 0;
         foreach ($node['data']['course_node_id'] as $coursenodeid) {
-            $course = get_course($coursenodeid);
+            $course = learning_path_update::get_course($coursenodeid);
             $tmpprogress = (int) progress::get_course_progress_percentage($course, $userid);
             if ($tmpprogress > $progress) {
                 $progress = $tmpprogress;
