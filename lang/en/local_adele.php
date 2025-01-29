@@ -146,6 +146,7 @@ $string['title_delete'] = '['.__LINE__.']Learning Path deleted';
 $string['description_delete'] = '['.__LINE__.']You have deleted the Learning Path!';
 $string['title_save'] = '['.__LINE__.']Learning Path saved/updated';
 $string['description_save'] = '['.__LINE__.']You have saved/updated the Learning Path!';
+$string['description_save_error'] = '['.__LINE__.']Error occured while saving following Learning Path:';
 $string['image_title_save'] = '['.__LINE__.']Learning Path image has been saved/updated';
 $string['image_description_save'] = '['.__LINE__.']You have saved/updated the Learning Path image!';
 $string['title_change_visibility'] = '['.__LINE__.']Changed learning path visibility';

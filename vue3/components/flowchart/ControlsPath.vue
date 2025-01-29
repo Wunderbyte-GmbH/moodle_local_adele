@@ -170,13 +170,9 @@ const onSave = async () => {
       if (!learningpathcontrol.value.image) {
         learningpathcontrol.value.image = '';
       }
-      await store.dispatch('saveLearningpath', learningpathcontrol.value);
-      onCancelConfirmation(true)
-      notify({
-        title: store.state.strings.title_save,
-        text: store.state.strings.description_save,
-        type: 'success'
-      });
+  
+      store.dispatch('saveLearningpath', learningpathcontrol.value);
+      onCancelConfirmation(true);
     }
 };
 

@@ -145,14 +145,9 @@ const onSave = async () => {
       }
       return element_node;
   });
-  const learningpathID = await store.dispatch('saveLearningpath', learningpathCompletion.value)
-  router.push('/learningpaths/edit/' + learningpathID);
+  store.dispatch('saveLearningpath', learningpathCompletion.value)
+  router.push('/learningpaths/edit/' + learningpathCompletion.value.id);
   onCancelConfirmation(true);
-  notify({
-    title: store.state.strings.title_save,
-    text: store.state.strings.description_save,
-    type: 'success'
-  })
 };
 
 const perpareCompletion = () => {

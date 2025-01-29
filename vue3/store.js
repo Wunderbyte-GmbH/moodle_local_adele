@@ -27,6 +27,8 @@ import { createStore } from 'vuex';
 import moodleAjax from 'core/ajax';
 import moodleStorage from 'core/localstorage';
 import Notification from 'core/notification';
+import { notify } from '@kyvg/vue3-notification';
+import { result } from 'lodash';
 
 // Defining store for application
 export function createAppStore() {
@@ -294,6 +296,20 @@ export function createAppStore() {
                   image: payload.image,
                   json: JSON.stringify(payload.json),
                   contextid: context.state.contextid,
+                }).then(result => {
+                  if (result && result.learningpath.id) {
+                    notify({
+                      title: context.state.strings.title_save,
+                      text: context.state.strings.description_save,
+                      type: 'success'
+                    });
+                  } else {
+                    notify({
+                      title:  context.state.strings.flowchart_save_notification_title,
+                      text: context.state.strings.description_save_error + payload.name,
+                      type: 'error'
+                    });
+                  }
                 });
                 context.dispatch('fetchLearningpaths');
                 return result.learningpath.id;
