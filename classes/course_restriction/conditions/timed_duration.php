@@ -182,8 +182,8 @@ class timed_duration implements course_restriction {
                         $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
-                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange ?? '';
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange ?? '';
 
                 } else {
                     $timed[$restrictionnode['id']] = [

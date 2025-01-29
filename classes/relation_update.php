@@ -187,7 +187,7 @@ class relation_update {
                       false;
                     if (!$getoldrestriction) {
                         $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
-                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall;
+                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall ?? [];
                         $userpath->json['user_path_relation'][$node['id']]['allrestrictioncriteria'] = $restrictionnode;
                         $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
                     }
@@ -525,7 +525,7 @@ class relation_update {
      */
     public static function getnodestatusforrestriciton
     (&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $restrictionnodepathsall) {
-        if (count($restrictionnodepaths) > 0 || $node['restriction'] === null) {
+        if (count($restrictionnodepaths) > 0 || !isset($node['restriction']) ||  $node['restriction'] === null) {
             self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
             return 'inbetween';
         }
