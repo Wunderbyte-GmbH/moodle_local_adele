@@ -595,7 +595,7 @@ class relation_update {
         }
         if (isset($node['restriction'])) {
             foreach ($node['restriction']['nodes'] as $restrictionall) {
-                if (str_contains($restrictionall['id'], '_feedback')) {
+                if (strpos($restrictionall['id'], '_feedback')) {
                     $hastimedcondition = false;
                     $nextid = str_replace('_feedback', '', $restrictionall['id']);
                     $safetycounter = 0;
@@ -605,7 +605,7 @@ class relation_update {
                         $found = false;
                         foreach ($node['restriction']['nodes'] as $restrictioncolumn) {
                             if ($restrictioncolumn['id'] == $nextid) {
-                                if (str_contains($restrictioncolumn['data']['label'], 'timed')) {
+                                if (strpos($restrictioncolumn['data']['label'], 'timed')) {
                                     $hastimedcondition = true;
                                     $starttime = new \DateTime();
                                     if (
@@ -624,7 +624,7 @@ class relation_update {
                                 }
                                 $newnextid = null;
                                 foreach ($restrictioncolumn['childCondition'] as $children) {
-                                    if (!str_contains($children, '_feedback')) {
+                                    if (!strpos($children, '_feedback')) {
                                         $newnextid = $children;
                                         break;
                                     }
