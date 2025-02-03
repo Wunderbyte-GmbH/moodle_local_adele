@@ -68,9 +68,13 @@ class node_finished extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
+        $names = [];
+        foreach ($data['other']['node'] as $singelnode) {
+            $names[] = $singelnode['data']['fullname'];
+        }
         return get_string('event_node_finished_description', 'local_adele', [
             'user' => $data['other']['user']['userpath']['user_id'] ?? 'missing',
-            'node' => $data['other']['node']['data']['fullname'] ?? 'missing',
+            'node' => implode(', ' , $names) ?? 'missing',
         ]);
     }
 
