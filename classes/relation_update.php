@@ -293,7 +293,7 @@ class relation_update {
         $restrictionnodepaths,
         $mode,
         $restrictioncriteria,
-        &$nodecompletedname,
+        &$nodecompletedname
     ) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
