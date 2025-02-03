@@ -375,7 +375,7 @@ class relation_update {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
                         unset($feedback['completion']['after_all'][$completionnode['id']]);
-                        if (!isset( $node['firstcompleted'])) {
+                        if (!isset( $node['firstcompleted']) || $node['firstcompleted'] == false) {
                             $nodecompletedname[] = $node;
                             $node['firstcompleted'] = true;
                         }
