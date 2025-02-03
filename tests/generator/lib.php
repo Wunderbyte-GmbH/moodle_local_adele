@@ -34,6 +34,6 @@ class local_adele_generator extends testing_module_generator {
         global $DB;
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $data['filename']);
         $object = json_decode($content);
-        $DB->insert_record('local_adele_learning_paths', $object);
+        $id = $DB->insert_record('local_adele_learning_paths', $object);
     }
 }

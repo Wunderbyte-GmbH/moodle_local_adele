@@ -49,6 +49,8 @@ class save_learningpath extends advanced_testcase {
 
         // Choose the first course as the "starting course".
         $startingcourseid = $courseids[0];
+        $data['filename'] = 'alise_zugangs_lp_einfach.json';
+        $generator->get_plugin_generator('local_adele')->create_adele_learningpaths($data);
 
         // Create an instance of mod_adele in the starting course.
         $adelestart = $generator->get_plugin_generator('mod_adele')->create_instance([
