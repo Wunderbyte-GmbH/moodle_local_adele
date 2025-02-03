@@ -59,6 +59,7 @@ class relation_update {
         $userpath = $event->other['userpath'];
         if ($userpath) {
             $creation = false;
+            $nodecompletedname = [];
             if (!isset($userpath->json['user_path_relation'])) {
                 $creation = true;
             }
@@ -176,7 +177,8 @@ class relation_update {
                             $userpath,
                             $restrictionnodepaths,
                             1,
-                            $restrictioncriteria
+                            $restrictioncriteria,
+                            $nodecompletedname
                         );
                     }
                     $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
@@ -218,6 +220,17 @@ class relation_update {
                       ],
                     ]);
                     $eventsingle->trigger();
+                }
+                if (!empty($nodecompletedname)) {
+                        $nodefinished = node_finished::create([
+                            'objectid' => $userpath->id,
+                            'context' => context_system::instance(),
+                            'other' => [
+                                'node' => $nodecompletedname,
+                                'userpath' => $userpath,
+                            ],
+                        ]);
+                        $nodefinished->trigger();
                 }
             }
         }
@@ -279,7 +292,8 @@ class relation_update {
         $userpath,
         $restrictionnodepaths,
         $mode,
-        $restrictioncriteria
+        $restrictioncriteria,
+        &$nodecompletedname,
     ) {
         $completionnodepaths = [];
         $singlecompletionnode = [];
@@ -361,15 +375,10 @@ class relation_update {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
                         unset($feedback['completion']['after_all'][$completionnode['id']]);
-                        $nodefinished = node_finished::create([
-                            'objectid' => $userpath->id,
-                            'context' => context_system::instance(),
-                            'other' => [
-                                'node' => $node,
-                                'userpath' => $userpath,
-                            ],
-                        ]);
-                        $nodefinished->trigger();
+                        if (!isset( $node['firstcompleted'])) {
+                            $nodecompletedname[] = $node;
+                            $node['firstcompleted'] = true;
+                        }
                     }
                 }
             }

@@ -183,6 +183,7 @@ class learning_path_update {
     public static function passnodevalues($newtree, $oldtree, $userid) {
         $oldpath = json_decode($oldtree, true);
         $userpathjson = json_decode($newtree, true);
+        $userpathjson['user_path_relation'] = $oldpath['user_path_relation'];
         $oldvalues = [];
 
         foreach ($oldpath['tree']['nodes'] as $node) {

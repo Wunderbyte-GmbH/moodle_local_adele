@@ -59,9 +59,14 @@ class node_completion {
         if (is_string($userpath)) {
             $userpath = json_decode($userpath);
         }
+        $uniquechildcourses = [];
+        foreach ($event->other['node'] as $signlenode) {
+            $uniquechildcourses = array_merge($uniquechildcourses, $signlenode['childCourse']);
+        }
+        $uniquechildcourses = array_unique($uniquechildcourses);
         $firstenrollededit = false;
         foreach ($userpath->tree->nodes as &$node) {
-            if (in_array($node->id, $event->other['node']['childCourse'])) {
+            if (in_array($node->id, $uniquechildcourses)) {
                 foreach ($node->data->course_node_id as $subscribecourse) {
                     if (!enrol_is_enabled('manual')) {
                         break; // Manual enrolment not enabled.
