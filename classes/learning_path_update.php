@@ -197,7 +197,7 @@ class learning_path_update {
         }
 
         foreach ($userpathjson['tree']['nodes'] as &$node) {
-            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']] == true ) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['firstcompleted'] == true ) {
                 $node['firstcompleted'] = true;
             }
             $manualrestriction = false;
