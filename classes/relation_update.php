@@ -520,7 +520,7 @@ class relation_update {
             }
         }
         if ($latestdate !== 0) {
-            $feedback['restriction'][$wheretoput . '_timed'] = get_string('node_restriction_' . $wheretoput . '_timed', 'local_adele', date('Y-m-d H:i:s', $latestdate));
+            $feedback['restriction'][$wheretoput . '_timed'] = get_string('node_restriction_' . $wheretoput . '_timed', 'local_adele', date('d.m.Y H:i', $latestdate));
         }
     }
 

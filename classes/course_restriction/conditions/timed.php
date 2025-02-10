@@ -145,12 +145,12 @@ class timed implements course_restriction {
                         }
                     }
                     if ($startdate) {
-                        $startdate = $startdate->format('Y-m-d H:i:s');
+                        $startdate = $startdate->format('d.m.Y H:i');
                         $timed[$restrictionnode['id']]['placeholders']['start_date'] =
                             $startdate;
                     }
                     if ($enddate) {
-                        $enddate = $enddate->format('Y-m-d H:i:s');
+                        $enddate = $enddate->format('d.m.Y H:i');
                         $timed[$restrictionnode['id']]['placeholders']['end_date'] =
                             get_string('course_restricition_before_condition_to', 'local_adele') . $enddate;
                     }
@@ -183,7 +183,7 @@ class timed implements course_restriction {
         if ($datestring !== null) {
             $datetime = DateTime::createFromFormat($format, $datestring);
             if ($datetime && $datetime->format($format) === $datestring) {
-                $datetime->format('Y-m-d H:i:s');
+                $datetime->format('d.m.Y H:i');
                 return $datetime;
             }
         }

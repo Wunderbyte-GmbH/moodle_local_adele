@@ -160,7 +160,7 @@ class timed_duration implements course_restriction {
                         }
                     }
                     if ($endtime) {
-                        $endtime = $endtime->format('Y-m-d H:i:s');
+                        $endtime = $endtime->format('d.m.Y H:i');
                     }
                     if (is_string($starttime)) {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
@@ -172,9 +172,9 @@ class timed_duration implements course_restriction {
                     } else {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
                           get_string('course_condition_timed_duration_since', 'local_adele') .
-                          $starttime->format('Y-m-d H:i:s');
+                          $starttime->format('d.m.Y H:i');
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
-                          'starttime' => $starttime->format('Y-m-d H:i:s') ?? null,
+                          'starttime' => $starttime->format('d.m.Y H:i') ?? null,
                           'endtime' => $endtime,
                         ];
                     }

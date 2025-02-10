@@ -64,7 +64,7 @@ class timed_test extends advanced_testcase {
         // Test valid date.
         $validdate = $timed->isvaliddate('2024-01-01T00:00');
         $this->assertInstanceOf(DateTime::class, $validdate);
-        $this->assertEquals('2024-01-01 00:00:00', $validdate->format('Y-m-d H:i:s'));
+        $this->assertEquals('2024-01-01 00:00:00', $validdate->format('d.m.Y H:i'));
 
         // Test invalid date.
         $validdate = $timed->isvaliddate('invalid-date');
