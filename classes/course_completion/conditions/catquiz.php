@@ -316,7 +316,7 @@ class catquiz implements course_completion {
         return $DB->get_record(
           'local_catquiz_attempts',
           ['attemptid' => $attemptid],
-          'attemptid, instanceid, endtime'
+          'attemptid, instanceid, endtime, timemodified'
         );
     }
 
@@ -327,14 +327,28 @@ class catquiz implements course_completion {
      */
     private function get_attempts_information($attemptids) {
         global $DB;
-        return $DB->get_records_list(
-          'local_catquiz_attempts',
-          'attemptid',
-          array_values($attemptids),
-          null,
-          'attemptid, instanceid, endtime'
-        );
+
+        // Convert the $attemptids array to a comma-separated list for use in the SQL query.
+        list($insql, $params) = $DB->get_in_or_equal(array_values($attemptids), SQL_PARAMS_NAMED);
+
+        // Construct the SQL query string.
+        $sql = "
+            SELECT
+                lca.attemptid, lca.instanceid, lca.endtime, lca.timemodified
+            FROM
+                {local_catquiz_attempts} lca
+            JOIN
+                {adaptivequiz_attempt} aa ON lca.attemptid = aa.id
+            WHERE
+                aa.attemptstate = 'complete'
+               AND lca.attemptid $insql
+        ";
+
+        // Execute the query and return the results.
+        return $DB->get_records_sql($sql, $params);
     }
+
+
 
     /**
      * Helper function to return localized description strings.
@@ -389,7 +403,9 @@ class catquiz implements course_completion {
               'currentperc' => $attempt['currentpercentage'],
               'targetlogit' => $scalemap[$scale]['scale'],
               'currentlogit' => $attempt['scale'],
-              'time' => date("j.n.y", $attemptsentries[$attempt['attemptid']]->endtime),
+              'time' => date("j.n.y", $attemptsentries[$attempt['attemptid']]->endtime !== '0'
+              ? $attemptsentries[$attempt['attemptid']]->endtime
+              : $attemptsentries[$attempt['attemptid']]->timemodified),
               'scale' => $scalemap[$scale]['name'],
               'link' =>
                 $CFG->wwwroot . '/mod/adaptivequiz/attemptfinished.php?attempt=' .
