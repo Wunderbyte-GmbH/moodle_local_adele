@@ -354,39 +354,6 @@
               </div>
             </div>
           </li>
-          <li
-            class="list-group-item"
-            style="user-select: text;"
-            @mousedown.stop
-            @mousemove.stop
-            @mouseup.stop
-          >
-            <i
-              class="fa-solid fa-play-circle"
-            />
-            <b>
-              {{ store.state.strings.completion_completion_inbetween_feedback }}
-            </b>
-            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
-              <div v-if="completion_inbetween && completion_inbetween.length > 0 && completion_inbetween != ''">
-                <div
-                  v-for="completion_string in completion_inbetween"
-                  :key="completion_string"
-                  style="user-select: text;"
-                  @mousedown.stop
-                  @mousemove.stop
-                  @mouseup.stop
-                >
-                  <div v-if="completion_string != ''">
-                    - <span v-html="completion_string"></span>
-                  </div>
-                </div>
-              </div>
-              <div v-else>
-                {{ store.state.strings.completion_nothing_defined_feedback }}
-              </div>
-            </div>
-          </li>
         </ul>
       </div>
     </transition>
