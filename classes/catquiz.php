@@ -50,12 +50,15 @@ class catquiz {
      *
      * @return array
      */
-    public static function get_catquiz_tests() {
+    public static function get_catquiz_tests($availablecourses) {
         if (!class_exists('local_catquiz\testenvironment')) {
             return [];
         }
+        $availablecourseids = array_map(function ($course) {
+            return $course['course_node_id'][0]; // Adjust this based on your data structure
+        }, $availablecourses);
         $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2, true);
-        $records = array_map(function ($record) {
+        $records = array_filter(array_map(function ($record) {
             $record = (array)$record;
             $record['json'] = json_decode($record['json']);
             $record['name'] = $record['json']->name;
@@ -63,8 +66,10 @@ class catquiz {
             $record['courseid'] = $record['courseid'];
             unset($record['json']);
             return $record;
-        }, $records);
-        return $records;
+        }, $records), function ($record) use ($availablecourseids) {
+            return in_array($record['courseid'], $availablecourseids);
+        });
+        return array_values($records);
     }
 
     /**

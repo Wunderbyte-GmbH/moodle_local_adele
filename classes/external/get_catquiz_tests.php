@@ -57,9 +57,23 @@ class get_catquiz_tests extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            'contextid' => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
+            'availablecourses' => new external_multiple_structure(
+                new external_single_structure(
+                    [
+                        'course_node_id' => new external_multiple_structure(
+                            new external_value(PARAM_TEXT, 'Course node IDs')
+                        ),
+                        'fullname' => new external_value(PARAM_TEXT, 'Full name of the course'),
+                        'shortname' => new external_value(PARAM_TEXT, 'Short name of the course'),
+                        'category' => new external_value(PARAM_INT, 'Category ID of the course'),
+                        'summary' => new external_value(PARAM_RAW, 'Summary of the course', VALUE_OPTIONAL),
+                        'tags' => new external_value(PARAM_TEXT, 'Tags for the course', VALUE_OPTIONAL, null),
+                        'selected_course_image' => new external_value(PARAM_URL, 'Selected course image URL', VALUE_OPTIONAL, null),
+                    ]
+                )
+            ),
+        ]);
     }
 
     /**
@@ -68,7 +82,7 @@ class get_catquiz_tests extends external_api {
      * @param int $contextid
      * @return array
      */
-    public static function execute($contextid): array {
+    public static function execute($contextid, $availablecourses): array {
 
         require_login();
 
@@ -81,7 +95,7 @@ class get_catquiz_tests extends external_api {
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:canmanage', $context);
 
-        return catquiz::get_catquiz_tests();
+        return catquiz::get_catquiz_tests($availablecourses);
     }
 
     /**

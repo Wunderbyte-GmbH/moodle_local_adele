@@ -47,12 +47,24 @@ class modquiz {
      *
      * @return array
      */
-    public static function get_mod_quizzes() {
+    public static function get_mod_quizzes($availablecourses) {
         global $DB;
+        $availablecourseids = array_map(function ($course) {
+            return $course['course_node_id'][0];
+        }, $availablecourses);
+
+        if (empty($availablecourseids)) {
+            return [];
+        }
+        list($insql, $params) = $DB->get_in_or_equal($availablecourseids, SQL_PARAMS_QM);
+
         $sql = "SELECT q.id, q.course, q.name, c.fullname as coursename
                 FROM {quiz} q
-                LEFT JOIN {course} c ON c.id = q.course";
-        $records = $DB->get_records_sql($sql);
+                LEFT JOIN {course} c ON c.id = q.course
+                WHERE q.course $insql";
+
+        $records = $DB->get_records_sql($sql, $params);
+
         return array_map(fn($a) => (array)$a, $records);
     }
 }

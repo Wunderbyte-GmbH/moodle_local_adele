@@ -336,6 +336,7 @@ export function createAppStore() {
                 const result = await ajax('local_adele_get_catquiz_tests',
                 {
                   contextid: context.state.contextid,
+                  availablecourses: context.state.availablecourses,
                 });
                 return result;
             },
@@ -370,6 +371,7 @@ export function createAppStore() {
                 const result = await ajax('local_adele_get_mod_quizzes',
                 {
                   contextid: context.state.contextid,
+                  availablecourses: context.state.availablecourses,
                 });
                 return result;
             },
