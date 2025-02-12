@@ -69,23 +69,23 @@ $string['subject'] = '['.__LINE__.']Thema';
 $string['learningpath'] = '['.__LINE__.']Ziel';
 $string['learningpath_name'] = '['.__LINE__.']Zielname';
 $string['learningpath_description'] = '['.__LINE__.']Zielbeschreibung';
-$string['learningpath_form_title_add'] = '['.__LINE__.']Einen neuen Lernpfad hinzufügen';
-$string['learningpath_form_title_edit'] = '['.__LINE__.']Einen Lernpfad bearbeiten';
+$string['learningpath_form_title_add'] = '['.__LINE__.']Lernpfad anlegen';
+$string['learningpath_form_title_edit'] = '['.__LINE__.']Bestehende Lernpfade bearbeiten';
 $string['save'] = '['.__LINE__.']Speichern';
 $string['cancel'] = '['.__LINE__.']Abbrechen';
 
 // Button-Strings.
 $string['btnadele'] = '['.__LINE__.']Lernpfade';
 $string['btnbacktooverview'] = '['.__LINE__.']Zurück zur Übersicht';
-$string['btncreatecourse'] = '['.__LINE__.']Zur Seite gehen und einen Kurs erstellen';
+$string['btncreatecourse'] = '['.__LINE__.']Kurse importieren';
 $string['btnsave'] = '['.__LINE__.']Speichern';
 $string['btncancel'] = '['.__LINE__.']Abbrechen';
 $string['btnupdate_positions'] = '['.__LINE__.']Positionen aktualisieren';
 $string['btntoggle'] = '['.__LINE__.']Ansicht wechseln';
 $string['btndarktoggle'] = '['.__LINE__.']Dunkle Ansicht';
 $string['btnlighttoggle'] = '['.__LINE__.']Helle Ansicht';
-$string['btnstudenttoggle'] = '['.__LINE__.']Student Ansicht';
-$string['btneditortoggle'] = '['.__LINE__.']Editor Ansicht';
+$string['btnstudenttoggle'] = '['.__LINE__.']Lernenden-Ansicht (Vorschau)';
+$string['btneditortoggle'] = '['.__LINE__.']Editor';
 $string['btnreload'] = '['.__LINE__.']Seite neu laden';
 
 // Aus Zeichenfolgen.
@@ -427,11 +427,11 @@ $string['nodes_items_completion'] = '['.__LINE__.']Abschluss';
 $string['nodes_items_no_progress'] = '['.__LINE__.']Kein Fortschritt';
 
 // Bedingungszeichenfolgen.
-$string['composables_new_node'] = '['.__LINE__.']Neuer Startknoten';
-$string['composables_drop_zone_parent'] = '['.__LINE__.']Ablagezone Eltern';
-$string['composables_drop_zone_child'] = '['.__LINE__.']Ablagezone Kind';
-$string['composables_drop_zone_add'] = '['.__LINE__.']Und Ablagezone';
-$string['composables_drop_zone_or'] = '['.__LINE__.']Oder Ablagezone';
+$string['composables_new_node'] = '['.__LINE__.']Neuer Start-Kurs/Stapel';
+$string['composables_drop_zone_parent'] = '['.__LINE__.']Vorgänger-Kurs/Stapel';
+$string['composables_drop_zone_child'] = '['.__LINE__.']Nachfolger-Kurs/Stapel';
+$string['composables_drop_zone_add'] = '['.__LINE__.']Alternativer Kurs/Stapel';
+$string['composables_drop_zone_or'] = '['.__LINE__.']Zum Stapel hinzufügen';
 $string['composables_feedback_node'] = '['.__LINE__.']Feedbackknoten';
 
 // Einschränkungszeichenfolgen.
@@ -448,8 +448,8 @@ $string['restriction_restrictions_for'] = '['.__LINE__.']Einschränkungen für:'
 $string['restriction_course_title'] = '['.__LINE__.']Knotentitel:';
 $string['restriction_tags'] = '['.__LINE__.']Tags:';
 $string['restriction_loading_restrictions'] = '['.__LINE__.']Lade Einschränkungen...';
-$string['restriction_node_drop_refused_title'] = '['.__LINE__.']Knotenabwurf abgelehnt';
-$string['restriction_node_drop_refused_text'] = '['.__LINE__.']Bitte lassen Sie den Knoten in den Ablagezonen fallen, die angezeigt werden, wenn Sie einen Knoten zu einem vorhandenen Knoten ziehen.';
+$string['restriction_node_drop_refused_title'] = '['.__LINE__.']Kann hier nicht abgelegt werden!';
+$string['restriction_node_drop_refused_text'] = '['.__LINE__.']Ziehen Sie den Kurs in einer der angezeigten Ablagezonen.';
 
 // Benutzeransichtzeichenfolgen.
 $string['user_view_id'] = '['.__LINE__.']ID';
@@ -458,11 +458,11 @@ $string['user_view_firstname'] = '['.__LINE__.']Vorname';
 $string['user_view_lastname'] = '['.__LINE__.']Nachname';
 $string['user_view_email'] = '['.__LINE__.']E-Mail';
 $string['user_view_progress'] = '['.__LINE__.']Fortschritt';
-$string['user_view_nodes'] = '['.__LINE__.']Abgeschlossene Knoten';
+$string['user_view_nodes'] = '['.__LINE__.']Abgeschlossene Kurse/Stapel';
 $string['userlistranking'] = '['.__LINE__.']Rang';
 $string['user_view_go_back_overview'] = '['.__LINE__.']Zurück zur Übersicht';
 $string['user_view_user_path_for'] = '['.__LINE__.']Benutzerpfad für:';
-$string['nodes_feedback_before'] = '['.__LINE__.']Vor Zugang zum Knoten/Stapel';
+$string['nodes_feedback_before'] = '['.__LINE__.']Vor Zugang zum Kurse/Stapel';
 $string['nodes_feedback_inbetween'] = '['.__LINE__.']Während Bearbeitung';
 $string['nodes_feedback_after'] = '['.__LINE__.']Nach Abschluss';
 $string['nodes_feedback_use_default'] = '['.__LINE__.']Standard-Feedback verwenden';
@@ -471,7 +471,7 @@ $string['user_view_user_list_show'] = '['.__LINE__.']Nutzerliste anzeigen';
 $string['user_view_user_list_hide'] = '['.__LINE__.']Nutzerliste verbergen';
 
 // Main strings.
-$string['main_intro_slider'] = '['.__LINE__.']Einführungsslider';
+$string['main_intro_slider'] = '['.__LINE__.']Tutorial ansehen';
 $string['main_description'] = '['.__LINE__.']Beschreibung:';
 $string['main_duplicate'] = '['.__LINE__.']Duplizieren';
 $string['main_delete'] = '['.__LINE__.']Löschen';
