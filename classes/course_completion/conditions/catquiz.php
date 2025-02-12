@@ -385,8 +385,10 @@ class catquiz implements course_completion {
             foreach ($percentageofrightanswersbyscalekeyid as $attempt => $scalevalues) {
                 if (
                   (!isset($bestattemptpescale[$subscaleid]) ||
-                  $scalevalues[$subscaleid] > $bestattemptpescale[$subscaleid])
-                  && $this->percentageattempts[$attempt][$subscaleid]['percentage']
+                  $scalevalues[$subscaleid] > $bestattemptpescale[$subscaleid]) &&
+                  isset($this->percentageattempts[$attempt]) &&
+                  isset($this->percentageattempts[$attempt][$subscaleid]) &&
+                  isset($this->percentageattempts[$attempt][$subscaleid]['percentage'])
                 ) {
                     $percentage = $this->percentageattempts[$attempt][$subscaleid]['percentage'];
                     $bestattemptpescale[$subscaleid] = [

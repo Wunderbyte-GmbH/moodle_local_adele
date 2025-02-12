@@ -133,6 +133,8 @@ class timed_duration implements course_restriction {
                     $iscurrenttimeinrange = false;
                     $starttime = new DateTime();
                     $endtime = null;
+                    $durationvalue = '';
+                    $selectedduration = '';
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
                         if ($restrictionnode['data']['value']['selectedOption'] == '1') {
                             if (isset($node['data']['first_enrolled'])) {
@@ -179,7 +181,7 @@ class timed_duration implements course_restriction {
                         ];
                     }
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
-                        $selectedduration . ' ' . $this->durationplaceholder[$durationvalue];
+                    $selectedduration . ' ' . ($this->durationplaceholder[$durationvalue] ?? '');
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange ?? '';

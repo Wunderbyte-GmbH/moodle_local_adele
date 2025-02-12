@@ -127,7 +127,7 @@ class node_completion {
 
         $latestrecord->json = json_decode(json_encode($userpath), true);
         $eventsingle = user_path_updated::create([
-            'objectid' => $userpath->id,
+            'objectid' => $event->other['userpath']->id,
             'context' => context_system::instance(),
             'other' => [
                 'userpath' => $latestrecord,
