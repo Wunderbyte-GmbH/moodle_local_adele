@@ -62,7 +62,7 @@ class save_learningpath extends external_api {
             'description'  => new external_value(PARAM_TEXT, 'description', VALUE_REQUIRED),
             'json'  => new external_value(PARAM_RAW, 'json', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            'image'  => new external_value(PARAM_TEXT, 'image', VALUE_OPTIONAL, ''),
+            'image'  => new external_value(PARAM_TEXT, 'image', VALUE_DEFAULT, ''),
             ]
         );
     }
