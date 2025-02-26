@@ -122,6 +122,7 @@ class node_completion {
               'status' => 'active',
               'user_id' => $event->other['userpath']->user_id,
               'learning_path_id' => $event->other['userpath']->learning_path_id,
+              'course_id' => $event->other['userpath']->course_id,
             ]
         );
 
