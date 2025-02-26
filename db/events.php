@@ -47,10 +47,6 @@
       'callback' => 'local_adele_observer::node_finished',
     ],
     [
-      'eventname' => '\mod_quiz\event\attempt_submitted',
-      'callback' => 'local_adele_observer::attempt_submitted',
-    ],
-    [
       'eventname' => '\mod_quiz\event\attempt_finished',
       'callback' => 'local_adele_observer::quiz_attempt_finished',
     ],
