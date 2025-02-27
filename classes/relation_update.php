@@ -982,7 +982,7 @@ class relation_update {
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
                 if (
-                  $node['type'] != 'dropzone' &&
+                  $node['type'] != 'dropzone' && isset($node['parentCourse']) &&
                   in_array('starting_node', $node['parentCourse'])
                 ) {
                     if (!is_int($node['data']['course_node_id'])) {
