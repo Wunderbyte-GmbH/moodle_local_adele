@@ -50,8 +50,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   let remove_nodes = []
-  let reversed_course_node_id = props.data.course_node_id;
-  reversed_course_node_id = reversed_course_node_id.reverse();
+  let reversed_course_node_id = [...props.data.course_node_id].reverse();
   reversed_course_node_id.forEach((node_id, index) => {
     remove_nodes.push(props.data.node_id + '_expanded_courses_' + node_id)
     let remove_node =findNode(props.data.node_id + '_expanded_courses_' + node_id)
