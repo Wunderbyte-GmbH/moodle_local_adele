@@ -131,7 +131,7 @@ function checkIntersetcion(event, closestNode) {
         node.data = {
           opacity: '0.6',
           bgcolor: 'grey',
-          infotext: 'Drop zone',
+          infotext: store.state.strings.completion_drop_zone,
           height: nodeHeight,
           width: '350px',
         }

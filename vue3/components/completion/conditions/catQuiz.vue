@@ -91,7 +91,7 @@
           class="btn btn-primary rounded-pill"
           @click="toggleTable"
         >
-          {{ showTable ? 'Hide Table' : 'Show Table' }}
+          {{ showTable ? store.state.strings.conditions_catquiz_hide_table : store.state.strings.conditions_catquiz_show_table }}
         </button>
 
         <div v-else>

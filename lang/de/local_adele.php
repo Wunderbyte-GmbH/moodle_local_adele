@@ -184,6 +184,7 @@ $string['course_description_condition_timed_duration'] = '['.__LINE__.']Zeitraum
 $string['course_name_condition_timed_duration'] = '['.__LINE__.']Kursbearbeitungszeitraum';
 $string['course_select_condition_timed_duration_learning_path'] = '['.__LINE__.']Seit Anmeldung zum Lernpfad';
 $string['course_select_condition_timed_duration_node'] = '['.__LINE__.']Seit Einschreibung in Kurs/Stapel';
+$string['course_name_condition_timed_duration_duration_value'] = '['.__LINE__.']Dauer';
 $string['course_select_condition_timed_duration_days'] = '['.__LINE__.']Tage';
 $string['course_select_condition_timed_duration_weeks'] = '['.__LINE__.']Wochen';
 $string['course_select_condition_timed_duration_months'] = '['.__LINE__.']Monate';
@@ -310,6 +311,8 @@ $string['conditions_set_values'] = '['.__LINE__.']Werte speichern';
 $string['conditions_catquiz_warning_description'] = '['.__LINE__.']Das Catquiz befindet sich im selben Kurs wie der Lernpfad';
 $string['conditions_catquiz_warning_name'] = '['.__LINE__.']Catquiz im Kurs';
 $string['conditions_min_grad'] = '['.__LINE__.']Mindestpunktzahl:';
+$string['conditions_catquiz_show_table'] = '['.__LINE__.']Tabelle anzeigen';
+$string['conditions_catquiz_hide_table'] = '['.__LINE__.']Tabelle verbergen';
 $string['conditions_finish_course'] = '['.__LINE__.']Knoten manuell abschließen';
 
 // Abschlusszeichenfolgen.

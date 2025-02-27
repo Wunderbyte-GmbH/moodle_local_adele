@@ -29,7 +29,7 @@
       <input
         v-model="data.selectedDuration"
         class="col-md-6 form-control"
-        placeholder="Duration value"
+        :placeholder="store.state.strings.course_name_condition_timed_duration_duration_value"
         @change="onChange()"
       >
       <select 

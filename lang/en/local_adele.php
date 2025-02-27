@@ -181,11 +181,12 @@ $string['course_description_condition_parent_node_completed'] = '[EN_'.__LINE__.
 $string['course_name_condition_parent_node_completed'] = '[EN_'.__LINE__.']Parent node finished';
 $string['course_description_condition_timed_duration'] = '[EN_'.__LINE__.']Duration in which it is possible to edit the course';
 $string['course_name_condition_timed_duration'] = '[EN_'.__LINE__.']Course edit duration';
-$string['course_select_condition_timed_duration_learning_path'] = '[EN_'.__LINE__.']Since learning path subscription';
 $string['course_select_condition_timed_duration_node'] = '[EN_'.__LINE__.']Since node subscription';
 $string['course_select_condition_timed_duration_days'] = '[EN_'.__LINE__.']days';
 $string['course_select_condition_timed_duration_weeks'] = '[EN_'.__LINE__.']weeks';
 $string['course_select_condition_timed_duration_months'] = '[EN_'.__LINE__.']months';
+$string['course_select_condition_timed_duration_learning_path'] = '[EN_'.__LINE__.']Since learning path subscription';
+$string['course_name_condition_timed_duration_duration_value'] = '['.__LINE__.']Duration value';
 
 // Feedback Strings.
 $string['node_access_completed'] = '[EN_'.__LINE__.']The node is completed because:';
@@ -301,6 +302,8 @@ $string['conditions_catquiz_warning_description'] = '[EN_'.__LINE__.']The Catqui
 $string['conditions_catquiz_warning_name'] = '[EN_'.__LINE__.']Catquiz inside course';
 $string['conditions_min_grad'] = '[EN_'.__LINE__.']Min. Grade:';
 $string['conditions_finish_course'] = '[EN_'.__LINE__.']Finish node manually';
+$string['conditions_catquiz_show_table'] = '['.__LINE__.']Show table';
+$string['conditions_catquiz_hide_table'] = '['.__LINE__.']Hide table';
 
 // Completion strings.
 $string['completion_invalid_path_title'] = '[EN_'.__LINE__.']Invalid Path';
