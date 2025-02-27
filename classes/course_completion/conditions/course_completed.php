@@ -190,7 +190,11 @@ class course_completed implements course_completion {
                             $counttodo -= $finished;
                         }
                         if ($isinbetween) {
-                            $string = $counttodo . ' ' . get_string('course_restricition_before_condition_from', 'local_adele') . $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                            $string = $counttodo . ' ' . get_string('course_restricition_before_condition_from', 'local_adele') .
+                            $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+                        } else if ($coursecompletion['completed'][$complitionnode['id']]) {
+                            $string = $finished . ' ' . get_string('course_restricition_before_condition_from', 'local_adele') .
+                            $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
                         } else {
                             $string = $counttodo . get_string('course_description_before_condition_course_completed_aus', 'local_adele') .
                             $numbcourses . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
