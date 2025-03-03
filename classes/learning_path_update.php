@@ -222,29 +222,10 @@ class learning_path_update {
                     $node['data']['manualcompletionvalue'] = $oldvalues[$node['id']]['manualcompletionvalue'];
                 }
             }
-            $node = self::checknodeprogression($node, $userid);
+            $nodeObj = json_decode(json_encode($node));
+            $node = json_decode(json_encode(learning_paths::checknodeprogression($nodeObj, $userid)), true);
         }
         return $userpathjson;
-    }
-
-    /**
-     * Get user path relation.
-     *
-     * @param object $node
-     * @param String $userid
-     * @return array
-     */
-    public static function checknodeprogression($node, $userid) {
-        $progress = 0;
-        foreach ($node['data']['course_node_id'] as $coursenodeid) {
-            $course = learning_path_update::get_course($coursenodeid);
-            $tmpprogress = (int) progress::get_course_progress_percentage($course, $userid);
-            if ($tmpprogress > $progress) {
-                $progress = $tmpprogress;
-            }
-        }
-        $node['data']['progress'] = $progress;
-        return $node;
     }
 
     /**

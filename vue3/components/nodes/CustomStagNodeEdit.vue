@@ -219,7 +219,7 @@ const expandCourses = () => {
             class="col-8"
             style="display: flex; justify-content: end;"
           >
-            <ProgressBar :progress="progress" />
+            <ProgressBar :progress="data.progress" />
           </div>
         </div>
         <div v-if="store.state.view !=='student'">

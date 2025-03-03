@@ -628,16 +628,87 @@ class learning_paths {
      * @return array
      */
     public static function checknodeprogression($node, $userid) {
-        $progress = 0;
+        $courseprogrressarray = [];
+        $completioncolumnprogress = [];
         foreach ($node->data->course_node_id as $coursenodeid) {
             $course = learning_path_update::get_course($coursenodeid);
-            $tmpprogress = (int) progress::get_course_progress_percentage($course, $userid);
-            if ($tmpprogress > $progress) {
-                $progress = $tmpprogress;
+            $courseprogrressarray[$coursenodeid] = (int) progress::get_course_progress_percentage($course, $userid);
+        }
+        arsort($courseprogrressarray);
+        $sortedcourseprogress = array_values($courseprogrressarray);
+        foreach ($node->completion->nodes as $completionnode) {
+            // $failedcompletion = false;
+            // $validationconditionstring = [];
+            if (
+                isset($completionnode->parentCondition) &&
+                $completionnode->parentCondition[0] == 'starting_condition'
+            ) {
+                $currentcondition = $completionnode;
+                // $progress = 0;
+                $completionprogressarray = [];
+                while ($currentcondition) {
+                    $completionnodeid = $currentcondition->id;
+                    $label = $currentcondition->data->label;
+                    $progress = 0;
+                    if (    $label == 'catquiz' ||
+                            $label == 'modquiz' ||
+                            $label == 'manual'
+                        ) {
+                        if (isset($node->data->completion->completioncriteria->$label->completed->$completionnodeid) &&
+                        $node->data->completion->completioncriteria->$label->completed->$completionnodeid == true) {
+                            $progress = 100;
+                        }
+                    } else if ($label == 'course_completed') {
+                        $minvalue = $currentcondition->data->value->min_courses ?? 1;
+                        $positioncount = 0;
+                        $nodecompletionprogress = 0;
+                        while ($positioncount < $minvalue) {
+                            $nodecompletionprogress += $sortedcourseprogress[$positioncount];
+                            $positioncount++;
+                        }
+                        $progress = $nodecompletionprogress / $minvalue;
+
+                    } else {
+                        $test2 = 'test2';
+                    }
+                    $completionprogressarray[] = $progress;
+                    $currentcondition = self::searchnestedarray(
+                        $node->completion->nodes,
+                        $currentcondition->childCondition,
+                        'id'
+                    );
+                }
+
+                $completioncolumnprogress[] = array_sum($completionprogressarray) / count($completionprogressarray);
             }
         }
-        $node->data->progress = $progress;
+        // Return highes value
+        arsort($completioncolumnprogress);
+        $node->data->progress = $completioncolumnprogress[0];
         return $node;
+    }
+
+
+
+    /**
+     * Observer for course completed
+     *
+     * @param array $haystack
+     * @param array $needle
+     * @param string $key
+     * @return mixed
+     */
+    public static function searchnestedarray($haystack, $needle, $key, $returnfeedack = false) {
+        foreach ($haystack as $item) {
+            foreach ($needle as $need) {
+                if (strpos($need, '_feedback') == $returnfeedack) {
+                    if (isset($item->$key) && $item->$key === $need) {
+                        return $item;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
