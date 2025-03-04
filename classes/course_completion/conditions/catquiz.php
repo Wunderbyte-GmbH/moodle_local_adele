@@ -279,6 +279,10 @@ class catquiz implements course_completion {
                         count($partialpassedrecords['percentage']) == $scaleattemptset['attempts']
                     ) {
                         $catquizzes['completed'][$complitionnode['id']] = $partialpassedrecords;
+                        $filteredpercentageofrightanswers = array_intersect_key(
+                            $percentageofrightanswersbyscalekeyid, 
+                            array_flip($partialpassedattemptids)
+                        );
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_list'] =
                           self::get_record_list(
                             $scales,

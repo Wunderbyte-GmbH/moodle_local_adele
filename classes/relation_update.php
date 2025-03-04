@@ -712,6 +712,9 @@ class relation_update {
             if ($type == 'completion') {
                 $completionpriorities = course_completion_status::get_condition_priority();
                 foreach ($conditionnodepaths as $conditionnodepath) {
+                    if (!is_array($conditionnodepath)) { 
+                        $conditionnodepath = [$conditionnodepath];
+                    }
                     foreach ($conditionnodepath as $condition) {
                         if (
                             isset($completionpriorities[$condition]) && (
