@@ -55,7 +55,8 @@ class get_lp_user_path_relations extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
+        return new external_function_parameters(
+            [
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
@@ -77,7 +78,6 @@ class get_lp_user_path_relations extends external_api {
             'learningpathid' => $learningpathid,
             'contextid' => $contextid,
         ]);
-
         require_login();
 
         $context = context::instance_by_id($contextid);

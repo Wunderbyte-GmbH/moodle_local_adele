@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace local_adele;
 
+use completion_info;
 use context_system;
 use local_adele\event\user_path_updated;
 use local_adele\helper\adhoc_task_helper;
@@ -74,11 +75,13 @@ class node_completion {
                     if (!$enrol = enrol_get_plugin('manual')) {
                         break; // No manual enrolment plugin.
                     }
-                    if (!$instances = $DB->get_records(
+                    if (
+                        !$instances = $DB->get_records(
                             'enrol',
                             ['enrol' => 'manual', 'courseid' => $subscribecourse, 'status' => ENROL_INSTANCE_ENABLED],
                             'sortorder,id ASC'
-                        )) {
+                        )
+                    ) {
                         break; // No manual enrolment instance on this course.
                     }
                     $instance = reset($instances);
@@ -96,9 +99,9 @@ class node_completion {
                         $enrol->enrol_user($instance, $event->other['userpath']->user_id, $selectedrole);
                     }
                     self::enrol_user_group(
-                      $userpath->tree->nodes,
-                      $subscribecourse,
-                      $event->other['userpath']->user_id
+                        $userpath->tree->nodes,
+                        $subscribecourse,
+                        $event->other['userpath']->user_id
                     );
                 }
             }
@@ -106,6 +109,137 @@ class node_completion {
         if ($firstenrollededit) {
             self::trigger_user_path_update_new_enrollments($event, $userpath);
         }
+        self::is_user_path_completed($userpath->tree, $event->other['userpath']);
+    }
+
+    /**
+     * Observer for course completed
+     *
+     * @param object $userpath
+     * @param object $learningpath
+     * @return bool
+     */
+    private static function is_user_path_completed($userpath, $learningpath) {
+        $paths = self::get_possible_paths($userpath->nodes);
+        if (self::check_user_path_completed($userpath, $paths)) {
+            global $DB;
+            $table = 'adele';
+            $adeleinstance = $DB->get_record(
+                $table,
+                [
+                    'learningpathid' => $learningpath->learning_path_id,
+                    'course' => $learningpath->course_id,
+                ]
+            );
+            if (!$adeleinstance) {
+                return false;
+            }
+            $cm = get_coursemodule_from_instance('adele', $adeleinstance->id, $learningpath->course_id);
+            if (!$cm) {
+                return false;
+            }
+            $completion = new completion_info(get_course($learningpath->course_id));
+            if (!$completion->is_enabled($cm)) {
+                return false;
+            }
+
+            if (!$adeleinstance->completionlearningpathfinished) {
+                return false;
+            }
+
+            $completion->update_state($cm, COMPLETION_COMPLETE, $learningpath->user_id);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Find a paths in learning path.
+     * @param array $nodes
+     * @return array
+     */
+    public static function get_possible_paths($nodes) {
+        $startingcondition = "starting_node";
+        $paths = [];
+        foreach ($nodes as $node) {
+            if (
+                isset($node->parentCourse) &&
+                is_array($node->parentCourse) &&
+                in_array($startingcondition, $node->parentCourse)
+            ) {
+                $paths = array_merge($paths, self::findpaths($node, [], $nodes));
+            }
+        }
+        return $paths;
+    }
+
+    /**
+     * Find a paths in learning path.
+     * @param object $userpath
+     * @param array $paths
+     * @return bool
+     */
+    public static function check_user_path_completed($userpath, $paths) {
+        foreach ($paths as $path) {
+            $validpath = true;
+            foreach ($path as $nodeid) {
+                $node = self::findnodebyid($nodeid, $userpath->nodes);
+                if (
+                    isset($node->data->completion->completionnode->valid) &&
+                    !$node->data->completion->completionnode->valid
+                ) {
+                    $validpath = false;
+                    break;
+                }
+            }
+            if ($validpath) {
+                return $validpath;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Find a node by its id.
+     * @param int $id
+     * @param array $nodes
+     * @return mixed
+     */
+    public static function findnodebyid($id, $nodes) {
+        global $data;
+        foreach ($nodes as $node) {
+            if ($node->id === $id) {
+                return $node;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find a paths in learning path.
+     *
+     * @param object $node
+     * @param array $currentpath
+     * @param array $nodes
+     * @return array
+     */
+    public static function findpaths($node, $currentpath, $nodes) {
+        $currentpath[] = $node->id;
+
+        if (empty($node->childCourse)) {
+            return [$currentpath];
+        }
+
+        $allpaths = [];
+        foreach ($node->childCourse as $childid) {
+            $childnode = self::findnodebyid($childid, $nodes);
+            if ($childnode) {
+                $childpaths = self::findpaths($childnode, $currentpath, $nodes);
+                $allpaths = array_merge($allpaths, $childpaths);
+            }
+        }
+
+        return $allpaths;
     }
 
     /**

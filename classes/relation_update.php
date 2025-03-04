@@ -532,8 +532,13 @@ class relation_update {
      * @param array $restrictioncriteria
      * @param array $node
      */
-    public static function getnodestatusforrestriciton
-    (&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $restrictionnodepathsall) {
+    public static function getnodestatusforrestriciton(
+        &$feedback,
+        $restrictionnodepaths,
+        $restrictioncriteria,
+        $node,
+        $restrictionnodepathsall
+    ) {
         if (count($restrictionnodepaths) > 0 || !isset($node['restriction']) ||  $node['restriction'] === null) {
             self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
             return 'inbetween';
@@ -712,7 +717,7 @@ class relation_update {
             if ($type == 'completion') {
                 $completionpriorities = course_completion_status::get_condition_priority();
                 foreach ($conditionnodepaths as $conditionnodepath) {
-                    if (!is_array($conditionnodepath)) { 
+                    if (!is_array($conditionnodepath)) {
                         $conditionnodepath = [$conditionnodepath];
                     }
                     foreach ($conditionnodepath as $condition) {

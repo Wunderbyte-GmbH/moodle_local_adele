@@ -407,7 +407,7 @@ class learning_paths {
             $totalnodes = 0;
             if (isset($relationnodes->user_path_relation)) {
                 foreach ($relationnodes->user_path_relation as $key => $node) {
-                    if (strstr($key , '_module') == false) {
+                    if (strstr($key, '_module') == false) {
                         if ($node->completionnode->valid) {
                             $validnodes++;
                         }
@@ -425,7 +425,7 @@ class learning_paths {
                         isset($node['parentCourse']) &&
                         is_array($node['parentCourse']) &&
                         in_array($startingcondition, $node['parentCourse'])
-                      ) {
+                    ) {
                         self::findpaths($node, [], $paths, $pathnodes);
                     }
                 }
