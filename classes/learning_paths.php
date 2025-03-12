@@ -636,55 +636,64 @@ class learning_paths {
         }
         arsort($courseprogrressarray);
         $sortedcourseprogress = array_values($courseprogrressarray);
-        foreach ($node->completion->nodes as $completionnode) {
-            // $failedcompletion = false;
-            // $validationconditionstring = [];
-            if (
-                isset($completionnode->parentCondition) &&
-                $completionnode->parentCondition[0] == 'starting_condition'
-            ) {
-                $currentcondition = $completionnode;
-                // $progress = 0;
-                $completionprogressarray = [];
-                while ($currentcondition) {
-                    $completionnodeid = $currentcondition->id;
-                    $label = $currentcondition->data->label;
-                    $progress = 0;
-                    if (    $label == 'catquiz' ||
-                            $label == 'modquiz' ||
+        if ($node->data->completion->master->completion) {
+            $completioncolumnprogress[] = 100;
+        } else {
+            foreach ($node->completion->nodes as $completionnode) {
+                if (
+                    isset($completionnode->parentCondition) &&
+                    $completionnode->parentCondition[0] == 'starting_condition'
+                ) {
+                    $currentcondition = $completionnode;
+                    $completionprogressarray = [];
+                    while ($currentcondition) {
+                        $completionnodeid = $currentcondition->id;
+                        $label = $currentcondition->data->label;
+                        $progress = 0;
+                        if (
                             $label == 'manual'
                         ) {
-                        if (isset($node->data->completion->completioncriteria->$label->completed->$completionnodeid) &&
-                        $node->data->completion->completioncriteria->$label->completed->$completionnodeid == true) {
-                            $progress = 100;
+                            if (
+                                isset($node->data->completion->completioncriteria->$label->completed) &&
+                                $node->data->completion->completioncriteria->$label->completed == true
+                            ) {
+                                $progress = 100;
+                            }
+                        } else if (
+                            $label == 'catquiz' ||
+                            $label == 'modquiz'
+                        ) {
+                            if (
+                                isset($node->data->completion->completioncriteria->$label->completed->$completionnodeid) &&
+                                $node->data->completion->completioncriteria->$label->completed->$completionnodeid == true
+                            ) {
+                                $progress = 100;
+                            }
+                        } else if ($label == 'course_completed') {
+                            $minvalue = $currentcondition->data->value->min_courses ?? 1;
+                            $positioncount = 0;
+                            $nodecompletionprogress = 0;
+                            while ($positioncount < $minvalue) {
+                                $nodecompletionprogress += $sortedcourseprogress[$positioncount];
+                                $positioncount++;
+                            }
+                            $progress = $nodecompletionprogress / $minvalue;
                         }
-                    } else if ($label == 'course_completed') {
-                        $minvalue = $currentcondition->data->value->min_courses ?? 1;
-                        $positioncount = 0;
-                        $nodecompletionprogress = 0;
-                        while ($positioncount < $minvalue) {
-                            $nodecompletionprogress += $sortedcourseprogress[$positioncount];
-                            $positioncount++;
-                        }
-                        $progress = $nodecompletionprogress / $minvalue;
-
-                    } else {
-                        $test2 = 'test2';
+                        $completionprogressarray[] = $progress;
+                        $currentcondition = self::searchnestedarray(
+                            $node->completion->nodes,
+                            $currentcondition->childCondition,
+                            'id'
+                        );
                     }
-                    $completionprogressarray[] = $progress;
-                    $currentcondition = self::searchnestedarray(
-                        $node->completion->nodes,
-                        $currentcondition->childCondition,
-                        'id'
-                    );
-                }
 
-                $completioncolumnprogress[] = array_sum($completionprogressarray) / count($completionprogressarray);
+                    $completioncolumnprogress[] = array_sum($completionprogressarray) / count($completionprogressarray);
+                }
             }
         }
-        // Return highes value
         arsort($completioncolumnprogress);
-        $node->data->progress = $completioncolumnprogress[0];
+        $completioncolumnprogress = array_values($completioncolumnprogress);
+        $node->data->progress = round($completioncolumnprogress[0], 2);
         return $node;
     }
 

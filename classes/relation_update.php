@@ -183,25 +183,18 @@ class relation_update {
                     }
                     $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
                     $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
-                    $getoldcompletion =
-                      self::checkcondition($completionnode, $userpath->json, $node['id'], 'completionnode');
-                    $getoldrestriction =
-                      false;
-                    if (!$getoldrestriction) {
-                        $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
-                        $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall ?? [];
-                        $userpath->json['user_path_relation'][$node['id']]['allrestrictioncriteria'] = $restrictionnode;
-                        $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
-                    }
-                    if (!$getoldcompletion) {
-                        $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
-                        $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
-                        $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
-                          $validatenodecompletion['singlecompletionnode'];
-                        $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
-                        // $userpath->json['user_path_relation'][$node['id']]['feedback']
 
-                    }
+                    $userpath->json['user_path_relation'][$node['id']]['restrictioncriteria'] = $restrictioncriteria;
+                    $userpath->json['user_path_relation'][$node['id']]['restrictionnode'] = $restrictionnodepathsall ?? [];
+                    $userpath->json['user_path_relation'][$node['id']]['allrestrictioncriteria'] = $restrictionnode;
+                    $userpath->json['user_path_relation'][$node['id']]['singlerestrictionnode'] = $singlerestrictionnode;
+
+                    $userpath->json['user_path_relation'][$node['id']]['completioncriteria'] = $completioncriteria;
+                    $userpath->json['user_path_relation'][$node['id']]['completionnode'] = $completionnode;
+                    $userpath->json['user_path_relation'][$node['id']]['singlecompletionnode'] =
+                        $validatenodecompletion['singlecompletionnode'];
+                    $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
+
                     $node['data']['completion'] = $userpath->json['user_path_relation'][$node['id']];
                 }
 
@@ -265,11 +258,9 @@ class relation_update {
      */
     public static function checkcondition($newcompletion, $oldcompletion, $nodeid, $condition) {
         if (
-            isset($oldcompletion['user_path_relation'][$nodeid][$condition]) &&
-            !$newcompletion['valid'] &&
-            $oldcompletion['user_path_relation'][$nodeid][$condition]['valid']
+            !$newcompletion['valid']
         ) {
-            return true;
+            return false;
         }
         return false;
     }
