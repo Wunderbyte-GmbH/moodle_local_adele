@@ -624,8 +624,8 @@ class learning_paths {
      * Get user path relation.
      *
      * @param object $node
-     * @param String $userid
-     * @return array
+     * @param string $userid
+     * @return stdClass
      */
     public static function checknodeprogression($node, $userid) {
         $courseprogrressarray = [];

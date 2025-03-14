@@ -33,7 +33,6 @@ use local_adele\relation_update;
  * Event observer for local_adele.
  */
 class local_adele_observer {
-
     /**
      * Observer for the update_catscale event
      *
