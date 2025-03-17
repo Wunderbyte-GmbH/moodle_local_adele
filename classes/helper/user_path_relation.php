@@ -159,7 +159,7 @@ class user_path_relation {
      * @return int
      *
      */
-    public function revision_user_path_relation($userpath) {
+    public static function revision_user_path_relation($userpath) {
         global $DB;
         $userpath->json = json_encode($userpath->json, true);
         if ($userpath->id) {
@@ -184,7 +184,5 @@ class user_path_relation {
                 'json' => $userpath->json,
             ]);
         }
-
-
     }
 }

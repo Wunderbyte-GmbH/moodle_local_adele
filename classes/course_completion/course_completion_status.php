@@ -33,7 +33,6 @@ namespace local_adele\course_completion;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_completion_status {
-
     /** @var int userid for a given user */
     protected $userid;
 

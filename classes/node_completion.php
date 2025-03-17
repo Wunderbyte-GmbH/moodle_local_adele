@@ -66,29 +66,35 @@ class node_completion {
         }
         $uniquechildcourses = array_unique($uniquechildcourses);
         $firstenrollededit = false;
+        $instances = [];
         foreach ($userpath->tree->nodes as &$node) {
             if (in_array($node->id, $uniquechildcourses)) {
                 foreach ($node->data->course_node_id as $subscribecourse) {
-                    if (!enrol_is_enabled('manual')) {
-                        break; // Manual enrolment not enabled.
-                    }
-                    if (!$enrol = enrol_get_plugin('manual')) {
-                        break; // No manual enrolment plugin.
-                    }
-                    if (
-                        !$instances = $DB->get_records(
+                    if (isset($instances[$subscribecourse])) {
+                        $instance = $instances[$subscribecourse];
+                    } else {
+                        if (!enrol_is_enabled('manual')) {
+                            break;
+                        }
+                        if (!$enrol = enrol_get_plugin('manual')) {
+                            break;
+                        }
+                        $instance = $DB->get_record(
                             'enrol',
-                            ['enrol' => 'manual', 'courseid' => $subscribecourse, 'status' => ENROL_INSTANCE_ENABLED],
-                            'sortorder,id ASC'
-                        )
-                    ) {
-                        break; // No manual enrolment instance on this course.
+                            [
+                                'courseid' => $subscribecourse,
+                                'enrol' => 'manual',
+                            ]
+                        );
+                        $instances[$subscribecourse] = $instance;
                     }
-                    $instance = reset($instances);
+
+                    if (!$instance) {
+                        continue;
+                    }
 
                     if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
-
                         adhoc_task_helper::set_scheduled_adhoc_tasks(json_decode(json_encode($node), true), $event->other['userpath']);
                         $firstenrollededit = true;
                     }
@@ -146,7 +152,6 @@ class node_completion {
             if (!$adeleinstance->completionlearningpathfinished) {
                 return false;
             }
-
             $completion->update_state($cm, COMPLETION_COMPLETE, $learningpath->user_id);
             return true;
         }

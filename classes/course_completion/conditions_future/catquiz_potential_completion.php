@@ -132,8 +132,10 @@ class catquiz_potential_completion implements course_completion {
         $catquizzes = [];
         if (isset($node['completion']) && isset($node['completion']['nodes'])) {
             foreach ($node['completion']['nodes'] as $complitionnode) {
-                if (isset($complitionnode['data']) && isset($complitionnode['data']['label'])
-                  && $complitionnode['data']['label'] == 'catquiz') {
+                if (
+                    isset($complitionnode['data']) && isset($complitionnode['data']['label']) &&
+                    $complitionnode['data']['label'] == 'catquiz'
+                ) {
                     $testid = $complitionnode['data']['value']['testid'];
                     $scales = $complitionnode['data']['value']['scales'];
                     foreach ($scales as $scale) {
@@ -143,7 +145,8 @@ class catquiz_potential_completion implements course_completion {
                                 // Check if scale matches.
                                 $contextid = catscale::get_context_id($scale['id']);
                                 $personabilities = Local_catquizCatquiz::get_person_abilities(
-                                    $contextid, [$scale['id']],
+                                    $contextid,
+                                    [$scale['id']],
                                     $userid
                                 );
                                 if ($personabilities) {
@@ -154,14 +157,17 @@ class catquiz_potential_completion implements course_completion {
                                     }
                                 }
                             }
-                            if (isset($scale['attempts']) &&
-                                (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))) {
+                            if (
+                                isset($scale['attempts']) &&
+                                (!isset($scale['scale']) || $validcatquiz || ($scale['scale'] == ''))
+                            ) {
                                 // Check if attempts matches.
                                 $records = Local_catquizCatquiz::return_attempt_and_contextid_from_attemptstable(
                                     $scale['attempts'],
                                     $scale['id'],
                                     $node['data']['course_node_id'],
-                                    $userid);
+                                    $userid
+                                );
                                 if (count($records) >= $scale['attempts'] || count($records) >= 1) {
                                     $validcatquiz = true;
                                 }

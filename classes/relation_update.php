@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace local_adele;
 
-use core_analytics\local\time_splitting\before_now;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
 use local_adele\helper\adhoc_task_helper;
@@ -55,7 +54,6 @@ class relation_update {
      * @param object $event
      */
     public static function updated_single($event) {
-        // Get the user path relation.
         $userpath = $event->other['userpath'];
         if ($userpath) {
             $creation = false;
@@ -75,8 +73,8 @@ class relation_update {
                               $node['data']['completion']['master'];
                     }
                     if (
-                      isset($restrictioncriteria['master']) &&
-                      $restrictioncriteria['master']
+                        isset($restrictioncriteria['master']) &&
+                        $restrictioncriteria['master']
                     ) {
                         $restrictionnodepaths[] = 'master';
                     } else if (isset($node['restriction'])) {
@@ -150,9 +148,11 @@ class relation_update {
                                 if ($validationcondition && !$failedrestriction) {
                                     $restrictionnodepaths[] = $validationconditionstring;
                                 }
-
                                 $activefeedbackfornode =
-                                implode(get_string('course_condition_concatination_and', 'local_adele'), $activecolumnfeedback);
+                                    implode(
+                                        get_string('course_condition_concatination_and', 'local_adele'),
+                                        $activecolumnfeedback
+                                    );
                                 $restrictionnodepathsall[] = $allconditions;
                                 $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
                                 $activefeedbackfornode;
@@ -161,8 +161,8 @@ class relation_update {
                     }
 
                     if (
-                      isset($completioncriteria['master']) &&
-                      $completioncriteria['master']
+                        isset($completioncriteria['master']) &&
+                        $completioncriteria['master']
                     ) {
                         $validatenodecompletion = [
                             'completionnodepaths' => ['master'],
@@ -197,9 +197,7 @@ class relation_update {
 
                     $node['data']['completion'] = $userpath->json['user_path_relation'][$node['id']];
                 }
-
-                $userpathrelationhelper = new user_path_relation();
-                $userpathid = $userpathrelationhelper->revision_user_path_relation($userpath);
+                $userpathid = user_path_relation::revision_user_path_relation($userpath);
                 if ($creation) {
                     global $DB;
                     $createduserpath = $DB->get_record('local_adele_path_user', ['id' => $userpathid]);
@@ -250,24 +248,6 @@ class relation_update {
     /**
      * Observer for course completed
      *
-     * @param  Array $newcompletion
-     * @param  Array $oldcompletion
-     * @param  int $nodeid
-     * @param  int $condition
-     * @return bool
-     */
-    public static function checkcondition($newcompletion, $oldcompletion, $nodeid, $condition) {
-        if (
-            !$newcompletion['valid']
-        ) {
-            return false;
-        }
-        return false;
-    }
-
-    /**
-     * Observer for course completed
-     *
      * @param  array $node
      * @param  array $completioncriteria
      * @param  object $userpath
@@ -289,7 +269,6 @@ class relation_update {
         $completionnodepaths = [];
         $singlecompletionnode = [];
         $feedback = self::getfeedback($node, $completioncriteria, $restrictioncriteria);
-        $priority = false;
         foreach ($node['completion']['nodes'] as $completionnode) {
             $failedcompletion = false;
             $validationconditionstring = [];
@@ -348,11 +327,9 @@ class relation_update {
                         $singlecompletionnode[$label] = $validationcondition;
                         $validationconditionstring[] = $label;
                     }
-                    // Check if the conditon is true and break if one condition is not met.
                     if (!$validationcondition) {
                         $failedcompletion = true;
                     }
-                    // Get next Condition and return null if no child node exsists.
                     $currentcondition = self::searchnestedarray(
                         $node['completion']['nodes'],
                         $currentcondition['childCondition'],
@@ -366,7 +343,10 @@ class relation_update {
                         $completionnodepaths[] = $validationconditionstring;
                         $feedback['completion']['after'][] = $feedback['completion']['after_all'][$completionnode['id']];
                         unset($feedback['completion']['after_all'][$completionnode['id']]);
-                        if (!isset( $node['firstcompleted']) || $node['firstcompleted'] == false) {
+                        if (
+                            !isset($node['firstcompleted']) ||
+                            $node['firstcompleted'] == false
+                        ) {
                             $nodecompletedname[] = $node;
                             $node['firstcompleted'] = true;
                         }
@@ -416,12 +396,12 @@ class relation_update {
             !isset($node['data']['animations']['seenrestriction']) &&
             $status != 'closed' &&
             $status != 'not_accessible'
-          ) {
+        ) {
             $node['data']['animations']['seenrestriction'] = false;
         }
         if (
-          !isset($node['data']['animations']['seencompletion']) &&
-          $status == 'completed'
+            !isset($node['data']['animations']['seencompletion']) &&
+            $status == 'completed'
         ) {
             $node['data']['animations']['seencompletion'] = false;
         }
@@ -438,7 +418,6 @@ class relation_update {
      * @param array $node
      */
     public static function getnodestatusforcompletion($feedback, $completionnodepaths, $completioncriteria, $node) {
-
         if (count($completionnodepaths) > 0) {
             return 'after';
         }
@@ -452,7 +431,6 @@ class relation_update {
             }
         }
         return 'before';
-
     }
 
     /**
@@ -493,8 +471,10 @@ class relation_update {
                 if (strpos($restrictionlabelid, 'time') === 0) {
                     $nodelabelid = explode('_condition_', $restrictionlabelid);
                     $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]] ?? [];
-                    if (isset($restnode['inbetween_info']['endtime']) &&
-                    $restnode['inbetween_info']['endtime'] !== false) {
+                    if (
+                        isset($restnode['inbetween_info']['endtime']) &&
+                        $restnode['inbetween_info']['endtime'] !== false
+                    ) {
                         if (!$smallestenddate || strtotime($restnode['inbetween_info']['endtime']) < $smallestenddate) {
                             $smallestenddate = strtotime($restnode['inbetween_info']['endtime']);
                         }
@@ -567,9 +547,7 @@ class relation_update {
         }
             self::inbetweenfeedback($feedback, $restrictionnodepathsall, $restrictioncriteria, $node, 'before');
             return 'before';
-
     }
-
 
     /**
      * Return node status for display purpose.
@@ -584,8 +562,8 @@ class relation_update {
             return 'completed';
         }
         if (
-          $restrictionnodepaths ||
-          is_null($feedback['restriction']['before'])
+            $restrictionnodepaths ||
+            is_null($feedback['restriction']['before'])
         ) {
             return 'accessible';
         }
@@ -605,8 +583,8 @@ class relation_update {
                                     $hastimedcondition = true;
                                     $starttime = new \DateTime();
                                     if (
-                                      $node['data'] &&
-                                      isset($node['data']['first_enrolled'])
+                                        $node['data'] &&
+                                        isset($node['data']['first_enrolled'])
                                     ) {
                                         $starttime->setTimestamp($node['data']['first_enrolled']);
                                     }
@@ -660,7 +638,7 @@ class relation_update {
     public static function gettimestamptoday($data, $starttime) {
         $now = new \DateTime();
         if (
-           isset($data['value']['end'])
+            isset($data['value']['end'])
         ) {
             $date = \DateTime::createFromFormat('Y-m-d\TH:i', $data['value']['end']);
             return $date > $now;
@@ -703,30 +681,17 @@ class relation_update {
      */
     public static function getconditionnode($conditionnodepaths, $type) {
         $valid = count($conditionnodepaths) ? true : false;
-        $priority = 0;
         if ($valid) {
             if ($type == 'completion') {
-                $completionpriorities = course_completion_status::get_condition_priority();
                 foreach ($conditionnodepaths as $conditionnodepath) {
                     if (!is_array($conditionnodepath)) {
                         $conditionnodepath = [$conditionnodepath];
-                    }
-                    foreach ($conditionnodepath as $condition) {
-                        if (
-                            isset($completionpriorities[$condition]) && (
-                                $priority == 0 ||
-                                $completionpriorities[$condition] < $priority
-                            )
-                        ) {
-                            $priority = $completionpriorities[$condition];
-                        }
                     }
                 }
             }
         }
         return [
             'valid' => $valid,
-            'priority' => $priority,
             'conditions' => $conditionnodepaths,
         ];
     }
@@ -758,17 +723,19 @@ class relation_update {
             if (
                 strpos($conditionnode['id'], '_feedback') !== false &&
                 isset($conditionnode['data']['visibility'])
-              ) {
+            ) {
                 $feedbacks['completion']['before'][] =
-                  isset($conditionnode['data']['feedback_before']) ?
-                      self::render_placeholders(
+                    isset($conditionnode['data']['feedback_before']) ?
+                    self::render_placeholders(
                         $conditionnode['data']['feedback_before'],
                         $completioncriteria,
                         $conditionnode['id'],
                         $node['completion']['nodes']
-                      ) :
-                      '';
-                $feedbacks['completion']['after_all'][str_replace('_feedback', '', $conditionnode['id'])] = isset($conditionnode['data']['feedback_after']) ?
+                    ) :
+                    '';
+                $conditionnodename = str_replace('_feedback', '', $conditionnode['id']);
+                $feedbacks['completion']['after_all'][$conditionnodename] =
+                    isset($conditionnode['data']['feedback_after']) ?
                         self::render_placeholders(
                             $conditionnode['data']['feedback_after'],
                             $completioncriteria,
@@ -788,14 +755,14 @@ class relation_update {
                         '';
                 } else {
                     $feedbacks['completion']['inbetween'][] =
-                      isset($conditionnode['data']['feedback_inbetween']) ?
-                          self::render_placeholders(
-                            $conditionnode['data']['feedback_inbetween'],
-                            $completioncriteria,
-                            $conditionnode['id'],
-                            $node['completion']['nodes']
-                          ) :
-                          '';
+                        isset($conditionnode['data']['feedback_inbetween']) ?
+                            self::render_placeholders(
+                                $conditionnode['data']['feedback_inbetween'],
+                                $completioncriteria,
+                                $conditionnode['id'],
+                                $node['completion']['nodes']
+                            ) :
+                        '';
                 }
             }
         }
@@ -972,58 +939,53 @@ class relation_update {
 
     /**
      * Subscribe to starting nodes
-     *
      * @param object $userpath
      */
-    public static function subscribe_user_starting_node($userpath) {
+    public static function subscribe_user_starting_node(&$userpath) {
         global $DB;
-        $firstenrollededit = false;
+        $instances = [];
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
                 if (
-                  $node['type'] != 'dropzone' && isset($node['parentCourse']) &&
-                  in_array('starting_node', $node['parentCourse'])
+                    $node['type'] != 'dropzone' && isset($node['parentCourse']) &&
+                    in_array('starting_node', $node['parentCourse'])
                 ) {
                     if (!is_int($node['data']['course_node_id'])) {
                         foreach ($node['data']['course_node_id'] as $courseid) {
-                            if (!enrol_is_enabled('manual')) {
-                                break; // Manual enrolment not enabled.
-                            }
-                            if (!$enrol = enrol_get_plugin('manual')) {
-                                break; // No manual enrolment plugin.
-                            }
                             if (!isset($node['data']['first_enrolled'])) {
                                 $node['data']['first_enrolled'] = time();
                                 adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
-                                $firstenrollededit = true;
                             }
-                            $instances = $DB->get_records('enrol', [
-                              'courseid' => $courseid,
-                              'enrol' => 'manual',
-                            ]);
-                            if (!$instances) {
-                                break;
+                            if (isset($instances[$courseid])) {
+                                $instance = $instances[$courseid];
+                            } else {
+                                if (!enrol_is_enabled('manual')) {
+                                    break;
+                                }
+                                if (!$enrol = enrol_get_plugin('manual')) {
+                                    break;
+                                }
+                                $instance = $DB->get_record(
+                                    'enrol',
+                                    [
+                                        'courseid' => $courseid,
+                                        'enrol' => 'manual',
+                                    ]
+                                );
+                                $instances[$courseid] = $instance;
                             }
-
-                            $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+                            if (!$instance) {
+                                continue;
+                            }
                             $context = \context_course::instance($courseid);
-
                             $isenrolled = is_enrolled($context, $userpath->user_id);
                             if (!$isenrolled) {
-                                $instance = reset($instances); // Use the first manual enrolment plugin in the course.
                                 $selectedrole = get_config('local_adele', 'enroll_as_setting');
                                 $enrol->enrol_user($instance, $userpath->user_id, $selectedrole);
                             }
                         }
                     }
                 }
-            }
-            if ($firstenrollededit) {
-                $data = [
-                    'id' => $userpath->id,
-                    'json' => json_encode($userpath->json),
-                ];
-                $DB->update_record('local_adele_path_user', $data);
             }
         }
     }

@@ -189,7 +189,7 @@ class course_completed implements course_completion {
                         if ($finished <= $minvalue) {
                             $counttodo -= $finished;
                         }
-                        if ( $finished >= $minvalue) {
+                        if ($finished >= $minvalue) {
                             $string = $finished . ' ' . get_string('course_restricition_before_condition_from', 'local_adele') .
                             $numbcourses . ' ' . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
                         } else if ($isinbetween) {
