@@ -156,38 +156,35 @@ class user_path_relation {
      * Get active user path relation.
      *
      * @param object $userpath
-     * @return object
+     * @return int
      *
      */
     public function revision_user_path_relation($userpath) {
         global $DB;
-        $conditionsarray = [
-            'user_id' => $userpath->user_id,
-            'course_id' => $userpath->course_id,
-            'learning_path_id' => $userpath->learning_path_id,
-            'status' => 'active',
-        ];
-        $allactive = $DB->get_records('local_adele_path_user', $conditionsarray);
-        foreach ($allactive as $singelactive) {
-            $data = [
-                'id' => $singelactive->id,
-                'status' => 'revision',
-                'timemodified' => time(),
-            ];
-            $DB->update_record('local_adele_path_user', $data);
-        }
-        // Update nodes and save new user path relation.
         $userpath->json = json_encode($userpath->json, true);
+        if ($userpath->id) {
+            $DB->update_record(
+                'local_adele_path_user',
+                [
+                    'id' => $userpath->id,
+                    'timemodified' => time(),
+                    'json' => $userpath->json,
+                ]
+            );
+            return $userpath->id;
+        } else {
+            return $DB->insert_record('local_adele_path_user', [
+                'user_id' => $userpath->user_id,
+                'course_id' => $userpath->course_id,
+                'learning_path_id' => $userpath->learning_path_id,
+                'status' => 'active',
+                'timecreated' => $userpath->timecreated,
+                'timemodified' => time(),
+                'createdby' => $userpath->createdby,
+                'json' => $userpath->json,
+            ]);
+        }
 
-        return $DB->insert_record('local_adele_path_user', [
-            'user_id' => $userpath->user_id,
-            'course_id' => $userpath->course_id,
-            'learning_path_id' => $userpath->learning_path_id,
-            'status' => 'active',
-            'timecreated' => $userpath->timecreated,
-            'timemodified' => time(),
-            'createdby' => $userpath->createdby,
-            'json' => $userpath->json,
-        ]);
+
     }
 }
