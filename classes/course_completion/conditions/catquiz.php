@@ -287,7 +287,7 @@ class catquiz implements course_completion {
                           self::get_record_list(
                             $scales,
                             $partialpassedattemptids,
-                            $percentageofrightanswersbyscalekeyid,
+                            $filteredpercentageofrightanswers,
                             $subscaleids
                           );
                     } else {
