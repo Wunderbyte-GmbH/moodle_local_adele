@@ -192,10 +192,18 @@ class learning_path_update {
                 'manualcompletionvalue' => $node['data']['manualcompletionvalue'],
                 'manualrestriction' => $node['data']['manualrestriction'],
                 'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
+                'mastercompletion' => $node["data"]["completion"]["master"]["completion"],
+                'masterrescrtriction' => $node["data"]["completion"]["master"]["restriction"],
             ];
         }
 
         foreach ($userpathjson['tree']['nodes'] as &$node) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['mastercompletion'] == true ) {
+                $node['data']['completion']['master']['completion'] = true;
+            }
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['masterrescrtriction'] == true ) {
+                $node["data"]["completion"]["master"]["restriction"] = true;
+            }
             if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['firstcompleted'] == true ) {
                 $node['firstcompleted'] = true;
             }
