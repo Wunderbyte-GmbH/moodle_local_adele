@@ -127,6 +127,26 @@ class modquiz implements course_completion {
     }
 
     /**
+     * Rounds a number to one decimal place.
+     *
+     * @param float $value The number to round
+     * @return float The rounded number with one decimal place
+     */
+    private function round_to_one_decimal($value) {
+        return ceil($value * 10) / 10;
+    }
+
+    /**
+     * Rounds down a number to one decimal place.
+     *
+     * @param float $value The number to round down
+     * @return float The rounded down number with one decimal place
+     */
+    private function round_down_to_one_decimal($value) {
+        return floor($value * 10) / 10;
+    }
+
+    /**
      * Helper function to return localized description strings.
      * TODO check if get_strategy_selectcontext suits.
      * @param array $node
@@ -166,7 +186,9 @@ class modquiz implements course_completion {
                           $record->name .
                           '</a>';
                         $modquizzes[$completion['id']]['placeholders']['minnumb'] = $completion['data']['value']['grade'] ?? $record->sumgrades ?? 0;
-                        $modquizzes[$completion['id']]['placeholders']['maxnumb'] = $record->grade ?? 0;
+                        $modquizzes[$completion['id']]['placeholders']['maxnumb'] = isset($record->grade)
+                        ? number_format(self::round_to_one_decimal($record->grade), 1)
+                        : '0.00';
                     } else {
                         $modquizzes[$completion['id']]['placeholders']['quiz_name_link'] =
                           'Mod Quiz';
@@ -189,7 +211,7 @@ class modquiz implements course_completion {
                         }
                     }
                     $modquizzes[$completion['id']]['placeholders']['currentbest'] =
-                        '(' . get_string('course_description_after_condition_modquiz_best', 'local_adele') . $bestgrade . ')';
+                        '(' . get_string('course_description_after_condition_modquiz_best', 'local_adele') . number_format(self::round_down_to_one_decimal($bestgrade), 1) . ')';
                     $modquizzes['completed'][$completion['id']] = $validcatquiz;
                 } else {
                     $modquizzes['completed'][$completion['id']] = false;

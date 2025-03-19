@@ -235,9 +235,9 @@ $string['course_description_after_condition_catquiz'] = '['.__LINE__.']Ihre Erge
 $string['course_description_after_condition_modquiz_list'] = '['.__LINE__.']<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time} mit einem Score von {$a->currentlogit} (mindestens {$a->targetlogit}) bzw. Richtig/Falsch-Quote von {$a->currentperc}% (mindestens: {$a->targetperc}%)</a>)</li>';
 
 $string['course_description_after_condition_modquiz_best'] = '['.__LINE__.']Bestpunktzahl:';
-$string['course_description_before_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen';
-$string['course_description_inbetween_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen (aktueller Bestwert: {currentbest})';
-$string['course_description_after_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehst';
+$string['course_description_before_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen ({quiz_name_link})';
+$string['course_description_inbetween_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen (aktueller Bestwert: {currentbest}) ({quiz_name_link})';
+$string['course_description_after_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehst ({quiz_name_link})';
 
 $string['course_restricition_before_condition_manual'] = '['.__LINE__.']manuelle Freigabe durch den Lehrenden';
 $string['course_restricition_before_condition_parent_courses'] = '['.__LINE__.']Abschluss des Vorgängerkurses „{node_name}“';

@@ -225,9 +225,9 @@ $string['course_description_after_condition_modquiz_list'] = '[EN_'.__LINE__.']<
 
 $string['course_description_after_condition_modquiz_best'] = '[EN_'.__LINE__.']Beste Note:';
 
-$string['course_description_before_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestehen';
-$string['course_description_inbetween_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} {currentbest} bestehen';
-$string['course_description_after_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestanden haben';
+$string['course_description_before_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestehen ({quiz_name_link})';
+$string['course_description_inbetween_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} {currentbest} bestehen ({quiz_name_link})';
+$string['course_description_after_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestanden haben ({quiz_name_link})';
 
 $string['course_restricition_before_condition_manual'] = '[EN_'.__LINE__.']eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
 $string['course_restricition_before_condition_parent_courses'] = '[EN_'.__LINE__.']Sie {node_name} abgeschlossen haben';
