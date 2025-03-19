@@ -78,7 +78,7 @@ const props = defineProps({
 
 const data = ref({
   selectedOption: null,
-  durationValue: null,
+  durationValue: 1,
   selectedDuration: null,
 });
 
