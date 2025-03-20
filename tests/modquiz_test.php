@@ -33,6 +33,7 @@ class modquiz_test extends advanced_testcase {
         global $DB;
         $DB = $this->getMockBuilder(stdClass::class)
             ->addMethods(['get_records_sql'])
+            ->addMethods(['get_in_or_equal'])
             ->getMock();
     }
 
@@ -45,12 +46,13 @@ class modquiz_test extends advanced_testcase {
         global $DB;
 
         // Expect the get_records_sql method to be called and return an empty array.
+        $DB->method('get_in_or_equal')->willReturn(['SELECT clause', []]);
         $DB->expects($this->once())
             ->method('get_records_sql')
             ->willReturn([]);
 
         // Call the method under test.
-        $result = modquiz::get_mod_quizzes();
+        $result = modquiz::get_mod_quizzes([['course_node_id' => '1'], ['course_node_id' => '2']]);
 
         // Assert that the result is an empty array.
         $this->assertIsArray($result);
@@ -82,12 +84,13 @@ class modquiz_test extends advanced_testcase {
         ];
 
         // Expect the get_records_sql method to be called once and return the mocked records.
+        $DB->method('get_in_or_equal')->willReturn(['SELECT clause', []]);
         $DB->expects($this->once())
             ->method('get_records_sql')
             ->willReturn($mockedrecords);
 
         // Call the method under test.
-        $result = modquiz::get_mod_quizzes();
+        $result = modquiz::get_mod_quizzes([['course_node_id' => '1'], ['course_node_id' => '2']]);
 
         // Assert that the result is an array.
         $this->assertIsArray($result);
