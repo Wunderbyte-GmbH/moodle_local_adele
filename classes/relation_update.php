@@ -444,7 +444,8 @@ class relation_update {
         switch ($node['data']['label']) {
             case 'timed':
             case 'timed_duration':
-                if (isset($restrictioncriteria[$node['data']['label']][$node['id']]) && $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']) {
+                if (isset($restrictioncriteria[$node['data']['label']][$node['id']]) &&
+                 $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']) {
                     return false;
                 } else {
                     return true;
@@ -491,7 +492,8 @@ class relation_update {
             }
         }
         if ($latestdate !== 0) {
-            $feedback['restriction'][$wheretoput . '_timed'] = get_string('node_restriction_' . $wheretoput . '_timed', 'local_adele', date('d.m.Y H:i', $latestdate));
+            $feedback['restriction'][$wheretoput . '_timed'] =
+            get_string('node_restriction_' . $wheretoput . '_timed', 'local_adele', date('d.m.Y H:i', $latestdate));
         }
     }
 
@@ -525,7 +527,8 @@ class relation_update {
                         return isset($item['id']) && $item['id'] === $childconditionid;
                     });
                     $childcondition = reset($filterednodes);
-                    while ($childcondition !== null && $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                    while ($childcondition !== null &&
+                        $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
                         $childconditionid = $childcondition['childCondition'][0] ?? null;
                         $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
                             return isset($item['id']) && $item['id'] === $childconditionid;
@@ -538,7 +541,8 @@ class relation_update {
                 }
                 if ($isvalid) {
                     $childconditionid = $restnode['childCondition'][0];
-                    $feedback['restriction']['before_valid'][$childconditionid] = $feedback['restriction']['before'][$childconditionid];
+                    $feedback['restriction']['before_valid'][$childconditionid] =
+                    $feedback['restriction']['before'][$childconditionid];
                 }
             }
         }

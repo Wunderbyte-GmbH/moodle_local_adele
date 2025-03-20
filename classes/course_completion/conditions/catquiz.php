@@ -280,7 +280,7 @@ class catquiz implements course_completion {
                     ) {
                         $catquizzes['completed'][$complitionnode['id']] = $partialpassedrecords;
                         $filteredpercentageofrightanswers = array_intersect_key(
-                            $percentageofrightanswersbyscalekeyid, 
+                            $percentageofrightanswersbyscalekeyid,
                             array_flip($partialpassedattemptids)
                         );
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_attempts_list'] =
@@ -424,7 +424,16 @@ class catquiz implements course_completion {
     }
 
 
-    private function check_scale_best_attempt ($scale, &$bestpartialpassedrecords, $record, &$bestpartialpassedattemptids,
+    /**
+     * Check if the current attempt is the best attempt for a given scale.
+     * @param array $scale The scale information array containing scale details
+     * @param array $bestpartialpassedrecords Reference to array storing the best partial passed records
+     * @param object $record The attempt record object
+     * @param array $bestpartialpassedattemptids Reference to array storing the best partial passed attempt IDs
+     * @param array $bestsubscaleids Reference to array storing the best subscale IDs
+     * @return bool Returns false after processing
+     */
+    private function check_scale_best_attempt($scale, &$bestpartialpassedrecords, $record, &$bestpartialpassedattemptids,
     &$bestsubscaleids
     ) {
         if (isset($scale['scale']) && is_numeric($scale['scale'])) {

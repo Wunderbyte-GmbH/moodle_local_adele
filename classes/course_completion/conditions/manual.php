@@ -131,7 +131,7 @@ class manual implements course_completion {
      * Helper function to return localized description strings.
      * @param array $node
      * @param int $userid
-     * @return boolean
+     * @return array
      */
     public function get_completion_status($node, $userid) {
         $coursecompletion = [
@@ -147,7 +147,8 @@ class manual implements course_completion {
           $coursecompletion['completed'] ? '' :
           get_string('course_name_condition_completion_manual_checkbox_status', 'local_adele');
 
-          $coursecompletion['placeholders']['Dozenten'] = get_string('course_name_condition_completion_manual_role_teacher', 'local_adele');
+          $coursecompletion['placeholders']['Dozenten'] =
+          get_string('course_name_condition_completion_manual_role_teacher', 'local_adele');
         return $coursecompletion;
     }
 

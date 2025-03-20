@@ -185,7 +185,8 @@ class modquiz implements course_completion {
                           '" target="_blank">' .
                           $record->name .
                           '</a>';
-                        $modquizzes[$completion['id']]['placeholders']['minnumb'] = $completion['data']['value']['grade'] ?? $record->sumgrades ?? 0;
+                        $modquizzes[$completion['id']]['placeholders']['minnumb'] =
+                        $completion['data']['value']['grade'] ?? $record->sumgrades ?? 0;
                         $modquizzes[$completion['id']]['placeholders']['maxnumb'] = isset($record->grade)
                         ? number_format(self::round_to_one_decimal($record->grade), 1)
                         : '0.00';
@@ -211,7 +212,8 @@ class modquiz implements course_completion {
                         }
                     }
                     $modquizzes[$completion['id']]['placeholders']['currentbest'] =
-                        '(' . get_string('course_description_after_condition_modquiz_best', 'local_adele') . number_format(self::round_down_to_one_decimal($bestgrade), 1) . ')';
+                        '(' . get_string('course_description_after_condition_modquiz_best', 'local_adele') .
+                         number_format(self::round_down_to_one_decimal($bestgrade), 1) . ')';
                     $modquizzes['completed'][$completion['id']] = $validcatquiz;
                 } else {
                     $modquizzes['completed'][$completion['id']] = false;

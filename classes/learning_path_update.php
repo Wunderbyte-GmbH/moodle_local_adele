@@ -229,8 +229,8 @@ class learning_path_update {
                     $node['data']['manualcompletionvalue'] = $oldvalues[$node['id']]['manualcompletionvalue'];
                 }
             }
-            $nodeObj = json_decode(json_encode($node));
-            $node = json_decode(json_encode(learning_paths::checknodeprogression($nodeObj, $userid)), true);
+            $nodeobj = json_decode(json_encode($node));
+            $node = json_decode(json_encode(learning_paths::checknodeprogression($nodeobj, $userid)), true);
         }
         return $userpathjson;
     }

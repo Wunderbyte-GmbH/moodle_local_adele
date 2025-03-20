@@ -1,6 +1,4 @@
 <?php
-
-use local_adele\learning_paths;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,6 +26,7 @@ use local_adele\learning_paths;
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once('lib.php');
+use local_adele\learning_paths;
 
 global $CFG, $DB, $USER;
 

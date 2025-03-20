@@ -29,6 +29,18 @@ use stdClass;
  */
 class save_learningpath extends advanced_testcase {
 
+    /**
+     * Test case to verify course and activity setup functionality.
+     * This test creates multiple courses and activities to ensure proper setup.
+     * It specifically:
+     * - Creates 5 test courses
+     * - Sets up a learning path using a JSON file
+     * - Creates an Adele activity instance in the first course
+     * - Creates a quiz activity in the second course
+     * - Verifies the creation and proper assignment of these elements
+     *
+     * @return void
+     */
     public function test_course_and_activity_setup() {
         global $DB;
 
@@ -69,6 +81,6 @@ class save_learningpath extends advanced_testcase {
         $this->assertEquals($startingcourseid, $adelestart->course);
 
         // Output course IDs for further use.
-        //var_dump($courseids);
+        // Var_dump($courseids).
     }
 }
