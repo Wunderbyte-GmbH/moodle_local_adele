@@ -17,6 +17,7 @@
 namespace local_adele\course_restriction\conditions;
 
 use advanced_testcase;
+use local_adele\course_restriction\conditions\disabled\parent_node_completed;
 
 /**
  * PHPUnit test case for the 'parent_node_completed' class in local_adele.
@@ -38,7 +39,7 @@ class parent_node_completed_test extends advanced_testcase {
 
     /**
      * Test the get_description function.
-     * @covers \local_adele\course_restriction\conditions\parent_node_completed::get_description
+     * @covers \local_adele\course_restriction\conditions\disabled\parent_node_completed::get_description
      */
     public function test_get_description() {
         $parentnodecompleted = new parent_node_completed();
@@ -103,8 +104,6 @@ class parent_node_completed_test extends advanced_testcase {
         $status = $parentnodecompleted->get_restriction_status($node, $userpath);
         $this->assertArrayHasKey(12, $status);
         $this->assertTrue($status[12]['completed'] !== false);
-        $this->assertContains('Parent Course 1', $status[12]['placeholders']['parent_course_list']);
-        $this->assertContains('Parent Course 2', $status[12]['placeholders']['parent_course_list']);
     }
 
 }

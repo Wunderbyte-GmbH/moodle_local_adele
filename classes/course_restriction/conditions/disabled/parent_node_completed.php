@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_adele\course_restriction\conditions;
+namespace local_adele\course_restriction\conditions\disabled;
 
 use local_adele\course_restriction\course_restriction;
 

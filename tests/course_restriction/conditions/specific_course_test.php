@@ -105,7 +105,7 @@ class specific_course_test extends advanced_testcase {
         $statuscomplete = $specificcourserestriction->get_restriction_status($nodecomplete, $userpath);
         $this->assertArrayHasKey(12, $statuscomplete);
         $this->assertEquals($statuscomplete[12]['completed']['id'], 1);
-        $this->assertContains('Course 1', $statuscomplete[12]['placeholders']['course_list']);
+        $this->assertContains('Course 1', $statuscomplete[12]['placeholders']['node_name']);
 
         $nodeincomplete = [
             'restriction' => [
@@ -125,7 +125,7 @@ class specific_course_test extends advanced_testcase {
         $statusincomplete = $specificcourserestriction->get_restriction_status($nodeincomplete, $userpath);
         $this->assertArrayHasKey(13, $statusincomplete);
         $this->assertArrayNotHasKey('completed', $statusincomplete[13]);
-        $this->assertContains('Course 2', $statusincomplete[13]['placeholders']['course_list']);
+        $this->assertContains('Course 2', $statusincomplete[13]['placeholders']['node_name']);
 
     }
 
