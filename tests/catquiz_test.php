@@ -45,7 +45,7 @@ class catquiz_test extends advanced_testcase {
     public function test_get_catquiz_tests_class_does_not_exist() {
         $this->mock_class_exists('local_catquiz\testenvironment', false);
 
-        $result = catquiz::get_catquiz_tests();
+        $result = catquiz::get_catquiz_tests([]);
         $this->assertIsArray($result);
         $this->assertCount(0, $result, 'Expected an empty array when class does not exist');
     }
@@ -93,7 +93,7 @@ class catquiz_test extends advanced_testcase {
                 ],
             ]);
 
-        $result = catquiz::get_catquiz_tests();
+        $result = catquiz::get_catquiz_tests([['course_node_id' => 123]]);
 
         // Assertions.
         $this->assertIsArray($result);
