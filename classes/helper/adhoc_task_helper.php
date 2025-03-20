@@ -39,10 +39,13 @@ use stdClass;
 class adhoc_task_helper {
 
 
+
     /**
-     * Schedules a task to update user paths.
+     * Sets scheduled adhoc tasks for a learning path node.
      *
-     * @param mixed $node Data needed to schedule the task.
+     * @param array $node The learning path node containing restriction data
+     * @param stdClass $userpath The user path object containing learning_path_id, user_id, and course_id
+     * @return void
      */
     public static function set_scheduled_adhoc_tasks($node, $userpath) {
 

@@ -44,7 +44,7 @@ class modquiz {
 
     /**
      * Get all tests.
-     *
+     * @param array $availablecourses
      * @return array
      */
     public static function get_mod_quizzes($availablecourses) {

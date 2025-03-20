@@ -705,6 +705,7 @@ class learning_paths {
      * @param array $haystack
      * @param array $needle
      * @param string $key
+     * @param bool $returnfeedack
      * @return mixed
      */
     public static function searchnestedarray($haystack, $needle, $key, $returnfeedack = false) {

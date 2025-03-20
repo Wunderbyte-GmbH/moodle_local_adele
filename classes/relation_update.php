@@ -245,16 +245,19 @@ class relation_update {
         return $json;
     }
 
+
     /**
      * Observer for course completed
      *
-     * @param  array $node
-     * @param  array $completioncriteria
-     * @param  object $userpath
-     * @param  array $restrictionnodepaths
-     * @param  number $mode
-     * @param  array $restrictioncriteria
-     * @return array
+     * @param array $restrictionnodepathsall Array of all restriction node paths
+     * @param array $node Node data to validate
+     * @param array $completioncriteria Criteria for completion
+     * @param object $userpath User path object
+     * @param array $restrictionnodepaths Array of restriction node paths
+     * @param int $mode Mode of validation (0 = check only, 1 = full validation)
+     * @param array $restrictioncriteria Criteria for restrictions
+     * @param array $nodecompletedname Reference to array of completed node names
+     * @return bool|array Returns false if mode=0 and validation fails
      */
     public static function validatenodecompletion(
         $restrictionnodepathsall,
@@ -413,9 +416,10 @@ class relation_update {
      * Return node status for display purpose.
      *
      * @param array $feedback
-     * @param array $restrictionnodepaths
+     * @param array $completionnodepaths
      * @param array $completioncriteria
      * @param array $node
+     * @return string Info on state
      */
     public static function getnodestatusforcompletion($feedback, $completionnodepaths, $completioncriteria, $node) {
         if (count($completionnodepaths) > 0) {
@@ -433,12 +437,13 @@ class relation_update {
         return 'before';
     }
 
+
     /**
-     * Returns true is conditiontype is time based
+     * Checks if a node is of a timed type and if its column is valid based on restriction criteria.
      *
-     * @param array $restrictioncriteria
-     * @param array $node
-     * @return boolean
+     * @param array $node The node to check
+     * @param array $restrictioncriteria The restriction criteria to validate against
+     * @return bool Returns true if the node is timed and its column is valid, false otherwise
      */
     public static function istypetimedandcolumnvalid($node, $restrictioncriteria) {
         switch ($node['data']['label']) {
@@ -462,6 +467,7 @@ class relation_update {
      * @param array $restrictionnodepaths
      * @param array $restrictioncriteria
      * @param array $node
+     * @param string $wheretoput
      */
     public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $wheretoput) {
         $latestdate = 0;
@@ -504,6 +510,7 @@ class relation_update {
      * @param array $restrictionnodepaths
      * @param array $restrictioncriteria
      * @param array $node
+     * @param array $restrictionnodepathsall
      */
     public static function getnodestatusforrestriciton(
         &$feedback,
@@ -800,14 +807,15 @@ class relation_update {
     }
 
 
+
     /**
-     * Observer for course completed
+     * Renders placeholders in a string for a single restriction.
      *
-     * @param string $string
-     * @param array $condition
-     * @param string $id
-     * @param array $nodes
-     * @return string
+     * @param string $string The string containing placeholders to be replaced
+     * @param string $id The ID of the node to process
+     * @param array $nodes Array of nodes containing child conditions
+     * @param array $condition Optional array of conditions with placeholder data
+     * @return string The string with all placeholders replaced with their values
      */
     public static function render_placeholders_single_restriction($string, $id, $nodes, $condition = [] ) {
         if (isset($condition['placeholders'])) {
@@ -926,12 +934,13 @@ class relation_update {
      * @param array $haystack
      * @param array $needle
      * @param string $key
+     * @param bool $returnfeedback
      * @return mixed
      */
-    public static function searchnestedarray($haystack, $needle, $key, $returnfeedack = false) {
+    public static function searchnestedarray($haystack, $needle, $key, $returnfeedback = false) {
         foreach ($haystack as $item) {
             foreach ($needle as $need) {
-                if (strpos($need, '_feedback') == $returnfeedack) {
+                if (strpos($need, '_feedback') == $returnfeedback) {
                     if (isset($item[$key]) && $item[$key] === $need) {
                         return $item;
                     }

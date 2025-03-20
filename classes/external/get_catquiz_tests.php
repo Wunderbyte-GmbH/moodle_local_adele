@@ -80,6 +80,7 @@ class get_catquiz_tests extends external_api {
      * Webservice for the local adele plugin to get next question.
      *
      * @param int $contextid
+     * @param array $availablecourses
      * @return array
      */
     public static function execute($contextid, $availablecourses): array {

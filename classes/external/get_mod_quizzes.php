@@ -79,6 +79,7 @@ class get_mod_quizzes extends external_api {
      * Webservice for the local catquiz plugin to get next question.
      *
      * @param int $contextid
+     * @param array $availablecourses
      * @return array
      */
     public static function execute($contextid, $availablecourses): array {

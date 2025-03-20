@@ -103,10 +103,12 @@ class learning_path_update {
         }
     }
 
+
     /**
-     * Observer for course completed
+     * Triggers an update event for a user's learning path.
      *
-     * @param object $event
+     * @param object $userpath The user path object containing path information to be updated
+     * @return void
      */
     public static function trigger_user_path_update($userpath) {
         $eventsingle = user_path_updated::create([

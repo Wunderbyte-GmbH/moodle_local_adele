@@ -47,7 +47,7 @@ class catquiz {
 
     /**
      * Get all tests.
-     *
+     * @param array $availablecourses
      * @return array
      */
     public static function get_catquiz_tests($availablecourses) {

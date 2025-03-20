@@ -47,9 +47,9 @@ class course_restriction_info {
     }
 
     /**
-     * Returns conditions depending on the conditions param.
-     *
-     * @return array
+     * Get all available course restrictions.
+     * @param bool $applyfilter Whether to apply the restriction filter from the configuration
+     * @return array Array of available course restrictions, filtered if requested
      */
     public static function get_restrictions($applyfilter = false): array {
         global $CFG;
