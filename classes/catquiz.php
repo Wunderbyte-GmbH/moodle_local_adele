@@ -55,7 +55,7 @@ class catquiz {
             return [];
         }
         $availablecourseids = array_map(function ($course) {
-            return $course['course_node_id'][0]; // Adjust this based on your data structure
+            return $course['course_node_id'][0];
         }, $availablecourses);
         $records = testenvironment::get_environments('mod_adaptivequiz', 0, 2, true);
         $records = array_filter(array_map(function ($record) {
