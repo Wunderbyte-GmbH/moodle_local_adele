@@ -64,7 +64,7 @@ class timed_test extends advanced_testcase {
         // Test valid date.
         $validdate = $timed->isvaliddate('2024-01-01T00:00');
         $this->assertInstanceOf(DateTime::class, $validdate);
-        $this->assertEquals('2024-01-01 00:00:00', $validdate->format('d.m.Y H:i'));
+        $this->assertEquals("01.01.2024 00:00", $validdate->format('d.m.Y H:i'));
 
         // Test invalid date.
         $validdate = $timed->isvaliddate('invalid-date');
@@ -102,8 +102,8 @@ class timed_test extends advanced_testcase {
         $this->assertArrayHasKey(1, $status);
         $this->assertTrue($status[1]['completed']);
         $this->assertNotEmpty($status[1]['inbetween_info']);
-        $this->assertEquals('2024-01-01 00:00:00', $status[1]['inbetween_info']['starttime']);
-        $this->assertEquals('2026-12-31 23:59:00', $status[1]['inbetween_info']['endtime']);
+        $this->assertEquals("01.01.2024 00:00", $status[1]['inbetween_info']['starttime']);
+        $this->assertEquals("31.12.2026 23:59", $status[1]['inbetween_info']['endtime']);
 
         // Test with future start date (restriction should be incomplete).
         $futurenode = [
@@ -127,8 +127,8 @@ class timed_test extends advanced_testcase {
 
         $this->assertArrayHasKey(2, $futurestatus);
         $this->assertFalse($futurestatus[2]['completed']);
-        $this->assertEquals('2099-01-01 00:00:00', $futurestatus[2]['inbetween_info']['starttime']);
-        $this->assertEquals('2099-12-31 23:59:00', $futurestatus[2]['inbetween_info']['endtime']);
+        $this->assertEquals("01.01.2099 00:00", $futurestatus[2]['inbetween_info']['starttime']);
+        $this->assertEquals("31.12.2099 23:59", $futurestatus[2]['inbetween_info']['endtime']);
     }
 
 }
