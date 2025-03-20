@@ -26,6 +26,7 @@ use stdClass;
  * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
  */
 class course_completed_test extends advanced_testcase {
 
