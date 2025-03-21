@@ -28,12 +28,13 @@ class local_adele_generator extends testing_module_generator {
      * Create catscale structure by importing from CSV file.
      *
      * @param array $data
-     * @return void
+     * @return int
      */
     public function create_adele_learningpaths(array $data) {
         global $DB;
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $data['filename']);
         $object = json_decode($content);
         $id = $DB->insert_record('local_adele_learning_paths', $object);
+        return $id;
     }
 }
