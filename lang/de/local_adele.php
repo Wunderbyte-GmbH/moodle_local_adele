@@ -306,7 +306,7 @@ $string['conditions_no_scales'] = '['.__LINE__.']Keine Skalen verfügbar';
 $string['conditions_name'] = '['.__LINE__.']Subskala';
 $string['conditions_parent_scale_name'] = '['.__LINE__.']Hauptskala';
 $string['conditions_scale_value'] = '['.__LINE__.']Mindest-Score:';
-$string['conditions_attempts'] = '['.__LINE__.']Max. Anzahl an Versuchen:';
+$string['conditions_attempts'] = '['.__LINE__.']Mindestanzahl korrekter Antworten in Prozent:';
 $string['conditions_set_values'] = '['.__LINE__.']Werte speichern';
 $string['conditions_catquiz_warning_description'] = '['.__LINE__.']Das Catquiz befindet sich im selben Kurs wie der Lernpfad';
 $string['conditions_catquiz_warning_name'] = '['.__LINE__.']Catquiz im Kurs';
@@ -347,8 +347,8 @@ $string['completion_list_of_criteria'] = '['.__LINE__.']Liste der verfügbaren '
 $string['completion_criteria'] = '['.__LINE__.'] Kriterien';
 $string['completion_edge_or'] = '['.__LINE__.'] ODER';
 $string['completion_edge_and'] = '['.__LINE__.']UND';
-$string['course_completion_choose_number'] = '['.__LINE__.']Bestimme eine Anzahl';
-$string['course_completion_minimum_amount'] = '['.__LINE__.']Bestimme die Mindestanzahl von Kursabschlüssen';
+$string['course_completion_choose_number'] = '['.__LINE__.']Anzahl';
+$string['course_completion_minimum_amount'] = '['.__LINE__.']Mindestanzahl an Kursabschlüssen:';
 
 // Flussdiagrammzeichenfolgen.
 $string['flowchart_add_learning'] = '['.__LINE__.']Ein Lernmodul hinzufügen';
@@ -365,7 +365,7 @@ $string['flowchart_delete_button'] = '['.__LINE__.']Löschen';
 $string['flowchart_save_notification_title'] = '['.__LINE__.']Speichern fehlgeschlagen';
 $string['flowchart_save_notification_text_missing_strings'] = '['.__LINE__.']Geben Sie einen Titel und eine kurze Beschreibung für den Lernpfad an';
 $string['flowchart_invalid_path_notification_title'] = '['.__LINE__.']Ungültiger Pfad';
-$string['flowchart_save_notification_text'] = '['.__LINE__.']Eigenständige Knoten gefunden. Jeder Knoten muss mit dem Pfad verbunden sein. Bestätige um trotzdem zu speichern.';
+$string['flowchart_save_notification_text'] = '['.__LINE__.']Eigenständige Knoten gefunden. Jeder Knoten muss mit dem Pfad verbunden sein. Bitte bestätigen, um dennoch zu speichern.';
 $string['flowchart_cancel_confirmation'] = '['.__LINE__.']Alle nicht gespeicherten Änderungen gehen verloren';
 $string['flowchart_back_button'] = '['.__LINE__.']Zurück';
 $string['flowchart_course_already_inside_title'] = '['.__LINE__.']Kurs bereits enthalten';
@@ -387,6 +387,9 @@ $string['modals_previous'] = '['.__LINE__.']Zurück';
 $string['modals_next'] = '['.__LINE__.']Weiter';
 $string['modals_edit'] = '['.__LINE__.']Bearbeiten';
 $string['modals_longname'] = '['.__LINE__.']Langname:';
+$string['modals_description'] = '['.__LINE__.']Beschreibung des Stapels:';
+$string['estimate_duration'] = '['.__LINE__.']Veranschlagte Bearbeitungsdauer ';
+$string['modals_no_description'] = '['.__LINE__.']Keine Beschreibung hinterlegt...';
 $string['modals_shortname'] = '['.__LINE__.']Kurzname:';
 
 // Knoten-Strings.
@@ -501,4 +504,4 @@ $string['privacy:metadata:local_adele_path_user:json'] = '['.__LINE__.']Zusätzl
 $string['privacy:metadata:local_adele_lp_editors'] = '['.__LINE__.']Die Tabelle speichert Informationen über Nutzer, die berechtigt sind, bestimmte Lernpfade zu bearbeiten.';
 $string['privacy:metadata:local_adele_lp_editors:userid'] = '['.__LINE__.']Die ID des Nutzers, der berechtigt ist, den Lernpfad zu bearbeiten.';
 
-$string['cachedef_navisteacher'] = '['.__LINE__.']Ist Lehrer cache';
+$string['cachedef_navisteacher'] = '['.__LINE__.']Ist Lehrer-Cache';
