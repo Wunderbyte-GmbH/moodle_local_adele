@@ -212,7 +212,7 @@ $string['node_access_completion_after_all'] = '['.__LINE__.']Sie erreichen einen
 $string['node_access_restriction_before'] = '['.__LINE__.']Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
 $string['node_access_restriction_inbetween'] = '['.__LINE__.']Der Kurs/Stapel ist freigeschaltet.';
 $string['node_access_restriction_after'] = '['.__LINE__.']Der Kurs/Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
-$string['course_description_condition_course_completed'] = '['.__LINE__.']Ein Kurs muss abgeschlossen werden';
+$string['course_description_condition_course_completed'] = '['.__LINE__.']Kurs muss abgeschlossen werden';
 
 $string['course_description_before_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_inbetween_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
