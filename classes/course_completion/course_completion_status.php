@@ -52,7 +52,7 @@ class course_completion_status {
      * @param int $userid
      * @return array
      */
-    public static function get_condition_status($node, $userid): array {
+    public function get_condition_status($node, $userid): array {
         global $CFG;
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_completion/conditions/*.php';

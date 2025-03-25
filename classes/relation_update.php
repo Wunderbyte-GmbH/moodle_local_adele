@@ -55,6 +55,8 @@ class relation_update {
      */
     public static function updated_single($event) {
         $userpath = $event->other['userpath'];
+        $completionclass = new course_completion_status();
+        $restrictionclass = new  course_restriction_status();
         if ($userpath) {
             $creation = false;
             $nodecompletedname = [];
@@ -64,8 +66,8 @@ class relation_update {
             self::subscribe_user_starting_node($userpath);
             if (!empty($userpath->json['tree']['nodes'])) {
                 foreach ($userpath->json['tree']['nodes'] as &$node) {
-                    $completioncriteria = course_completion_status::get_condition_status($node, $userpath->user_id);
-                    $restrictioncriteria = course_restriction_status::get_restriction_status($node, $userpath);
+                    $completioncriteria = $completionclass->get_condition_status($node, $userpath->user_id);
+                    $restrictioncriteria = $restrictionclass->get_restriction_status($node, $userpath);
                     $restrictionnodepaths = [];
                     $singlerestrictionnode = [];
                     if (isset($node['data']['completion']['master'])) {

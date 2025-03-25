@@ -52,7 +52,7 @@ class course_restriction_status {
      * @param object $userpath
      * @return array
      */
-    public static function get_restriction_status($node, $userpath): array {
+    public function get_restriction_status($node, $userpath): array {
         global $CFG;
         // First, we get all the available conditions from our directory.
         $path = $CFG->dirroot . '/local/adele/classes/course_restriction/conditions/*.php';
