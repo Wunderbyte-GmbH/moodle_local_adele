@@ -17,7 +17,8 @@
 namespace local_adele;
 
 use advanced_testcase;
-use stdClass;
+use mod_adele_observer;
+use moodle_database;
 
 /**
  * PHPUnit test case for the 'catquiz' class in local_adele.
@@ -26,6 +27,7 @@ use stdClass;
  * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
  */
 class save_learningpath_test extends advanced_testcase {
 
@@ -41,7 +43,7 @@ class save_learningpath_test extends advanced_testcase {
      *
      * @return void
      */
-    public function test_course_and_activity_setup() {
+    public function test_subscribe_user_to_learning_path() {
         global $DB;
 
         // Reset Moodle database.
@@ -56,6 +58,14 @@ class save_learningpath_test extends advanced_testcase {
             $courseids[] = $course->id;
         }
 
+        // Add user to the first course (optional: adjust role, context, etc.).
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // Enroll the users into the first course.
+        $generator->enrol_user($user1->id, $courseids[0]);
+        $generator->enrol_user($user2->id, $courseids[0]);
+
         // Verify that 5 courses were created.
         $this->assertCount(5, $courseids);
 
@@ -63,6 +73,8 @@ class save_learningpath_test extends advanced_testcase {
         $startingcourseid = $courseids[0];
         $data['filename'] = 'alise_zugangs_lp_einfach.json';
         $lpid = $generator->get_plugin_generator('local_adele')->create_adele_learningpaths($data);
+
+        $sink = $this->redirectEvents();
 
         // Create an instance of mod_adele in the starting course.
         $adelestart = $generator->get_plugin_generator('mod_adele')->create_instance([
@@ -73,17 +85,19 @@ class save_learningpath_test extends advanced_testcase {
 
         ]);
 
-        // Create an instance of mod_adele in the starting course.
-        $adele = $generator->get_plugin_generator('mod_quiz')->create_instance([
-            'course' => $courseids[1],
-            'name' => 'quiz Activity',
-        ]);
+        $events = $sink->get_events();
 
-        // Verify the activity exists.
-        $this->assertNotEmpty($adele);
         $this->assertEquals($startingcourseid, $adelestart->course);
 
-        // Output course IDs for further use.
-        // Var_dump($courseids).
+        $createdevents = array_filter($events, function($event) {
+            return $event->eventname === '\core\event\course_module_created';
+        });
+
+        // Assert that the course_module_created event was called exactly once.
+        $this->assertCount(1, $createdevents, "Expected course_module_created event to be called exactly once.");
+
+        $sink->close();
+
     }
 }
+
