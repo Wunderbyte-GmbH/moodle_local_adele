@@ -168,7 +168,7 @@ function drawDropZones(freeEdges, closestNode) {
       position.x -= 450;
     }
 
-    if(freeEdge == 'source_and' ||(freeEdge == 'source_or' && freeEdges.includes('target_and'))){
+    if((freeEdge == 'source_and' ) ||( freeEdge == 'source_or' && closestNode.parentCondition == 'starting_condition')){
       const data = {
         opacity: '0.6',
         bgcolor: 'grey',
@@ -241,13 +241,14 @@ function findClosestNode(event) {
   let closestDistance = Infinity;
   props.nodes.forEach((node) => {
     if(
+      node.parentCondition == "starting_condition" ||(
       node.type != 'dropzone' &&
       node.type != 'selected' &&
       node.type != 'feedback' &&
       (
         node.childCondition.length == 0 ||
         node.childCondition[0].includes('_feedback')
-      )
+      ))
     ){
       const nodeCenter = {
         x: node.position.x + node.dimensions.width / 2,
