@@ -28,6 +28,7 @@
         @dragover="onDragOver"
         @node-drag="onDrag"
         @node-click="onNodeClickCall"
+        :delete-key-code="['Backspace', 'Delete']"
       >
         <Background
           :pattern-color="dark ? '#FFFFFB' : '#aaa'"
