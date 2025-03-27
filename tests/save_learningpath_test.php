@@ -143,6 +143,8 @@ class save_learningpath_test extends advanced_testcase {
      * - The expected number of path user entries are created
      *
      * @covers \mod_adele_observer::saved_module
+     * @covers \local_adele\relation_update
+     * @covers \local_adele\enrollment
      * @return void
      */
     public function test_subscribe_user_to_learning_path() {
@@ -170,7 +172,7 @@ class save_learningpath_test extends advanced_testcase {
      * - Confirms proper enrollment of users in subsequent courses
      * - Validates the creation of adhoc tasks
      *
-     * @covers \local_adele\relation_update::updated_single
+     * @covers \local_adele\relation_update
      * @return void
      */
     public function test_user_path_starting_node_enrollment() {

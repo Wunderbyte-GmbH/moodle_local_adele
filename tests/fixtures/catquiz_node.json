@@ -1,0 +1,108 @@
+{
+    "completion": {
+      "nodes": [
+        {
+          "id": "condition_2",
+          "type": "custom",
+          "draggable": false,
+          "initialized": false,
+          "position": {
+            "x": 1133,
+            "y": 445
+          },
+          "data": {
+            "id": 170,
+            "name": "[EN_176]Catquiz Quiz",
+            "description": "[EN_175]Accroding to catquiz results/attempts",
+            "description_before": "[EN_219]beende das Quiz {quiz_name}",
+            "description_after": "[EN_222]deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.",
+            "description_inbetween": "[EN_220]deiner Ergebnisse im Test „{quiz_name}”. Denn hierüber hast Du die im Kurs zu erwerbenden Kompetenzen zu:{quiz_attempts_list} in ausreichender Form nachgewiesen.",
+            "priority": "2",
+            "label": "catquiz",
+            "visibility": true,
+            "node_id": "condition_2",
+            "value": {
+              "testid": "1",
+              "testid_courseid": "9",
+              "componentid": "1",
+              "scales": {
+                "parent": {
+                  "id": "1",
+                  "name": "Simulation",
+                  "showDetails": false,
+                  "scale": "0.7",
+                  "attempts": "60"
+                },
+                "sub": [
+                  {
+                    "id": "2",
+                    "name": "SimA",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "3",
+                    "name": "SimA01",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "4",
+                    "name": "SimA02",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "5",
+                    "name": "SimA03",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "6",
+                    "name": "SimA04",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "7",
+                    "name": "SimA05",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "8",
+                    "name": "SimA06",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "9",
+                    "name": "SimA07",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "10",
+                    "name": "SimB",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "11",
+                    "name": "SimB01",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "12",
+                    "name": "SimB02",
+                    "showDetails": false
+                  },
+                  {
+                    "id": "13",
+                    "name": "SimB03",
+                    "showDetails": false
+                  }
+                ]
+              }
+            }
+          },
+          "label": "custom node",
+          "deletable": false,
+          "parentCondition": ["starting_condition"],
+          "childCondition": ["condition_2_feedback"]
+        }
+      ]
+    }
+  }

@@ -1,0 +1,11 @@
+[
+    {
+      "attemptid": 1,
+      "contextid": 2,
+      "userid": 2,
+      "endtime": 1733219090,
+      "timemodified": 1733219090,
+      "json": "{\"attemptid\":3,\"contextid\":2,\"courseid\":\"9\",\"component\":\"mod_adaptivequiz\",\"userid\":\"2\",\"teststrategy\":\"8\",\"starttime\":1733219089,\"endtime\":false,\"total_number_of_testitems\":420,\"number_of_testitems_used\":null,\"ability_before_attempt\":0.7875,\"catquizerror\":false,\"studentfeedback\":[],\"teacherfeedback\":[],\"personabilities\":{\"1\":0.79},\"num_pilot_questions\":null,\"catscaleid\":1,\"testid\":1,\"includesubscales\":true,\"maximumquestions\":10,\"minimumquestions\":3,\"penalty_threshold\":864000,\"initial_standarderror\":1,\"pilot_ratio\":0,\"pilot_attempts_threshold\":30,\"questionsattempted\":0,\"firstquestion_use_existing_data\":true,\"selectfirstquestion\":\"0\",\"skip_reason\":\"lastquestionnull\",\"max_attempts_per_scale\":5,\"min_attempts_per_scale\":2,\"timestamp\":1733219089,\"has_fisherinformation\":true,\"max_attempttime_in_sec\":300,\"max_itemtime_in_sec\":-1,\"se_max\":1,\"se_min\":0.35,\"pp_min_inc\":0.01,\"questions_ordered_by\":\"difficulty\",\"se\":{\"1\":1,\"2\":1,\"3\":1,\"4\":1,\"5\":1,\"6\":1,\"7\":1,\"8\":1,\"9\":1,\"10\":1}}",
+      "debug_info": null
+    }
+  ]
