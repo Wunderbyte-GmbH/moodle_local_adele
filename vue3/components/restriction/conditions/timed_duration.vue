@@ -11,7 +11,7 @@
           value="" 
           selected
         >
-          Select the duration start
+          {{ store.state.strings.course_name_condition_timed_duration_select_start }}
         </option>
         <option 
           v-for="(label, key) in options" 
@@ -42,7 +42,7 @@
           value="" 
           selected
         >
-          Select a duration format
+        {{ store.state.strings.course_name_condition_timed_duration_select_format }}
         </option>
         <option 
           v-for="(label, key) in durationOptions" 

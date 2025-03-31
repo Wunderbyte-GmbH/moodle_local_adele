@@ -166,7 +166,7 @@ const renderFeedback = (action, emitting) => {
                 @change="renderFeedback('before', true)"
               >
               <label for="feedback_before">
-                Use default feedback
+                {{store.state.strings.nodes_feedback_use_default}}
               </label>
               <textarea
                 id="exampleFormControlTextarea1"

@@ -105,33 +105,33 @@
               </p>
             </div>
             <div class="form-group">
-              <b>Tags <i class="fa fa-tag" /> :</b>
+              <b>{{store.state.strings.modals_tags}}<i class="fa fa-tag" /> :</b>
               <p class="form-control-static">
                 {{ tags }}
               </p>
             </div>
             <div>
-              <b>Background image
+              <b>{{store.state.strings.modals_backgroundimage}}
                 <i
                   :class="store.state.version ? 'fa-solid fa-image' : 'fa fa-picture-o'"
                 />
                 :</b>
               <p>
-                If no course image is available, the selected stock image will be choosen.
+                {{store.state.strings.modals_select_stock_image_description}}
               </p>
               <div
                 v-if="store.state.node && store.state.node.imagepaths && Object.keys(store.state.node.imagepaths).length > 0"
                 class="mb-2"
               >
                 <p>
-                  If no image is selected, the course image will be selected.
+                 {{store.state.strings.modals_select_course_image_description}}
                 </p>
                 <button
                   type="button"
                   class="btn btn-info"
                   @click="showCourseImageSelection = !showCourseImageSelection"
                 >
-                  Select course image
+                  {{store.sate.strings.modals_select_button}}
                 </button>
                 <div
                   v-if="selectedCourseImagePath"
@@ -146,7 +146,7 @@
                     class="deselect-btn"
                     @click="selectedCourseImagePath = ''"
                   >
-                    Deselect
+                  {{store.sate.strings.modals_deselect_button}}
                   </button>
                 </div>
                 <div
@@ -172,7 +172,7 @@
                 class="btn btn-info"
                 @click="showImageSelection = !showImageSelection"
               >
-                Select Stock Image
+                {{store.state.strings.modals_select_stock_image}}
               </button>
               <div
                 v-if="selectedImagePath"

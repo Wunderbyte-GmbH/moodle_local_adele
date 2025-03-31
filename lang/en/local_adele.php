@@ -186,7 +186,9 @@ $string['course_select_condition_timed_duration_days'] = '[EN_'.__LINE__.']days'
 $string['course_select_condition_timed_duration_weeks'] = '[EN_'.__LINE__.']weeks';
 $string['course_select_condition_timed_duration_months'] = '[EN_'.__LINE__.']months';
 $string['course_select_condition_timed_duration_learning_path'] = '[EN_'.__LINE__.']Since learning path subscription';
-$string['course_name_condition_timed_duration_duration_value'] = '['.__LINE__.']Duration value';
+$string['course_name_condition_timed_duration_duration_value'] = '[EN_'.__LINE__.']Duration value';
+$string['course_name_condition_timed_duration_select_start'] = '[EN_'.__LINE__.']Select the duration start';
+$string['course_name_condition_timed_duration_select_format'] = '[EN_'.__LINE__.']Select a duration format';
 
 // Feedback Strings.
 $string['node_access_completed'] = '[EN_'.__LINE__.']The node is completed because:';
@@ -381,6 +383,13 @@ $string['modals_description'] = '[EN_'.__LINE__.']Node description:';
 $string['estimate_duration'] = '[EN_'.__LINE__.']Estimated duration ';
 $string['modals_no_description'] = '[EN_'.__LINE__.']No node description given...';
 $string['modals_shortname'] = '[EN_'.__LINE__.']Shortname:';
+$string['modals_backgroundimage'] = '[EN_'.__LINE__.'] Background-image';
+$string['modals_tags'] = '[EN_'.__LINE__.'] Tags';
+$string['modals_select_stock_image'] = '[EN_'.__LINE__.'] Select Stock Image';
+$string['modals_select_stock_image_description'] = '[EN_'.__LINE__.'] If no course image is available, the selected stock image will be choosen';
+$string['modals_select_course_image_description'] = '[EN_'.__LINE__.'] If no image is selected, the course image will be selected.';
+$string['modals_select_button'] = '[EN_'.__LINE__.'] Select course image';
+$string['modals_deselect_button'] = '[EN_'.__LINE__.'] Deselect';
 
 // Nodes strings.
 $string['nodes_collection'] = '[EN_'.__LINE__.']Collection';

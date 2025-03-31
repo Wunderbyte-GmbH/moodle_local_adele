@@ -185,6 +185,8 @@ $string['course_name_condition_timed_duration'] = '['.__LINE__.']Kursbearbeitung
 $string['course_select_condition_timed_duration_learning_path'] = '['.__LINE__.']Seit Anmeldung zum Lernpfad';
 $string['course_select_condition_timed_duration_node'] = '['.__LINE__.']Seit Einschreibung in Kurs/Stapel';
 $string['course_name_condition_timed_duration_duration_value'] = '['.__LINE__.']Dauer';
+$string['course_name_condition_timed_duration_select_start'] = '['.__LINE__.']Zeitraum-Beginn wählen';
+$string['course_name_condition_timed_duration_select_format'] = '['.__LINE__.']Zeitraum-Einheit wählen';
 $string['course_select_condition_timed_duration_days'] = '['.__LINE__.']Tage';
 $string['course_select_condition_timed_duration_weeks'] = '['.__LINE__.']Wochen';
 $string['course_select_condition_timed_duration_months'] = '['.__LINE__.']Monate';
@@ -391,6 +393,13 @@ $string['modals_description'] = '['.__LINE__.']Beschreibung des Stapels:';
 $string['estimate_duration'] = '['.__LINE__.']Veranschlagte Bearbeitungsdauer ';
 $string['modals_no_description'] = '['.__LINE__.']Keine Beschreibung hinterlegt...';
 $string['modals_shortname'] = '['.__LINE__.']Kurzname:';
+$string['modals_backgroundimage'] = '['.__LINE__.']Hintergrundbild';
+$string['modals_tags'] = '['.__LINE__.'] Tags';
+$string['modals_select_stock_image'] = '['.__LINE__.'] Stockfoto auswählen';
+$string['modals_select_stock_image_description'] = '['.__LINE__.'] Wenn kein Kursbild verfügbar ist, wird das ausgewählte Stockfoto angezeigt.';
+$string['modals_select_course_image_description'] = '['.__LINE__.'] Wenn kein Bild ausgewählt ist, wird das Kursbild ausgewählt.';
+$string['modals_select_button'] = '['.__LINE__.'] Kursbild auswählen';
+$string['modals_deselect_button'] = '['.__LINE__.'] Auswahl aufheben';
 
 // Knoten-Strings.
 $string['nodes_collection'] = '['.__LINE__.']Sammlung';

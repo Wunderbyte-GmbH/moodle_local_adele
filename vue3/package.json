@@ -6,7 +6,7 @@
   "scripts": {
     "build": "cross-env webpack --mode production --progress",
     "serve": "vue-cli-service serve",
-    "test": "jest --watchAll=false",
+    "test": "jest --watchAll=false --coverage",
     "lint": "eslint .",
     "dev": "cross-env webpack --mode development --progress",
     "watch": "cross-env webpack --mode development --watch",
