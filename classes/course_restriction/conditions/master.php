@@ -114,7 +114,7 @@ class master implements course_restriction {
     public function get_restriction_status($node, $userid) {
         $master = false;
         if (
-          isset($node['data']['completion']['master']['completion'])
+          isset($node['data']['completion']['master']['restriction'])
         ) {
             $master = $node['data']['completion']['master']['restriction'];
         }

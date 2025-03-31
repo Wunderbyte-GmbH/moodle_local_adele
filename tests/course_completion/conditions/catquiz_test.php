@@ -174,7 +174,7 @@ class catquiz_test extends advanced_testcase {
      * 'completed' keys, where condition_2 is set to true. The test uses mock quiz attempts
      * and database interactions to simulate a real scenario.
      *
-     * @covers \local_adele\course_completion\conditions\catquiz::get_completion_status
+     * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
     public function test_get_completion_status_is_true() {
@@ -205,7 +205,7 @@ class catquiz_test extends advanced_testcase {
      * 'completed' keys, where condition_2 is set to false. The test uses empty mock quiz attempts
      * and database interactions to simulate a scenario with no attempts.
      *
-     * @covers \local_adele\course_completion\conditions\catquiz::get_completion_status
+     * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
     public function test_get_completion_status_is_false() {
