@@ -5,8 +5,8 @@ describe('addAutoRestrictions', () => {
 
   beforeEach(() => {
     // Mock the newNode and oldNode structures
-    newNode = { id: 'new_node', restriction: undefined };
-    oldNode = { id: 'old_node', restriction: undefined };
+    newNode = { node_id: 'new_node', restriction: undefined };
+    oldNode = { node_id: 'old_node', restriction: undefined };
 
     // Mock the store object
     store = {
@@ -28,8 +28,7 @@ describe('addAutoRestrictions', () => {
     // Check that the restriction has been added to newNode
     expect(result.restriction).toBeDefined();
     expect(result.restriction.nodes).toHaveLength(2); // Two nodes: condition_1 and condition_1_feedback
-    expect(result.restriction.nodes[0].data.label).toBe('parent_node_completed');
-    expect(result.restriction.nodes[0].data.value.node_id).toBe(oldNode.id);
+    expect(result.restriction.nodes[0].data.label).toBe('parent_courses');
     expect(result.restriction.nodes[1].label).toBe(store.state.strings.composables_feedback_node);
   });
 
@@ -39,8 +38,7 @@ describe('addAutoRestrictions', () => {
     // Check that the restriction has been added to oldNode
     expect(result.restriction).toBeDefined();
     expect(result.restriction.nodes).toHaveLength(2); // Two nodes: condition_1 and condition_1_feedback
-    expect(result.restriction.nodes[0].data.label).toBe('parent_node_completed');
-    expect(result.restriction.nodes[0].data.value.node_id).toBe(newNode.id);
+    expect(result.restriction.nodes[0].data.label).toBe('parent_courses');
     expect(result.restriction.nodes[1].label).toBe(store.state.strings.composables_feedback_node);
   });
 

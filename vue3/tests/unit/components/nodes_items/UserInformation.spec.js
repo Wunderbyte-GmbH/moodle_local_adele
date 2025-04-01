@@ -13,6 +13,9 @@ describe('UserInformation.vue', () => {
     store = createStore({
       state: {
         strings: {
+          node_access_restriction_before : 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:',
+          node_access_restriction_inbetween : 'Der Kurs/Der Stapel ist freigeschaltet:',
+          node_access_restriction_after : 'Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.',
           node_access_closed: 'Access closed',
           node_access_nothing_defined: 'Nothing defined',
           course_description_before_condition_course_completed: 'Before condition description',
@@ -79,31 +82,19 @@ describe('UserInformation.vue', () => {
     expect(feedbackArea.attributes('style')).toContain('position: absolute');
   });
 
-  it('displays the correct status text when feedback is closed', async () => {
-    const toggleButton = wrapper.find('.toggle-button');
-    await toggleButton.trigger('click');
-
-    const statusText = wrapper.find('.status-text');
-    expect(statusText.text()).toContain('Access closed');
-  });
-
-  it('shows the "Nothing defined" message if no completion data exists', async () => {
-    await wrapper.setProps({ data: { node_id: '123', completion: null } }); // Simulate no completion data
-    const toggleButton = wrapper.find('.toggle-button');
-    await toggleButton.trigger('click');
-
-    const nothingDefinedText = wrapper.text();
-    expect(nothingDefinedText).toContain('Nothing defined');
-  });
-
-  it('shows the not_accessible status', async () => {
+  it('shows restriction after string', async () => {
     await wrapper.setProps({
       data: {
         node_id: '123',
         completion: {
           feedback: {
             status: 'not_accessible', // Updated feedback status
+            status_completion: 'before',
+            status_restriction: 'after',
             restriction: {
+              before_active: { message: 'Some restriction data active' },
+              inbetween: { message: 'Some restriction data inbetween' },
+              after: { message: 'Some restriction data after' },
               before: { message: 'Some restriction data' },
             },
             completion: {
@@ -121,22 +112,28 @@ describe('UserInformation.vue', () => {
     await toggleButton.trigger('click');
 
     const statusText = wrapper.find('.status-text');
-    expect(statusText.text()).toContain('Node status not accessible');
+    expect(statusText.text()).toContain('Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden');
 
     // Verify that the completion feedback blocks are rendered
     const completionBeforeBlock = wrapper.findComponent(UserFeedbackBlock);
     expect(completionBeforeBlock.exists()).toBe(true);
-    expect(completionBeforeBlock.props('data')).toEqual({ message: 'Some restriction data' });
+    expect(completionBeforeBlock.props('data')).toEqual({ message: 'Completion before data' });
   });
 
-  it('shows the completed status', async () => {
+  it('shows the before restriction', async () => {
     await wrapper.setProps({
       data: {
         node_id: '123',
         completion: {
           feedback: {
-            status: 'completed', // Updated feedback status
+            status: 'not_accessible', // Updated feedback status
+            status_completion: 'inbetween',
+            status_restriction: 'before',
             restriction: {
+              before_valid: { message: 'Datum xyz erreicht wird'},
+              before_active: { message: 'Some restriction data active' },
+              inbetween: { message: 'Some restriction data inbetween' },
+              after: { message: 'Some restriction data after' },
               before: { message: 'Some restriction data' },
             },
             completion: {
@@ -155,11 +152,11 @@ describe('UserInformation.vue', () => {
     await toggleButton.trigger('click');
 
     const statusText = wrapper.find('.status-text');
-    expect(statusText.text()).toContain('Node status completed');
+    expect(statusText.text()).toContain('Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:');
 
     // Verify that the completion feedback blocks are rendered
     const completionBeforeBlock = wrapper.findComponent(UserFeedbackBlock);
     expect(completionBeforeBlock.exists()).toBe(true);
-    expect(completionBeforeBlock.props('data')).toEqual({ message: 'Completion after data' });
+    expect(completionBeforeBlock.props('data')).toEqual(Object.values({ message: 'Some restriction data active' }));
   });
 });

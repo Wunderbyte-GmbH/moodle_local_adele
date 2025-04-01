@@ -14,6 +14,18 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',        // JavaScript transformer
     '^.+\\.ts$': 'ts-jest',           // TypeScript transformer
   },
+  watchPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+  ],
+  reporters: [
+    'default',
+    ['jest-html-reporter', {
+      pageTitle: 'Test Report',
+      outputPath: 'test-report.html',
+      includeFailureMsg: true,
+      includeSuiteFailure: true,
+    }],
+  ],
   testEnvironment: 'jsdom',           // Use jsdom for DOM simulation
   moduleNameMapper: {
     '^@vue/test-utils$': '<rootDir>/node_modules/@vue/test-utils',

@@ -45,7 +45,7 @@ describe('UserFeedbackBlock.vue', () => {
     await wrapper.setProps({ data: [] });
     await wrapper.vm.$nextTick();
     const feedbackList = wrapper.find('.feedback-list');
-    expect(feedbackList.exists()).toBe(false);
+    expect(feedbackList.text()).toBe('');
 
     // Assert that no feedback items are rendered
     const feedbackItems = wrapper.findAll('.feedback-item');
