@@ -26,6 +26,7 @@ module.exports = {
       includeSuiteFailure: true,
     }],
   ],
+  coverageProvider: "v8",
   testEnvironment: 'jsdom',           // Use jsdom for DOM simulation
   moduleNameMapper: {
     '^@vue/test-utils$': '<rootDir>/node_modules/@vue/test-utils',
