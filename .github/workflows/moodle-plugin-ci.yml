@@ -167,8 +167,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: /vue3/
+        working-directory: vue3
 
       - name: Run tests
         run: npm test -- --ci --coverage
-        working-directory: /vue3/
+        working-directory: vue3
