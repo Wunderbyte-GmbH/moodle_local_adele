@@ -205,7 +205,7 @@ jobs:
           if grep -q '"test":' package.json; then
             echo "Running npm test"
             export NODE_OPTIONS="--max-old-space-size=4096"
-            npm test -- --ci --legacy-peer-deps || echo "Tests failed but continuing"
+            npm test -- --ci --coverage || echo "Tests failed but continuing"
           else
             echo "No test script found in package.json. Skipping tests."
           fi
