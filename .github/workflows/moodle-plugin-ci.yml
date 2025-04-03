@@ -54,6 +54,26 @@ jobs:
         with:
           path: ${{ env.MATRIX_DIR }}/plugin
 
+      - name: Fix bash permissions
+        run: |
+          # Create directories if they don't exist
+          sudo mkdir -p /root/.nvm/versions/node/v20.14.0/bin/
+          sudo mkdir -p /root/bin
+          
+          # Create symbolic links to system bash
+          sudo ln -sf /usr/bin/bash /root/.nvm/versions/node/v20.14.0/bin/bash
+          sudo ln -sf /usr/bin/bash /root/bin/bash
+          
+          # Set correct permissions
+          sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin/bash
+          sudo chmod 755 /root/bin/bash
+          
+          # Make directories accessible
+          sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin
+          sudo chmod 755 /root/bin
+          
+          echo "Bash permissions fixed"
+
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
