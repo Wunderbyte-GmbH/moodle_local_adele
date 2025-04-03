@@ -147,7 +147,7 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         run: |
           # Already in the directory with package.json
-        npm test -- --ci --coverage || echo "Tests may have failed but continuing"
+          npm test -- --ci --coverage || echo "Tests may have failed but continuing"
 
       - name: Clean Docker
         if: always()
