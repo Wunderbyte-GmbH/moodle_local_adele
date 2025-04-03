@@ -182,9 +182,9 @@ jobs:
         working-directory: plugin/vue3
         run: |
           echo "Installing dependencies in Vue3 directory with legacy peer deps"
-          npm install --legacy-peer-deps || npm install --force
+          npm install --force
           # Install missing Babel dependencies
-          npm install --save-dev @babel/plugin-syntax-dynamic-import
+          npm install --save-dev @babel/plugin-syntax-dynamic-import --force
 
       - name: Run Vue tests
         if: steps.check_vue.outputs.VUE3_EXISTS == 'true'
