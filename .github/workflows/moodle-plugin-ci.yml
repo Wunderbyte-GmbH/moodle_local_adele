@@ -78,7 +78,7 @@ jobs:
           sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin/bash
           sudo chmod 755 /root/bin/bash
           
-          echo "PHP versions available:"
+          echo "PHP versions available: "
           ls -la /usr/bin/php*
 
       - name: Set PHP Version
