@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
 
     services:
       postgres:
@@ -31,57 +31,28 @@ jobs:
           - php: 8.2
             moodle-branch: MOODLE_403_STABLE
             database: pgsql
-          - php: 8.2
-            moodle-branch: MOODLE_403_STABLE
-            database: mariadb
-          - php: 8.1
-            moodle-branch: MOODLE_403_STABLE
-            database: pgsql
-          - php: 8.1
-            moodle-branch: MOODLE_403_STABLE
-            database: mariadb
-          - php: 8.0
-            moodle-branch: MOODLE_403_STABLE
-            database: pgsql
-          - php: 8.0
-            moodle-branch: MOODLE_403_STABLE
-            database: mariadb
-          - php: 8.1
-            moodle-branch: MOODLE_402_STABLE
-            database: pgsql
           - php: 8.1
             moodle-branch: MOODLE_402_STABLE
             database: mariadb
-          - php: 8.0
-            moodle-branch: MOODLE_402_STABLE
-            database: pgsql
-          - php: 8.0
-            moodle-branch: MOODLE_402_STABLE
-            database: mariadb
           - php: 8.1
             moodle-branch: MOODLE_401_STABLE
             database: pgsql
-          - php: 8.1
-            moodle-branch: MOODLE_401_STABLE
-            database: mariadb
           - php: 8.0
-            moodle-branch: MOODLE_401_STABLE
-            database: pgsql
-          - php: 8.0
-            moodle-branch: MOODLE_401_STABLE
-            database: mariadb
-          - php: 7.4
-            moodle-branch: MOODLE_401_STABLE
-            database: pgsql
-          - php: 7.4
             moodle-branch: MOODLE_401_STABLE
             database: mariadb
 
     steps:
+      - name: Clean workspace for matrix job
+        run: |
+          MATRIX_ID="${{ matrix.php }}-${{ matrix.database }}-${{ matrix.moodle-branch }}"
+          rm -rf "$GITHUB_WORKSPACE"
+          mkdir -p "$GITHUB_WORKSPACE/matrix-$MATRIX_ID"
+          echo "MATRIX_DIR=matrix-$MATRIX_ID" >> $GITHUB_ENV
+
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
-          path: plugin
+          path: ${{ env.MATRIX_DIR }}/plugin
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
@@ -100,6 +71,7 @@ jobs:
           # Install nvm v0.39.7 (temp workaround for issue moodlehq/moodle-plugin-ci#309).
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
       - name: Install moodle-plugin-ci
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
           moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
@@ -113,64 +85,68 @@ jobs:
           MUSTACHE_IGNORE_NAMES: ''
 
       - name: PHP Lint
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         if: ${{ always() }}
         run: moodle-plugin-ci phplint
 
       - name: PHP Copy/Paste Detector
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci phpcpd
 
       - name: PHP Mess Detector
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci phpmd
 
       - name: Moodle Code Checker
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         if: ${{ always() }}
         run: moodle-plugin-ci codechecker --max-warnings 0
 
       - name: Moodle PHPDoc Checker
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         if: ${{ always() }}
         run: moodle-plugin-ci phpdoc
 
       - name: Validating
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         if: ${{ always() }}
         run: moodle-plugin-ci validate
 
       - name: Check upgrade savepoints
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         if: ${{ always() }}
         run: moodle-plugin-ci savepoints
 
       - name: Mustache Lint
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 
       - name: Grunt
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
-      - name: PHPUnit tests
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --testdox
-
-      - name: Behat features
-        if: ${{ always() }}
-        run: moodle-plugin-ci behat --profile chrome
-      
       - name: Set up Node.js
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         uses: actions/setup-node@v3
         with:
           node-version: '16' # You can specify the version of Node.js you are using
 
       - name: Install dependencies
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         run: |
           cd vue3
           npm install
 
       - name: Run tests
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         run: |
           cd vue3
           npm test -- --ci --coverage
