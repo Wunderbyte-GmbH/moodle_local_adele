@@ -146,11 +146,6 @@ jobs:
           echo "Package.json content:"
           cat package.json
 
-      - name: Install dependencies
-        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
-        run: |
-          npm install
-
       - name: Check for Vue files in plugin directory
         working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
         run: |
@@ -160,9 +155,18 @@ jobs:
           echo "Looking for package.json files:"
           find plugin -name "package.json" || echo "No package.json files found in plugin"
 
-      - name: Run appropriate tests or build
-        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}
+      - name: Install Vue dependencies
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}/plugin/vue3
         run: |
+          echo "Installing dependencies in Vue3 directory"
+          npm install
+
+      - name: Run Vue tests
+        working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}/plugin/vue3
+        run: |
+          echo "Checking available scripts in Vue3 directory:"
+          npm run || true
+          
           # Check if there's a test script
           if grep -q '"test":' package.json; then
             echo "Running npm test"
@@ -171,14 +175,8 @@ jobs:
           elif grep -q '"build":' package.json; then
             echo "Running npm build"
             npm run build || echo "Build may have failed but continuing"
-          # Check for any other common scripts
-          elif grep -q '"dev":' package.json; then
-            echo "Running npm dev"
-            npm run dev || echo "Dev script may have failed but continuing" 
           else
-            echo "No appropriate test or build scripts found in package.json. Available scripts:"
-            npm run || true
-            echo "Skipping this step."
+            echo "No appropriate test or build scripts found. Skipping."
           fi
       - name: Clean Docker
         if: always()
