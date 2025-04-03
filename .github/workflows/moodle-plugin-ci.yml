@@ -47,7 +47,7 @@ jobs:
           MATRIX_ID="${{ matrix.php }}-${{ matrix.database }}-${{ matrix.moodle-branch }}"
           rm -rf "$GITHUB_WORKSPACE"
           mkdir -p "$GITHUB_WORKSPACE/matrix-$MATRIX_ID"
-          echo "MATRIX_DIR=matrix-$MATRIX_ID" >> $GITHUB_ENV
+          echo "MATRIX_DIR=matrix-$MATRIX_ID" >> $GITHUB_ENV 
 
       - name: Check out repository code
         uses: actions/checkout@v3
