@@ -72,7 +72,7 @@ jobs:
           sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin
           sudo chmod 755 /root/bin
           
-          echo "Bash permissions fixed"
+          echo "Bash permissions fixed "
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
