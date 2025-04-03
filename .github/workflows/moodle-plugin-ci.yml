@@ -54,25 +54,41 @@ jobs:
         with:
           path: ${{ env.MATRIX_DIR }}/plugin
 
-      - name: Fix bash permissions
+      - name: Fix permissions and debug environment
         run: |
-          # Create directories if they don't exist
+          # Fix permissions
           sudo mkdir -p /root/.nvm/versions/node/v20.14.0/bin/
           sudo mkdir -p /root/bin
-          
-          # Create symbolic links to system bash
           sudo ln -sf /usr/bin/bash /root/.nvm/versions/node/v20.14.0/bin/bash
           sudo ln -sf /usr/bin/bash /root/bin/bash
-          
-          # Set correct permissions
           sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin/bash
           sudo chmod 755 /root/bin/bash
           
-          # Make directories accessible
-          sudo chmod 755 /root/.nvm/versions/node/v20.14.0/bin
-          sudo chmod 755 /root/bin
+          # Debug environment
+          echo "== System Information =="
+          uname -a
           
-          echo "Bash permissions fixed "
+          echo "== Available PHP Versions =="
+          ls -la /usr/bin/php*
+          
+          echo "== PHP Version Information =="
+          php -v || echo "Default PHP not found"
+          
+          echo "== Available Disk Space =="
+          df -h
+          
+          echo "== Memory Information =="
+          free -h
+          
+          echo "== User Information =="
+          whoami
+          id
+          
+          echo "== Runner Directory Permissions =="
+          ls -la /home/action/adele/actions-runner/_work/_actions/shivammathur/setup-php/v2/src/scripts/
+          
+          echo "== Testing script execution =="
+          bash -c "echo 'Test script execution: Success'"
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
@@ -81,6 +97,7 @@ jobs:
           extensions: ${{ matrix.extensions }}
           ini-values: max_input_vars=5000
           coverage: none
+          debug: true 
 
 
       - name: Initialise moodle-plugin-ci
