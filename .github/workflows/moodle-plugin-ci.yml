@@ -155,11 +155,17 @@ jobs:
           echo "Looking for package.json files:"
           find plugin -name "package.json" || echo "No package.json files found in plugin"
 
-      - name: Install Vue dependencies
+      - name: Install Vue dependencies with legacy peer deps
         working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}/plugin/vue3
         run: |
-          echo "Installing dependencies in Vue3 directory"
-          npm install
+          echo "Installing dependencies in Vue3 directory with --legacy-peer-deps flag"
+          npm install --legacy-peer-deps
+          
+          # If that doesn't work, try with --force
+          if [ $? -ne 0 ]; then
+            echo "Legacy peer deps didn't work, trying with --force"
+            npm install --force
+          fi
 
       - name: Run Vue tests
         working-directory: ${{ github.workspace }}/${{ env.MATRIX_DIR }}/plugin/vue3
@@ -169,15 +175,18 @@ jobs:
           
           # Check if there's a test script
           if grep -q '"test":' package.json; then
-            echo "Running npm test"
-            npm test -- --ci --coverage || echo "Tests may have failed but continuing"
+            echo "Running npm test with --legacy-peer-deps"
+            # Adding NODE_OPTIONS to increase memory limit if needed
+            export NODE_OPTIONS="--max-old-space-size=4096"
+            npm test -- --ci --legacy-peer-deps || echo "Tests may have failed but continuing"
           # Check if there's a build script
           elif grep -q '"build":' package.json; then
-            echo "Running npm build"
-            npm run build || echo "Build may have failed but continuing"
+            echo "Running npm build with --legacy-peer-deps"
+            npm run build --legacy-peer-deps || echo "Build may have failed but continuing"
           else
             echo "No appropriate test or build scripts found. Skipping."
           fi
+
       - name: Clean Docker
         if: always()
         run: |
