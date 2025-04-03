@@ -163,17 +163,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # You can specify the version of Node.js you are using
-
-#      - name: Install dependencies
-#        run: |
-#          cd vue3
-#          npm install
-
-#      - name: Run tests
-#        run: |
-#          cd vue3
-#          npm test -- --ci --coverage
+          node-version: '20' # You can specify the version of Node.js you are using
 
       - name: Check if Vue3 directory exists
         id: check_vue
@@ -193,6 +183,8 @@ jobs:
         run: |
           echo "Installing dependencies in Vue3 directory with legacy peer deps"
           npm install --legacy-peer-deps || npm install --force
+          # Install missing Babel dependencies
+          npm install --save-dev @babel/plugin-syntax-dynamic-import
 
       - name: Run Vue tests
         if: steps.check_vue.outputs.VUE3_EXISTS == 'true'
@@ -209,3 +201,5 @@ jobs:
           else
             echo "No test script found in package.json. Skipping tests."
           fi
+
+
