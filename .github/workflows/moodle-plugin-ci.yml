@@ -149,3 +149,10 @@ jobs:
         run: |
           cd vue3
           npm test -- --ci --coverage
+
+      - name: Clean Docker
+        if: always()
+        run: |
+          docker container prune -f
+          docker image prune -a -f
+          docker volume prune -f
