@@ -166,9 +166,11 @@ jobs:
           node-version: '16' # You can specify the version of Node.js you are using
 
       - name: Install dependencies
-        working-directory: ./vue3
-        run: npm install
+        run: |
+          cd vue3
+          npm install
 
       - name: Run tests
-        working-directory: ./vue3
-        run: npm test -- --ci --coverage
+        run: |
+          cd vue3
+          npm test -- --ci --coverage
