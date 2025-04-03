@@ -62,6 +62,7 @@ jobs:
           ini-values: max_input_vars=5000
           coverage: none
 
+
       - name: Initialise moodle-plugin-ci
         run: |
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
