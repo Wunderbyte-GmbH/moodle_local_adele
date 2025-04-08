@@ -251,6 +251,7 @@ $string['course_restricition_before_condition_from'] = '['.__LINE__.']von ';
 $string['course_restricition_before_condition_to'] = '['.__LINE__.']bis ';
 $string['course_restricition_before_condition_timed_duration'] = '['.__LINE__.']innerhalb von {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = '['.__LINE__.']Sie {node_name} abgeschlossen haben';
+$string['course_restricition_timed_no_date'] = '['.__LINE__.']Fehlendes Datum';
 
 $string['node_restriction_inbetween_timed'] = '['.__LINE__.']Sie haben bis {$a} Uhr Zugang zu diesem Kurs/diesem Stapel.';
 $string['node_restriction_before_timed'] = '['.__LINE__.']Ab Einschreibung haben Sie bis {$a} Zugang.';

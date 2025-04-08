@@ -129,6 +129,9 @@ class timed implements course_restriction {
                         } else {
                             $validstart = false;
                         }
+                    } else {
+                        $timed[$restrictionnode['id']]['placeholders']['start_date'] =
+                        get_string('course_restricition_timed_no_date', 'local_adele');
                     }
                     $enddate = $this->isvaliddate($restrictionnode['data']['value']['end']);
                     if ($enddate) {
@@ -143,6 +146,10 @@ class timed implements course_restriction {
                         } else {
                             $validtime = false;
                         }
+                    } else {
+                        // Assign placeholder for missing start date
+                        $timed[$restrictionnode['id']]['placeholders']['end_date'] =
+                        get_string('course_restricition_timed_no_date', 'local_adele');
                     }
                     if ($startdate) {
                         $startdate = $startdate->format('d.m.Y H:i');

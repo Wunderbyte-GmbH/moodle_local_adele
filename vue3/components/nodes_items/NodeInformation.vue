@@ -95,24 +95,37 @@
   })
 
   const format_dates = (return_date) => {
-    const options = {
-      weekday: 'long', // "Monday"
-      year: 'numeric', // "2024"
-      month: 'long', // "April"
-      day: 'numeric', // "29"
-      hour: '2-digit', // "13"
-      minute: '2-digit', // "28"
-      second: '2-digit', // "12"
-      hour12: false
-    };
-    Object.entries(return_date).forEach(([type, dateString]) => {
-      if (dateString != undefined) {
-        const date = new Date(dateString);
-        return_date[type] = date.toLocaleDateString('en-US', options);
+  const options = {
+    weekday: 'long', // "Monday"
+    year: 'numeric', // "2024"
+    month: 'long', // "April"
+    day: 'numeric', // "29"
+    hour: '2-digit', // "13"
+    minute: '2-digit', // "28"
+    second: '2-digit', // "12"
+    hour12: false
+  };
+
+  Object.entries(return_date).forEach(([type, dateString]) => {
+    if (typeof dateString === "string") {
+      // Extract day, month, year, hours, and minutes from the string
+      const [datePart, timePart] = dateString.split(' ');
+      
+      if (datePart && timePart) { // Ensure both parts are present
+        const [day, month, year] = datePart.split('.').map(Number);
+        const [hours, minutes] = timePart.split(':').map(Number);
+
+        // Create a Date object using UTC to avoid timezone issues
+        const date = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+
+        // Convert to locale string
+        return_date[type] = date.toLocaleString('en-US', options);
       }
-    })
-    return return_date;
-  }
+    }
+  });
+
+  return return_date;
+}
 
   onMounted(() => {
     triggerAnimation()
@@ -195,6 +208,7 @@
       />
     </div>
     <transition :name="mobile ? 'fade' : 'unfold'">
+   
       <div
         v-if="showCard"
         :class="{
@@ -206,8 +220,9 @@
         @mouseup.stop
       >
         <ul class="list-group">
+          dadadad {{ ending_date.start_date }}        {{ ending_date.end_date }}
           <li
-            v-if="description && typeof description === 'string'"
+            v-if="props.data.description"
             class="list-group-item"
             style="user-select: text;"
             @mousedown.stop
@@ -225,11 +240,10 @@
               @mousemove.stop
               @mouseup.stop
             >
-              {{ description }}
+              {{ props.data.description}}
             </div>
           </li>
           <li
-            v-if="estimate_duration && typeof estimate_duration === 'string'"
             class="list-group-item"
             style="user-select: text;"
             @mousedown.stop
@@ -241,6 +255,7 @@
               {{ store.state.strings.completion_dates_duration_feedback }}
             </b>
             <div
+            v-if="estimate_duration && typeof estimate_duration === 'string'"
               class="list-group-text"
               style="user-select: text;"
               @mousedown.stop
