@@ -196,6 +196,7 @@ class learning_path_update {
                 'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
                 'mastercompletion' => $node["data"]["completion"]["master"]["completion"],
                 'masterrescrtriction' => $node["data"]["completion"]["master"]["restriction"],
+                'first_enrolled' => $node["data"]["first_enrolled"],
             ];
         }
 
@@ -208,6 +209,9 @@ class learning_path_update {
             }
             if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['firstcompleted'] == true ) {
                 $node['firstcompleted'] = true;
+            }
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['first_enrolled'] == true ) {
+                $node['data']['first_enrolled'] = $oldvalues[$node['id']]['first_enrolled'];
             }
             $manualrestriction = false;
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
