@@ -88,6 +88,7 @@ class get_restrictions extends external_api {
                     'description' => new external_value(PARAM_TEXT, 'Condition description'),
                     'description_before' => new external_value(PARAM_TEXT, 'Condition description before'),
                     'label' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'information' => new external_value(PARAM_TEXT, 'Condition Information', 0),
                 ]
             )
         );

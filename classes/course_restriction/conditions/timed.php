@@ -73,7 +73,18 @@ class timed implements course_restriction {
             'description' => $description,
             'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
+            'information' => $this->get_information_string(),
         ];
+    }
+
+    /**
+     * Helper function to return localized information strings.
+     *
+     * @return string
+     */
+    private function get_information_string() {
+        $information = get_string('course_information_condition_timed', 'local_adele');
+        return $information;
     }
 
     /**
@@ -148,7 +159,7 @@ class timed implements course_restriction {
                         }
                     } else {
                         // Assign placeholder for missing start date
-                        $timed[$restrictionnode['id']]['placeholders']['end_date'] =
+                        $timed[$restrictionnode['id']]['placeholders']['start_date'] =
                         get_string('course_restricition_timed_no_date', 'local_adele');
                     }
                     if ($startdate) {
@@ -158,8 +169,7 @@ class timed implements course_restriction {
                     }
                     if ($enddate) {
                         $enddate = $enddate->format('d.m.Y H:i');
-                        $timed[$restrictionnode['id']]['placeholders']['end_date'] =
-                            get_string('course_restricition_before_condition_to', 'local_adele') . $enddate;
+                        $timed[$restrictionnode['id']]['placeholders']['end_date'] = $enddate;
                     }
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween'] = $validtime;

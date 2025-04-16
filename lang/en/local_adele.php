@@ -158,6 +158,7 @@ $string['node_courseshortname'] = '[EN_'.__LINE__.']Short node name:';
 
 // Conditions description.
 $string['course_description_master'] = '[EN_'.__LINE__.']This condition overrules everything else';
+$string['course_information_condition_master'] = '[EN_'.__LINE__.']Diese Einstellungen überschreiben alle anderen Voreinstellungen';
 $string['course_name_master'] = '[EN_'.__LINE__.']Master condition';
 $string['course_description_condition_completion_manual'] = '[EN_'.__LINE__.']Node will be completed manually';
 $string['course_description_condition_parent_courses'] = '[EN_'.__LINE__.']Node will be accessible if a certain amount of parent nodes are completed';
@@ -166,6 +167,7 @@ $string['course_name_condition_completion_manual_checkbox_status'] = '[EN_'.__LI
 $string['course_name_condition_completion_manual_role_teacher'] = '[EN_'.__LINE__.']Dozenten';
 $string['course_name_condition_parent_courses'] = '[EN_'.__LINE__.']According to parent nodes';
 $string['course_description_condition_restriction_manual'] = '[EN_'.__LINE__.']Access will be granted manually';
+$string['course_information_condition_manual'] = '[EN_'.__LINE__.']Access will be granted manually';
 $string['course_name_condition_restriction_manual'] = '[EN_'.__LINE__.']Node restriction checkbox';
 $string['course_description_condition_restriction_specific_course'] = '[EN_'.__LINE__.']Only if a certain node of this learning path is completed';
 $string['course_name_condition_restriction_specific_course'] = '[EN_'.__LINE__.']Certain node completed';
@@ -233,13 +235,17 @@ $string['course_description_after_condition_modquiz'] = '[EN_'.__LINE__.']das Qu
 
 $string['course_restricition_before_condition_manual'] = '[EN_'.__LINE__.']eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
 $string['course_restricition_before_condition_parent_courses'] = '[EN_'.__LINE__.']Sie {node_name} abgeschlossen haben';
+$string['course_information_condition_parent_courses'] = '[EN_'.__LINE__.']Vorgängerkurses „{node_name}“ abschliessen';
 $string['course_restricition_before_condition_specific_course'] = '[EN_'.__LINE__.']Sie {node_name} abgeschlossen haben';
+$string['course_information_condition_specific_course'] = '[EN_'.__LINE__.']„{node_name}“ abschliessen';
 $string['course_condition_timed_duration_start'] = '[EN_'.__LINE__.']from the moment of subscription to this node';
 $string['course_condition_timed_duration_since'] = '[EN_'.__LINE__.']since ';
 $string['course_restricition_before_condition_timed'] = '[EN_'.__LINE__.']der {start_date} erreicht wird';
+$string['course_information_condition_timed'] = '[EN_'.__LINE__.']{start_date} bis {end_date}';
 $string['course_restricition_before_condition_from'] = '[EN_'.__LINE__.']from ';
 $string['course_restricition_before_condition_to'] = '[EN_'.__LINE__.']to ';
 $string['course_restricition_before_condition_timed_duration'] = '[EN_'.__LINE__.']zugänglich für {duration_period} {timed_condition}';
+$string['course_information_condition_timed_duration'] = '['.__LINE__.']Innerhalb von {duration_period} {timed_condition}';
 $string['course_restricition_before_condition_parent_node_completed'] = '[EN_'.__LINE__.']Sie {node_name} abgeschlossen haben';
 $string['course_restricition_timed_no_date'] = '['.__LINE__.']Missing Date';
 

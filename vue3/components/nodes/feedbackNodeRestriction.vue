@@ -75,45 +75,52 @@ const handleStyle = computed(() => ({
 
 const renderFeedback = (action, emitting) => {
   const checked = action == 'before' ? feedback.value.feedback_before_checkmark : feedback.value.feedback_after_checkmark
-  if (checked) {
-    let renderedFeedback = ''
-    const start_node = findNode(feedback.value.childCondition)
-    let nextNode = null;
-    if (start_node.data.visibility) {
-      renderedFeedback += start_node.data['description_' + action]
+  let renderedFeedback = '';
+  let renderedInformation = '';
+  const start_node = findNode(feedback.value.childCondition)
+  let nextNode = null;
+  if (start_node.data.visibility && checked) {
+    renderedFeedback += start_node.data['description_' + action]
+  }
+  renderedInformation += start_node.data['information']
+  if (start_node.childCondition) {
+    if (typeof(start_node.childCondition) == 'string') {
+      start_node.childCondition = [start_node.childCondition]
     }
-    if (start_node.childCondition) {
-      if (typeof(start_node.childCondition) == 'string') {
-        start_node.childCondition = [start_node.childCondition]
+    start_node.childCondition.forEach((childCondition) => {
+      if (!childCondition.includes('feedback')) {
+        nextNode = childCondition
       }
-      start_node.childCondition.forEach((childCondition) => {
+    })
+  }
+  while(nextNode) {
+    nextNode = findNode(nextNode)
+    if (nextNode) {
+      if(nextNode.data.visibility) {
+      if (renderedFeedback != '') {
+        renderedFeedback += store.state.strings.course_condition_concatination_and
+      }
+      renderedFeedback += nextNode.data['description_' + action]
+    }
+      if (renderedInformation != '') {
+        renderedInformation += store.state.strings.course_condition_concatination_and
+      }
+      renderedInformation += nextNode.data['information']
+    }
+    if (nextNode && nextNode.childCondition) {
+      nextNode.childCondition =
+        typeof nextNode.childCondition == 'string' ? [nextNode.childCondition ] : nextNode.childCondition
+      nextNode.childCondition.forEach((childCondition) => {
         if (!childCondition.includes('feedback')) {
           nextNode = childCondition
         }
       })
+    } else {
+      nextNode = null
     }
-    while(nextNode) {
-      nextNode = findNode(nextNode)
-      if (nextNode && nextNode.data.visibility) {
-        if (renderedFeedback != '') {
-          renderedFeedback += store.state.strings.course_condition_concatination_and
-        }
-        renderedFeedback += nextNode.data['description_' + action]
-      }
-      if (nextNode && nextNode.childCondition) {
-        nextNode.childCondition =
-          typeof nextNode.childCondition == 'string' ? [nextNode.childCondition ] : nextNode.childCondition
-        nextNode.childCondition.forEach((childCondition) => {
-          if (!childCondition.includes('feedback')) {
-            nextNode = childCondition
-          }
-        })
-      } else {
-        nextNode = null
-      }
-    }
-    feedback.value['feedback_' + action] = renderedFeedback
   }
+    feedback.value['feedback_' + action] = renderedFeedback
+    feedback.value['information'] = renderedInformation
   if (emitting) {
     emit('updateFeedback', feedback.value)
   }

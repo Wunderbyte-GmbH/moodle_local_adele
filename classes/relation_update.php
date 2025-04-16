@@ -720,12 +720,14 @@ class relation_update {
     public static function getfeedback($node, $completioncriteria, $restrictioncriteria) {
         $feedbacks = [
           'completion' => [
+            'information' => null,
             'before' => null,
             'after_all' => null,
             'after' => null,
             'inbetween' => null,
           ],
           'restriction' => [
+            'information' => null,
             'before' => null,
             'before_active' => isset($node["data"]["completion"]) ?
             $node["data"]["completion"]["feedback"]["restriction"]["before_active"] : '',
@@ -746,6 +748,15 @@ class relation_update {
                         $node['completion']['nodes']
                     ) :
                     '';
+                $feedbacks['completion']['information'][] =
+                isset($conditionnode['data']['information']) ?
+                self::render_placeholders(
+                    $conditionnode['data']['information'],
+                    $completioncriteria,
+                    $conditionnode['id'],
+                    $node['completion']['nodes']
+                ) :
+                '';
                 $conditionnodename = str_replace('_feedback', '', $conditionnode['id']);
                 $feedbacks['completion']['after_all'][$conditionnodename] =
                     isset($conditionnode['data']['feedback_after']) ?
@@ -792,6 +803,15 @@ class relation_update {
                             $node['restriction']['nodes']
                         ) :
                         '';
+                        $feedbacks['restriction']['information'][$restrictionnode['id']] =
+                        isset($restrictionnode['data']['information']) ?
+                          self::render_placeholders(
+                              $restrictionnode['data']['information'],
+                              $restrictioncriteria,
+                              $restrictionnode['id'],
+                              $node['restriction']['nodes']
+                          ) :
+                          '';
                 }
             }
         }

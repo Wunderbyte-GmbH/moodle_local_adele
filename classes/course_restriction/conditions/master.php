@@ -72,7 +72,18 @@ class master implements course_restriction {
             'description' => $description,
             'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
+            'information' => $this->get_information_string(),
         ];
+    }
+
+    /**
+     * Helper function to return localized information strings.
+     *
+     * @return string
+     */
+    private function get_information_string() {
+        $information = get_string('course_information_condition_master', 'local_adele');
+        return $information;
     }
 
     /**

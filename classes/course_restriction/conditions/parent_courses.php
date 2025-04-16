@@ -72,7 +72,18 @@ class parent_courses implements course_restriction {
             'description' => $description,
             'description_before' => $this->get_restriction_description_before(),
             'label' => $label,
+            'information' => $this->get_information_string(),
         ];
+    }
+
+    /**
+     * Helper function to return localized information strings.
+     *
+     * @return string
+     */
+    private function get_information_string() {
+        $information = get_string('course_information_condition_parent_courses', 'local_adele');
+        return $information;
     }
 
     /**
