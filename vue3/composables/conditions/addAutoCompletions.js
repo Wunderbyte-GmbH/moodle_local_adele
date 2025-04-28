@@ -32,6 +32,7 @@ const  addAutoCompletions = (node, store) => {
               "priority": 1,
               "id": 150,
               "label": "course_completed",
+              "information" : store.state.strings.course_information_condition_course_completed,
               "name": store.state.strings.course_name_condition_course_completed,
               "node_id": 'condition_1',
               "visibility": true

@@ -77,7 +77,18 @@ class master implements course_completion {
             'description_inbetween' => $this->get_completion_description_inbetween(),
             'priority' => $this->get_completion_priority(),
             'label' => $label,
+            'information' => $this->get_information_string(),
         ];
+    }
+
+    /**
+     * Helper function to return localized information strings.
+     *
+     * @return string
+     */
+    private function get_information_string() {
+        $information = get_string('course_information_master', 'local_adele');
+        return $information;
     }
 
     /**

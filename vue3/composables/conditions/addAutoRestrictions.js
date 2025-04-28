@@ -48,6 +48,7 @@ function createRestriction (node_id, parent_node_id, store) {
           "description_before": store.state.strings.course_restricition_before_condition_parent_courses,
           "id": 150,
           "label": "parent_courses",
+          "information" : store.state.strings.course_information_condition_parent_courses,
           "name": store.state.strings.course_name_condition_parent_courses,
           "node_id": 'condition_1',
           "value": {

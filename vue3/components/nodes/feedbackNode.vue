@@ -97,11 +97,13 @@ const renderFeedback = (action, emitting) => {
   }
 
   let renderedFeedback = ''
+  let renderedInformation = ''
   const start_node = findNode(feedback.value.childCondition)
   let nextNode = null;
   if (start_node.data.visibility) {
     renderedFeedback += start_node.data['description_' + action]
   }
+  renderedInformation += start_node.data['information']
   if (start_node.childCondition) {
     if (typeof(start_node.childCondition) == 'string') {
       start_node.childCondition = [start_node.childCondition]
@@ -124,7 +126,11 @@ const renderFeedback = (action, emitting) => {
       if (renderedFeedback != '') {
         renderedFeedback += store.state.strings.course_condition_concatination_and
       }
+      if (renderedInformation != '') {
+        renderedInformation += store.state.strings.course_condition_concatination_and
+      }
       renderedFeedback += nextNode.data['description_' + action]
+      renderedInformation += nextNode.data['information']
     }
     if (nextNode && nextNode.childCondition) {
       nextNode.childCondition =
@@ -140,6 +146,7 @@ const renderFeedback = (action, emitting) => {
   }
   if (checked) {
     feedback.value['feedback_' + action] = renderedFeedback
+    feedback.value['information'] = renderedInformation
     feedback.value['feedback_priority'] = priority
   }
   if (emitting) {

@@ -159,6 +159,7 @@ $string['node_courseshortname'] = '['.__LINE__.']Kurzbezeichnung:';
 
 // Conditions description.
 $string['course_description_master'] = '['.__LINE__.']Diese Einstellungen überschreiben alle anderen Voreinstellungen';
+$string['course_information_master'] = '['.__LINE__.']Master Condition';
 $string['course_information_condition_master'] = '['.__LINE__.']Diese Einstellungen überschreiben alle anderen Voreinstellungen';
 $string['course_name_master'] = '['.__LINE__.']Master-Einstellung';
 $string['course_description_condition_completion_manual'] = '['.__LINE__.']Der Kurs/Stapel wird manuell abgeschlossen';
@@ -176,6 +177,7 @@ $string['course_description_condition_timed'] = '['.__LINE__.']Startzeitpunkt; E
 $string['course_name_condition_timed'] = '['.__LINE__.']Start- und Endzeitpunkt';
 $string['course_name_condition_course_completed'] = '['.__LINE__.']Kurs(e) abgeschlossen';
 $string['course_description_condition_catquiz'] = '['.__LINE__.']CAT-Quiz:';
+$string['course_information_catquiz'] = '[EN_'.__LINE__.']beende das Quiz {quiz_name}';
 $string['course_name_condition_catquiz'] = '['.__LINE__.']CAT-Quiz';
 $string['no_catquiz_class'] = '['.__LINE__.']Kein CAT-Quiz gefunden';
 $string['course_description_condition_modquiz'] = '['.__LINE__.']Moodle-Quiz:';
@@ -217,7 +219,9 @@ $string['node_access_restriction_before'] = '['.__LINE__.']Sie haben keinen Zuga
 $string['node_access_restriction_inbetween'] = '['.__LINE__.']Der Kurs/Stapel ist freigeschaltet.';
 $string['node_access_restriction_after'] = '['.__LINE__.']Der Kurs/Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = '['.__LINE__.']Kurs muss abgeschlossen werden';
+$string['course_information_condition_course_completed'] = '['.__LINE__.']{item} bearbeiten.';
 
+$string['course_information_condition_completion_manual'] = '['.__LINE__.']manueller Abschluss verbucht';
 $string['course_description_before_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_inbetween_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_after_completion_manual'] = '['.__LINE__.']ihn erfolgreich bearbeitet haben';
@@ -239,6 +243,7 @@ $string['course_description_after_condition_catquiz'] = '['.__LINE__.']Ihre Erge
 $string['course_description_after_condition_modquiz_list'] = '['.__LINE__.']<li>„{$a->scale}” (<a href="{$a->link}" target="_blank">bestes Testergebnis am {$a->time} mit einem Score von {$a->currentlogit} (mindestens {$a->targetlogit}) bzw. Richtig/Falsch-Quote von {$a->currentperc}% (mindestens: {$a->targetperc}%)</a>)</li>';
 
 $string['course_description_after_condition_modquiz_best'] = '['.__LINE__.']Bestpunktzahl:';
+$string['course_information_condition_modquiz'] = '['.__LINE__.']Finish Quiz {quiz_name_link}';
 $string['course_description_before_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen ({quiz_name_link})';
 $string['course_description_inbetween_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehen (aktueller Bestwert: {currentbest}) ({quiz_name_link})';
 $string['course_description_after_condition_modquiz'] = '['.__LINE__.']das Quiz mit {minnumb} von {maxnumb} Punkten bestehst ({quiz_name_link})';

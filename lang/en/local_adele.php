@@ -158,8 +158,10 @@ $string['node_courseshortname'] = '[EN_'.__LINE__.']Short node name:';
 
 // Conditions description.
 $string['course_description_master'] = '[EN_'.__LINE__.']This condition overrules everything else';
+$string['course_information_master'] = '[EN_'.__LINE__.']Master Condition';
 $string['course_information_condition_master'] = '[EN_'.__LINE__.']Diese Einstellungen überschreiben alle anderen Voreinstellungen';
 $string['course_name_master'] = '[EN_'.__LINE__.']Master condition';
+$string['course_information_condition_completion_manual'] = '[EN_'.__LINE__.']manueller Abschluss verbucht';
 $string['course_description_condition_completion_manual'] = '[EN_'.__LINE__.']Node will be completed manually';
 $string['course_description_condition_parent_courses'] = '[EN_'.__LINE__.']Node will be accessible if a certain amount of parent nodes are completed';
 $string['course_name_condition_completion_manual'] = '[EN_'.__LINE__.']Node completion checkbox';
@@ -175,6 +177,7 @@ $string['course_description_condition_timed'] = '[EN_'.__LINE__.']Node start dat
 $string['course_name_condition_timed'] = '[EN_'.__LINE__.']Node start/end date';
 $string['course_name_condition_course_completed'] = '[EN_'.__LINE__.']Course(s) completed';
 $string['course_description_condition_catquiz'] = '[EN_'.__LINE__.']Accroding to catquiz results/attempts';
+$string['course_information_catquiz'] = '[EN_'.__LINE__.']beende das Quiz {quiz_name}';
 $string['course_name_condition_catquiz'] = '[EN_'.__LINE__.']Catquiz Quiz';
 $string['no_catquiz_class'] = '[EN_'.__LINE__.']No catquiz found!';
 $string['course_description_condition_modquiz'] = '[EN_'.__LINE__.']Accroding to mod Quiz result';
@@ -206,6 +209,7 @@ $string['node_access_restriction_before'] = '[EN_'.__LINE__.']Sie haben keinen Z
 $string['node_access_restriction_inbetween'] = '[EN_'.__LINE__.']Der Kurs/Der Stapel ist freigeschaltet:';
 $string['node_access_restriction_after'] = '[EN_'.__LINE__.']Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['course_description_condition_course_completed'] = '[EN_'.__LINE__.']One course inside this node has to be completed';
+$string['course_information_condition_course_completed'] = '[EN_'.__LINE__.']{item} bearbeiten.';
 
 $string['course_description_before_completion_manual'] = '[EN_'.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_inbetween_completion_manual'] = '[EN_'.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
@@ -229,6 +233,7 @@ $string['course_description_after_condition_modquiz_list'] = '[EN_'.__LINE__.']<
 
 $string['course_description_after_condition_modquiz_best'] = '[EN_'.__LINE__.']Beste Note:';
 
+$string['course_information_condition_modquiz'] = '[EN_'.__LINE__.']Finish Quiz {quiz_name_link}';
 $string['course_description_before_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestehen ({quiz_name_link})';
 $string['course_description_inbetween_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} {currentbest} bestehen ({quiz_name_link})';
 $string['course_description_after_condition_modquiz'] = '[EN_'.__LINE__.']das Quiz mit {minnumb} von {maxnumb} bestanden haben ({quiz_name_link})';

@@ -90,6 +90,7 @@ class get_completions extends external_api {
                     'description_inbetween' => new external_value(PARAM_RAW, 'Condition description inbetween'),
                     'priority' => new external_value(PARAM_TEXT, 'Conditions priority'),
                     'label' => new external_value(PARAM_TEXT, 'Condition label'),
+                    'information' => new external_value(PARAM_TEXT, 'Condition Information', 0),
                 ]
             )
         );
