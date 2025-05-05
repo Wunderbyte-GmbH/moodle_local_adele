@@ -119,6 +119,7 @@ import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import onNodeClick from '../../composables/flowHelper/onNodeClick';
 import onWheel from '../../composables/flowHelper/onWheel';
+import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
 
 // Load Router
 const router = useRouter()
@@ -225,7 +226,17 @@ function setFlowchart() {
 
 // Zoom in node
 function onNodeClickCall(event) {
-  zoomstep.value = onNodeClick(event, setCenter, store)
+  zoomstep.value = onNodeClick(event, setCenter, store);
+  // Find all expand buttons and click if they are ExpandedCourses.
+  nextTick(() => {
+    // Query all elements with the 'fa-minus-circle' class
+    const buttons = document.querySelectorAll('.fa-minus-circle');
+    
+    // For each found button, simulate a click event
+    buttons.forEach(button => {
+        button.click();
+    });
+  });
 }
 
 </script>
