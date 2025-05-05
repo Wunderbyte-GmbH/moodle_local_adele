@@ -40,6 +40,7 @@ onMounted(() => {
       position,
     }
     setTimeout(() => {
+      newnode.zIndex = 9999;
       addNodes([newnode])
       if (index === props.data.course_node_id.length - 1) {
         emit('done-folding');

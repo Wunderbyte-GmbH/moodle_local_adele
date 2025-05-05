@@ -90,7 +90,7 @@ class catquiz implements course_completion {
      * @return string
      */
     private function get_information_string() {
-        $information = get_string('course_information_condition_catquiz', 'local_adele');
+        $information = get_string('course_information_catquiz', 'local_adele');
         return $information;
     }
 

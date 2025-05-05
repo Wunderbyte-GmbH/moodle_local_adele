@@ -220,7 +220,6 @@
         @mouseup.stop
       >
         <ul class="list-group">
-          dadadad {{ ending_date.start_date }}        {{ ending_date.end_date }}
           <li
             v-if="props.data.description"
             class="list-group-item"
@@ -244,6 +243,28 @@
             </div>
           </li>
           <li
+             v-if="props.data.estimate_duration && typeof props.data.estimate_duration === 'string'"
+            class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
+          >
+            <i class="fa fa-spinner" />
+            <b>
+              {{ store.state.strings.completion_estimated_duration_feedback }}
+            </b>
+            <div
+              class="list-group-text"
+              style="user-select: text;"
+              @mousedown.stop
+              @mousemove.stop
+              @mouseup.stop
+            >
+            {{ props.data.estimate_duration }}
+            </div>
+          </li>
+          <!-- <li
             class="list-group-item"
             style="user-select: text;"
             @mousedown.stop
@@ -255,7 +276,7 @@
               {{ store.state.strings.completion_dates_duration_feedback }}
             </b>
             <div
-            v-if="estimate_duration && typeof estimate_duration === 'string'"
+            v-if="props.data.estimate_duration && typeof props.data.estimate_duration === 'string'"
               class="list-group-text"
               style="user-select: text;"
               @mousedown.stop
@@ -265,7 +286,7 @@
               <b>
                 {{ store.state.strings.completion_estimated_duration_feedback }}
               </b>
-              {{ estimate_duration }}
+              {{ props.data.estimate_duration }}
             </div>
             <div
               v-if="ending_date.start_date"
@@ -306,8 +327,8 @@
               </b>
               {{ subscribbed_date }}
             </div>
-          </li>
-          <li
+          </li> -->
+          <!-- <li
             class="list-group-item"
             style="user-select: text;"
             @mousedown.stop
@@ -353,6 +374,72 @@
               <div v-if="props.parentnode && props.parentnode.completion && completion">
                 <div
                   v-for="completion_string in completion"
+                  :key="completion_string"
+                  style="user-select: text;"
+                  @mousedown.stop
+                  @mousemove.stop
+                  @mouseup.stop
+                >
+                  <div v-if="completion_string != ''">
+                    - <span v-html="completion_string"></span>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                {{ store.state.strings.completion_nothing_defined_feedback }}
+              </div>
+            </div>
+          </li> -->
+          <li
+            class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
+          >
+            <i
+              class="fa fa-tasks"
+            />
+            <b>
+              {{ store.state.strings.completion_restriction_feedback }}
+            </b>
+            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
+              <div v-if="props.data.completion.feedback.restriction.information">
+                <div
+                  v-for="completion_string in props.data.completion.feedback.restriction.information"
+                  :key="completion_string"
+                  style="user-select: text;"
+                  @mousedown.stop
+                  @mousemove.stop
+                  @mouseup.stop
+                >
+                  <div v-if="completion_string != ''">
+                    - <span v-html="completion_string"></span>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                {{ store.state.strings.completion_nothing_defined_feedback }}
+              </div>
+            </div>
+          </li>
+          <li
+            class="list-group-item"
+            style="user-select: text;"
+            @mousedown.stop
+            @mousemove.stop
+            @mouseup.stop
+          >
+            <i
+              class="fa fa-tasks"
+            />
+            <b>
+              {{ store.state.strings.completion_completion_feedback }}
+            </b>
+            <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
+              <div v-if="props.data.completion.feedback.completion.information">
+                <div
+                  v-for="completion_string in props.data.completion.feedback.completion.information"
                   :key="completion_string"
                   style="user-select: text;"
                   @mousedown.stop
