@@ -26,7 +26,7 @@
 // Import needed libraries
 import { Handle, Position } from '@vue-flow/core'
 import {  useVueFlow } from '@vue-flow/core'
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, defineExpose } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore()
@@ -53,6 +53,7 @@ watch(() => props.visibility, () => {
 }, {deep: true})
 
 const feedback = ref([])
+
 const emit = defineEmits(['updateFeedback'])
 const { findNode } = useVueFlow()
 
@@ -80,6 +81,7 @@ const handleStyle = computed(() => ({
   width: '10px',
   height: '10px'
 }))
+
 
 const renderFeedback = (action, emitting) => {
   let checked = false
@@ -144,15 +146,19 @@ const renderFeedback = (action, emitting) => {
       nextNode = null
     }
   }
+  feedback.value['information'] = renderedInformation
   if (checked) {
     feedback.value['feedback_' + action] = renderedFeedback
-    feedback.value['information'] = renderedInformation
     feedback.value['feedback_priority'] = priority
   }
   if (emitting) {
     emit('updateFeedback', feedback.value)
   }
 }
+
+defineExpose({
+  renderFeedback
+});
 
 </script>
 

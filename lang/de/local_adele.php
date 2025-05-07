@@ -222,6 +222,10 @@ $string['course_description_condition_course_completed'] = '['.__LINE__.']Kurs m
 $string['course_information_condition_course_completed'] = '['.__LINE__.']{item} bearbeiten.';
 
 $string['course_information_condition_completion_manual'] = '['.__LINE__.']manueller Abschluss verbucht';
+$string['btnupdatetext_manual_check'] = '[DE_'.__LINE__.']Informationen aktualisieren';
+$string['enabletextarea_manual_check'] = '[DE_'.__LINE__.']Textarea aktivieren';
+$string['info_placeholder_manual_check'] = '[DE_'.__LINE__.']Informationstext (Kein Feedback!)';
+$string['completion_manual_check'] = '[DE_'.__LINE__.']Abschlussbeschreibung';
 $string['course_description_before_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_inbetween_completion_manual'] = '['.__LINE__.']durch den {Dozenten} ein manueller Abschluss verbucht werden';
 $string['course_description_after_completion_manual'] = '['.__LINE__.']ihn erfolgreich bearbeitet haben';

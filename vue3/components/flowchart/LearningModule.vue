@@ -57,7 +57,12 @@
             <label for="color" class="form-label">
               {{ store.state.strings.flowchart_color }}
             </label>
-            <input type="color" id="color" v-model="color" class="form-control">
+            <input type="color" id="color" v-model="color" class="form-control" list="presetColors">
+            <!-- <datalist id="presetColors">
+              <option>#ff0000</option>
+              <option>#00ff00</option>
+              <option>#0000ff</option>
+            </datalist> -->
           </div>
         </div>
         <div class="mt-2 d-flex justify-content-between">
@@ -127,7 +132,12 @@
                 <label for="color" class="form-label">
                   {{ store.state.strings.flowchart_color }}
                 </label>
-                <input type="color" id="color" v-model="cancelColor" class="form-control">
+                <input type="color" id="color" v-model="cancelColor" class="form-control" list="presetColors">
+                <!-- <datalist id="presetColors">
+                <option>#ff0000</option>
+                <option>#00ff00</option>
+                <option>#0000ff</option>
+              </datalist> -->
               </div>
             </div>
             <div class="row mt-2">

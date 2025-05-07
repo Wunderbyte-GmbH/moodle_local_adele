@@ -158,7 +158,7 @@ class timed implements course_restriction {
                             $validtime = false;
                         }
                     } else {
-                        // Assign placeholder for missing start date
+                        // Assign placeholder for missing start date.
                         $timed[$restrictionnode['id']]['placeholders']['start_date'] =
                         get_string('course_restricition_timed_no_date', 'local_adele');
                     }

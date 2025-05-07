@@ -90,6 +90,7 @@
                   :learningpath="learningpathcompletion"
                   :visibility="visibility_emitted"
                   @update-feedback="handleFeedback"
+                  ref="feedbackcomponent" 
                 />
               </template>
               <template #edge-condition="props">
@@ -152,6 +153,7 @@ const store = useStore();
 const learningpathcompletion= ref({})
 const showBackConfirmation = ref(false)
 const visibility_emitted = ref(false)
+const feedbackcomponent = ref(null);
 
 const zoomLock = ref(false)
 
@@ -219,6 +221,12 @@ const handleVisibility = (visibility) => {
 const handleValues = (handleValues) => {
   let changedNode = findNode(handleValues.nodeid)
   changedNode.data.value = handleValues.values
+  if (changedNode.data.value == "newinformation") {
+    //Todo call handlefeedback in feedbackcomponent)
+    if (feedbackcomponent.value) {
+      feedbackcomponent.value.renderFeedback('before', false);
+  }
+  }
 }
 
 const goBackConfirmation = (toggle) => {
