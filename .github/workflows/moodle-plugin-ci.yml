@@ -195,8 +195,9 @@ jobs:
       - name: Behat features
         if: ${{ always() }}
         run: moodle-plugin-ci behat --profile chrome
-      
+
       - name: Set up Node.js
+        if: ${{ always() }}
         uses: actions/setup-node@v3
         with:
           node-version: '20' # You can specify the version of Node.js you are using
@@ -228,7 +229,7 @@ jobs:
         run: |
           echo "Available npm scripts:"
           npm run || true
-          
+
           # Check if test script exists
           if grep -q '"test":' package.json; then
             echo "Running npm test"
