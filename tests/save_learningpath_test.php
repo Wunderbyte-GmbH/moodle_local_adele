@@ -31,8 +31,7 @@ use moodle_database;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
-class save_learningpath_test extends advanced_testcase {
-
+final class save_learningpath_test extends advanced_testcase {
     /**
      * @var array Array of course IDs created during test setup, storing IDs for 5 test courses.
      */
@@ -101,7 +100,6 @@ class save_learningpath_test extends advanced_testcase {
             'participantslist' => [1],
             'learningpathid' => $lpid,
         ]);
-
     }
 
     /**
@@ -116,7 +114,7 @@ class save_learningpath_test extends advanced_testcase {
      * @covers \core\event\course_module_created
      * @return void
      */
-    public function test_course_module_created() {
+    public function test_course_module_created(): void {
 
         // Fetch events.
         $events = $this->sink->get_events();
@@ -130,7 +128,6 @@ class save_learningpath_test extends advanced_testcase {
 
         // Clean up the event sink.
         $this->sink->close();
-
     }
 
     /**
@@ -148,7 +145,7 @@ class save_learningpath_test extends advanced_testcase {
      * @covers \local_adele\classes\course_completion
      * @return void
      */
-    public function test_subscribe_user_to_learning_path() {
+    public function test_subscribe_user_to_learning_path(): void {
         global $DB;
         // Fetch events.
         $events = $this->sink->get_events();
@@ -161,7 +158,6 @@ class save_learningpath_test extends advanced_testcase {
         $this->assertCount(2, $getlps, "Expected local_adele_path_user' to have 2 entries.");
         // Clean up the event sink.
         $this->sink->close();
-
     }
 
 
@@ -177,7 +173,7 @@ class save_learningpath_test extends advanced_testcase {
      * @covers \local_adele\classes\course_completion
      * @return void
      */
-    public function test_user_path_starting_node_enrollment() {
+    public function test_user_path_starting_node_enrollment(): void {
         global $DB;
         // Fetch events.
         $events = $this->sink->get_events();
@@ -187,7 +183,7 @@ class save_learningpath_test extends advanced_testcase {
         mod_adele_observer::saved_module($eventsingle);
 
         $eventsnew = $this->sink->get_events();
-        $updateevents = array_values(array_filter($eventsnew , fn($event) =>
+        $updateevents = array_values(array_filter($eventsnew, fn($event) =>
             $event->eventname === '\local_adele\event\user_path_updated'));
 
         relation_update::updated_single($updateevents[0]);
@@ -201,9 +197,5 @@ class save_learningpath_test extends advanced_testcase {
         $adhoctasks = $DB->get_records('task_adhoc');
         // Clean up the event sink.
         $this->sink->close();
-
     }
-
-
 }
-

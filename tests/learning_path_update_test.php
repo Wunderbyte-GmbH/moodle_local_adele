@@ -40,8 +40,7 @@ use stdClass;
  *
  * @covers \local_adele
  */
-class learning_path_update_test extends advanced_testcase {
-
+final class learning_path_update_test extends advanced_testcase {
     /**
      * Test the update_visibility method.
      *
@@ -55,7 +54,7 @@ class learning_path_update_test extends advanced_testcase {
             ->method('update_record')
             ->with(
                 $this->equalTo('local_adele_learning_paths'),
-                $this->callback(function($data) {
+                $this->callback(function ($data) {
                     return $data->id === 1 && $data->visibility === true;
                 })
             )
@@ -122,7 +121,7 @@ class learning_path_update_test extends advanced_testcase {
             ->method('update_record')
             ->with(
                 'local_adele_path_user',
-                $this->callback(function($arg) use ($record) {
+                $this->callback(function ($arg) use ($record) {
                     $json = json_decode($arg['json']);
                     return $arg['id'] == $record->id &&
                           $json->tree->nodes[0]->data->animations->seenrestriction == true &&

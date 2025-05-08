@@ -26,12 +26,12 @@ use advanced_testcase;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class specific_course_test extends advanced_testcase {
-
+final class specific_course_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -40,7 +40,7 @@ class specific_course_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_restriction\conditions\specific_course::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $specificcourserestriction = new specific_course();
         $description = $specificcourserestriction->get_description();
 
@@ -56,7 +56,7 @@ class specific_course_test extends advanced_testcase {
      * Test the get_restriction_status function.
      * @covers \local_adele\course_restriction\conditions\specific_course::get_restriction_status
      */
-    public function test_get_restriction_status() {
+    public function test_get_restriction_status(): void {
         $specificcourserestriction = new specific_course();
 
         // Test with valid start and end date.
@@ -126,7 +126,5 @@ class specific_course_test extends advanced_testcase {
         $this->assertArrayHasKey(13, $statusincomplete);
         $this->assertArrayNotHasKey('completed', $statusincomplete[13]);
         $this->assertContains('Course 2', $statusincomplete[13]['placeholders']['node_name']);
-
     }
-
 }

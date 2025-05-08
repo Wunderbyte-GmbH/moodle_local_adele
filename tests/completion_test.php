@@ -41,13 +41,13 @@ use context_system;
  *
  * @covers \local_adele
  */
-class completion_test extends advanced_testcase {
+final class completion_test extends advanced_testcase {
     /**
      * Test the searchnestedarray method.
      *
      * @runInSeparateProcess
      */
-    public function test_searchnestedarray() {
+    public function test_searchnestedarray(): void {
         $haystack = [
             ['id' => 1, 'name' => 'Item 1'],
             ['id' => 2, 'name' => 'Item 2'],

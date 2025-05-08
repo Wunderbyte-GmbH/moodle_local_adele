@@ -26,13 +26,12 @@ use advanced_testcase;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class modquiz_test extends advanced_testcase {
-
-
+final class modquiz_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
     }
 
@@ -40,7 +39,7 @@ class modquiz_test extends advanced_testcase {
      * Test the get_completion_priority function.
      * @covers \local_adele\course_completion\conditions\modquiz::get_completion_priority
      */
-    public function test_get_completion_priority() {
+    public function test_get_completion_priority(): void {
         $modquiz = new modquiz();
         $priority = $modquiz->get_completion_priority();
         $this->assertEquals($modquiz->priority, $priority);
@@ -50,7 +49,7 @@ class modquiz_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_completion\conditions\modquiz::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $modquiz = new modquiz();
 
         $description = $modquiz->get_description();
@@ -67,7 +66,7 @@ class modquiz_test extends advanced_testcase {
      * Test the get_completion_status function.
      * @covers \local_adele\course_completion\conditions\modquiz::get_completion_status
      */
-    public function test_get_completion_status() {
+    public function test_get_completion_status(): void {
         global $DB;
 
         // Mock the global $DB object.
@@ -132,5 +131,4 @@ class modquiz_test extends advanced_testcase {
         $this->assertTrue($statuscomplete['completed'][10]);
         $this->assertStringContainsString('65/55', $statuscomplete['inbetween_info']);
     }
-
 }

@@ -27,12 +27,12 @@ use local_adele\course_restriction\conditions\disabled\parent_node_completed;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class parent_node_completed_test extends advanced_testcase {
-
+final class parent_node_completed_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -41,7 +41,7 @@ class parent_node_completed_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_restriction\conditions\disabled\parent_node_completed::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $parentnodecompleted = new parent_node_completed();
         $description = $parentnodecompleted->get_description();
 
@@ -57,7 +57,7 @@ class parent_node_completed_test extends advanced_testcase {
      * Test the get_restriction_status function.
      * @covers \local_adele\course_restriction\conditions\parent_node_completed::get_restriction_status
      */
-    public function test_get_restriction_status() {
+    public function test_get_restriction_status(): void {
         $parentnodecompleted = new parent_node_completed();
 
         // Test with valid start and end date.
@@ -105,5 +105,4 @@ class parent_node_completed_test extends advanced_testcase {
         $this->assertArrayHasKey(12, $status);
         $this->assertTrue($status[12]['completed'] !== false);
     }
-
 }

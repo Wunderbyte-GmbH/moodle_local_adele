@@ -25,8 +25,7 @@ use advanced_testcase;
  * @copyright  2023 Christian Badusch <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catquiz_test extends advanced_testcase {
-
+final class catquiz_test extends advanced_testcase {
     /**
      * Mock database object used for simulating database interactions.
      *
@@ -110,6 +109,7 @@ class catquiz_test extends advanced_testcase {
      * @return void
      */
     protected function setUp(): void {
+        parent::setUp();
 
         $this->resetAfterTest(true);
 
@@ -161,9 +161,13 @@ class catquiz_test extends advanced_testcase {
 
         $this->dbmock->expects($this->any())
             ->method('get_record')
-            ->willReturnOnConsecutiveCalls($this->mockquiz, $this->mockattemptsprogress, (object)['uniqueid' => 7],
-            (object)['uniqueid' => 7], (object)['uniqueid' => 7]);
-
+            ->willReturnOnConsecutiveCalls(
+                $this->mockquiz,
+                $this->mockattemptsprogress,
+                (object)['uniqueid' => 7],
+                (object)['uniqueid' => 7],
+                (object)['uniqueid' => 7]
+            );
     }
 
     /**
@@ -177,7 +181,7 @@ class catquiz_test extends advanced_testcase {
      * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
-    public function test_get_completion_status_is_true() {
+    public function test_get_completion_status_is_true(): void {
         global $DB;
 
         $this->dbmock->expects($this->exactly(2))
@@ -208,7 +212,7 @@ class catquiz_test extends advanced_testcase {
      * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
-    public function test_get_completion_status_is_false() {
+    public function test_get_completion_status_is_false(): void {
         global $DB;
 
         $this->mockquizattempts = [];
@@ -229,4 +233,3 @@ class catquiz_test extends advanced_testcase {
         $this->assertFalse($status['completed']['condition_2']);
     }
 }
-

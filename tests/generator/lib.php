@@ -23,7 +23,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_adele_generator extends testing_module_generator {
-
     /**
      * Create catscale structure by importing from CSV file.
      *

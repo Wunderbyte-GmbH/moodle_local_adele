@@ -27,10 +27,10 @@ use stdClass;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catquiz_test extends advanced_testcase {
-
+final class catquiz_test extends advanced_testcase {
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
 
         // Mock the global $DB object to ensure get_records_sql can be called.
         $DB = $this->getMockBuilder(stdClass::class)
@@ -42,7 +42,7 @@ class catquiz_test extends advanced_testcase {
      * Test the get_catquiz_tests function.
      * @covers \local_adele\catquiz::get_catquiz_tests
      */
-    public function test_get_catquiz_tests_class_does_not_exist() {
+    public function test_get_catquiz_tests_class_does_not_exist(): void {
         $this->mock_class_exists('local_catquiz\testenvironment', false);
 
         $result = catquiz::get_catquiz_tests([]);
@@ -54,7 +54,7 @@ class catquiz_test extends advanced_testcase {
      * Test the get_catquiz_tests function.
      * @covers \local_adele\catquiz::get_catquiz_tests
      */
-    public function test_get_catquiz_tests_class_exists_with_records() {
+    public function test_get_catquiz_tests_class_exists_with_records(): void {
         global $DB;
 
         // Check if the class exists in the environment.
@@ -132,5 +132,4 @@ class catquiz_test extends advanced_testcase {
         global $classexistsmocks;
         $classexistsmocks = [];
     }
-
 }

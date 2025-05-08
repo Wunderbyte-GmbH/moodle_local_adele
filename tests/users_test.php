@@ -28,10 +28,10 @@ use stdClass;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class users_test extends advanced_testcase {
-
+final class users_test extends advanced_testcase {
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
         $DB = $this->getMockBuilder(stdClass::class)
             ->addMethods(['sql_concat', 'sql_like', 'get_recordset_sql'])
             ->getMock();
@@ -42,7 +42,7 @@ class users_test extends advanced_testcase {
      * @covers \local_adele\users::load_users
      * @runInSeparateProcess
      */
-    public function test_load_users() {
+    public function test_load_users(): void {
         global $DB;
 
         // Mock the SQL functions.
@@ -114,7 +114,7 @@ class users_test extends advanced_testcase {
      * @covers \local_adele\users::load_users
      * @runInSeparateProcess
      */
-    public function test_load_users_exceeds_limit() {
+    public function test_load_users_exceeds_limit(): void {
         global $DB;
 
         $DB->expects($this->once())
@@ -166,5 +166,4 @@ class users_test extends advanced_testcase {
         $this->assertCount(0, $result['list'], 'Expected no users to be returned when results exceed 100.');
         $this->assertNotEmpty($result['warnings'], 'Expected a warning when results exceed 100.');
     }
-
 }

@@ -26,12 +26,12 @@ use advanced_testcase;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manual_test extends advanced_testcase {
-
+final class manual_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -40,7 +40,7 @@ class manual_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_completion\conditions\manual::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $manualcompletion = new manual();
 
         $description = $manualcompletion->get_description();
@@ -57,7 +57,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_priority function.
      * @covers \local_adele\course_completion\conditions\manual::get_completion_priority
      */
-    public function test_get_completion_priority() {
+    public function test_get_completion_priority(): void {
         $manualcompletion = new manual();
         $priority = $manualcompletion->get_completion_priority();
         $this->assertIsInt($priority);
@@ -68,7 +68,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_description_before function.
      * @covers \local_adele\course_completion\conditions\manual::get_completion_description_before
      */
-    public function test_get_completion_description_before() {
+    public function test_get_completion_description_before(): void {
         $manualcompletion = new manual();
         $description = $manualcompletion->get_completion_description_before();
         $this->assertIsString($description);
@@ -79,7 +79,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_description_after function.
      * @covers \local_adele\course_completion\conditions\manual::get_completion_description_after
      */
-    public function test_get_completion_description_after() {
+    public function test_get_completion_description_after(): void {
         $manualcompletion = new manual();
         $description = $manualcompletion->get_completion_description_after();
         $this->assertIsString($description);
@@ -90,7 +90,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_description_inbetween function.
      * @covers \local_adele\course_completion\conditions\manual::get_completion_description_inbetween
      */
-    public function test_get_completion_description_inbetween() {
+    public function test_get_completion_description_inbetween(): void {
         $manualcompletion = new manual();
         $description = $manualcompletion->get_completion_description_inbetween();
         $this->assertIsString($description);
@@ -101,7 +101,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_status function.
      * @covers \local_adele\course_completion\conditions\manual::get_completion_status
      */
-    public function test_get_completion_status() {
+    public function test_get_completion_status(): void {
         $manualcompletion = new manual();
 
         // Mock node data that is incomplete.

@@ -26,13 +26,12 @@ use local_adele\course_completion\conditions\master;
  * @copyright   2023 Wunderbyte GmbH
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class master_test extends advanced_testcase {
-
+final class master_test extends advanced_testcase {
     /**
      * Test get_description method.
      * @covers \local_adele\course_completion\conditions\master
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $this->resetAfterTest(true);
 
         $instance = new master();
@@ -50,7 +49,7 @@ class master_test extends advanced_testcase {
      * Test get_completion_status method.
      * @covers \local_adele\course_completion\conditions\master
      */
-    public function test_get_completion_status() {
+    public function test_get_completion_status(): void {
         $this->resetAfterTest(true);
 
         $instance = new master();

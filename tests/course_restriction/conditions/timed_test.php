@@ -27,12 +27,12 @@ use DateTime;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timed_test extends advanced_testcase {
-
+final class timed_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -41,7 +41,7 @@ class timed_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_restriction\conditions\timed::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $timedrestriction = new timed();
 
         $description = $timedrestriction->get_description();
@@ -58,7 +58,7 @@ class timed_test extends advanced_testcase {
      * Test the isvaliddate function.
      * @covers \local_adele\course_restriction\conditions\timed::isvaliddate
      */
-    public function test_isvaliddate() {
+    public function test_isvaliddate(): void {
         $timed = new timed();
 
         // Test valid date.
@@ -75,7 +75,7 @@ class timed_test extends advanced_testcase {
      * Test the get_restriction_status function.
      * @covers \local_adele\course_restriction\conditions\timed::get_restriction_status
      */
-    public function test_get_restriction_status() {
+    public function test_get_restriction_status(): void {
         $timed = new timed();
 
         // Test with valid start and end date.
@@ -130,5 +130,4 @@ class timed_test extends advanced_testcase {
         $this->assertEquals("01.01.2099 00:00", $futurestatus[2]['inbetween_info']['starttime']);
         $this->assertEquals("31.12.2099 23:59", $futurestatus[2]['inbetween_info']['endtime']);
     }
-
 }

@@ -26,12 +26,12 @@ use advanced_testcase;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manual_test extends advanced_testcase {
-
+final class manual_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -40,7 +40,7 @@ class manual_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_completion\conditions\manual::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $manualrestriction = new manual();
 
         $description = $manualrestriction->get_description();
@@ -57,7 +57,7 @@ class manual_test extends advanced_testcase {
      * Test the get_completion_description_before function.
      * @covers \local_adele\course_completion\conditions\manual::get_restriction_status
      */
-    public function test_get_restriction_status() {
+    public function test_get_restriction_status(): void {
         $manualrestriction = new manual();
 
         $nodeincomplete = [
@@ -82,5 +82,4 @@ class manual_test extends advanced_testcase {
         $this->assertFalse($statuscomplete['completed']);
         $this->assertEquals('unchecked', $statuscomplete['inbetween_info']);
     }
-
 }

@@ -38,12 +38,11 @@ use advanced_testcase;
  *
  * @covers \local_adele
  */
-class learning_path_editors_test extends advanced_testcase {
-
+final class learning_path_editors_test extends advanced_testcase {
     /**
      * Test the get_editors method.
      */
-    public function test_get_editors() {
+    public function test_get_editors(): void {
         global $DB;
         $DB = $this->createMock(\moodle_database::class);
         $lpid = 15;
@@ -78,7 +77,7 @@ class learning_path_editors_test extends advanced_testcase {
 
         $DB->expects($this->once())
             ->method('insert_record')
-            ->with('local_adele_lp_editors', $this->callback(function($data) use ($userid, $learningpathid) {
+            ->with('local_adele_lp_editors', $this->callback(function ($data) use ($userid, $learningpathid) {
                 return $data->userid === $userid && $data->learningpathid === $learningpathid;
             }))
             ->willReturn(true);  // Simulate a successful insert.
@@ -91,7 +90,7 @@ class learning_path_editors_test extends advanced_testcase {
     /**
      * Test the remove_editors method.
      */
-    public function test_remove_editors() {
+    public function test_remove_editors(): void {
         global $DB;
         $DB = $this->createMock(\moodle_database::class);
         $lpid = 10;

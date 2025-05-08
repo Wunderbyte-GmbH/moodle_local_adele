@@ -27,10 +27,10 @@ use stdClass;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class modquiz_test extends advanced_testcase {
-
+final class modquiz_test extends advanced_testcase {
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
         $DB = $this->getMockBuilder(stdClass::class)
             ->addMethods(['get_records_sql'])
             ->addMethods(['get_in_or_equal'])
@@ -42,7 +42,7 @@ class modquiz_test extends advanced_testcase {
      * @covers \local_adele\modquiz::get_mod_quizzes
      * @runInSeparateProcess
      */
-    public function test_get_mod_quizzes_with_no_data() {
+    public function test_get_mod_quizzes_with_no_data(): void {
         global $DB;
 
         // Expect the get_records_sql method to be called and return an empty array.
@@ -64,7 +64,7 @@ class modquiz_test extends advanced_testcase {
      * @covers \local_adele\modquiz::get_mod_quizzes
      * @runInSeparateProcess
      */
-    public function test_get_mod_quizzes_with_data() {
+    public function test_get_mod_quizzes_with_data(): void {
         global $DB;
 
         // Mock data returned from the DB.

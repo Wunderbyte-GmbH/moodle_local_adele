@@ -28,13 +28,12 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
-class course_completed_test extends advanced_testcase {
-
-
+final class course_completed_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
     }
 
@@ -42,7 +41,7 @@ class course_completed_test extends advanced_testcase {
      * Test the get_completion_priority function.
      * @covers \local_adele\course_completion\conditions\modquiz::get_completion_priority
      */
-    public function test_get_completion_priority() {
+    public function test_get_completion_priority(): void {
         $coursecompleted = new course_completed();
         $priority = $coursecompleted->get_completion_priority();
         $this->assertEquals($coursecompleted->priority, $priority);
@@ -52,7 +51,7 @@ class course_completed_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_completion\conditions\modquiz::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $coursecompleted = new course_completed();
         $description = $coursecompleted->get_description();
 
@@ -68,7 +67,7 @@ class course_completed_test extends advanced_testcase {
      * Test the get_node_progress function.
      * @covers \local_adele\course_completion\conditions\course_completed::get_node_progress
      */
-    public function test_get_node_progress() {
+    public function test_get_node_progress(): void {
         $coursecompleted = new course_completed();
         $progresses = [100, 90, 80];
 
@@ -89,7 +88,7 @@ class course_completed_test extends advanced_testcase {
      * Test the get_completion_status function with mocked progress.
      * @covers \local_adele\course_completion\conditions\course_completed::get_completion_status
      */
-    public function test_get_completion_status() {
+    public function test_get_completion_status(): void {
         // Reset the database after the test.
         $this->resetAfterTest(true);
          // Insert mock courses into the database.
@@ -134,7 +133,6 @@ class course_completed_test extends advanced_testcase {
         // Assert that the placeholders are correct.
         $this->assertArrayHasKey('numb_courses', $status[1]['placeholders']);
         $this->assertEquals(2, $status[1]['placeholders']['numb_courses']);
-
     }
 
     /**

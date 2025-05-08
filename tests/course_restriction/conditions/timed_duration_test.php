@@ -27,12 +27,12 @@ use DateTime;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timed_duration_test extends advanced_testcase {
-
+final class timed_duration_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
      */
     protected function setUp(): void {
+        parent::setUp();
         // Reset the database after each test.
         $this->resetAfterTest();
     }
@@ -41,7 +41,7 @@ class timed_duration_test extends advanced_testcase {
      * Test the get_description function.
      * @covers \local_adele\course_restriction\conditions\timed_duration::get_description
      */
-    public function test_get_description() {
+    public function test_get_description(): void {
         $timedduration = new timed_duration();
 
         $description = $timedduration->get_description();
@@ -58,7 +58,7 @@ class timed_duration_test extends advanced_testcase {
      * Test the get_restriction_status function.
      * @covers \local_adele\course_restriction\conditions\timed_duration::get_restriction_status
      */
-    public function test_get_restriction_status() {
+    public function test_get_restriction_status(): void {
         $timedduration = new timed_duration();
 
         // Test with valid start and end date.
@@ -99,5 +99,4 @@ class timed_duration_test extends advanced_testcase {
 
         $this->assertFalse($status[1]['completed']);
     }
-
 }
