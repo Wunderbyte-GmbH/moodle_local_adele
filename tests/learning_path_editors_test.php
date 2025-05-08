@@ -69,7 +69,7 @@ final class learning_path_editors_test extends advanced_testcase {
     /**
      * Test the create_editors method.
      */
-    public function test_create_editors() {
+    public function test_create_editors(): void {
         global $DB;
         $userid = 10;
         $learningpathid = 20;

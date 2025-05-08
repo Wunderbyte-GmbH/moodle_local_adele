@@ -175,7 +175,6 @@ $string['activefilter'] = '[' . __LINE__ . ']Filter aktivieren';
  $string['course_name_condition_catquiz'] = '[' . __LINE__ . ']CAT-Quiz';
  $string['course_name_condition_completion_manual'] = '[' . __LINE__ . ']Abschluss-Kontrollkästchen';
  $string['course_name_condition_completion_manual_checkbox_status'] = '[' . __LINE__ . ']nicht';
- $string['course_name_condition_completion_manual_checkbox_status'] = '[' . __LINE__ . ']not';
  $string['course_name_condition_completion_manual_role_teacher'] = '[' . __LINE__ . ']Dozenten';
  $string['course_name_condition_course_completed'] = '[' . __LINE__ . ']Kurs(e) abgeschlossen';
  $string['course_name_condition_modquiz'] = '[' . __LINE__ . ']Moodle-Quiz';

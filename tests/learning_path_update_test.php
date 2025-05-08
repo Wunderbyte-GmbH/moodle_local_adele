@@ -46,7 +46,7 @@ final class learning_path_update_test extends advanced_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_update_visibility() {
+    public function test_update_visibility(): void {
         global $DB;
 
         $DB = $this->createMock(moodle_database::class);
@@ -72,7 +72,7 @@ final class learning_path_update_test extends advanced_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_update_animations() {
+    public function test_update_animations(): void {
         global $DB;
         $learningpathid = 1;
         $userid = 2;
