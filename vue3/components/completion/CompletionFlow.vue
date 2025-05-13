@@ -224,7 +224,7 @@ const handleValues = (handleValues) => {
   if (changedNode.data.value == "newinformation") {
     //Todo call handlefeedback in feedbackcomponent)
     if (feedbackcomponent.value) {
-      feedbackcomponent.value.renderFeedback('before', false);
+      feedbackcomponent.value.renderFeedback('before', true);
   }
   }
 }
