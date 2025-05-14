@@ -6,7 +6,6 @@ jobs:
   ci:
     uses: Wunderbyte-GmbH/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     with:
-      # Change these based on your plugin's requirements
       disable_release: true  # Use true if using the tag-based release workflow
 
       # Command to install more dependencies
