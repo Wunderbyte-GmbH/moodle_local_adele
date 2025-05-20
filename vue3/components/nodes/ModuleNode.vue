@@ -70,17 +70,17 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
     <div
       class="custom-node text-center p-3"
       :style="{
-        'background-color': backgroundColor,
+        'background-color': addOpacity(data),
         'height': data.height,
-        'width': data.width ? data.width : '400px'
+        'width': data.width ? data.width : '400px',
       }"
     />
     <div
       class="module-name"
       :style="{
-        'background-color': backgroundColor,
-        'border': '5px solid ' + darkerColor,
-        'border-bottom': '5px solid ' + darkerColor,
+        'background-color': addOpacity(data),
+        'border': '5px solid ' + darkenColor(data.color),
+        'border-bottom': '5px solid ' + darkenColor(data.color),
         'border-radius': '8px 8px 0 0'
       }"
     >
@@ -102,14 +102,14 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
       id="target"
       type="target"
       :position="Position.Top"
-      :style="handleStyle"
+      :style="{'background-color' : addOpacity(data), 'filter' : 'invert(100%)', 'width': '10px', 'height': '10px'}"
     />
     <Handle
       v-if="zoomstep == '0.2'"
       id="source"
       type="source"
       :position="Position.Bottom"
-      :style="handleStyle"
+      :style="{'background-color' : addOpacity(data), 'filter' : 'invert(100%)', 'width': '10px', 'height': '10px'}"
     />
   </div>
 </template>
