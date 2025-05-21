@@ -313,7 +313,7 @@
             <div class="list-group-text" style="user-select: text;" @mousedown.stop @mousemove.stop @mouseup.stop>
               <div v-if="props.data.completion.feedback.completion.information">
                 <div
-                  v-for="completion_string in props.data.completion.feedback.completion.information"
+                  v-for="(completion_string, index) in props.data.completion.feedback.completion.information"
                   :key="completion_string"
                   style="user-select: text;"
                   @mousedown.stop
@@ -321,8 +321,11 @@
                   @mouseup.stop
                 >
                   <div v-if="completion_string != ''">
-                    - <span v-html="completion_string"></span>
+                    • <span v-html="completion_string"></span>
                   </div>
+                    <div v-if="index < props.data.completion.feedback.completion.information.length - 1" class="or-separator">
+                      {{ store.state.strings.completion_edge_or }}
+                    </div>
                 </div>
               </div>
               <div v-else>
