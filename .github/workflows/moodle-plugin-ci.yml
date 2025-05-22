@@ -24,7 +24,7 @@ jobs:
       # ignore_paths: "vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3,OpenTBS,TinyButStrong"
 
       # Specify paths to ignore for mustache lint
-      # mustache_ignore_names: 'cashier.mustache,shopping_cart_item.mustache,history_item.mustache,form-user-selector-suggestion.mustache,shopping_cart_popover.mustache'
+      mustache_ignore_names: 'initview.mustache'
 
       # Specify paths to ignore for code checker
       # codechecker_ignore_paths: 'OpenTBS, TinyButStrong'
