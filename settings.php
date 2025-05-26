@@ -33,9 +33,8 @@ $componentname = 'local_adele';
 // Default for users that have site config.
 if ($hassiteconfig) {
     // Add the category to the local plugin branch.
-    $settings = new admin_settingpage('local_adele_settings', '');
-    $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
-    $ADMIN->add($componentname, $settings);
+    $settings = new admin_settingpage('local_adele_settings', get_string('pluginname', $componentname));
+    $ADMIN->add('localplugins', $settings);
 
     $rolenamesclass = new role_names();
     $rolenames = $rolenamesclass->get_role_names();
