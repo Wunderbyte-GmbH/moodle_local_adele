@@ -68,16 +68,16 @@ onMounted(() => {
     if (props.data.node_id == node.id) {
       parentnode.value = node
       if (node.restriction && node.restriction.nodes) {
-      node.restriction.nodes.forEach((restrictionnode) => {
-        if(restrictionnode.data.label == 'timed'){
-          date.value = restrictionnode.data.value
-        }
-      })
+        node.restriction.nodes.forEach((restrictionnode) => {
+          if (restrictionnode.data.label == 'timed') {
+            date.value = restrictionnode.data.value
+          }
+        })
       }
       if (node.parentCourse.includes('starting_node')) {
-      isParentNode.value = true;
+        isParentNode.value = true;
       }
-     }
+    }
   })
 
   if (props.data.course_node_id && store.state.availablecourses) {
@@ -100,6 +100,7 @@ onMounted(() => {
   } else if (props.data.completion.feedback.status == 'accessible') {
     active.value = true
   }
+
   const triggerAnimation = () => {
     if (
       props.data.completion.feedback &&
@@ -112,7 +113,7 @@ onMounted(() => {
         startanimation.value
       ) {
         iconState.value = 'expanding';
-          setTimeout(() => {
+        setTimeout(() => {
           iconClass.value = 'fa-play';
           setTimeout(() => {
             iconState.value = 'fading';
@@ -135,7 +136,49 @@ onMounted(() => {
   triggerAnimation();
 })
 
-const customNodeEdit = ref(null); 
+ const statusMessage = computed(() => {
+  const feedback = props.data?.completion?.feedback || {};
+  const completion = feedback.completion || {};
+
+  // Check for "Status 0" condition
+  if (
+    completion.after == null &&
+    completion.after_all == null &&
+    completion.before == null &&
+    completion.inbetween == null
+  ) {
+    return 'Status 0';
+  }
+
+  // Switch case to determine other statuses
+  switch (feedback.status_restriction) {
+    case 'before':
+      if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
+        return 'Status A1';
+      }
+      break;
+    case 'inbetween':
+      if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
+        return 'Status A2';
+      }
+      if (completion.after && completion.after.length > 0) {
+        return completion.after_all && Object.keys(completion.after_all).length > 0 ? 'Status B' : 'Status C';
+      }
+      break;
+    case 'after':
+      if (completion.after && completion.after.length > 0) {
+        return completion.after_all && completion.after_all.length === 0 ? 'Status E' : 'Status D';
+      }
+      if (!completion.after || completion.after.length === 0) {
+        return 'Status F';
+      }
+      break;
+    default:
+      return '';
+  }
+});
+
+const customNodeEdit = ref(null);
 const emit = defineEmits([
 
   'zoomOnParent'
@@ -193,7 +236,7 @@ const nodeBackgroundColor = computed(() => {
 });
 
 // Connection handles
-const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
+const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px' }))
 
 const isParentNode = ref(false);
 
@@ -213,21 +256,10 @@ const iconClass = ref('fa-lock');
 </script>
 
 <template>
-  <div
-    @click="handleNodeClick"
-    ref="customNodeEdit"
-  >
-    <div
-      v-if="zoomstep != '0.2'"
-      class="card"
-      :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
-    >
+  <div @click="handleNodeClick" ref="customNodeEdit">
+    <div v-if="zoomstep != '0.2'" class="card" :style="[{ minHeight: '200px', width: '400px' }, parentStyle]">
       <div class="card-header text-center">
-        <NodeInformation
-          :data
-          :parentnode
-          :startanimation
-        />
+        <NodeInformation :data :parentnode :startanimation />
         <div class="row align-items-center">
           <div class="col">
             <h5>
@@ -236,108 +268,98 @@ const iconClass = ref('fa-lock');
           </div>
         </div>
       </div>
-      <div
-        class="card-body"
-        :class="active ? 'active-node' : 'inactive-node'"
-        :style="[nodeBackgroundColor]"
-      >
+      <div class="card-body" :class="active ? 'active-node' : 'inactive-node'" :style="[nodeBackgroundColor]">
         <div>
-          <div
-            class="card-img dashboard-card-img mb-2"
-            :style="{
-              height: '10rem',
-              backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundColor: cover_image ? '' : '#cccccc'
-            }"
-          >
+          <div class="card-img dashboard-card-img mb-2" :style="{
+            height: '10rem',
+            backgroundImage: cover_image ? 'url(' + cover_image + ')' : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundColor: cover_image ? '' : '#cccccc'
+          }">
             <div class="overlay">
-              <button
-                class="icon-link"
-                @click="goToCourse"
-              >
-                <i
-                  :class="
-                    ['fa', iconClass,
+              <button class="icon-link" @click="goToCourse">
+                <i :class="['fa', iconClass,
                     {
                       'icon-fading': iconState === 'fading',
                       'icon-expanding': iconState === 'expanding',
                       'icon-fadingIn': iconState === 'fadingIn',
                     },
-                  ]"
-                  />
+                  ]" />
               </button>
             </div>
           </div>
-          <div
-            class="row mb-2"
-          >
+          <div class="row mb-2">
             <div class="col-4 text-left">
               <b>
                 {{ store.state.strings.nodes_progress }}
               </b>
             </div>
-            <div
-              class="col-8"
-              style="display: flex; justify-content: end;"
-            >
+            <div class="col-8" style="display: flex; justify-content: end;">
               <ProgressBar :progress="data.progress" />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualrestriction">
-              <RestrictionOutPutItem
-                :data="data"
-              />
+              <RestrictionOutPutItem :data="data" />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualcompletion">
-              <CompletionOutPutItem
-                :data="data"
-              />
+              <CompletionOutPutItem :data="data" />
             </div>
-            <MasterConditions
-              v-if="store.state.view == 'teacher'"
-              class="col-12"
-              :data="data"
-            />
+            <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
           </div>
         </div>
+        <p v-if="data.completion.feedback.completion?.after == null &&
+                data.completion.feedback.completion?.after_all == null &&
+                data.completion.feedback.completion?.before == null &&
+                data.completion.feedback.completion?.inbetween == null 
+        ">Status 0</p>
+        <p
+          v-if="data.completion.feedback.status_restriction == 'before' &&
+               (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null )&&
+               (data.completion.feedback.completion.before?.length > 0 ||  data.completion.feedback.completion.inbetween?.length > 0)
+                ">Status A1</p>
+           <p
+          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
+                (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null )&&
+               (data.completion.feedback.completion.before?.length > 0 ||  data.completion.feedback.completion.inbetween?.length > 0)
+                ">Status A2</p>
+          <p
+          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
+              data.completion.feedback.completion.after?.length > 0 &&
+              data.completion?.feedback?.completion?.after_all && Object.keys(data.completion.feedback.completion.after_all).length > 0
+              ">Status B</p>
+          <p
+          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
+              data.completion.feedback.completion.after?.length > 0 &&
+              data.completion?.feedback?.completion?.after_all.length == 0
+              ">Status C</p>
+                    <p
+          v-if="data.completion.feedback.status_restriction == 'after' &&
+              data.completion.feedback.completion.after?.length > 0
+              ">Status D</p>
+                              <p
+          v-if="data.completion.feedback.status_restriction == 'after' &&
+              data.completion.feedback.completion.after?.length > 0 &&
+              data.completion?.feedback?.completion?.after_all.length == 0
+              ">Status E</p>
+                                        <p
+          v-if="data.completion.feedback.status_restriction == 'after' &&
+              (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null)
+              ">Status F</p>
+                <p v-if="statusMessage">{{ statusMessage }}</p>
       </div>
-      <div
-        v-if="data"
-        class="card-footer"
-      >
-        <UserInformation
-          :data="data"
-          @focusChanged="zoomOnParent"
-        />
+      <div v-if="data" class="card-footer">
+        <UserInformation :data="data" @focusChanged="zoomOnParent" />
       </div>
     </div>
-    <div
-      v-else
-      class="card"
-      :style="[{ minHeight: '300px', width: '400px' }, parentStyle]"
-    >
-      <div
-        class="card-body card-body-outer"
-        :style="[nodeBackgroundColor]"
-      >
+    <div v-else class="card" :style="[{ minHeight: '300px', width: '400px' }, parentStyle]">
+      <div class="card-body card-body-outer" :style="[nodeBackgroundColor]">
         {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 28) }}
       </div>
     </div>
-    <Handle
-      v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="target"
-      type="target"
-      :position="Position.Top"
-      :style="handleStyle"
-    />
-    <Handle
-      v-if="store.state.view!='teacher' && store.state.view!='student'"
-      id="source"
-      type="source"
-      :position="Position.Bottom"
-      :style="handleStyle"
-    />
+    <Handle v-if="store.state.view != 'teacher' && store.state.view != 'student'" id="target" type="target"
+      :position="Position.Top" :style="handleStyle" />
+    <Handle v-if="store.state.view != 'teacher' && store.state.view != 'student'" id="source" type="source"
+      :position="Position.Bottom" :style="handleStyle" />
   </div>
 </template>
 
@@ -348,6 +370,7 @@ const iconClass = ref('fa-lock');
     transform: scale(0.2);
   }
 }
+
 .icon-fading {
   animation: fading 1s ease-out forwards;
 }
@@ -357,15 +380,18 @@ const iconClass = ref('fa-lock');
     transform: scale(0.2);
     opacity: 0.1;
   }
+
   80% {
     transform: scale(1.5);
     opacity: 0.5;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
   }
 }
+
 .icon-expanding {
   animation: expanding 0.75s ease-in-out forwards;
 }
@@ -375,11 +401,13 @@ const iconClass = ref('fa-lock');
     opacity: 0;
     transform: scale(0.2);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
   }
 }
+
 .icon-fadingIn {
   animation: fadingIn 1s ease-out forwards;
 }
@@ -405,14 +433,19 @@ const iconClass = ref('fa-lock');
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent gray */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Semi-transparent gray */
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 70%; /* Adjust width as needed */
-  height: 50%; /* Adjust height as needed */
-  border-radius: 15px; /* Rounded edges */
+  width: 70%;
+  /* Adjust width as needed */
+  height: 50%;
+  /* Adjust height as needed */
+  border-radius: 15px;
+  /* Rounded edges */
 }
+
 .icon-link {
   border: none;
   background: none;
@@ -425,10 +458,13 @@ const iconClass = ref('fa-lock');
   display: inline-flex;
   align-items: center;
 }
+
 .icon-link:hover {
-  color: lightgray; /* Hover effect */
+  color: lightgray;
+  /* Hover effect */
 }
-.inactive-node{
+
+.inactive-node {
   pointer-events: none;
   opacity: 0.5;
 }
@@ -437,39 +473,51 @@ const iconClass = ref('fa-lock');
   background-color: #f5f5f5;
 
 }
+
 .table-container {
   width: 300px;
   position: absolute;
 }
+
 .table-container-left {
   transform: translate(-50%, 0);
 }
 
 .fancy-table {
-  border-radius: 10px; /* Rounded corners */
+  border-radius: 10px;
+  /* Rounded corners */
 }
 
 .fancy-table thead th {
-  background-color: #3498db; /* Header background color */
-  color: #fff; /* Header text color */
+  background-color: #3498db;
+  /* Header background color */
+  color: #fff;
+  /* Header text color */
 }
 
 .fancy-table tbody {
-  background-color: #ecf0f1; /* Body background color */
+  background-color: #ecf0f1;
+  /* Body background color */
 }
 
 .fancy-table tbody tr:nth-child(odd) {
-  background-color: #d1d1d1; /* Alternate row background color */
+  background-color: #d1d1d1;
+  /* Alternate row background color */
 }
 
 .fancy-table tbody tr:hover {
-  background-color: #bdc3c7; /* Hovered row background color */
-}
-.starting-node {
-  font-size: 20px; /* Adjust the font size as needed */
-  font-weight: bold; /* Make the text bold */
-  display: flex; /* Align icon and text horizontally */
-  align-items: center; /* Center items vertically */
+  background-color: #bdc3c7;
+  /* Hovered row background color */
 }
 
+.starting-node {
+  font-size: 20px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Make the text bold */
+  display: flex;
+  /* Align icon and text horizontally */
+  align-items: center;
+  /* Center items vertically */
+}
 </style>
