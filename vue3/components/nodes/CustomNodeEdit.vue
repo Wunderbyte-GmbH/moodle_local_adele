@@ -147,30 +147,30 @@ onMounted(() => {
     completion.before == null &&
     completion.inbetween == null
   ) {
-    return 'Status 0';
+    return '0';
   }
 
   // Switch case to determine other statuses
   switch (feedback.status_restriction) {
     case 'before':
       if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
-        return 'Status A1';
+        return 'a1';
       }
       break;
     case 'inbetween':
       if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
-        return 'Status A2';
+        return 'a2';
       }
       if (completion.after && completion.after.length > 0) {
-        return completion.after_all && Object.keys(completion.after_all).length > 0 ? 'Status B' : 'Status C';
+        return completion.after_all && Object.keys(completion.after_all).length > 0 ? 'b' : 'c';
       }
       break;
     case 'after':
       if (completion.after && completion.after.length > 0) {
-        return completion.after_all && completion.after_all.length === 0 ? 'Status E' : 'Status D';
+        return completion.after_all && completion.after_all.length === 0 ? 'e' : 'd';
       }
       if (!completion.after || completion.after.length === 0) {
-        return 'Status F';
+        return 'f';
       }
       break;
     default:
@@ -296,7 +296,7 @@ const iconClass = ref('fa-lock');
               </b>
             </div>
             <div class="col-8" style="display: flex; justify-content: end;">
-              <ProgressBar :progress="data.progress" />
+              <ProgressBar :progress="data.progress" :status="statusMessage" />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualrestriction">
               <RestrictionOutPutItem :data="data" />
@@ -307,7 +307,7 @@ const iconClass = ref('fa-lock');
             <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
           </div>
         </div>
-        <p v-if="data.completion.feedback.completion?.after == null &&
+        <!-- <p v-if="data.completion.feedback.completion?.after == null &&
                 data.completion.feedback.completion?.after_all == null &&
                 data.completion.feedback.completion?.before == null &&
                 data.completion.feedback.completion?.inbetween == null 
@@ -344,7 +344,7 @@ const iconClass = ref('fa-lock');
                                         <p
           v-if="data.completion.feedback.status_restriction == 'after' &&
               (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null)
-              ">Status F</p>
+              ">Status F</p> -->
                 <p v-if="statusMessage">{{ statusMessage }}</p>
       </div>
       <div v-if="data" class="card-footer">

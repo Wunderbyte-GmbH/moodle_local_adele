@@ -1,10 +1,11 @@
 <template>
+  <p>{{props.status}}</p>
   <div class="progress-container">
     <div
       class="progress-bar"
-      :class="{ 'bg-success': props.progress > 0 }"
+
       role="progressbar"
-      :style="{ width: props.progress + '%' }"
+       :style="[progressStyle, { width: props.progress + '%' }]"
       aria-valuenow="{{ props.progress }}"
       aria-valuemin="0"
       aria-valuemax="100"
@@ -19,6 +20,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 const store = useStore();
 
@@ -27,6 +29,45 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  status: {
+    type: String,
+    required: false,
+  }
+});
+
+
+const progressStyle = computed(() => {
+  let color;
+  switch (props.statusMessage) {
+    case '0':
+      color = 'red'; // White
+      break;
+    case 'a1':
+      color = 'red'; // Gold
+      break;
+    case 'a2':
+      color = 'red'; // Orange
+      break;
+    case 'b':
+      color = 'red'; // Green
+      break;
+    case 'c':
+      color = 'red'; // Blue
+      break;
+    case 'd':
+      color = 'red'; // Indigo
+      break;
+    case 'e':
+      color = 'red'; // Violet
+      break;
+    case 'f':
+      color = 'red'; // Red
+      break;
+    default:
+      color = 'red'; // Default Gray
+      break;
+  }
+  return { backgroundColor: color };
 });
 </script>
 
