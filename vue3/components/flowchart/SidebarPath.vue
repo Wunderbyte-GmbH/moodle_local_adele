@@ -22,6 +22,21 @@ const emit = defineEmits([
   'changedModule',
 ]);
 
+function throttle(fn, delay) {
+  let lastCall = 0;
+  return function (...args) {
+    const now = new Date().getTime();
+    if (now - lastCall < delay) return;
+    lastCall = now;
+    return fn(...args);
+  };
+}
+
+// Usage: Wrap your event handler with the throttle function.
+const handleDrag = throttle((event) => {
+    onDrag(event);
+}, 100); 
+
 const intersectingNode = ref(null);
 const closestNode = ref({})
 
@@ -73,7 +88,7 @@ const filteredCourses = computed(() => {
 });
 
 // Function sets up data for nodes
-function onDrag(event) {
+async function onDrag(event) {
   //find closestNode node
   const startingNode = findNode('starting_node');
   const dz_check_node = findNode('dropzone_parent');
@@ -88,7 +103,7 @@ function onDrag(event) {
   if(closestNode.value && startingNodeIntersecting){
     if (dropzoneShown()) {
       activeNode.value = closestNode.value
-      const newDrop = drawDropzone(closestNode.value, store)
+      const newDrop =  await drawDropzone(closestNode.value, store);
       addNodes(newDrop.nodes);
       addEdges(newDrop.edges);
     }
@@ -348,7 +363,7 @@ function changeTab(index) {
             :data="course"
             style="width: 100%; padding: 0rem; margin-left: 0.025rem; height: 3rem"
             @dragstart="onDragStart($event, course)"
-            @drag="onDrag($event)"
+            @drag="handleDrag($event)"
             @dragend="onDragEnd()"
           >
             <div

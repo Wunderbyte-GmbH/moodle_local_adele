@@ -44,6 +44,8 @@ const router = useRouter();
 const learningpathcontrol = ref({})
 const deepCopy = ref({})
 const deepCopyText = ref({})
+const modulesDrawn = ref(false);
+const oldtree = ref({});
 
 const { toObject, setNodes, setEdges, removeNodes,
   addNodes, nodes, findNode } = useVueFlow()
@@ -103,32 +105,39 @@ watch(() => props.learningpath, (newValue) => {
 });
 
 watch(() => learningpathcontrol.value, async() => {
-  if (learningpathcontrol.value.json.tree != undefined) {
+  if (learningpathcontrol.value.json.tree != undefined 
+  && learningpathcontrol.value.json.tree !== oldtree.value.json.tree) {
     await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
+    oldtree.value = learningpathcontrol.value;
   }
 }, { deep: true } )
 
-// Trigger web services on mount
-onMounted( async () => {
-  learningpathcontrol.value = props.learningpath
-  if (learningpathcontrol.value.json.tree != undefined) {
-    const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view)
-    setNodes(flowchart.nodes)
-    setEdges(flowchart.edges)
-    let nodesDimensions = []
+onMounted(async () => {
+  learningpathcontrol.value = props.learningpath;
+
+  if (learningpathcontrol.value.json.tree !== undefined) {
+    const flowchart = loadFlowChart(props.learningpath.json.tree, store.state.view);
+    setNodes(flowchart.nodes);
+    setEdges(flowchart.edges);
+
+    let nodesDimensions = [];
     learningpathcontrol.value.json.tree.nodes.forEach((node) => {
-      nodesDimensions.push(findNode(node.id))
-    })
-    learningpathcontrol.value.json.tree.nodes = nodesDimensions
-    drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
+      nodesDimensions.push(findNode(node.id));
+    });
+
+    learningpathcontrol.value.json.tree.nodes = nodesDimensions;
+    drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
+    setTimeout(() =>{
+      drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
+    }, 100)
   }
+
   if (!props.view) {
-    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
-    deepCopy.value = JSON.parse(JSON.stringify(toObject()))
-    deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath))
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store);
+    deepCopy.value = JSON.parse(JSON.stringify(toObject()));
+    deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath));
   }
 });
-
 
 // Prepare and save learning path
 const onSave = async () => {

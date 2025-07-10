@@ -74,97 +74,86 @@ interface DropZoneCourseNode {
   width?: number;
 }
 
-const  drawDropzone = (closestNode: ClosestNode, store: Store) => {
-    let newDrop: NewDrop = {
-        nodes: [],
-        edges: [],
+const drawDropzone = async (closestNode: ClosestNode, store: Store): Promise<NewDrop> => {
+  const dropZoneCourseNodes: Record<string, DropZoneCourseNode> = {
+    parent: {
+      name: store.state.strings.composables_drop_zone_parent,
+      positionY: -250,
+      positionX: 0,
+      type: 'dropzone',
+    },
+    child: {
+      name: store.state.strings.composables_drop_zone_child,
+      positionY: 50 + closestNode.dimensions.height,
+      positionX: 0,
+      type: 'dropzone',
+    },
+    and: {
+      name: store.state.strings.composables_drop_zone_add,
+      positionY: 200,
+      positionX: 450,
+      type: 'conditionaldropzone',
+    },
+    or: {
+      name: store.state.strings.composables_drop_zone_or,
+      positionY: 300,
+      positionX: -350,
+      type: 'conditionaldropzone',
     }
-    const dropZoneCourseNodes:  { [key: string]: DropZoneCourseNode } = {
-        parent: {
-            name: store.state.strings.composables_drop_zone_parent,
-            positionY: -250,
-            positionX: 0,
-            type: 'dropzone',
-        },
-        child: {
-            name: store.state.strings.composables_drop_zone_child,
-            positionY: 50 + closestNode.dimensions.height,
-            positionX: 0,
-            type: 'dropzone',
-        },
-        and: {
-            name: store.state.strings.composables_drop_zone_add,
-            positionY: 200,
-            positionX: 450,
-            type: 'conditionaldropzone',
-        },
-        or: {
-            name: store.state.strings.composables_drop_zone_or,
-            positionY: 300,
-            positionX: -350,
-            type: 'conditionaldropzone',
-        }
+  };
+
+  // Precompute reusable values
+  const baseX = closestNode.position.x;
+  const baseY = closestNode.position.y;
+  const offsetY = getOffsetY(closestNode);
+  const defaultOpacity = '0.6';
+  const defaultBgColor = 'grey';
+  const defaultHeight = '200px';
+
+  const newDrop: NewDrop = { nodes: [], edges: [] };
+
+  await Promise.all(Object.keys(dropZoneCourseNodes).map(async key => {
+    const nodeInfo = dropZoneCourseNodes[key];
+    const isConditional = key === 'and' || key === 'or';
+
+    const position: Position = {
+      x: isConditional ? baseX + nodeInfo.positionX : getOffsetX(closestNode, key),
+      y: isConditional ? offsetY : baseY + nodeInfo.positionY,
+    };
+
+    const newNode: DropZoneNode = {
+      id: `dropzone_${key}`,
+      type: nodeInfo.type,
+      position,
+      label: 'default node',
+      data: {
+        opacity: defaultOpacity,
+        bgcolor: defaultBgColor,
+        height: defaultHeight,
+        infotext: nodeInfo.name,
+        width: nodeInfo.width,
+      },
+      style: { zIndex: 1000 },
+    };
+
+    newDrop.nodes.push(newNode);
+
+    if (!isConditional) {
+      const newEdge: DropZoneEdge = {
+        id: `${closestNode.id}-${key}`,
+        source: closestNode.id,
+        sourceHandle: key === 'child' ? 'source' : 'target',
+        target: newNode.id,
+        targetHandle: key === 'child' ? 'target_and' : 'source_and',
+        type: 'default',
+      };
+      newDrop.edges.push(newEdge);
     }
-    let data: NodeData = {
-        opacity: '0.6',
-        bgcolor: 'grey',
-        height: '200px',
-    }
+  }));
+  return newDrop;
+};
 
-    //check if closest node has childerns TODO
-    for (const key in dropZoneCourseNodes){
-        data.infotext = dropZoneCourseNodes[key].name
-        data.width = dropZoneCourseNodes[key].width
-        let position: Position = {
-            x: 0,
-            y: 0
-        }
-        if (key != 'and' &&key != 'or') {
-            position = {
-                x: getOffsetX(closestNode, key),
-                y: closestNode.position.y + dropZoneCourseNodes[key].positionY
-            }
-        } else {
-            position = {
-                x: closestNode.position.x + dropZoneCourseNodes[key].positionX,
-                y: getOffsetY(closestNode)
-            }
-        }
-        const newNode: DropZoneNode = {
-            id: 'dropzone_' + key,
-            type: dropZoneCourseNodes[key].type,
-            position: position,
-            label: `default node`,
-            data: data,
-            style: {
-              zIndex: 1000,
-            },
-        }
-        newDrop.nodes.push(newNode);
 
-        let targetHandle = 'source_and'
-        let sourceHandle =  'target'
-
-        if(key == 'child'){
-            targetHandle = 'target_and'
-            sourceHandle =  'source'
-        }
-
-        if (key != 'and' &&key != 'or') {
-            const newEdge: DropZoneEdge = {
-                id: `${closestNode.id}-${key}`,
-                source: closestNode.id,
-                sourceHandle: sourceHandle,
-                target: newNode.id,
-                targetHandle: targetHandle,
-                type: 'default',
-            };
-            // Add the new edge
-            newDrop.edges.push(newEdge);
-        }
-    }
-    return newDrop
-}
 
 const getOffsetX = (closestNode: ClosestNode, relation: string): number => {
     let relationHandle = closestNode.childCourse
