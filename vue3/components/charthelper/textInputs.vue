@@ -64,6 +64,7 @@ const uploadNewImage = async () => {
         type: 'success'
       })
       selectCourseImage(response.filename)
+      newImagePreview.value = null;
     } catch (error) {
       console.error('Error uploading image:', error);
     }
@@ -224,7 +225,7 @@ const editLearningpath = async (singlelearningpathid) => {
               <input type="file" id="newImage" @change="onFileChange">
               <div
                 v-if="newImagePreview"
-              >
+              > 
                 <img
                   :src="newImagePreview"
                   alt="Selected Image"
@@ -235,7 +236,7 @@ const editLearningpath = async (singlelearningpathid) => {
                   class="btn btn-info"
                   @click="uploadNewImage()"
                 >
-                  {{ store.state.strings.uploadowndefaultimage }}
+                  {{ store.state.strings.uploaddefaultimage }}
                 </button>
               </div>
             </div>
