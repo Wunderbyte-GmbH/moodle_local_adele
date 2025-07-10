@@ -123,7 +123,7 @@ class asset_handler {
             'filearea'  => 'lp_images',
             'itemid'    => $learningpathid,
             'filepath'  => '/',
-            'filename'  => $filename,
+            'filename'  => $filename . (string)time(),
             'userid'    => $USER->id,
             'license'   => 'allrightsreserved',
             'author'    => $USER->firstname . ' ' . $USER->lastname,
