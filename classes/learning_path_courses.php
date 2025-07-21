@@ -100,8 +100,8 @@ class learning_path_courses {
             $entry->selected_course_image = null;
             if ($file = reset($files)) {
                 $path = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                                                        $file->get_itemid(), $file->get_filepath(), $file->get_filename());
-                $entry->selected_course_image = str_replace('/0/', '/', $path->out());
+                                                        '', $file->get_filepath(), $file->get_filename());
+                $entry->selected_course_image = $path->out();
             }
         }
         return $entries;

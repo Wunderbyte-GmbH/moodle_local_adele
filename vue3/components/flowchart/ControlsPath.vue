@@ -104,13 +104,15 @@ watch(() => props.learningpath, (newValue) => {
   }
 });
 
-watch(() => learningpathcontrol.value, async() => {
-  if (learningpathcontrol.value.json.tree != undefined 
-  && learningpathcontrol.value.json.tree !== oldtree.value.json.tree) {
-    await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode)
+watch(() => learningpathcontrol.value, async () => {
+  if (
+    learningpathcontrol.value?.json?.tree !== undefined && 
+    learningpathcontrol.value.json.tree !== oldtree.value?.json?.tree
+  ) {
+    await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
     oldtree.value = learningpathcontrol.value;
   }
-}, { deep: true } )
+}, { deep: true });
 
 onMounted(async () => {
   learningpathcontrol.value = props.learningpath;

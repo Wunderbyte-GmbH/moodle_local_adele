@@ -131,7 +131,7 @@
                   class="btn btn-info"
                   @click="showCourseImageSelection = !showCourseImageSelection"
                 >
-                  {{store.sate.strings.modals_select_button}}
+                  {{store.state.strings.modals_select_button}}
                 </button>
                 <div
                   v-if="selectedCourseImagePath"
@@ -146,7 +146,7 @@
                     class="deselect-btn"
                     @click="selectedCourseImagePath = ''"
                   >
-                  {{store.sate.strings.modals_deselect_button}}
+                  {{store.state.strings.modals_deselect_button}}
                   </button>
                 </div>
                 <div
