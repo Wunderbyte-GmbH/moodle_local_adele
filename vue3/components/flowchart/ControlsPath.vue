@@ -37,6 +37,7 @@ import removeModules from '../../composables/nodesHelper/removeModules';
 import standaloneNodeCheck from '../../composables/standaloneNodeCheck';
 import recalculateParentChild from '../../composables/recalculateParentChild';
 import { computed } from 'vue';
+import _ from 'lodash';
 
 // Load Store and Router
 const store = useStore();
@@ -71,8 +72,13 @@ const current_user_view = ref(true)
 const emit = defineEmits([
   'change-class',
   'change-user-view',
-  'finish-edit'
+  'finish-edit',
+  'draw-modules'
 ]);
+
+defineExpose({
+       handleDrawModules
+});
 // Toggle the dark mode of the flow-chart
 function toggleClass() {
   current_view.value = !current_view.value
@@ -104,15 +110,23 @@ watch(() => props.learningpath, (newValue) => {
   }
 });
 
-watch(() => learningpathcontrol.value, async () => {
-  if (
-    learningpathcontrol.value?.json?.tree !== undefined && 
-    learningpathcontrol.value.json.tree !== oldtree.value?.json?.tree
-  ) {
-    await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
-    oldtree.value = learningpathcontrol.value;
-  }
-}, { deep: true });
+async function handleDrawModules() {
+  setTimeout(() => {
+     drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
+  }, 300)
+}
+
+// watch(() => learningpathcontrol.value, async () => {
+//   // console.log('learnpath change before', learningpathcontrol.value?.json?.tree?.nodes);
+//   if (
+//     learningpathcontrol.value?.json?.tree?.nodes !== undefined && 
+//     learningpathcontrol.value.json.tree !== oldtree.value?.json?.tree?
+//   ) {
+//     // console.log('learnpath change after', learningpathcontrol.value?.json?.tree?.nodes);
+//     // await drawModules(learningpathcontrol.value, addNodes, removeNodes, findNode);
+//     oldtree.value = _.cloneDeep(learningpathcontrol.value);
+//   }
+// }, { deep: true });
 
 onMounted(async () => {
   learningpathcontrol.value = props.learningpath;

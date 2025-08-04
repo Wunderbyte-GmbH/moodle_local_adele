@@ -98,6 +98,7 @@
         @change-class="toggleClass"
         @change-user-view="toggleUserView"
         @finish-edit="finishEdit"
+        ref="controls"
       />
     </div>
     <p />
@@ -162,6 +163,9 @@ const emit = defineEmits([
 ]);
 // Define constants that will be referenced
 const dark = ref(false)
+
+const controls = ref(null);
+
 const editor_view = ref(true)
 // Intersected node
 const intersectedNode = ref(null);
@@ -250,6 +254,8 @@ const onChangeModule = (data) => {
       }
     })
   }
+
+   controls.value.handleDrawModules();
 }
 
 onNodeDragStop(({node}) => {
