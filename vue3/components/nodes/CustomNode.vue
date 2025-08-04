@@ -66,6 +66,7 @@ const courses = computed(() => {
       id: [course.course_node_id[0]]
   }))
 });
+const selectModule = ref(null);
 const dataValue = ref('')
 const learningmodule = computed(() => {
   if (props.learningpath.json && props.learningpath.json.modules) {
@@ -142,6 +143,12 @@ const changeModule = (data) => {
     delete data.module
   }
   emit('change-module', data);
+  const mouseupEvent = new MouseEvent('mouseup', {
+    bubbles: true,
+    cancelable: true,
+    view: window
+  });
+  selectModule.value.dispatchEvent(mouseupEvent);
 }
 
 const nodeBackgroundColor = computed(() => {
@@ -277,6 +284,7 @@ const zoomOnParent = () => {
           </h5>
           <div v-if="dataValue">
             <select
+              ref="selectModule"
               v-model="dataValue.module"
               class="form-select form-control"
               @change="changeModule(dataValue)"
