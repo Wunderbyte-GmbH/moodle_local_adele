@@ -72,6 +72,8 @@ class get_learningpaths extends external_api {
      * @return array
      */
     public static function execute($userid, $learningpathid, $contextid): array {
+        global $DB;
+
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'learningpathid' => $learningpathid,
@@ -93,10 +95,33 @@ class get_learningpaths extends external_api {
                 'You do not have the required capability and the session key is not set.'
             );
         }
-        return learning_paths::get_learning_paths(
+
+
+        $role = $DB->get_record('role', ['shortname' => 'adelemanager']);
+        $ismanager = user_has_role_assignment($userid, $role->id, $contextid);
+        $isadmin = is_siteadmin($userid);
+
+        $allpaths = learning_paths::get_learning_paths(
             $hascapability,
             $learningpaths
         );
+
+        $lpkeys = array_keys($learningpaths);
+
+        if ($ismanager || $isadmin) {
+            return $allpaths;
+        }
+
+        $filteredpaths = [
+            'edit' => array_filter($allpaths['edit'], function ($lp) use ($lpkeys) {
+                return in_array((int)$lp['id'], $lpkeys);
+            }),
+            'view' => array_filter($allpaths['view'], function ($lp) use ($lpkeys) {
+                return in_array((int)$lp['id'], $lpkeys);
+            }),
+        ];
+
+        return $filteredpaths;
     }
 
     /**

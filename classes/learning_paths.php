@@ -748,21 +748,20 @@ class learning_paths {
         global $USER, $DB;
 
         $cache = \cache::make('local_adele', 'navisteacher');
-        $records = $cache->get('localadeleeditor');
+        // $records = $cache->get('localadeleeditor');
 
-        if ($records === false) {
             // If we don't have the capability, we check with cache if we are editor.
-            $params = [
-                'userid' => (int)$USER->id,
-            ];
+        $params = [
+            'userid' => (int)$USER->id,
+        ];
 
-            $sql = "SELECT lpe.learningpathid
-                FROM {local_adele_lp_editors} lpe
-                WHERE lpe.userid = :userid";
-            $records = $DB->get_records_sql($sql, $params);
+        $sql = "SELECT lpe.learningpathid
+            FROM {local_adele_lp_editors} lpe
+            WHERE lpe.userid = :userid";
+        $records = $DB->get_records_sql($sql, $params);
 
-            $cache->set('localadeleeditor', $records);
-        }
+        $cache->set('localadeleeditor', $records);
+
 
         return $records ?? [];
     }
