@@ -67,6 +67,7 @@ const cardHeight = computed(() => {
   return  minHeight
 })
 
+const selectOrModule = ref(null);
 const dataValue = ref('')
 const learningmodule = computed(() => {
   let parsedLearningModule = props.learningpath.json;
@@ -182,6 +183,12 @@ const changeModule = (data) => {
     delete data.module
   }
   emit('change-module', data);
+  const mouseupEvent = new MouseEvent('mouseup', {
+    bubbles: true,
+    cancelable: true,
+    view: window
+  });
+  selectOrModule.value.dispatchEvent(mouseupEvent);
 }
 
 const childStyle = {
@@ -323,6 +330,7 @@ const deleteCondition = () => {
               {{ store.state.strings.nodes_learning_module }}
             </h5>
             <select
+              ref="selectOrModule"
               v-model="dataValue.module"
               class="form-select form-control"
               @change="changeModule(dataValue)"
