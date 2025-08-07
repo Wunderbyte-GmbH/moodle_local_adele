@@ -748,8 +748,6 @@ class learning_paths {
         global $USER, $DB;
 
         $cache = \cache::make('local_adele', 'navisteacher');
-        // TEMP $records = $cache->get('localadeleeditor');.
-
         $params = [
             'userid' => (int)$USER->id,
         ];
