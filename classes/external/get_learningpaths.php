@@ -96,7 +96,6 @@ class get_learningpaths extends external_api {
             );
         }
 
-
         $role = $DB->get_record('role', ['shortname' => 'adelemanager']);
         $ismanager = user_has_role_assignment($userid, $role->id, $contextid);
         $isadmin = is_siteadmin($userid);
