@@ -57,7 +57,7 @@ echo $OUTPUT->header();
 $view = null;
 
 $hasaccess = learning_paths::check_access();
-
+$learningpaths = learning_paths::return_learningpaths();
 if (has_capability('local/adele:canmanage', $context)) {
     $view = 'manager';
 } else if (

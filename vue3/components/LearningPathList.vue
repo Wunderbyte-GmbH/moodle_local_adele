@@ -96,10 +96,6 @@
                 <div class="overlay">
                   <a
                     v-if="
-                      (
-                        store.state.view != null &&
-                        store.state.editablepaths[singlelearningpath.id] != undefined
-                      ) ||
                       store.state.view == 'manager'
                     "
                     class="icon-link"
@@ -127,10 +123,6 @@
                   </a>
                   <a
                     v-if="
-                      (
-                        store.state.view != null &&
-                        store.state.editablepaths[singlelearningpath.id] != undefined
-                      ) ||
                       store.state.view == 'manager'
                     "
                     class="icon-link"
