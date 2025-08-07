@@ -83,7 +83,7 @@
                   >
                     <img
                       :src="imagepath.path"
-                      class="d-block w-100"
+                      class="d-block h-100 w-100 sliderimage"
                       :alt="'Slide ' + (index + 1)"
                     >
                   </div>
@@ -180,4 +180,11 @@ watch(() => store.state.lpimages.helpingslider, (newVal) => {
   min-height: 500px;
 }
 
+.sliderimage {
+  object-fit: contain;
+}
+
+.carousel {
+  width: 100%;
+}
 </style>
