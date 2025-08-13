@@ -29,33 +29,50 @@
 function xmldb_local_adele_install() {
     global $DB;
 
-    $role = $DB->get_record('role', ['shortname' => 'adelemanager']);
+    // Create or update the Adele Manager role.
+    create_role('Adele Manager', 'adelemanager', 'adeleroledescription', ['local/adele:canmanage']);
+
+    // Create or update the new Adele Assistant role.
+    create_role('Adele Assistant', 'adeleassistant', 'adeleassistantdescription', ['local/adele:assist']);
+
+    return true;
+}
+
+/**
+ * Helper function to create a role if it does not exist.
+ *
+ * @param string $name Role name.
+ * @param string $shortname Role shortname.
+ * @param string $descriptionstr Identifier for the description string.
+ * @param array $capabilities List of capabilities for the role.
+ */
+function create_role($name, $shortname, $descriptionstr, $capabilities) {
+    global $DB;
+
+    $role = $DB->get_record('role', ['shortname' => $shortname]);
     if (empty($role->id)) {
         $sql = "SELECT MAX(sortorder)+1 AS id FROM {role}";
         $max = $DB->get_record_sql($sql, []);
 
         $role = (object) [
-            'name' => 'Adele Manager',
-            'shortname' => 'adelemanager',
-            'description' => get_string('adeleroledescription', 'local_adele'),
+            'name' => $name,
+            'shortname' => $shortname,
+            'description' => 'Adele assistant',
             'sortorder' => $max->id,
             'archetype' => '',
         ];
         $role->id = $DB->insert_record('role', $role);
     }
 
-    // Ensure, that this role is assigned in the required context levels.
+    // Ensure this role is assigned at the required context level.
     $chk = $DB->get_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
     if (empty($chk->id)) {
         $DB->insert_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
     }
 
-    // Ensure, that this role has the required capabilities.
+    // Ensure this role has the required capabilities.
     $ctx = \context_system::instance();
-    $caps = [
-        'local/adele:canmanage',
-    ];
-    foreach ($caps as $cap) {
+    foreach ($capabilities as $cap) {
         $chk = $DB->get_record('role_capabilities', [
                 'contextid' => $ctx->id,
                 'roleid' => $role->id,
@@ -73,6 +90,4 @@ function xmldb_local_adele_install() {
             ]);
         }
     }
-
-    return true;
 }

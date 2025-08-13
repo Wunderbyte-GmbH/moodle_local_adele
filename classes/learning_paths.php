@@ -762,6 +762,27 @@ class learning_paths {
         return $records ?? [];
     }
 
+    public static function return_learningpaths_owned() {
+
+        global $USER, $DB;
+
+        // $cache = \cache::make('local_adele', 'navisteacher');
+        $params = [
+            'userid1' => (int)$USER->id,
+            'userid2' => (int)$USER->id,
+        ];
+
+        $sql = "SELECT lpe.learningpathid
+            FROM {local_adele_lp_editors} lpe
+            JOIN {local_adele_learning_paths} lp on lp.id = lpe.learningpathid
+            WHERE lpe.userid = :userid1 AND lp.createdby = :userid2";
+        $records = $DB->get_records_sql($sql, $params);
+
+        // $cache->set('localadeleeditor', $records);
+
+        return $records ?? [];
+    }
+
     /**
      * Just checks access.
      *
@@ -771,7 +792,9 @@ class learning_paths {
     public static function check_access() {
 
         // First fast check if we show the button in the navbar.
-        if (has_capability('local/adele:canmanage', context_system::instance())) {
+        if (has_capability('local/adele:canmanage', context_system::instance())
+            || has_capability('local/adele:assist', context_system::instance())
+            ) {
             $iseditor = true;
         } else {
             $learningpaths = self::return_learningpaths();

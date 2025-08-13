@@ -73,11 +73,10 @@ class get_image_paths extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        $hascapability = has_capability('local/adele:canmanage', $context);
         $sessionvalue = learning_paths::check_access();
 
         // If the user doesn't have the capability and the session value is empty, handle the error.
-        if (!$hascapability && empty($sessionvalue)) {
+        if (empty($sessionvalue)) {
             throw new required_capability_exception(
               $context,
               'local/adele:canmanage',

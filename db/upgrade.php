@@ -143,5 +143,71 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Adele savepoint reached.
         upgrade_plugin_savepoint(true, 2024082905, 'local', 'adele');
     }
+       // Example upgrade step.
+    if ($oldversion < 2023101200) { // Adjust this version number appropriately.
+        // Perform database schema changes, add new capabilities, etc.
+
+        // Update the plugin's savepoint version.
+        upgrade_plugin_savepoint(true, 2023101200, 'local', 'adele');
+    }
+    if ($oldversion < 2025081200) {
+        // Define the new "Adele Assistant" role properties.
+        $name = 'Adele Assistant';
+        $shortname = 'adeleassistant';
+        $descriptionstr = 'adeleassistantdescription';
+        $capabilities = ['local/adele:assist'];
+
+        // Check if the role exists by its shortname.
+        $role = $DB->get_record('role', ['shortname' => $shortname]);
+        if (empty($role->id)) {
+            // Get the new sort order.
+            $sql = "SELECT MAX(sortorder)+1 AS id FROM {role}";
+            $max = $DB->get_record_sql($sql, []);
+
+            // Create the new role record.
+            $role = (object) [
+                'name' => $name,
+                'shortname' => $shortname,
+                'description' => 'Adele assistant',
+                'sortorder' => $max->id,
+                'archetype' => '',
+            ];
+            // Insert the new role into the database.
+            $role->id = $DB->insert_record('role', $role);
+        }
+
+        // Ensure this role is assigned at the required context level.
+        $chk = $DB->get_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
+        if (empty($chk->id)) {
+            $DB->insert_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
+        }
+
+        // Ensure this role has the required capabilities.
+        $ctx = \context_system::instance();
+        foreach ($capabilities as $cap) {
+            $chk = $DB->get_record('role_capabilities', [
+                    'contextid' => $ctx->id,
+                    'roleid' => $role->id,
+                    'capability' => $cap,
+                    'permission' => 1,
+                ]);
+            if (empty($chk->id)) {
+                $DB->insert_record('role_capabilities', [
+                    'contextid' => $ctx->id,
+                    'roleid' => $role->id,
+                    'capability' => $cap,
+                    'permission' => 1,
+                    'timemodified' => time(),
+                    'modifierid' => 2,
+                ]);
+            }
+        }
+
+        // Update savepoint to mark the successful upgrade.
+        upgrade_plugin_savepoint(true, 2025081200, 'local', 'adele');
+    }
+    
+
+
     return true;
 }

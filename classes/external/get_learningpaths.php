@@ -83,11 +83,11 @@ class get_learningpaths extends external_api {
         require_login();
         $context = context::instance_by_id($contextid);
 
-        $hascapability = has_capability('local/adele:edit', $context);
         $learningpaths = learning_paths::return_learningpaths();
-
+        $pathscreatedfornamedperson = learning_paths::return_learningpaths_owned();
+        $sessionvalue = learning_paths::check_access();
         // If the user doesn't have the capability and the session value is empty, handle the error.
-        if (!$hascapability && empty($sessionvalue)) {
+        if (empty($sessionvalue)) {
             throw new required_capability_exception(
                 $context,
                 'local/adele:canmanage',
@@ -101,24 +101,40 @@ class get_learningpaths extends external_api {
         $isadmin = is_siteadmin($userid);
 
         $allpaths = learning_paths::get_learning_paths(
-            $hascapability,
+            true,
             $learningpaths
         );
-
+        
+        
         $lpkeys = array_keys($learningpaths);
+        $lpownedkeys = array_keys($pathscreatedfornamedperson);
 
         if ($ismanager || $isadmin) {
+            foreach ($allpaths as &$typepaths) {
+                foreach ($typepaths as &$path) {
+                    $path['isowner'] = "true";
+                }
+            }
             return $allpaths;
         }
 
         $filteredpaths = [
-            'edit' => array_filter($allpaths['edit'], function ($lp) use ($lpkeys) {
-                return in_array((int)$lp['id'], $lpkeys);
-            }),
-            'view' => array_filter($allpaths['view'], function ($lp) use ($lpkeys) {
-                return in_array((int)$lp['id'], $lpkeys);
-            }),
+            'edit' => array_map(function ($lp) use ($lpkeys, $lpownedkeys) {
+                if (in_array((int)$lp['id'], $lpkeys)) {
+                    $lp['isowner'] = in_array((int)$lp['id'], $lpownedkeys) ? "true" : "false";
+                    return $lp;
+                }
+            }, $allpaths['edit']),
+            'view' => array_map(function ($lp) use ($lpkeys, $lpownedkeys) {
+                if (in_array((int)$lp['id'], $lpkeys)) {
+                    $lp['isowner'] = in_array((int)$lp['id'], $lpownedkeys) ? "true" : "false";
+                    return $lp;
+                }
+            }, $allpaths['view']),
         ];
+
+        $filteredpaths['edit'] = array_filter($filteredpaths['edit']);
+        $filteredpaths['view'] = array_filter($filteredpaths['view']);
 
         return $filteredpaths;
     }
@@ -137,6 +153,7 @@ class get_learningpaths extends external_api {
                     'description' => new external_value(PARAM_TEXT, 'Item description'),
                     'image' => new external_value(PARAM_TEXT, 'Item image'),
                     'visibility' => new external_value(PARAM_TEXT, 'visibility'),
+                    'isowner' => new external_value(PARAM_TEXT, 'canbedeleted'),
                 ]),
                 VALUE_OPTIONAL
             ),
@@ -147,6 +164,7 @@ class get_learningpaths extends external_api {
                     'description' => new external_value(PARAM_TEXT, 'Item description'),
                     'image' => new external_value(PARAM_TEXT, 'Item image'),
                     'visibility' => new external_value(PARAM_TEXT, 'visibility'),
+                    'isowner' => new external_value(PARAM_TEXT, 'canbedeleted'),
                 ]),
                 VALUE_OPTIONAL
             ),

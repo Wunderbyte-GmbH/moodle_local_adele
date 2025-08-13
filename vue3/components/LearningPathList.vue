@@ -4,7 +4,7 @@
     <h3>{{ store.state.strings.pluginname }}</h3>
     <div class="col-lg-2">
       <button
-        v-if="store.state.view != null"
+        v-if="store.state.view != null && (store.state.view == 'manager' || store.state.view == 'assistant')"
         type="button"
         class="btn btn-primary mt-4 mb-4 btn-block"
         @click.prevent="addNewLearningpath()"
@@ -45,7 +45,7 @@
         <div
           v-if="
             store.state.editablepaths[singlelearningpath.id] != undefined ||
-            store.state.view == 'manager' ||
+            store.state.view == 'manager' || store.state.view == 'assistant' || 
             (
               singlelearningpath.visibility == 1 &&
               store.state.view != null
@@ -80,7 +80,7 @@
             </div>
           </div>
             <div
-              class="card-body"
+              class="card-body" 
             >
               <div
                 class="mb-2"
@@ -96,7 +96,7 @@
                 <div class="overlay">
                   <a
                     v-if="
-                      store.state.view == 'manager'
+                      store.state.view == 'manager'||store.state.view == 'assistant'
                     "
                     class="icon-link"
                     href=""
@@ -123,7 +123,7 @@
                   </a>
                   <a
                     v-if="
-                      store.state.view == 'manager'
+                       (store.state.view == 'manager') || (store.state.view == 'assistant' && singlelearningpath.isowner == 'true')
                     "
                     class="icon-link"
                     href=""
