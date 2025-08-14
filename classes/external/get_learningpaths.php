@@ -104,8 +104,7 @@ class get_learningpaths extends external_api {
             true,
             $learningpaths
         );
-        
-        
+
         $lpkeys = array_keys($learningpaths);
         $lpownedkeys = array_keys($pathscreatedfornamedperson);
 

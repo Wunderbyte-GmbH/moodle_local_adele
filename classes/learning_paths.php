@@ -762,11 +762,19 @@ class learning_paths {
         return $records ?? [];
     }
 
+
+    /**
+     * Retrieves a list of learning path IDs owned by the current user.
+     *
+     * This function queries the database to find all learning paths where the
+     * current user is an editor and also the creator, and returns their IDs.
+     *
+     * @return array An associative array of records containing learning path IDs owned by the current user.
+     */
     public static function return_learningpaths_owned() {
 
         global $USER, $DB;
 
-        // $cache = \cache::make('local_adele', 'navisteacher');
         $params = [
             'userid1' => (int)$USER->id,
             'userid2' => (int)$USER->id,
@@ -777,9 +785,6 @@ class learning_paths {
             JOIN {local_adele_learning_paths} lp on lp.id = lpe.learningpathid
             WHERE lpe.userid = :userid1 AND lp.createdby = :userid2";
         $records = $DB->get_records_sql($sql, $params);
-
-        // $cache->set('localadeleeditor', $records);
-
         return $records ?? [];
     }
 

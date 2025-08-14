@@ -206,8 +206,5 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Update savepoint to mark the successful upgrade.
         upgrade_plugin_savepoint(true, 2025081200, 'local', 'adele');
     }
-    
-
-
     return true;
 }
