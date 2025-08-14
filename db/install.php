@@ -30,10 +30,10 @@ function xmldb_local_adele_install() {
     global $DB;
 
     // Create or update the Adele Manager role.
-    create_role('Adele Manager', 'adelemanager', 'adeleroledescription', ['local/adele:canmanage']);
+    create_role_for_adele('Adele Manager', 'adelemanager', 'adeleroledescription', ['local/adele:canmanage']);
 
     // Create or update the new Adele Assistant role.
-    create_role('Adele Assistant', 'adeleassistant', 'adeleassistantdescription', ['local/adele:assist']);
+    create_role_for_adele('Adele Assistant', 'adeleassistant', 'adeleassistantdescription', ['local/adele:assist']);
 
     return true;
 }
@@ -46,7 +46,7 @@ function xmldb_local_adele_install() {
  * @param string $descriptionstr Identifier for the description string.
  * @param array $capabilities List of capabilities for the role.
  */
-function create_role($name, $shortname, $descriptionstr, $capabilities) {
+function create_role_for_adele($name, $shortname, $descriptionstr, $capabilities) {
     global $DB;
 
     $role = $DB->get_record('role', ['shortname' => $shortname]);
