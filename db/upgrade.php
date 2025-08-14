@@ -143,13 +143,6 @@ function xmldb_local_adele_upgrade($oldversion) {
         // Adele savepoint reached.
         upgrade_plugin_savepoint(true, 2024082905, 'local', 'adele');
     }
-       // Example upgrade step.
-    if ($oldversion < 2023101200) { // Adjust this version number appropriately.
-        // Perform database schema changes, add new capabilities, etc.
-
-        // Update the plugin's savepoint version.
-        upgrade_plugin_savepoint(true, 2023101200, 'local', 'adele');
-    }
     if ($oldversion < 2025081200) {
         // Define the new "Adele Assistant" role properties.
         $name = 'Adele Assistant';
