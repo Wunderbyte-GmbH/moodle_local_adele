@@ -62,4 +62,8 @@
       'eventname' => '\core\event\course_viewed',
       'callback' => 'local_adele_observer::user_views_learning_path',
     ],
+    [
+      'eventname' => '\core\event\role_assigned',
+      'callback' => 'local_adele_observer::assign_assistant_to_role',
+    ],
  ];

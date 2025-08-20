@@ -48,8 +48,16 @@ class local_adele_observer {
      * @param base $event
      */
     public static function user_enrolment_created(base $event) {
-        return;
         $observer = enrollment::enrolled($event);
+    }
+
+    /**
+     * Observer for the assign_assistant_to_role event
+     *
+     * @param \core\event\role_assigned $event
+     */
+    public static function assign_assistant_to_role(\core\event\role_assigned $event) {
+        $observer = enrollment::assign_assistant_to_role($event);
     }
 
     /**

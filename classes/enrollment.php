@@ -156,4 +156,21 @@ class enrollment {
 
         return $record;
     }
+
+    /**
+     * Assings the assistant role.
+     *
+     * @param object $event
+     */
+    public static function assign_assistant_to_role($event) {
+        global $DB;
+        $configrole = get_config('local_adele', 'enrollassistant');
+        $eventroleid = $event->objectid;
+        $userid = $event->relateduserid;
+        $systemrole = $DB->get_record('role', ['shortname' => 'adeleassistant'], '*', MUST_EXIST);
+        $systemcontext = context_system::instance();
+        if ($configrole !== '' && ($eventroleid == $configrole)) {
+            role_assign($systemrole->id, $userid, $systemcontext->id);
+        }
+    }
 }
