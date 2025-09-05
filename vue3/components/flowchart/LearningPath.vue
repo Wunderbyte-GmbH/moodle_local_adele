@@ -188,7 +188,7 @@ const finishEdit = () => {
 // load useVueFlow properties / functions
 const { nodes, edges, findNode, onConnect, addEdges, zoomTo,
     addNodes, removeNodes, fitView, viewport, setCenter,
-    toObject, getEdges, onNodeDragStop } = useVueFlow({
+    toObject, getEdges, onNodeDragStop, updateNode } = useVueFlow({
 nodes: [],
 edges: [],
 })
@@ -471,7 +471,7 @@ function onDrop(event) {
     tree = removeDropzones(tree)
     emit('changedLearningpathTree', tree)
     if(intersectedNode.value.closestnode.id == 'starting_node'){
-      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store)
+      setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, updateNode)
     }
   } else{
     notify({
@@ -491,7 +491,7 @@ watch(
         if (deletedNode[0]) {
           emit('removeNode', deletedNode[0]);
         }
-        setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, true)
+        setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 600, store, updateNode, true)
         if (deletedNode[0] && deletedNode[0].id) {
           drawModules(props.learningpath, addNodes, removeNodes, findNode, null, deletedNode[0].id)
         }
@@ -507,7 +507,7 @@ const debouncedHandler = debounce((newVal, oldVal) => {
     const lastEdgesVal = store.state.undoEdges[store.state.undoEdges.length - 1];
     edges.value = [...lastEdgesVal]
     store.commit('unsetUndoEdges');
-    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store, updateNode)
   }
 }, 300);
 

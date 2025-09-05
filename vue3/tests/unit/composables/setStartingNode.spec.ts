@@ -39,10 +39,11 @@ interface Store {
 }
 
 describe('setStartingNode', () => {
-  let removeNodesMock: jest.Mock, nextTickMock: jest.Mock, addNodesMock: jest.Mock, storeMock: Store, nodes: Node[];
+  let removeNodesMock: jest.Mock, updateNodesMock: jest.Mock, nextTickMock: jest.Mock, addNodesMock: jest.Mock, storeMock: Store, nodes: Node[];
 
     beforeEach(() => {
     removeNodesMock = jest.fn(); // Mock for removeNodes
+    updateNodesMock = jest.fn();
     nextTickMock = jest.fn((cb: () => void) => cb()); // Mock for nextTick
     addNodesMock = jest.fn(); // Mock for addNodes
     storeMock = {
@@ -106,13 +107,13 @@ describe('setStartingNode', () => {
 
   it('should not execute if the store view is teacher', () => {
     storeMock.state.view = 'teacher';
-    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock);
+    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock, updateNodesMock);
     expect(removeNodesMock).not.toHaveBeenCalled();
     expect(addNodesMock).not.toHaveBeenCalled();
   });
 
   it('should calculate the correct position for the starting node', () => {
-    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock);
+    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock, updateNodesMock);
 
     expect(removeNodesMock).toHaveBeenCalledWith(['starting_node']);
     expect(addNodesMock).toHaveBeenCalledWith([expect.objectContaining({
@@ -149,7 +150,7 @@ describe('setStartingNode', () => {
       draggable: true,
     });
 
-    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock, true);
+    setStartingNode(removeNodesMock, nextTickMock, addNodesMock, nodes, 150, storeMock, updateNodesMock, true);
 
     expect(removeNodesMock).toHaveBeenCalledWith(['starting_node']);
     expect(addNodesMock).toHaveBeenCalledWith([expect.objectContaining({
