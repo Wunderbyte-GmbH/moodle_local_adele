@@ -49,7 +49,7 @@ const modulesDrawn = ref(false);
 const oldtree = ref({});
 
 const { toObject, setNodes, setEdges, removeNodes,
-  addNodes, nodes, findNode } = useVueFlow()
+  addNodes, nodes, findNode, updateNode } = useVueFlow()
 
 // Define props in the setup block
 const props = defineProps({
@@ -106,7 +106,7 @@ watch(() => props.learningpath, (newValue) => {
     setEdges([])
   }
   if (!props.view) {
-    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store)
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store, updateNode)
   }
 });
 
@@ -119,7 +119,7 @@ async function handleDrawModules() {
 // watch(() => learningpathcontrol.value, async () => {
 //   // console.log('learnpath change before', learningpathcontrol.value?.json?.tree?.nodes);
 //   if (
-//     learningpathcontrol.value?.json?.tree?.nodes !== undefined && 
+//     learningpathcontrol.value?.json?.tree?.nodes !== undefined &&
 //     learningpathcontrol.value.json.tree !== oldtree.value?.json?.tree?
 //   ) {
 //     // console.log('learnpath change after', learningpathcontrol.value?.json?.tree?.nodes);
@@ -149,7 +149,7 @@ onMounted(async () => {
   }
 
   if (!props.view) {
-    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store);
+    setStartingNode(removeNodes, nextTick, addNodes, nodes.value, 800, store, updateNode);
     deepCopy.value = JSON.parse(JSON.stringify(toObject()));
     deepCopyText.value = JSON.parse(JSON.stringify(props.learningpath));
   }
@@ -164,6 +164,8 @@ const onSave = async () => {
         type: 'error'
       });
     } else {
+        console.log('starting_node');
+      updateNode('starting_node', { deletable: true });
       removeNodes(['starting_node'])
       if (learningpathcontrol.value.id == 0) {
         if (learningpathcontrol.value.json != '') {

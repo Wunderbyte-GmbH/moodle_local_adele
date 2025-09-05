@@ -23,6 +23,7 @@ interface Node {
   label: string;
   data: NodeData;
   draggable: boolean;
+  deletable: boolean,
   parentCourse: string;
   dimensions?: Dimensions; // Optional since it may not be set initially
 }
@@ -48,6 +49,7 @@ let startingNode: Node = {
       width: '400px',
     },
     draggable: true,
+    deletable: false,
     parentCourse: '',
   }
 
@@ -58,7 +60,8 @@ const setStartingNode = (
   nodes: Node[],
   skip: number,
   store: Store,
-  backwards: boolean = false
+  updateNode: (id: string, partial: Partial<Node>) => void,
+  backwards: boolean = false,
 ): void => {
   if (store.state.view != 'teacher') {
       nextTick(() => {
@@ -82,6 +85,7 @@ const setStartingNode = (
               startingNode.position.x = rightStartingNode + skip
           }
           startingNode.data.infotext = store.state.strings.composables_new_node;
+          updateNode('starting_node', { deletable: true });
           removeNodes(['starting_node'])
 
           nodes.forEach((node) => {
