@@ -1,8 +1,9 @@
 <script setup>
 // Import needed libraries
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, computed } from 'vue';
 import UserFeedbackBlock from './UserFeedbackBlock.vue';
 import { useStore } from 'vuex';
+import * as nodeColors from '../../config/nodeColors';
 
 // Load Store
 const showFeedbackarea = ref(false);
@@ -18,6 +19,45 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  status: {
+    type: String,
+    default: '',
+  },
+});
+
+// Icon color based on status
+const iconColor = computed(() => {
+  let color;
+  switch (props.status) {
+    case '0':
+      color = nodeColors.progressBarColorCase0;
+      break;
+    case 'a1':
+      color = nodeColors.progressBarColorCaseA1;
+      break;
+    case 'a2':
+      color = nodeColors.progressBarColorCaseA2;
+      break;
+    case 'b':
+      color = nodeColors.progressBarColorCaseB;
+      break;
+    case 'c':
+      color = nodeColors.progressBarColorCaseC;
+      break;
+    case 'd':
+      color = nodeColors.progressBarColorCaseD;
+      break;
+    case 'e':
+      color = nodeColors.progressBarColorCaseE;
+      break;
+    case 'f':
+      color = nodeColors.progressBarColorCaseF;
+      break;
+    default:
+      color = nodeColors.progressBarColorCaseDefault;
+      break;
+  }
+  return color;
 });
 
 const toggleFeedbackarea = () => {
@@ -75,7 +115,7 @@ const handleBlur = () => {
     :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }" @click.stop
     @focus="handleFocus" @blur="handleBlur">
     <div class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }" @click.stop="toggleFeedbackarea">
-      <i class="fa fa-comment" :class="{ 'fa-comment-mobile': mobile }" />
+      <i class="fa fa-comment" :class="{ 'fa-comment-mobile': mobile }" :style="{ color: iconColor }" />
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
@@ -215,7 +255,7 @@ const handleBlur = () => {
 }
 
 .fa-comment {
-  font-size: 20px;
+  font-size: 28px;
 }
 
 .fa-comment-mobile {

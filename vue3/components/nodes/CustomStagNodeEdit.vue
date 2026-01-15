@@ -171,7 +171,6 @@ const expandCourses = () => {
       </div>
       <div
         class="card-body"
-        :class="active ? 'active-node' : 'inactive-node'"
         :style="[nodeBackgroundColor]"
       >
         <div v-if="min_courses > 1">
@@ -210,13 +209,8 @@ const expandCourses = () => {
         <div
           class="row mb-2"
         >
-          <div class="col-4 text-left">
-            <b>
-              {{ store.state.strings.nodes_progress }}
-            </b>
-          </div>
           <div
-            class="col-8"
+            class="col-12"
             style="display: flex; justify-content: end;"
           >
             <ProgressBar :progress="data.progress" />

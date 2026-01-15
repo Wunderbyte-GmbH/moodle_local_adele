@@ -402,11 +402,6 @@ const deleteCondition = () => {
             v-else
             class="row mb-2 mt-2"
           >
-            <div class="col-4 text-left">
-              <b>
-                {{ store.state.strings.nodes_progress }}
-              </b>
-            </div>
             <div
               class="col-8"
               style="display: flex; justify-content: end;"

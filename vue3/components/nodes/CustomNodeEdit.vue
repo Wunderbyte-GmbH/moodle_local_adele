@@ -34,6 +34,8 @@ import ProgressBar from '../nodes_items/ProgressBar.vue';
 import NodeInformation from '../nodes_items/NodeInformation.vue';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
 import MasterConditions from '../nodes_items/MasterConditions.vue';
+import { useStatusMessage } from '../../composables/useStatusMessage';
+import * as nodeColors from '../../config/nodeColors';
 
 // Load Store
 const store = useStore();
@@ -136,47 +138,7 @@ onMounted(() => {
   triggerAnimation();
 })
 
- const statusMessage = computed(() => {
-  const feedback = props.data?.completion?.feedback || {};
-  const completion = feedback.completion || {};
-
-  // Check for "Status 0" condition
-  if (
-    completion.after == null &&
-    completion.after_all == null &&
-    completion.before == null &&
-    completion.inbetween == null
-  ) {
-    return '0';
-  }
-
-  // Switch case to determine other statuses
-  switch (feedback.status_restriction) {
-    case 'before':
-      if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
-        return 'a1';
-      }
-      break;
-    case 'inbetween':
-      if ((!completion.after || completion.after.length === 0) && (completion.before?.length > 0 || completion.inbetween?.length > 0)) {
-        return 'a2';
-      }
-      if (completion.after && completion.after.length > 0) {
-        return completion.after_all && Object.keys(completion.after_all).length > 0 ? 'b' : 'c';
-      }
-      break;
-    case 'after':
-      if (completion.after && completion.after.length > 0) {
-        return completion.after_all && completion.after_all.length === 0 ? 'e' : 'd';
-      }
-      if (!completion.after || completion.after.length === 0) {
-        return 'f';
-      }
-      break;
-    default:
-      return '';
-  }
-});
+const { statusMessage } = useStatusMessage(computed(() => props.data));
 
 const customNodeEdit = ref(null);
 const emit = defineEmits([
@@ -223,16 +185,47 @@ const get_cover_image = (data) => {
   }
 }
 
-// Dynamic background color based on data.completion
+const cardBackgroundColor = computed(() => {
+    return { backgroundColor: nodeColors.cardBackgroundColor }; 
+});
+
 const nodeBackgroundColor = computed(() => {
-  if (props.data.completion.completionnode) {
-    return {
-      backgroundColor: props.data.completion.completionnode.valid ? store.state.strings.LIGHT_STEEL_BLUE : store.state.strings.LIGHT_GRAY,
-    };
+    return { backgroundColor: nodeColors.nodeBackgroundColorDefault };
+});
+
+// Header background color based on statusMessage
+const headerBackgroundColor = computed(() => {
+  let color;
+  switch (statusMessage.value) {
+    case '0':
+      color = nodeColors.headerBackgroundColorCase0;
+      break;
+    case 'a1':
+      color = nodeColors.headerBackgroundColorCaseA1;
+      break;
+    case 'a2':
+      color = nodeColors.headerBackgroundColorCaseA2;
+      break;
+    case 'b':
+      color = nodeColors.headerBackgroundColorCaseB;
+      break;
+    case 'c':
+      color = nodeColors.headerBackgroundColorCaseC;
+      break;
+    case 'd':
+      color = nodeColors.headerBackgroundColorCaseD;
+      break;
+    case 'e':
+      color = nodeColors.headerBackgroundColorCaseE;
+      break;
+    case 'f':
+      color = nodeColors.headerBackgroundColorCaseF;
+      break;
+    default:
+      color = nodeColors.headerBackgroundColorCaseDefault;
+      break;
   }
-  return {
-    backgroundColor: props.data.completion ? store.state.strings.LIGHT_STEEL_BLUE : store.state.strings.LIGHT_GRAY,
-  };
+  return { backgroundColor: color, color: '#fff' };
 });
 
 // Connection handles
@@ -241,8 +234,8 @@ const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter:
 const isParentNode = ref(false);
 
 const parentStyle = {
-  borderColor: store.state.strings.DEEP_SKY_BLUE,
-  borderWidth: '3px',
+  borderColor: 'darkgrey',
+  borderWidth: '2px',
 };
 
 const goToCourse = () => {
@@ -257,9 +250,9 @@ const iconClass = ref('fa-lock');
 
 <template>
   <div @click="handleNodeClick" ref="customNodeEdit">
-    <div v-if="zoomstep != '0.2'" class="card" :style="[{ minHeight: '200px', width: '400px' }, parentStyle]">
-      <div class="card-header text-center">
-        <NodeInformation :data :parentnode :startanimation />
+    <div v-if="zoomstep != '0.2'" class="card" :style="[{ minHeight: '200px', width: '400px' }, parentStyle, cardBackgroundColor]">
+      <div class="card-header text-center" :style="headerBackgroundColor">
+        <NodeInformation :data :parentnode :startanimation :status="statusMessage" />
         <div class="row align-items-center">
           <div class="col">
             <h5>
@@ -268,7 +261,7 @@ const iconClass = ref('fa-lock');
           </div>
         </div>
       </div>
-      <div class="card-body" :class="active ? 'active-node' : 'inactive-node'" :style="[nodeBackgroundColor]">
+      <div class="card-body" :style="nodeBackgroundColor">
         <div>
           <div class="card-img dashboard-card-img mb-2" :style="{
             height: '10rem',
@@ -290,12 +283,7 @@ const iconClass = ref('fa-lock');
             </div>
           </div>
           <div class="row mb-2">
-            <div class="col-4 text-left">
-              <b>
-                {{ store.state.strings.nodes_progress }}
-              </b>
-            </div>
-            <div class="col-8" style="display: flex; justify-content: end;">
+            <div class="col-12" style="display: flex; justify-content: end;">
               <ProgressBar :progress="data.progress" :status="statusMessage" />
             </div>
             <div v-if="store.state.view == 'teacher' && data.manualrestriction">
@@ -348,7 +336,7 @@ const iconClass = ref('fa-lock');
                 <p v-if="statusMessage">{{ statusMessage }}</p>
       </div>
       <div v-if="data" class="card-footer">
-        <UserInformation :data="data" @focusChanged="zoomOnParent" />
+        <UserInformation :data="data" @focusChanged="zoomOnParent" :status="statusMessage" />
       </div>
     </div>
     <div v-else class="card" :style="[{ minHeight: '300px', width: '400px' }, parentStyle]">

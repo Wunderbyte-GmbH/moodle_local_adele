@@ -2,6 +2,7 @@
   // Import needed libraries
   import { computed, onMounted, ref, watch } from 'vue';
   import { useStore } from 'vuex';
+  import * as nodeColors from '../../config/nodeColors';
 
   const props = defineProps({
     data: {
@@ -20,6 +21,10 @@
       type: Boolean,
       default: true,
     },
+    status: {
+      type: String,
+      default: '',
+    },
   });
   const store = useStore();
 
@@ -27,6 +32,66 @@
   const showCard = ref(false);
   const iconState = ref('initial');
   const iconClass = ref('fa-info');
+
+  // Icon color based on status (using progressBar colors)
+  const iconColor = computed(() => {
+    let color;
+    switch (props.status) {
+      case '0':
+        color = nodeColors.progressBarColorCase0;
+        break;
+      case 'a1':
+        color = nodeColors.progressBarColorCaseA1;
+        break;
+      case 'a2':
+        color = nodeColors.progressBarColorCaseA2;
+        break;
+      case 'b':
+        color = nodeColors.progressBarColorCaseB;
+        break;
+      case 'c':
+        color = nodeColors.progressBarColorCaseC;
+        break;
+      case 'd':
+        color = nodeColors.progressBarColorCaseD;
+        break;
+      case 'e':
+        color = nodeColors.progressBarColorCaseE;
+        break;
+      case 'f':
+        color = nodeColors.progressBarColorCaseF;
+        break;
+      default:
+        color = nodeColors.progressBarColorCaseDefault;
+        break;
+    }
+    return color;
+  });
+
+  // Icon type based on status (prepared for future customization)
+  const iconType = computed(() => {
+    // TODO: Customize icons based on status
+    switch (props.status) {
+      case '0':
+        return 'fa-info'; // Placeholder - change later
+      case 'a1':
+        return 'fa-info'; // Placeholder - change later
+      case 'a2':
+        return 'fa-info'; // Placeholder - change later
+      case 'b':
+        return 'fa-info'; // Placeholder - change later
+      case 'c':
+        return 'fa-info'; // Placeholder - change later
+      case 'd':
+        return 'fa-info'; // Placeholder - change later
+      case 'e':
+        return 'fa-info'; // Placeholder - change later
+      case 'f':
+        return 'fa-info'; // Placeholder - change later
+      default:
+        return 'fa-info';
+    }
+  });
 
   const toggleCard = () => {
     showCard.value = !showCard.value
@@ -195,7 +260,7 @@
   >
     <div
       class="information"
-      :style="{ backgroundColor: backgroundColor }"
+      :style="{ backgroundColor: iconColor, '--icon-bg-color': iconColor }"
       @click.stop="toggleCard"
       :class="{ 'information-rotating': iconState === 'rotating' }"
     >
@@ -205,6 +270,7 @@
           'icon-fadingIn': iconState === 'fadingIn',
           'icon-fadingOut': iconState === 'fadingOut'
         }]"
+        :style="{ color: '#fff' }"
       />
     </div>
     <transition :name="mobile ? 'fade' : 'unfold'">
@@ -358,11 +424,13 @@
 
 .information {
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
   transform-style: preserve-3d; /* Preserve 3D context */
   perspective: 1000px; /* Hides the back side during rotation */
@@ -375,9 +443,8 @@
 
 .fa-info,
 .fa-check {
-  font-size: 30px;
+  font-size: 38px;
   color: white;
-  margin-top: 7px;
 }
 
 .information-rotating .fa-check {
@@ -422,12 +489,14 @@
   text-align: center;
   cursor: default;
   user-select: text;
+  color: black;
 }
 
 .list-group-text {
   text-align: left;
   cursor: text;
   user-select: text;
+  color: black;
 }
 
 .icon-container {
@@ -441,7 +510,7 @@
 }
 
 .information:hover {
-  background-color: #ad0050 !important;
+  background-color: var(--icon-bg-color);
   box-shadow: 0 6px 8px rgba(0,0,0,0.2);
 }
 
@@ -455,6 +524,16 @@
   text-align: start;
   cursor: default;
   user-select: text;
+  color: black;
+}
+
+.additional-card b,
+.additional-card i {
+  color: black;
+}
+
+.list-group-item {
+  color: black !important;
 }
 
 /* Starting state for entering */

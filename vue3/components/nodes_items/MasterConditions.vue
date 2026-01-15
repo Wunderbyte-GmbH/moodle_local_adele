@@ -50,7 +50,7 @@ const toggleVisibility = () => {
 <template>
   <div>
     <button
-      class="btn btn-secondary dropdown-toggle master-dropdown"
+      class="btn dropdown-toggle master-dropdown"
       type="button"
       :id="masterdata.node_id + '_dropdown_menu_button'"
       @click="toggleVisibility"

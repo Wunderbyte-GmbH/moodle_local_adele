@@ -1,5 +1,4 @@
 <template>
-  <p>{{props.status}}</p>
   <div class="progress-container">
     <div
       class="progress-bar"
@@ -22,6 +21,8 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import * as nodeColors from '../../config/nodeColors';
+
 const store = useStore();
 
 const props = defineProps({
@@ -38,33 +39,33 @@ const props = defineProps({
 
 const progressStyle = computed(() => {
   let color;
-  switch (props.statusMessage) {
+  switch (props.status) {
     case '0':
-      color = 'red'; // White
+      color = nodeColors.progressBarColorCase0;
       break;
     case 'a1':
-      color = 'red'; // Gold
+      color = nodeColors.progressBarColorCaseA1;
       break;
     case 'a2':
-      color = 'red'; // Orange
+      color = nodeColors.progressBarColorCaseA2;
       break;
     case 'b':
-      color = 'red'; // Green
+      color = nodeColors.progressBarColorCaseB;
       break;
     case 'c':
-      color = 'red'; // Blue
+      color = nodeColors.progressBarColorCaseC;
       break;
     case 'd':
-      color = 'red'; // Indigo
+      color = nodeColors.progressBarColorCaseD;
       break;
     case 'e':
-      color = 'red'; // Violet
+      color = nodeColors.progressBarColorCaseE;
       break;
     case 'f':
-      color = 'red'; // Red
+      color = nodeColors.progressBarColorCaseF;
       break;
     default:
-      color = 'red'; // Default Gray
+      color = nodeColors.progressBarColorCaseDefault;
       break;
   }
   return { backgroundColor: color };
@@ -73,17 +74,17 @@ const progressStyle = computed(() => {
 
 <style scoped>
 .progress-container {
-  width: 80%;
-  height: 20px;
+  width: 100%;
+  height: 28px;
   overflow: hidden;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   position: relative;
+  background: #999999;
 }
 
 .progress-bar {
   text-align: center;
-  line-height: 20px;
+  line-height: 28px;
   height: 100%;
   color: #fff;
   border-radius: 10px;
@@ -97,11 +98,12 @@ const progressStyle = computed(() => {
 
 .progress-label {
   position: absolute;
-  line-height: 20px;
+  line-height: 28px;
   height: 100%;
   position: absolute;
   top: 0;
   width: 100%;
   text-align: center;
+  color: #fff;
 }
 </style>
