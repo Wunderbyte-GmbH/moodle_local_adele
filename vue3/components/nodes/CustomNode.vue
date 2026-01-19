@@ -31,8 +31,6 @@ import NodeInformation from '../nodes_items/NodeInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import UserInformation from '../nodes_items/UserInformation.vue';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
-import { useStatusMessage } from '../../composables/useStatusMessage';
-import * as nodeColors from '../../config/nodeColors';
 
 
 // Load Store
@@ -52,8 +50,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const { statusMessage } = useStatusMessage(computed(() => props.data));
 
 const courses = computed(() => {
   if (
@@ -155,54 +151,18 @@ const changeModule = (data) => {
   selectModule.value.dispatchEvent(mouseupEvent);
 }
 
-const cardBackgroundColor = computed(() => {
-    return { backgroundColor: nodeColors.cardBackgroundColor }; 
-});
-
 const nodeBackgroundColor = computed(() => {
-    return { backgroundColor: nodeColors.nodeBackgroundColorDefault };
-});
-
-// Header background color based on statusMessage
-const headerBackgroundColor = computed(() => {
-  let color;
-  switch (statusMessage.value) {
-    case '0':
-      color = nodeColors.headerBackgroundColorCase0;
-      break;
-    case 'a1':
-      color = nodeColors.headerBackgroundColorCaseA1;
-      break;
-    case 'a2':
-      color = nodeColors.headerBackgroundColorCaseA2;
-      break;
-    case 'b':
-      color = nodeColors.headerBackgroundColorCaseB;
-      break;
-    case 'c':
-      color = nodeColors.headerBackgroundColorCaseC;
-      break;
-    case 'd':
-      color = nodeColors.headerBackgroundColorCaseD;
-      break;
-    case 'e':
-      color = nodeColors.headerBackgroundColorCaseE;
-      break;
-    case 'f':
-      color = nodeColors.headerBackgroundColorCaseF;
-      break;
-    default:
-      color = nodeColors.headerBackgroundColorCaseDefault;
-      break;
+  if (!props.editorview) {
+    return store.state.strings.LIGHT_GRAY
   }
-  return { backgroundColor: color, color: '#fff' };
+  return ''
 });
 
 // Connection handles
 const handleStyle = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', width: '10px', height: '10px'}))
 
 const childStyle = {
-  borderColor: 'darkgrey',
+  borderColor: store.state.strings.GRAY,
   borderWidth: '2px',
 };
 
@@ -221,15 +181,14 @@ const zoomOnParent = () => {
   <div>
     <div
       class="card"
-      :style="[{ minHeight: '200px', width: '400px' }, childStyle, cardBackgroundColor]"
+      :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
     >
-      <div class="card-header text-center" :style="headerBackgroundColor">
+      <div class="card-header text-center">
         <NodeInformation
          @focusChanged="zoomOnParent"
           v-if="!editorview"
           :data
           :parentnode
-          :status="statusMessage"
         />
         <div class="row align-items-center">
           <div class="col">
@@ -251,7 +210,7 @@ const zoomOnParent = () => {
       </div>
       <div
         class="card-body"
-        :style="nodeBackgroundColor"
+        :style="{backgroundColor: nodeBackgroundColor}"
       >
         <div
           class="card-img dashboard-card-img"
@@ -370,7 +329,7 @@ const zoomOnParent = () => {
             class="col-12"
             style="display: flex; justify-content: end;"
           >
-            <ProgressBar :progress="0" :status="statusMessage" />
+            <ProgressBar :progress="0" />
           </div>
         </div>
       </div>
@@ -380,7 +339,6 @@ const zoomOnParent = () => {
       >
         <UserInformation
           :data="data"
-          :status="statusMessage"
         />
       </div>
     </div>

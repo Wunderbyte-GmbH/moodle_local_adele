@@ -104,6 +104,17 @@ onMounted(() => {
   }
 
   const triggerAnimation = () => {
+    // Check if there's a timed condition in restrictioncriteria.timed or timed_duration objects
+    hasTimedCondition.value = false;
+    if (props.data.completion?.restrictioncriteria) {
+      const timedObj = props.data.completion.restrictioncriteria.timed;
+      const timedDurationObj = props.data.completion.restrictioncriteria.timed_duration;
+      
+      if ((timedObj && Object.keys(timedObj).length > 0) || 
+          (timedDurationObj && Object.keys(timedDurationObj).length > 0)) {
+        hasTimedCondition.value = true;
+      }
+    }
     if (
       props.data.completion.feedback &&
       props.data.completion.feedback.status !== 'closed' &&
@@ -129,7 +140,7 @@ onMounted(() => {
             }, 2000);
           }, 2000);
         }, 750);
-      } else {
+      } else {  
         iconClass.value = 'fa-play';
         iconState.value = '';
       }
@@ -246,6 +257,7 @@ const goToCourse = () => {
 }
 const iconState = ref('initial');
 const iconClass = ref('fa-lock');
+const hasTimedCondition = ref(false);
 </script>
 
 <template>
@@ -272,13 +284,18 @@ const iconClass = ref('fa-lock');
           }">
             <div class="overlay">
               <button class="icon-link" @click="goToCourse">
-                <i :class="['fa', iconClass,
-                    {
-                      'icon-fading': iconState === 'fading',
-                      'icon-expanding': iconState === 'expanding',
-                      'icon-fadingIn': iconState === 'fadingIn',
-                    },
-                  ]" />
+                <div
+                  :class="{ 'icon-with-ring': hasTimedCondition }"
+                  :style="hasTimedCondition ? { backgroundImage: 'url(/local/adele/public/ring.png)' } : {}"
+                >
+                  <i :class="['fa', iconClass,
+                      {
+                        'icon-fading': iconState === 'fading',
+                        'icon-expanding': iconState === 'expanding',
+                        'icon-fadingIn': iconState === 'fadingIn',
+                      },
+                    ]" />
+                </div>
               </button>
             </div>
           </div>
@@ -417,7 +434,7 @@ const iconClass = ref('fa-lock');
 }
 
 .overlay {
-  position: relative;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -432,6 +449,10 @@ const iconClass = ref('fa-lock');
   /* Adjust height as needed */
   border-radius: 15px;
   /* Rounded edges */
+}
+
+.dashboard-card-img {
+  position: relative;
 }
 
 .icon-link {
@@ -507,5 +528,17 @@ const iconClass = ref('fa-lock');
   /* Align icon and text horizontally */
   align-items: center;
   /* Center items vertically */
+}
+
+.icon-with-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 </style>
