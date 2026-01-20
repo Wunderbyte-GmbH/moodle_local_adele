@@ -67,7 +67,8 @@ class learning_path_courses {
         $configtags['exclude'] = explode(',', str_replace(' ', '', $configadele->excludetags));
         $configtags['category'] = self::get_categories($configadele->catfilter);
         $whereparamsquery = self::build_where_query($configtags);
-        $wherestatement  = " WHERE c.visible=1 ";
+        $wherestatement  = " WHERE c.visible=1 AND c.id <> :frontpageid ";
+        $whereparamsquery['params']['frontpageid'] = 1;
 
         // Filter according to select button.
         if ($configadele->selectconfig != null && $configadele->selectconfig == 'only_subscribed') {
