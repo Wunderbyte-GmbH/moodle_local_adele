@@ -41,6 +41,21 @@ function init() {
     __webpack_public_path__ = M.cfg.wwwroot + '/local/adele/amd/build/';
     /* eslint-enable no-undef */
 
+    // Ensure Font Awesome 5.15.4 is loaded from plugin public assets (no bundling into AMD build).
+    const ensureFontAwesome = () => {
+        const existing = document.querySelector('link[data-adele-fa="5.15.4"]');
+        if (existing) {
+            return;
+        }
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = M.cfg.wwwroot + '/local/adele/public/fontawesome/css/all.min.css';
+        link.dataset.adeleFa = '5.15.4';
+        document.head.appendChild(link);
+    };
+
+    ensureFontAwesome();
+
     const localAdeleAppElements = document.getElementsByName('local-adele-app');
     localAdeleAppElements.forEach((localAdeleAppElement) => {
         if (!localAdeleAppElement.__vue_app__) {

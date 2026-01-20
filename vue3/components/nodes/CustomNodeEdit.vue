@@ -118,7 +118,8 @@ onMounted(() => {
     if (
       props.data.completion.feedback &&
       props.data.completion.feedback.status !== 'closed' &&
-      props.data.completion.feedback.status !== 'not_accessible'
+      props.data.completion.feedback.status !== 'not_accessible' &&
+      props.data.completion.feedback.status_restriction !== 'after'
     ) {
       if (
         props.data.animations &&
@@ -312,44 +313,6 @@ const hasTimedCondition = ref(false);
             <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
           </div>
         </div>
-        <!-- <p v-if="data.completion.feedback.completion?.after == null &&
-                data.completion.feedback.completion?.after_all == null &&
-                data.completion.feedback.completion?.before == null &&
-                data.completion.feedback.completion?.inbetween == null 
-        ">Status 0</p>
-        <p
-          v-if="data.completion.feedback.status_restriction == 'before' &&
-               (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null )&&
-               (data.completion.feedback.completion.before?.length > 0 ||  data.completion.feedback.completion.inbetween?.length > 0)
-                ">Status A1</p>
-           <p
-          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
-                (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null )&&
-               (data.completion.feedback.completion.before?.length > 0 ||  data.completion.feedback.completion.inbetween?.length > 0)
-                ">Status A2</p>
-          <p
-          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
-              data.completion.feedback.completion.after?.length > 0 &&
-              data.completion?.feedback?.completion?.after_all && Object.keys(data.completion.feedback.completion.after_all).length > 0
-              ">Status B</p>
-          <p
-          v-if="data.completion.feedback.status_restriction == 'inbetween' &&
-              data.completion.feedback.completion.after?.length > 0 &&
-              data.completion?.feedback?.completion?.after_all.length == 0
-              ">Status C</p>
-                    <p
-          v-if="data.completion.feedback.status_restriction == 'after' &&
-              data.completion.feedback.completion.after?.length > 0
-              ">Status D</p>
-                              <p
-          v-if="data.completion.feedback.status_restriction == 'after' &&
-              data.completion.feedback.completion.after?.length > 0 &&
-              data.completion?.feedback?.completion?.after_all.length == 0
-              ">Status E</p>
-                                        <p
-          v-if="data.completion.feedback.status_restriction == 'after' &&
-              (data.completion.feedback.completion.after?.length == 0 || data.completion.feedback.completion.after == null)
-              ">Status F</p> -->
                 <p v-if="statusMessage">{{ statusMessage }}</p>
       </div>
       <div v-if="data" class="card-footer">

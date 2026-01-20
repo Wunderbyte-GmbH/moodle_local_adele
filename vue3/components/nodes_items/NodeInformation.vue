@@ -427,11 +427,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.28);
   transform-style: preserve-3d; /* Preserve 3D context */
   perspective: 1000px; /* Hides the back side during rotation */
   z-index: 5;
@@ -443,7 +443,7 @@
 
 .fa-info,
 .fa-check {
-  font-size: 38px;
+  font-size: 28px;
   color: white;
 }
 
