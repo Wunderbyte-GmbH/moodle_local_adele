@@ -61,14 +61,16 @@ const drawModules = async (learningpath, addNodes, removeNodes, findNode, dragge
       if (insertModule) {
         // Check if rightestNode and lowestNode are assigned values
         if (rightestNode && lowestNode) {
-          if (userpath && !active) {
-            newModule.data.color_inactive = darkenColor(newModule.data.color, 0.5)
-            newModule.data.opacity = '0.6'
-            newModule.zIndex = 1
-          } else {
-            newModule.data.opacity = '0.2'
-            newModule.zIndex = -10
-          }
+          newModule.data.opacity = '0.2'
+          newModule.zIndex = -10
+          // if (userpath && !active) {
+          //   newModule.data.color_inactive = darkenColor(newModule.data.color, 0.5)
+          //   newModule.data.opacity = '0.6'
+          //   newModule.zIndex = 1
+          // } else {
+          //   newModule.data.opacity = '0.2'
+          //   newModule.zIndex = -10
+          // }
 
           const lowestNodeDimensions = findNode(lowestNode.id)
           if (lowestNodeDimensions) {
