@@ -1,23 +1,65 @@
 <script setup>
   // Import needed libraries
-  import { computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useStore } from 'vuex';
+  import * as nodeColors from '../../config/nodeColors';
 
-  defineProps({
+  const props = defineProps({
     courses: {
       type: Object,
       required: true,
+    },
+    data: {
+      type: Object,
+      required: false,
+    },
+    startanimation: {
+      type: Boolean,
+      default: true,
     },
   });
   const store = useStore();
 
   // Create a ref for conditions
   const showCard = ref(false);
+  const iconClass = ref('fa-info');
+  const iconState = ref('initial');
 
   const toggleCard = () => {
     showCard.value = !showCard.value
   }
+  // Keep original card background
   const backgroundColor = computed(() => store.state.strings.LIGHT_GRAY)
+
+  // Icon (circle) background based on course completion
+  const iconBackgroundColor = computed(() =>
+    isCourseCompleted.value
+      ? nodeColors.courseNodeFinishedColor
+      : nodeColors.courseNodeNotFinishedColor
+  )
+
+  // Determine completion based on course-specific completion criteria
+  const isCourseCompleted = computed(() => {
+    const courseId = props.data?.course_id;
+    const completedMap = props.data?.completion?.completioncriteria?.course_completed?.completed;
+    if (!courseId || !completedMap || typeof completedMap !== 'object') {
+      return false;
+    }
+    return !!completedMap[courseId];
+  });
+
+  const triggerAnimation = () => {
+    iconClass.value = isCourseCompleted.value ? 'fa-check' : 'fa-info';
+  };
+
+  // Watch for data changes and trigger animation
+  watch(
+    () => isCourseCompleted.value,
+    () => {
+      triggerAnimation();
+    },
+    { immediate: true }
+  );
 
 </script>
 
@@ -30,9 +72,9 @@
     <div>
       <div
         class="information"
-        :style="{ backgroundColor: backgroundColor }"
+        :style="{ backgroundColor: iconBackgroundColor }"
       >
-        <i class="fa fa-info" />
+        <i :class="['fas', iconClass]" />
       </div>
       <transition name="unfold">
         <div
@@ -44,7 +86,7 @@
             <li
               class="list-group-item"
             >
-              <i class="fa fa-pencil" />
+              <i class="fas fa-pencil" />
               <b>
                 Description
               </b>
@@ -100,12 +142,14 @@
 }
 
 .information {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.28);
 }
 
 .information:hover {
@@ -113,10 +157,9 @@
   box-shadow: 0 6px 8px rgba(0,0,0,0.2);
 }
 
-.fa-info {
-  font-size: 30px;
+.information i {
+  font-size: 28px;
   color: white;
-  margin-top: 7px;
 }
 
 .additional-card {

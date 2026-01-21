@@ -44,3 +44,9 @@ export const headerBackgroundColorCaseDefault = '#808080';
 
 export const nodeBackgroundColorDefault = '#cccccc';
 export const cardBackgroundColor = '#efefef';
+
+export const courseNodeFinishedColor = '#63aa43';
+export const courseNodeNotFinishedColor = '#db8d31';
+
+export const courseNodeFinishedColorLight = '#e0edd9';
+export const courseNodeNotFinishedColorLight = '#eaddce';

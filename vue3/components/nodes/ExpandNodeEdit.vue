@@ -27,6 +27,7 @@
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import ExpandNodeInformation from '../nodes_items/ExpandNodeInformation.vue';
+import * as nodeColors from '../../config/nodeColors';
 
 // Load Store
 const store = useStore();
@@ -55,6 +56,30 @@ const get_cover_image = (data) => {
   }
   return null
 }
+
+// Determine completion for the current course id
+const isCourseCompleted = computed(() => {
+  const courseId = props.data?.course_id;
+  const completedMap = props.data?.completion?.completioncriteria?.course_completed?.completed;
+  if (!courseId || !completedMap || typeof completedMap !== 'object') {
+    return false;
+  }
+  return !!completedMap[courseId];
+});
+
+// Style: light header color and solid border using nodeColors
+const headerBackgroundColor = computed(() => ({
+  backgroundColor: isCourseCompleted.value
+    ? nodeColors.courseNodeFinishedColorLight
+    : nodeColors.courseNodeNotFinishedColorLight,
+}));
+
+const parentStyle = computed(() => ({
+  borderColor: isCourseCompleted.value
+    ? nodeColors.courseNodeFinishedColor
+    : nodeColors.courseNodeNotFinishedColor,
+  borderWidth: '2px',
+}));
 
 const courses = computed(() => {
 
@@ -95,18 +120,20 @@ onMounted(() => {
     <div v-if="data.showCard">
       <div
         class="card test"
-        :style="[{ minHeight: '200px', width: '400px' }]"
+        :style="[{ minHeight: '200px', width: '400px' }, parentStyle]"
       >
-        <div class="card-header text-center">
+        <div class="card-header text-center" :style="headerBackgroundColor">
           <ExpandNodeInformation
             :courses
+            :data="data"
+            :startanimation="true"
           />
-          <div class="row">
+          <div class="row justify-content-center">
             <div class="col-10">
-              <h5 v-if="courses[0]">
-                {{ courses[0].givenname || courses[0].fullname }}
+              <h5 v-if="courses[0]" style="color: #000;">
+                {{ courses[0].givenname || courses[0].fullname }}
               </h5>
-              <h5 v-else>
+              <h5 v-else style="color: #000;">
                 Subcourse
               </h5>
             </div>
@@ -130,7 +157,7 @@ onMounted(() => {
                 class="icon-link"
                 @click="goToCourse"
               >
-                <i class="fa fa-play" />
+                <i class="fas fa-play" />
               </button>
             </div>
           </div>
