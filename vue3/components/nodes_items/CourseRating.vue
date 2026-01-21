@@ -38,7 +38,7 @@ onMounted(() => {
 <template>
   <div>
     <i
-      :class="store.state.version ? 'fa-solid fa-award fa-2xl' : 'fa fa-trophy fa-2xl'"
+      :class="store.state.version ? 'fa-solid fa-award fa-2xl' : 'fas fa-trophy fa-2xl'"
       :style="{ color: medaille, textShadow: '0 0 2px #000' }"
     />
   </div>

@@ -115,7 +115,7 @@ const handleBlur = () => {
     :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }" @click.stop
     @focus="handleFocus" @blur="handleBlur">
     <div class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }" @click.stop="toggleFeedbackarea">
-      <i class="fa fa-comment" :class="{ 'fa-comment-mobile': mobile }" :style="{ color: iconColor }" />
+      <i class="fas fa-comment" :class="{ 'fa-comment-mobile': mobile }" :style="{ color: iconColor }" />
     </div>
     <transition name="fade">
       <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
@@ -124,21 +124,21 @@ const handleBlur = () => {
         <div
           v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid"
           class="status-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="fas fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
             }}</span>
         </div>
         <div
           v-if="data.completion && data.completion.feedback.status_restriction === 'inbetween'"
           class="status-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="fas fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_restriction_' + data.completion.feedback.status_restriction]
             }}</span>
         </div>
         <div
           v-if="data.completion && data.completion.feedback.status_restriction !== 'inbetween' && !data.completion.feedback.restriction.before_valid"
           class="status-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="fas fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_restriction_after']
             }}</span>
         </div>
@@ -166,7 +166,7 @@ const handleBlur = () => {
         <div
           v-if="data.completion && data.completion.feedback.status_completion"
           class="status-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="fas fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_completion_' + data.completion.feedback.status_completion]
             }}</span>
         </div>
@@ -179,7 +179,7 @@ const handleBlur = () => {
          <div
           v-if="data.completion && data.completion.feedback.status_completion === 'after' && data.completion.feedback.completion.after_all  && Object.values(data.completion.feedback.completion.after_all).length > 0"
           class="status-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="fas fa-info-circle"></i>
           <span>{{ store.state.strings['node_access_completion_after_all']
             }}</span>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="tooltip-container">
-    <i class="ml-2 fa fa-exclamation-triangle" />
+    <i class="ml-2 fas fa-exclamation-triangle" />
     <div class="tooltip-text">
       {{ store.state.strings.nodes_warning_time_restriction }}
     </div>

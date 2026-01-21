@@ -13,7 +13,8 @@
       finishedCourses: FinishedCourses;
     }>();
 
-    const backgroundColor = computed(() => store.state.strings.DARK_RED);
+    // Neutral background for course completion dots
+    const backgroundColor = computed(() => store.state.strings.LIGHT_GRAY);
     const minCoursesArray = computed(() => Array.from({ length: props.minCourses }, (_, i) => i));
     const finishedCoursesCount = computed(() => {
       return Object.values(props.finishedCourses).filter(value => value === true).length;
@@ -37,7 +38,7 @@
       >
         <div v-if="finishedCoursesCount > index">
           <i
-            class="fa fa-check"
+            class="fas fa-check"
           />
         </div>
       </span>
@@ -54,18 +55,18 @@
 }
 
 .coursecompletion {
-  display: inline-block;
-  width: 50px; /* Diameter of the round button */
-  height: 50px; /* Diameter of the round button */
-  border-radius: 50%; /* Makes the div round */
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.38); /* Adds depth with a shadow */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
 }
 
 .fa-check {
-  font-size: 30px; /* Make the icon larger */
-  color: white; /* Change the color if needed */
-  margin-left: 10px;
-  margin-top: 10px;
+  font-size: 18px;
+  color: #555;
 }
 </style>

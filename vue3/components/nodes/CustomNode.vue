@@ -192,7 +192,7 @@ const zoomOnParent = () => {
         />
         <div class="row align-items-center">
           <div class="col">
-            <h5>
+            <h5 style="color: #000;">
               {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
             <button
@@ -202,7 +202,7 @@ const zoomOnParent = () => {
               @click.stop="deleteCondition"
             >
               <i
-                class="fa fa-trash"
+                class="fas fa-trash"
               />
             </button>
           </div>
@@ -233,7 +233,7 @@ const zoomOnParent = () => {
                 class="icon-link"
                 @click="setRestrictionView"
               >
-                <i class="fa fa-lock" />
+                <i class="fas fa-lock" />
               </button>
             </span>
             <span
@@ -244,7 +244,7 @@ const zoomOnParent = () => {
                 @click="setPretestView"
               >
                 <i
-                  class="fa fa-tasks"
+                  class="fas fa-tasks"
                 />
               </button>
             </span>
@@ -258,7 +258,7 @@ const zoomOnParent = () => {
                 data-placement="right"
                 @click="setNodeModal"
               >
-                <i class="fa fa-pencil" />
+                <i class="fas fa-pencil" />
               </button>
             </span>
           </div>
@@ -272,7 +272,7 @@ const zoomOnParent = () => {
               <button
                 class="icon-link"
               >
-                <i class="fa fa-lock" />
+                <i class="fas fa-lock" />
               </button>
             </span>
           </div>

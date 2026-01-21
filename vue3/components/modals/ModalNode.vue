@@ -85,7 +85,7 @@
               <label for="estimate_duration">
                 <b>
                   {{ store.state.strings.estimate_duration }}
-                  <i class="fa fa-spinner" />
+                  <i class="fas fa-spinner" />
                   :
                 </b>
               </label>
@@ -105,7 +105,7 @@
               </p>
             </div>
             <div class="form-group">
-              <b>{{store.state.strings.modals_tags}}<i class="fa fa-tag" /> :</b>
+              <b>{{store.state.strings.modals_tags}}<i class="fas fa-tag" /> :</b>
               <p class="form-control-static">
                 {{ tags }}
               </p>
@@ -113,7 +113,7 @@
             <div>
               <b>{{store.state.strings.modals_backgroundimage}}
                 <i
-                  :class="store.state.version ? 'fa-solid fa-image' : 'fa fa-picture-o'"
+                  :class="store.state.version ? 'fa-solid fa-image' : 'fas fa-picture-o'"
                 />
                 :</b>
               <p>

@@ -19,7 +19,7 @@
       >
         {{ store.state.strings.main_intro_slider }}
         <i
-          :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fa fa-book'"
+          :class="store.state.version ? 'fa-solid fa-book-open-reader' : 'fas fa-book'"
         />
       </button>
     </div>
@@ -74,7 +74,7 @@
               >
                 <i
                   class="icon fa-fw iconsmall"
-                  :class="singlelearningpath.visibility== '1' ? 'fa fa-eye' : 'fa fa-eye-slash'"
+                  :class="singlelearningpath.visibility== '1' ? 'fas fa-eye' : 'fas fa-eye-slash'"
                 />
               </a>
             </div>
@@ -104,7 +104,7 @@
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
                     <i
-                      class="icon m-r-0 fa fa-copy fa-fw iconsmall"
+                      class="icon m-r-0 fas fa-copy fa-fw iconsmall"
                     />
                   </a>
                   <a
@@ -118,7 +118,7 @@
                     @click.prevent="editLearningpath(singlelearningpath.id)"
                   >
                     <i
-                      class="icon m-r-0 fa fa-pencil fa-fw iconsmall"
+                      class="icon m-r-0 fas fa-pencil fa-fw iconsmall"
                     />
                   </a>
                   <a
@@ -213,7 +213,7 @@
                     @click.prevent="viewLearningpath(viewablelearningpath.id)"
                   >
                     <i
-                      class="icon m-r-0 fa fa-solid fa-play fa-fw iconsmall"
+                      class="icon m-r-0 fas fa-solid fa-play fa-fw iconsmall"
                     />
                   </a>
                 </div>

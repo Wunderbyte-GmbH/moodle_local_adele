@@ -163,7 +163,7 @@ const expandCourses = () => {
         />
         <div class="row align-items-center">
           <div class="col">
-            <h5>
+            <h5 style="color: #000;">
               {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
           </div>
@@ -202,7 +202,7 @@ const expandCourses = () => {
               v-else
               class="icon-link"
             >
-              <i :class="'fa fa-lock'" />
+              <i :class="'fas fa-lock'" />
             </button>
           </div>
         </div>

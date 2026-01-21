@@ -294,7 +294,7 @@
             @mousemove.stop
             @mouseup.stop
           >
-            <i class="fa fa-pencil" />
+            <i class="fas fa-pencil" />
             <b>
               {{ store.state.strings.completion_description_feedback}}
             </b>
@@ -316,7 +316,7 @@
             @mousemove.stop
             @mouseup.stop
           >
-            <i class="fa fa-spinner" />
+            <i class="fas fa-spinner" />
             <b>
               {{ store.state.strings.completion_estimated_duration_feedback }}
             </b>
@@ -338,7 +338,7 @@
             @mouseup.stop
           >
             <i
-              class="fa fa-tasks"
+              class="fas fa-tasks"
             />
             <b>
               {{ store.state.strings.completion_restriction_feedback }}
@@ -371,7 +371,7 @@
             @mouseup.stop
           >
             <i
-              class="fa fa-tasks"
+              class="fas fa-tasks"
             />
             <b>
               {{ store.state.strings.completion_completion_feedback }}

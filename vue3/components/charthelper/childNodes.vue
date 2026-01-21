@@ -14,7 +14,7 @@
 <template>
   <div class="card-body">
     <h5 class="card-title">
-      <i class="fa fa-arrow-circle-down" /> {{ store.state.strings.charthelper_child_nodes }}
+      <i class="fas fa-arrow-circle-down" /> {{ store.state.strings.charthelper_child_nodes }}
     </h5>
     <ul class="list-group list-group-flush">
       <template v-if="props.childNodes.length > 0">

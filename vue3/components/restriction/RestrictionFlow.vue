@@ -5,7 +5,7 @@
       :disabled="showBackConfirmation"
       @click="goBack"
     >
-      <i class="fa fa-arrow-left" /> {{ store.state.strings.restriction_go_back_learningpath }}
+      <i class="fas fa-arrow-left" /> {{ store.state.strings.restriction_go_back_learningpath }}
     </button>
     <div
       v-if="showBackConfirmation"
@@ -33,18 +33,18 @@
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">
-          <i class="fa fa-check-circle" />
+          <i class="fas fa-check-circle" />
           {{ store.state.strings.restriction_restrictions_for }}
         </h5>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <i
-              :class="store.state.version ? 'fa fa-header' : 'fa fa-font'"
+              :class="store.state.version ? 'fas fa-header' : 'fas fa-font'"
             />
             {{ store.state.strings.restriction_course_title }} {{ store.state.node.fullname }}
           </li>
           <li class="list-group-item">
-            <i class="fa fa-tag" /> {{ store.state.strings.restriction_tags }} {{ store.state.node.tags }}
+            <i class="fas fa-tag" /> {{ store.state.strings.restriction_tags }} {{ store.state.node.tags }}
           </li>
         </ul>
         <div v-if="restrictions !== null">

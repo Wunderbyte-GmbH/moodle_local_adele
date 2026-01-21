@@ -377,7 +377,7 @@ function changeTab(index) {
                 style="position: relative; padding-left: 0.25rem;"
                 target="_blank"
               >
-                <i class="fa fa-link" />
+                <i class="fas fa-link" />
               </a>
             </div>
           </div>

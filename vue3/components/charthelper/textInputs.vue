@@ -127,7 +127,7 @@ const editLearningpath = async (singlelearningpathid) => {
           >
             <i
               v-tooltip="store.state.strings.required"
-              class="fa fa-exclamation-circle text-danger ml-2"
+              class="fas fa-exclamation-circle text-danger ml-2"
             />
           </span>
         </h4>
@@ -152,7 +152,7 @@ const editLearningpath = async (singlelearningpathid) => {
           >
             <i
               v-tooltip="store.state.strings.required"
-              class="fa fa-exclamation-circle text-danger ml-2"
+              class="fas fa-exclamation-circle text-danger ml-2"
             />
           </span>
         </h4>

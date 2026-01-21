@@ -236,7 +236,7 @@ const deleteCondition = () => {
         />
         <div class="row align-items-center">
           <div class="col">
-            <h5>
+            <h5 style="color: #000;">
               {{ truncatedText(data.fullname || store.state.strings.nodes_collection, 45) }}
             </h5>
             <button
@@ -246,7 +246,7 @@ const deleteCondition = () => {
               @click.stop="deleteCondition"
             >
               <i
-                class="fa fa-trash"
+                class="fas fa-trash"
               />
             </button>
           </div>
@@ -283,7 +283,7 @@ const deleteCondition = () => {
                   class="icon-link"
                   @click="setRestrictionView"
                 >
-                  <i class="fa fa-lock" />
+                  <i class="fas fa-lock" />
                 </button>
               </span>
               <span
@@ -294,7 +294,7 @@ const deleteCondition = () => {
                   @click="setPretestView"
                 >
                   <i
-                    class="fa fa-tasks"
+                    class="fas fa-tasks"
                   />
                 </button>
               </span>
@@ -307,7 +307,7 @@ const deleteCondition = () => {
                   data-target="#nodeModal"
                   @click="setNodeModal"
                 >
-                  <i class="fa fa-pencil" />
+                  <i class="fas fa-pencil" />
                 </button>
               </span>
             </div>
@@ -381,7 +381,7 @@ const deleteCondition = () => {
                     @click="setCourseModal(value.id)"
                   >
                     <i
-                      class="fa fa-pencil"
+                      class="fas fa-pencil"
                     />
                   </button>
                   <button
@@ -390,7 +390,7 @@ const deleteCondition = () => {
                     @click.stop="removeCourse(value.id)"
                   >
                     <i
-                      :class="store.state.version ? 'fa fa-trash' : 'fa fa-trash-o'"
+                      :class="store.state.version ? 'fas fa-trash' : 'fas fa-trash-o'"
                     />
                   </button>
                 </div>

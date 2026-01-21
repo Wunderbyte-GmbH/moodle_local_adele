@@ -335,7 +335,7 @@ const filteredConditions = computed(() => {
             class="col-auto info-circle"
             v-tooltip="condition.description"
           >
-            <i class="fa fa-circle-info fa-lg" />
+            <i class="fas fa-circle-info fa-lg" />
           </div>
           {{ condition.name }}
         </div>

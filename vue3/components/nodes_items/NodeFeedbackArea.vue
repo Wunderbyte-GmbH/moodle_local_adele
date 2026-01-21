@@ -50,7 +50,7 @@
     @click="toggleFeedbackarea"
   >
     <div>
-      <i class="fa fa-comment"  />
+      <i class="fas fa-comment"  />
     </div>
     <div>
       <transition name="fade">

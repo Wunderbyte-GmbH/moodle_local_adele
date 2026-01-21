@@ -7,7 +7,7 @@
         class="btn btn-outline-primary"
         @click="goBack"
       >
-        <i class="fa fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
+        <i class="fas fa-arrow-left" /> {{ store.state.strings.user_view_go_back_overview }}
       </button>
       <h2
         v-if="store.state.view!='student'"
@@ -23,19 +23,19 @@
           <div class="card-body">
             <h5 class="card-title">
               <i
-                :class="store.state.version ? 'fa fa-user-circle' : 'fa fa-user'"
+                :class="store.state.version ? 'fas fa-user-circle' : 'fas fa-user'"
               />
               {{ user_learningpath.username }}
             </h5>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                <i class="fa fa-user" /> {{ store.state.strings.user_view_firstname }}: {{ user_learningpath.firstname }}
+                <i class="fas fa-user" /> {{ store.state.strings.user_view_firstname }}: {{ user_learningpath.firstname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-user" /> {{ store.state.strings.user_view_lastname }}: {{ user_learningpath.lastname }}
+                <i class="fas fa-user" /> {{ store.state.strings.user_view_lastname }}: {{ user_learningpath.lastname }}
               </li>
               <li class="list-group-item">
-                <i class="fa fa-envelope" /> {{ store.state.strings.user_view_email }}: {{ user_learningpath.email }}
+                <i class="fas fa-envelope" /> {{ store.state.strings.user_view_email }}: {{ user_learningpath.email }}
               </li>
             </ul>
           </div>
@@ -242,8 +242,27 @@ function onNodeClickCall(event) {
 </script>
 
 <style>
+.vue-flow__edge-layer {
+  z-index: 0; /* Ensure edges are below */
+}
+
+.vue-flow__node-layer {
+  z-index: 10; /* Ensure nodes are above */
+}
 
 .control-btns {
   height: 100px;
+}
+</style>
+
+<style scoped>
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/core@1.26.0/dist/theme-default.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
+ @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
+
+.learning-path-flow {
+  border-radius: 1rem;
 }
 </style>

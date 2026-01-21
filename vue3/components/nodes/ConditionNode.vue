@@ -256,7 +256,7 @@ const shiftLeft = (deletedNode, edges) => {
               @click="deleteCondition"
             >
               <i
-                class="fa fa-trash"
+                class="fas fa-trash"
               />
             </button>
           </div>

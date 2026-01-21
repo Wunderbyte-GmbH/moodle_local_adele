@@ -6,7 +6,7 @@
     >
       <div class="col-4 text-left">
         <b>
-          <i class="fa fa-calendar mr-2" />
+          <i class="fas fa-calendar mr-2" />
           {{ store.state.strings.nodes_items_start }}
         </b>
       </div>
@@ -20,7 +20,7 @@
     >
       <div class="col-4 text-left">
         <b>
-          <i class="fa fa-calendar mr-2" />
+          <i class="fas fa-calendar mr-2" />
           {{ store.state.strings.nodes_items_end }}
         </b>
       </div>

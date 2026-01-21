@@ -105,7 +105,7 @@
           @click.prevent="editLearningModule(module)"
         >
           <i
-            class="icon fa fa-pencil fa-fw iconsmall m-r-0"
+            class="icon fas fa-pencil fa-fw iconsmall m-r-0"
             :title="store.state.strings.edit"
           />
         </a>

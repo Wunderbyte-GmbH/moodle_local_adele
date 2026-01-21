@@ -12,7 +12,7 @@
 <template>
   <div class="card-body">
     <h5 class="card-title">
-      <i class="fa fa-arrow-circle-up" /> {{ store.state.strings.charthelper_parent_nodes }}
+      <i class="fas fa-arrow-circle-up" /> {{ store.state.strings.charthelper_parent_nodes }}
     </h5>
     <ul class="list-group list-group-flush">
       <template v-if="props.parentNodes.length > 0">
