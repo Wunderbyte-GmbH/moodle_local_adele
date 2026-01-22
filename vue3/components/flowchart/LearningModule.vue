@@ -58,11 +58,23 @@
               {{ store.state.strings.flowchart_color }}
             </label>
             <input type="color" id="color" v-model="color" class="form-control" list="presetColors">
-            <!-- <datalist id="presetColors">
-              <option>#ff0000</option>
-              <option>#00ff00</option>
-              <option>#0000ff</option>
-            </datalist> -->
+            <datalist id="presetColors">
+              <option>#000000</option>
+              <option>#333333</option>
+              <option>#666666</option>
+              <option>#808080</option>
+              <option>#b2b2b2</option>
+              <option>#eaae40</option>
+              <option>#ab6800</option>
+              <option>#a40008</option>
+              <option>#a02a73</option>
+              <option>#7f00a8</option>
+              <option>#47ac2e</option>
+              <option>#006e31</option>
+              <option>#46c6c6</option>
+              <option>#008fad</option>
+              <option>#005f68</option>
+            </datalist>
           </div>
         </div>
         <div class="mt-2 d-flex justify-content-between">
@@ -133,11 +145,23 @@
                   {{ store.state.strings.flowchart_color }}
                 </label>
                 <input type="color" id="color" v-model="cancelColor" class="form-control" list="presetColors">
-                <!-- <datalist id="presetColors">
-                <option>#ff0000</option>
-                <option>#00ff00</option>
-                <option>#0000ff</option>
-              </datalist> -->
+                <datalist id="presetColors">
+                <option>#000000</option>
+                <option>#333333</option>
+                <option>#666666</option>
+                <option>#808080</option>
+                <option>#b2b2b2</option>
+                <option>#eaae40</option>
+                <option>#ab6800</option>
+                <option>#a40008</option>
+                <option>#a02a73</option>
+                <option>#7f00a8</option>
+                <option>#47ac2e</option>
+                <option>#006e31</option>
+                <option>#46c6c6</option>
+                <option>#008fad</option>
+                <option>#005f68</option>
+              </datalist>
               </div>
             </div>
             <div class="row mt-2">
