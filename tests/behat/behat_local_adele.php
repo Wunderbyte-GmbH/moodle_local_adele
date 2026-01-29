@@ -158,4 +158,67 @@ class behat_local_adele extends behat_base {
             JS;
         $this->getSession()->executeScript($script);
     }
+
+    /**
+     * Connect two Vue Flow nodes by dragging from source handle to target handle.
+     *
+     * @When /^I connect vue flow node "(?P<source>[^"]+)" to "(?P<target>[^"]+)"$/
+     *
+     * @param string $source CSS selector for the source node element.
+     * @param string $target CSS selector for the target node element.
+     */
+    public function i_connect_vue_flow_node_to(string $source, string $target): void {
+        $sourcesel = json_encode($source, JSON_UNESCAPED_SLASHES);
+        $targetsel = json_encode($target, JSON_UNESCAPED_SLASHES);
+        $script = <<<JS
+            (function() {
+              const sourceNode = document.querySelector($sourcesel);
+              const targetNode = document.querySelector($targetsel);
+              if (!sourceNode) {
+                throw new Error('Vue Flow source node not found: ' + $sourcesel);
+              }
+              if (!targetNode) {
+                throw new Error('Vue Flow target node not found: ' + $targetsel);
+              }
+
+              const sourceHandle = sourceNode.querySelector('.vue-flow__handle.source') || sourceNode.querySelector('.vue-flow__handle');
+              const targetHandle = targetNode.querySelector('.vue-flow__handle.target') || targetNode.querySelector('.vue-flow__handle');
+              if (!sourceHandle) {
+                throw new Error('Vue Flow source handle not found for: ' + $sourcesel);
+              }
+              if (!targetHandle) {
+                throw new Error('Vue Flow target handle not found for: ' + $targetsel);
+              }
+
+              const sourceRect = sourceHandle.getBoundingClientRect();
+              const targetRect = targetHandle.getBoundingClientRect();
+              const startX = sourceRect.left + sourceRect.width / 2;
+              const startY = sourceRect.top + sourceRect.height / 2;
+              const endX = targetRect.left + targetRect.width / 2;
+              const endY = targetRect.top + targetRect.height / 2;
+
+              const buildPointer = (type, x, y) => new PointerEvent(type, {
+                bubbles: true,
+                cancelable: true,
+                clientX: x,
+                clientY: y,
+                button: 0,
+              });
+
+              sourceHandle.dispatchEvent(buildPointer('pointerdown', startX, startY));
+              sourceHandle.dispatchEvent(
+                new MouseEvent('mousedown', {bubbles: true, cancelable: true, clientX: startX, clientY: startY, button: 0})
+              );
+              document.dispatchEvent(buildPointer('pointermove', endX, endY));
+              document.dispatchEvent(
+                new MouseEvent('mousemove', {bubbles: true, cancelable: true, clientX: endX, clientY: endY, button: 0})
+              );
+              targetHandle.dispatchEvent(buildPointer('pointerup', endX, endY));
+              targetHandle.dispatchEvent(
+                new MouseEvent('mouseup', {bubbles: true, cancelable: true, clientX: endX, clientY: endY, button: 0})
+              );
+            })();
+            JS;
+        $this->getSession()->executeScript($script);
+    }
 }
