@@ -109,5 +109,53 @@ class behat_local_adele extends behat_base {
         $this->getSession()->executeScript($script);
     }
 
+    /**
+     * Pan the Vue Flow viewport so the element is centered.
+     *
+     * @When /^I pan vue flow to "(?P<target>[^"]+)"$/
+     *
+     * @param string $target CSS selector for the element to center.
+     */
+    public function i_pan_vue_flow_to(string $target): void {
+        $targetsel = json_encode($target, JSON_UNESCAPED_SLASHES);
+        $script = <<<JS
+            (function() {
+              const pane = document.querySelector('.vue-flow__transformationpane');
+              const viewport = document.querySelector('.vue-flow__viewport');
+              const target = document.querySelector($targetsel);
+              if (!pane || !viewport) {
+                throw new Error('Vue Flow viewport elements not found.');
+              }
+              if (!target) {
+                throw new Error('Vue Flow pan target not found: ' + $targetsel);
+              }
+              const transform = pane.style.transform || '';
+              const match = /translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\)\\s*scale\\(([-\\d.]+)\\)/.exec(transform);
+              const translateX = match ? parseFloat(match[1]) : 0;
+              const translateY = match ? parseFloat(match[2]) : 0;
+              const scale = match ? parseFloat(match[3]) : 1;
 
+              const viewportRect = viewport.getBoundingClientRect();
+              const viewportCenterX = viewportRect.left + viewportRect.width / 2;
+              const viewportCenterY = viewportRect.top + viewportRect.height / 2;
+
+              const nodeTransform = target.style.transform || '';
+              const nodeMatch = /translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\)/.exec(nodeTransform);
+              const nodeX = nodeMatch ? parseFloat(nodeMatch[1]) : 0;
+              const nodeY = nodeMatch ? parseFloat(nodeMatch[2]) : 0;
+
+              const targetRect = target.getBoundingClientRect();
+              const nodeWidth = targetRect.width / scale;
+              const nodeHeight = targetRect.height / scale;
+              const nodeCenterX = nodeX + nodeWidth / 2;
+              const nodeCenterY = nodeY + nodeHeight / 2;
+
+              const newTranslateX = viewportCenterX - viewportRect.left - nodeCenterX * scale;
+              const newTranslateY = viewportCenterY - viewportRect.top - nodeCenterY * scale;
+
+              pane.style.transform = `translate(\${newTranslateX}px, \${newTranslateY}px) scale(\${scale})`;
+            })();
+            JS;
+        $this->getSession()->executeScript($script);
+    }
 }
