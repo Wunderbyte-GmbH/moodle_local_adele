@@ -82,4 +82,32 @@ class behat_local_adele extends behat_base {
             JS;
         $this->getSession()->executeScript($script);
     }
+
+    /**
+     * Zoom the Vue Flow viewport to a specific percentage (e.g. 100, 150).
+     *
+     * @When /^I zoom vue flow to "(?P<percent>[\d.]+)" percent$/
+     *
+     * @param string $percent Zoom percentage (e.g. 100 for 1.0).
+     */
+    public function i_zoom_vue_flow_to_percent(string $percent): void {
+        $scale = ((float) $percent) / 100.0;
+        $scalejson = json_encode($scale);
+        $script = <<<JS
+            (function() {
+              const pane = document.querySelector('.vue-flow__transformationpane');
+              if (!pane) {
+                throw new Error('Vue Flow transformation pane not found.');
+              }
+              const transform = pane.style.transform || '';
+              const match = /translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\)\\s*scale\\(([-\\d.]+)\\)/.exec(transform);
+              const translateX = match ? parseFloat(match[1]) : 0;
+              const translateY = match ? parseFloat(match[2]) : 0;
+              pane.style.transform = `translate(\${translateX}px, \${translateY}px) scale($scalejson)`;
+            })();
+            JS;
+        $this->getSession()->executeScript($script);
+    }
+
+
 }
