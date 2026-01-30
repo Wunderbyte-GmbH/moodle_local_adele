@@ -28,20 +28,22 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I set the field "goalsubjectplaceholder" to "Test Learning Path Description"
     And I click on "Select learning path image" "button"
     And I click on ".image-selection-container .image-option-img" "css_element"
-    ##And I zoom vue flow to "40" percent
     And I wait "1" seconds
-    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(3)" to "[data-id='starting_node']"
-    ##And I zoom vue flow to "80" percent
-    And I wait "1" seconds
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :first-child" to "[data-id='starting_node']"
     And I pan vue flow to "[data-id='starting_node']"
     And I click on "[data-id='starting_node']" "css_element"
     And I wait "1" seconds
     And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(2)" to "[data-id='starting_node']"
-    ##And I zoom vue flow to "80" percent
+    And I pan vue flow to "[data-id='dndnode_1']"
+    And I zoom vue flow to "40" percent
+    And I connect vue flow node "[data-id='dndnode_1']" to "[data-id='dndnode_2']"
     And I wait "1" seconds
     And I pan vue flow to "[data-id='starting_node']"
     And I click on "[data-id='starting_node']" "css_element"
     And I wait "1" seconds
-    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :first-child" to "[data-id='starting_node']"
-    ##And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
-    ##And I wait "15" seconds
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(3)" to "[data-id='starting_node']"
+    And I pan vue flow to "[data-id='dndnode_1']"
+    And I zoom vue flow to "40" percent
+    And I connect vue flow node "[data-id='dndnode_2']" to "[data-id='dndnode_3']"
+    And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
+    And I wait "15" seconds
