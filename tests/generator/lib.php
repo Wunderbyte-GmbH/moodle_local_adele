@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+require_once($CFG->dirroot . '/course/externallib.php');
+
 /**
  * Class local_adele_generator for generation of dummy data
  *
@@ -30,7 +32,53 @@ class local_adele_generator extends testing_module_generator {
      * @return int
      */
     public function create_adele_learningpaths(array $data) {
-        global $DB;
+        global $DB, $CFG;
+
+        // Load learning path data from file if it is provided (specifically for Behat tests).
+        if (isset($data['filepath'])) {
+            // Validate path and load JSON.
+            $filepath = "{$CFG->dirroot}/{$data['filepath']}";
+            if (!file_exists($filepath)) {
+                throw new coding_exception("File '{$filepath}' does not exist");
+            }
+            if (!isset($data['courses']) || !is_string($data['courses'])) {
+                throw new coding_exception("Courses must be provided as string");
+            }
+            // Prepare list of course IDs.
+            $shortnamearr = explode(',', $data['courses']);
+            $courses = [];
+            foreach ($shortnamearr as $shortname) {
+                $courses[] = $DB->get_field(
+                    'course',
+                    'id',
+                    ['shortname' => trim($shortname)],
+                    MUST_EXIST
+                );
+            }
+
+            // Prepare image file path if correct.
+            $imagefilepath = $data['image'] ? (file_exists("{$CFG->dirroot}/{$data['image']}") ? $data['image'] : '') : '';
+            // Load LP from file.
+            $content = file_get_contents($filepath);
+            $data = json_decode($content, true);
+            $data['image'] = $imagefilepath;
+            $nodedata = json_decode($data['json'], true);
+            // Associate courses with LP nodes.
+            if (count($courses) < count($nodedata['tree']['nodes'])) {
+                throw new coding_exception("No enough courses to fill LP nodes");
+            }
+            $i = 0;
+            foreach ($nodedata['tree']['nodes'] as &$node) {
+                if (isset($node['data']['course_node_id'])) {
+                    $node['data']['course_node_id'] = [
+                        $courses[$i],
+                    ];
+                    $i++;
+                }
+            }
+            $data['json'] = json_encode($nodedata);
+        }
+
         $id = $DB->insert_record('local_adele_learning_paths', $data);
         return $id;
     }
