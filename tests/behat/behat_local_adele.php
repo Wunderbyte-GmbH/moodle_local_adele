@@ -30,57 +30,133 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  */
 class behat_local_adele extends behat_base {
     /**
-     * Drag and drop with HTML5 data transfer.
+     * Drag and drop with HTML5 data transfer, optionally targeting a dropzone.
      *
      * @When /^I drag and drop HTML5 from "(?P<source>[^"]+)" to "(?P<target>[^"]+)"$/
+     * @When /^I drag and drop HTML5 from "(?P<source>[^"]+)" to "(?P<target>[^"]+)" as "(?P<dropzone>[^"]+)"$/
      *
      * @param string $source CSS selector for the draggable element.
      * @param string $target CSS selector for the drop target.
+     * @param string|null $dropzone Optional CSS selector for a specific dropzone.
      */
-    public function i_drag_and_drop_html5_from_to(string $source, string $target): void {
+    public function i_drag_and_drop_html5_from_to(
+        string $source,
+        string $target,
+        ?string $dropzone = null
+    ): void {
         $sourcesel = json_encode($source, JSON_UNESCAPED_SLASHES);
         $targetsel = json_encode($target, JSON_UNESCAPED_SLASHES);
+        $dropzonesel = $dropzone !== null ? json_encode($dropzone, JSON_UNESCAPED_SLASHES) : 'null';
         $script = <<<JS
             (function() {
+              window.__adele_drag_done = false;
+              window.__adele_drag_error = null;
+
               const source = document.querySelector($sourcesel);
               const target = document.querySelector($targetsel);
               if (!source) {
-                throw new Error('HTML5 drag source not found: ' + $sourcesel);
+                window.__adele_drag_error = 'HTML5 drag source not found: ' + $sourcesel;
+                window.__adele_drag_done = true;
+                return;
               }
               if (!target) {
-                throw new Error('HTML5 drop target not found: ' + $targetsel);
+                window.__adele_drag_error = 'HTML5 drop target not found: ' + $targetsel;
+                window.__adele_drag_done = true;
+                return;
               }
+
               source.scrollIntoView({block: 'center', inline: 'center'});
               target.scrollIntoView({block: 'center', inline: 'center'});
 
-              const targetRect = target.getBoundingClientRect();
-              const clientX = targetRect.left + targetRect.width / 2;
-              const clientY = targetRect.top + targetRect.height / 2;
               const dataTransfer = new DataTransfer();
-
               const dragOverTarget = document.querySelector('.learning-path-flow') || target;
-              const dropTarget = target.closest('.dndflow') || target;
+              const dropContainer = target.closest('.dndflow') || target;
+              const dropzoneSelector = $dropzonesel;
+              const timeoutMs = 7000;
+              const targetId = target.getAttribute('data-id') || '';
+              const shouldWaitForDropzone = !!dropzoneSelector || (targetId && targetId !== 'starting_node');
 
-              const buildEvent = (type, extra = {}) => new DragEvent(type, {
+              const getCenter = (element) => {
+                const rect = element.getBoundingClientRect();
+                return {
+                  x: rect.left + rect.width / 2,
+                  y: rect.top + rect.height / 2,
+                };
+              };
+
+              const buildEvent = (type, coords, extra = {}) => new DragEvent(type, {
                 bubbles: true,
                 cancelable: true,
-                clientX,
-                clientY,
+                clientX: coords.x,
+                clientY: coords.y,
                 dataTransfer,
                 ...extra,
               });
 
-              source.dispatchEvent(buildEvent('dragstart'));
-              source.dispatchEvent(buildEvent('drag'));
-              document.dispatchEvent(buildEvent('dragover'));
-              dragOverTarget.dispatchEvent(buildEvent('dragover'));
-              dropTarget.dispatchEvent(buildEvent('dragenter'));
-              dropTarget.dispatchEvent(buildEvent('dragover'));
-              dropTarget.dispatchEvent(buildEvent('drop'));
-              source.dispatchEvent(buildEvent('dragend'));
+              const targetCenter = getCenter(target);
+              source.dispatchEvent(buildEvent('dragstart', targetCenter));
+
+              if (!shouldWaitForDropzone) {
+                source.dispatchEvent(buildEvent('drag', targetCenter));
+                document.dispatchEvent(buildEvent('dragover', targetCenter));
+                dragOverTarget.dispatchEvent(buildEvent('dragover', targetCenter));
+                target.dispatchEvent(buildEvent('dragenter', targetCenter));
+                target.dispatchEvent(buildEvent('dragover', targetCenter));
+                target.dispatchEvent(buildEvent('drop', targetCenter));
+                source.dispatchEvent(buildEvent('dragend', targetCenter));
+                window.__adele_drag_done = true;
+                return;
+              }
+
+              const start = Date.now();
+              const intervalId = window.setInterval(() => {
+                const elapsed = Date.now() - start;
+                if (elapsed > timeoutMs) {
+                  window.clearInterval(intervalId);
+                  window.__adele_drag_error = 'Timed out waiting for dropzone to activate.';
+                  window.__adele_drag_done = true;
+                  return;
+                }
+
+                source.dispatchEvent(buildEvent('drag', targetCenter));
+                document.dispatchEvent(buildEvent('dragover', targetCenter));
+                dragOverTarget.dispatchEvent(buildEvent('dragover', targetCenter));
+
+                const dropTarget = dropzoneSelector
+                  ? dropContainer.querySelector(dropzoneSelector) || document.querySelector(dropzoneSelector)
+                  : dropContainer.querySelector('[data-id^="dropzone_"]');
+
+                if (!dropTarget) {
+                  return;
+                }
+
+                const dropCenter = getCenter(dropTarget);
+                source.dispatchEvent(buildEvent('drag', dropCenter));
+                document.dispatchEvent(buildEvent('dragover', dropCenter));
+                dragOverTarget.dispatchEvent(buildEvent('dragover', dropCenter));
+                dropTarget.dispatchEvent(buildEvent('dragenter', dropCenter));
+                dropTarget.dispatchEvent(buildEvent('dragover', dropCenter));
+
+                const customNode = dropTarget.querySelector('.custom-node') || dropTarget;
+                const bgColor = window.getComputedStyle(customNode).backgroundColor;
+                const isReady = bgColor === 'chartreuse' || bgColor === 'rgb(127, 255, 0)';
+                if (!isReady) {
+                  return;
+                }
+
+                dropTarget.dispatchEvent(buildEvent('drop', dropCenter));
+                source.dispatchEvent(buildEvent('dragend', dropCenter));
+                window.clearInterval(intervalId);
+                window.__adele_drag_done = true;
+              }, 50);
             })();
             JS;
         $this->getSession()->executeScript($script);
+        $this->getSession()->wait(10000, 'window.__adele_drag_done === true');
+        $error = $this->getSession()->evaluateScript('window.__adele_drag_error');
+        if (!empty($error)) {
+            throw new \RuntimeException($error);
+        }
     }
 
     /**
