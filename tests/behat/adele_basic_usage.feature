@@ -17,6 +17,9 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
       | user     | course | role           |
       | user     | C1     | student        |
       | teacher  | C1     | editingteacher |
+    And the following config values are set as admin:
+      | config            | value                                                      | plugin      |
+      | restrictionfilter | timed,timed_duration,specific_course,parent_courses,manual | local_adele |
     And I change viewport size to "1366x3000"
 
   @javascript
@@ -44,8 +47,17 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I pan vue flow to "[data-id='dndnode_1']"
     And I zoom vue flow to "40" percent
     And I connect vue flow node "[data-id='dndnode_2']" to "[data-id='dndnode_3']"
+    ## Manually add restriction to the parent nodes.
+    And I click on "[data-id='dndnode_2'] .icon-link .fa-lock" "css_element"
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(4)" to ".vue-flow__pane.vue-flow__container.draggable"
     And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
-    ## Validate learning path and its visual elements - nodes and connections.
+    And I wait "1" seconds
+    And I click on "[data-id='dndnode_3'] .icon-link .fa-lock" "css_element"
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(4)" to ".vue-flow__pane.vue-flow__container.draggable"
+    And I wait "1" seconds
+    And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
+    ## Save entire learning path and validate its root elements - nodes and connections.
+    And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
     And I should see "Test Learning Path" in the ".learningcardcont .learningcard" "css_element"
     And I click on ".learningcardcont .learningcard " "css_element"
     And I should see "Course 1" in the ".vue-flow.learning-path-flow" "css_element"
