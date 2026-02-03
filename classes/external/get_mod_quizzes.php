@@ -68,7 +68,7 @@ class get_mod_quizzes extends external_api {
                         'category' => new external_value(PARAM_INT, 'Category ID of the course'),
                         'summary' => new external_value(PARAM_RAW, 'Summary of the course', VALUE_OPTIONAL),
                         'tags' => new external_value(PARAM_TEXT, 'Tags for the course', VALUE_OPTIONAL, null),
-                        'selected_course_image' => new external_value(PARAM_URL, 'Selected course image URL', VALUE_OPTIONAL, null),
+                        'selected_course_image' => new external_value(PARAM_TEXT, 'Selected course image URL', VALUE_OPTIONAL, null),
                     ]
                 )
             ),
