@@ -50,7 +50,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_lp_visiblity extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -61,8 +60,7 @@ class update_lp_visiblity extends external_api {
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             'lpid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             'visibility'  => new external_value(PARAM_BOOL, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -81,10 +79,10 @@ class update_lp_visiblity extends external_api {
         // If the user doesn't have the capability and the session value is empty, handle the error.
         if (empty($sessionvalue)) {
             throw new required_capability_exception(
-              $context,
-              'local/adele:canmanage',
-              'nopermission',
-              'You do not have the required capability and the session key is not set.'
+                $context,
+                'local/adele:canmanage',
+                'nopermission',
+                'You do not have the required capability and the session key is not set.'
             );
         }
 
@@ -99,7 +97,6 @@ class update_lp_visiblity extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
                     'success' => new external_value(PARAM_INT, 'Condition description'),
-                ]
-        );
+                ]);
     }
 }

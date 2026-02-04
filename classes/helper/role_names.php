@@ -43,7 +43,7 @@ class role_names {
     public function get_role_names() {
         global $DB;
         $roleshortnames = ['editingteacher', 'teacher'];
-        list($insql, $params) = $DB->get_in_or_equal($roleshortnames, SQL_PARAMS_QM, 'param', true);
+        [$insql, $params] = $DB->get_in_or_equal($roleshortnames, SQL_PARAMS_QM, 'param', true);
         $sql = "SELECT shortname, name
                 FROM {role}
                 WHERE shortname {$insql}";
@@ -66,5 +66,4 @@ class role_names {
         }
         return implode(' and ', $rolenames);
     }
-
 }

@@ -43,7 +43,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manual implements course_completion {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
     /** @var string $label of the redered condition in frontend. */
@@ -149,8 +148,10 @@ class manual implements course_completion {
           'completed' => false,
           'inbetween_info' => 'unchecked',
         ];
-        if (isset($node['data']['manualcompletion'] ) && $node['data']['manualcompletion']
-            && $node['data']['manualcompletionvalue']) {
+        if (
+            isset($node['data']['manualcompletion']) && $node['data']['manualcompletion']
+            && $node['data']['manualcompletionvalue']
+        ) {
             $coursecompletion['completed'] = true;
             $coursecompletion['inbetween_info'] = 'checked';
         }

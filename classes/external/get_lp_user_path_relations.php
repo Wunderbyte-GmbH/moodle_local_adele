@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_lp_user_path_relations extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -110,8 +109,7 @@ class get_lp_user_path_relations extends external_api {
                         'progress' => new external_value(PARAM_FLOAT, 'progress'),
                     ]),
                     'rank' => new external_value(PARAM_INT, 'Ranking'),
-                ]
-            )
+                ])
         );
     }
 }

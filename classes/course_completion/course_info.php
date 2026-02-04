@@ -35,7 +35,6 @@ use core_plugin_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_info {
-
     /** @var int userid for a given user */
     protected $userid;
 
@@ -70,11 +69,11 @@ class course_info {
             $path = pathinfo($filepath);
             $filename = 'local_adele\\course_completion\\conditions\\' . $path['filename'];
             if (
-              (
+                (
                 $path['filename'] == 'catquiz' &&
                 !array_key_exists('catquiz', $plugins)
-              ) ||
-              $path['filename'] == 'master'
+                ) ||
+                $path['filename'] == 'master'
             ) {
                 $addcondition = false;
             }
@@ -84,7 +83,7 @@ class course_info {
                 $conditions[] = $conditionclass->get_description();
             }
         }
-        usort($conditions, function($a, $b) {
+        usort($conditions, function ($a, $b) {
             return $b['id'] <=> $a['id'];
         });
         return $conditions;

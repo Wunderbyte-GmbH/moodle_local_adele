@@ -37,7 +37,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learnpath_deleted extends \core\event\base {
-
     /**
      * Init parameters.
      *

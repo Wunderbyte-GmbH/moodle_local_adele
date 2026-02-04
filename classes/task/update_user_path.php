@@ -40,7 +40,6 @@ global $CFG;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_user_path extends \core\task\adhoc_task {
-
     /**
      * Get name of Module.
      *
@@ -71,6 +70,5 @@ class update_user_path extends \core\task\adhoc_task {
         } catch (\Exception $e) {
             return true;
         }
-
     }
 }

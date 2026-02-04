@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_mod_quizzes extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -104,8 +103,7 @@ class get_mod_quizzes extends external_api {
                     'course' => new external_value(PARAM_TEXT, 'courseid'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
                     'coursename' => new external_value(PARAM_TEXT, 'coursename'),
-                ]
-            )
+                ])
         );
     }
 }

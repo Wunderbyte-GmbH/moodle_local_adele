@@ -42,7 +42,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class specific_course implements course_restriction {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
     /** @var string $label of the redered condition in frontend. */
@@ -127,7 +126,7 @@ class specific_course implements course_restriction {
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
-                if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'specific_course') {
+                if (isset($restriction['data']['label']) && $restriction['data']['label'] == 'specific_course') {
                     // Get grade and check if valid.
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         foreach ($userpath->json['tree']['nodes'] as $usernode) {

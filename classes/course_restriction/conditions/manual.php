@@ -42,7 +42,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manual implements course_restriction {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MANUALLY;
     /** @var string $label of the redered condition in frontend. */
@@ -126,8 +125,10 @@ class manual implements course_restriction {
           'completed' => false,
           'inbetween_info' => 'unchecked',
         ];
-        if (isset($node['data']['manualrestriction'] ) && $node['data']['manualrestriction']
-            && $node['data']['manualrestrictionvalue']) {
+        if (
+            isset($node['data']['manualrestriction']) && $node['data']['manualrestriction']
+            && $node['data']['manualrestrictionvalue']
+        ) {
             $coursecompletion['completed'] = true;
             $coursecompletion['inbetween_info'] = 'checked';
         }

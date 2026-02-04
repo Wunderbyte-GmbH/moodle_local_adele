@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_completions extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -57,8 +56,7 @@ class get_completions extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -91,8 +89,7 @@ class get_completions extends external_api {
                     'priority' => new external_value(PARAM_TEXT, 'Conditions priority'),
                     'label' => new external_value(PARAM_TEXT, 'Condition label'),
                     'information' => new external_value(PARAM_TEXT, 'Condition Information', 0),
-                ]
-            )
+                ])
         );
     }
 }

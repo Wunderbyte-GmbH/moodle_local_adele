@@ -49,7 +49,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_catquiz_tests extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -112,8 +111,7 @@ class get_catquiz_tests extends external_api {
                     'coursename' => new external_value(PARAM_TEXT, 'coursename'),
                     'name' => new external_value(PARAM_TEXT, 'name'),
                     'courseid' => new external_value(PARAM_TEXT, 'courseid'),
-                ]
-            )
+                ])
         );
     }
 }

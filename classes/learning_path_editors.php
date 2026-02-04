@@ -39,12 +39,10 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_path_editors {
-
     /**
      * Entities constructor.
      */
     public function __construct() {
-
     }
 
     /**
@@ -106,8 +104,7 @@ class learning_path_editors {
         $DB->delete_records('local_adele_lp_editors', [
             'learningpathid' => $lpid,
             'userid' => $userid,
-          ]
-        );
+          ]);
         return ['success' => true];
     }
 }

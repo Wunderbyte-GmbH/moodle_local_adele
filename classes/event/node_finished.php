@@ -37,7 +37,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class node_finished extends \core\event\base {
-
     /**
      * Init parameters.
      *
@@ -74,7 +73,7 @@ class node_finished extends \core\event\base {
         }
         return get_string('event_node_finished_description', 'local_adele', [
             'user' => $data['other']['userpath']['user_id'] ?? 'missing',
-            'node' => implode(', ' , $names) ?? 'missing',
+            'node' => implode(', ', $names) ?? 'missing',
         ]);
     }
 

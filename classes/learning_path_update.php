@@ -130,9 +130,9 @@ class learning_path_update {
         // Get the user path relations.
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_learning_paths(
-          $event->userid,
-          null,
-          '"quizid":"' . $event->other['quizid'] . '"'
+            $event->userid,
+            null,
+            '"quizid":"' . $event->other['quizid'] . '"'
         );
         foreach ($records as $userpath) {
             $userpath->json = json_decode($userpath->json, true);
@@ -157,8 +157,8 @@ class learning_path_update {
         $cm = get_coursemodule_from_id(null, $event->contextinstanceid);
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_learning_paths(
-          $event->userid,
-          '"componentid":"' . $cm->instance . '"'
+            $event->userid,
+            '"componentid":"' . $cm->instance . '"'
         );
         foreach ($records as $userpath) {
             $userpath->json = json_decode($userpath->json, true);
@@ -201,27 +201,27 @@ class learning_path_update {
         }
 
         foreach ($userpathjson['tree']['nodes'] as &$node) {
-            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['mastercompletion'] == true ) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['mastercompletion'] == true) {
                 $node['data']['completion']['master']['completion'] = true;
             }
-            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['masterrescrtriction'] == true ) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['masterrescrtriction'] == true) {
                 $node["data"]["completion"]["master"]["restriction"] = true;
             }
-            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['firstcompleted'] == true ) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['firstcompleted'] == true) {
                 $node['firstcompleted'] = true;
             }
-            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['first_enrolled'] == true ) {
+            if (isset($oldvalues[$node['id']]) && $oldvalues[$node['id']]['first_enrolled'] == true) {
                 $node['data']['first_enrolled'] = $oldvalues[$node['id']]['first_enrolled'];
             }
             $manualrestriction = false;
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if ( $restrictionnode['data']['label'] == 'manual' ) {
+                if ($restrictionnode['data']['label'] == 'manual') {
                     $manualrestriction = true;
                 }
             }
             $manualcompletion = false;
             foreach ($node['completion']['nodes'] as $completionnode) {
-                if ( $completionnode['data']['label'] == 'manual' ) {
+                if ($completionnode['data']['label'] == 'manual') {
                     $manualcompletion = true;
                 }
             }
@@ -298,13 +298,13 @@ class learning_path_update {
     ) {
         global $DB;
         $record = $DB->get_record(
-          'local_adele_path_user',
-          [
+            'local_adele_path_user',
+            [
             'user_id' => $userid,
             'learning_path_id' => $learningpathid,
             'status' => 'active',
-          ],
-          'id, json',
+            ],
+            'id, json',
         );
         $animations = (array) json_decode($animations);
         $json = json_decode($record->json);
@@ -315,10 +315,9 @@ class learning_path_update {
             }
         }
         $DB->update_record(
-          'local_adele_path_user',
-          ['id' => $record->id, 'json' => json_encode($json)]
+            'local_adele_path_user',
+            ['id' => $record->id, 'json' => json_encode($json)]
         );
         return ['success' => true];
     }
-
 }

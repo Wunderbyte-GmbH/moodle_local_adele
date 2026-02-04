@@ -34,12 +34,10 @@ namespace local_adele;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class modquiz {
-
     /**
      * Entities constructor.
      */
     public function __construct() {
-
     }
 
     /**
@@ -56,7 +54,7 @@ class modquiz {
         if (empty($availablecourseids)) {
             return [];
         }
-        list($insql, $params) = $DB->get_in_or_equal($availablecourseids, SQL_PARAMS_QM);
+        [$insql, $params] = $DB->get_in_or_equal($availablecourseids, SQL_PARAMS_QM);
 
         $sql = "SELECT q.id, q.course, q.name, c.fullname as coursename
                 FROM {quiz} q

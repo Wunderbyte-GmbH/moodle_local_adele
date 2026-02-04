@@ -43,7 +43,6 @@ require_once("{$CFG->libdir}/completionlib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class master implements course_completion {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_MASTER;
     /** @var string $label of the redered condition in frontend. */
@@ -148,7 +147,7 @@ class master implements course_completion {
     public function get_completion_status($node, $userid) {
         $master = false;
         if (
-          isset($node['data']['completion']['master']['completion'])
+            isset($node['data']['completion']['master']['completion'])
         ) {
             $master = $node['data']['completion']['master']['completion'];
         }

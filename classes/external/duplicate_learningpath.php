@@ -47,7 +47,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class duplicate_learningpath extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -58,8 +57,7 @@ class duplicate_learningpath extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -93,7 +91,6 @@ class duplicate_learningpath extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 }

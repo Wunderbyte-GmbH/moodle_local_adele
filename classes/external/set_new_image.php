@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class set_new_image extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *

@@ -43,7 +43,6 @@ require_once("{$CFG->libdir}/completionlib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class parent_node_completed implements course_restriction {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_PARENT_NODE;
     /** @var string $label of the redered condition in frontend. */

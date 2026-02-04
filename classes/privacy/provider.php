@@ -52,7 +52,6 @@ class provider implements
 
     // This plugin is capable of determining which users have data within it.
     \core_privacy\local\request\core_userlist_provider {
-
     /**
      * Returns metadata about the data stored by this plugin.
      *
@@ -329,7 +328,7 @@ class provider implements
             return;
         }
 
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         // Delete learning paths created by these users.
         $DB->delete_records_select('local_adele_learning_paths', "createdby $insql", $inparams);

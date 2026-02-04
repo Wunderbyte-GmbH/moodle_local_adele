@@ -37,9 +37,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class adhoc_task_helper {
-
-
-
     /**
      * Sets scheduled adhoc tasks for a learning path node.
      *
@@ -78,6 +75,4 @@ class adhoc_task_helper {
             }
         }
     }
-
-
 }

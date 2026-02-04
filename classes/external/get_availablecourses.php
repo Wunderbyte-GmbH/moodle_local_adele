@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_availablecourses extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -59,8 +58,7 @@ class get_availablecourses extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathd', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -102,8 +100,7 @@ class get_availablecourses extends external_api {
                     'summary' => new external_value(PARAM_RAW, 'Course summary'),
                     'tags' => new external_value(PARAM_TEXT, 'Item tags'),
                     'selected_course_image' => new external_value(PARAM_TEXT, 'Course image path'),
-                ]
-            )
+                ])
         );
     }
 }
