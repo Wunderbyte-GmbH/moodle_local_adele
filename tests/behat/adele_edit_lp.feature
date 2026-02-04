@@ -41,7 +41,19 @@ Feature: As an admin I perform editing of the adele learning plan.
     ## Edit completion for course 2 - add customized "manual completion" checkbox.
     And I click on "[data-id='dndnode_2'] .icon-link .fa-tasks" "css_element"
     And I wait "1" seconds
-    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(3)" to "[data-id='condition_1']" as "[data-id='source_and']"
+    ## GitHub - ensure Catquiz installed 
+    And I should see "Catquiz Quiz" in the ".learning-path-nodes-container .nodes > :nth-child(2)" "css_element"
+    And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes > :nth-child(4)" "css_element"
+    ## Local - might be without Catquiz
+    ## And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes > :nth-child(3)" "css_element"
+    ## Add and remove OR condition
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(4)" to "[data-id='condition_1']" as "[data-id='source_or']"
+    And I should see "Node completion checkbox" in the "[data-id='condition_2']" "css_element"
+    And I should see "OR" in the ".vue-flow__edge-labels" "css_element"
+    And I click on "[data-id='condition_2'] .fa-trash" "css_element"
+    And "[data-id='condition_2']" "css_element" should not exist
+    ## Add AND condition
+    And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(4)" to "[data-id='condition_1']" as "[data-id='source_and']"
     And I wait "1" seconds
     And I pan vue flow to "[data-id='condition_2']"
     And I set the field "Enable Textarea" to "checked"
@@ -52,9 +64,9 @@ Feature: As an admin I perform editing of the adele learning plan.
     And I wait "1" seconds
     And I click on "[data-id='dndnode_2'] .icon-link .fa-tasks" "css_element"
     And I pan vue flow to "[data-id='condition_2']"
+    ## Validate the AND condition.
     And I should see "Node completion checkbox" in the "[data-id='condition_2']" "css_element"
-    ## TODO: Fix below step to validate textarea content (element ids/names issue?).
-    ##And the field "//div[@data-id='condition_2']//textarea[@class='form-control']" matches value "must be completed by teacher"
+    And the field "Information text (Not Feedback!)" matches value "must be completed by teacher"
     And I should see "AND" in the ".vue-flow__edge-labels" "css_element"
     And I press "Go Back to Learningpath"
     ## Edit restriction for course 3 manually.
