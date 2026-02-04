@@ -156,7 +156,7 @@ const renderFeedback = (action, emitting) => {
             <div class="mb-3">
               <div>
                 <label
-                  for="feedback_before_restriction_textarea"
+                  :for="'feedback_before_restriction_textarea_' + data.childCondition"
                   class="form-label"
                 >
                   <h5>
@@ -165,18 +165,18 @@ const renderFeedback = (action, emitting) => {
                 </label>
               </div>
               <input
-                id="feedback_before"
+                :id="'feedback_before_restriction_' + data.childCondition"
                 v-model="feedback.feedback_before_checkmark"
                 class="form-check-input"
                 type="checkbox"
                 :disabled="!feedback.visibility"
                 @change="renderFeedback('before', true)"
               >
-              <label for="feedback_before">
+              <label :for="'feedback_before_restriction_' + data.childCondition">
                 {{store.state.strings.nodes_feedback_use_default}}
               </label>
               <textarea
-                id="feedback_before_restriction_textarea"
+                :id="'feedback_before_restriction_textarea_' + data.childCondition"
                 v-model="feedback.feedback_before"
                 :name="store.state.strings.nodes_no_feedback"
                 class="form-control"
