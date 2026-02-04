@@ -257,8 +257,10 @@ class behat_local_adele extends behat_base {
                 throw new Error('Vue Flow target node not found: ' + $targetsel);
               }
 
-              const sourceHandle = sourceNode.querySelector('.vue-flow__handle.source') || sourceNode.querySelector('.vue-flow__handle');
-              const targetHandle = targetNode.querySelector('.vue-flow__handle.target') || targetNode.querySelector('.vue-flow__handle');
+              const sourceHandle = sourceNode.querySelector('.vue-flow__handle.source')
+                  || sourceNode.querySelector('.vue-flow__handle');
+              const targetHandle = targetNode.querySelector('.vue-flow__handle.target')
+                  || targetNode.querySelector('.vue-flow__handle');
               if (!sourceHandle) {
                 throw new Error('Vue Flow source handle not found for: ' + $sourcesel);
               }

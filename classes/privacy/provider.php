@@ -115,7 +115,9 @@ class provider implements
                  WHERE c.contextlevel = :contextlevel
                    AND (
                        EXISTS (SELECT 1 FROM {local_adele_learning_paths} lap WHERE lap.createdby = :userid1)
-                       OR EXISTS (SELECT 1 FROM {local_adele_path_user} lpu WHERE lpu.user_id = :userid2 OR lpu.createdby = :userid3)
+                       OR EXISTS (
+                            SELECT 1 FROM {local_adele_path_user} lpu WHERE lpu.user_id = :userid2 OR lpu.createdby = :userid3
+                       )
                        OR EXISTS (SELECT 1 FROM {local_adele_lp_editors} lpe WHERE lpe.userid = :userid4)
                    )";
 
@@ -251,7 +253,10 @@ class provider implements
                     'learningpathid' => $editor->learningpathid,
                 ];
             }
-            writer::with_context($systemcontext)->export_data(['learning_path_editor_permissions'], (object) ['permissions' => $data]);
+            writer::with_context($systemcontext)->export_data(
+                ['learning_path_editor_permissions'],
+                (object) ['permissions' => $data]
+            );
         }
     }
 
