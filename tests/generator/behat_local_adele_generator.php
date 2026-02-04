@@ -32,7 +32,7 @@ class behat_local_adele_generator extends behat_generator_base {
         return [
             'learningpaths' => [
                 'datagenerator' => 'adele_learningpaths',
-                'required' => ['filepath', 'filename'],
+                'required' => ['filepath', 'courses'],
             ],
         ];
     }
