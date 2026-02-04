@@ -284,7 +284,7 @@ const hasTimedCondition = ref(false);
             backgroundColor: cover_image ? '' : '#cccccc'
           }">
             <div class="overlay">
-              <button class="icon-link" @click="goToCourse">
+              <button class="icon-link" :title="store.state.strings.go_to_course" @click="goToCourse">
                 <div
                   :class="{ 'icon-with-ring': hasTimedCondition }"
                   :style="hasTimedCondition ? { backgroundImage: 'url(/local/adele/public/ring.png)' } : {}"

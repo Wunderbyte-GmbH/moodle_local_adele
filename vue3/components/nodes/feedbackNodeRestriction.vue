@@ -156,7 +156,7 @@ const renderFeedback = (action, emitting) => {
             <div class="mb-3">
               <div>
                 <label
-                  for="exampleFormControlTextarea1"
+                  for="feedback_before_restriction_textarea"
                   class="form-label"
                 >
                   <h5>
@@ -176,8 +176,9 @@ const renderFeedback = (action, emitting) => {
                 {{store.state.strings.nodes_feedback_use_default}}
               </label>
               <textarea
-                id="exampleFormControlTextarea1"
+                id="feedback_before_restriction_textarea"
                 v-model="feedback.feedback_before"
+                :name="store.state.strings.nodes_no_feedback"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"

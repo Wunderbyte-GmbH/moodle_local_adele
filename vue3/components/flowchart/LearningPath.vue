@@ -17,6 +17,7 @@
         @saveEditCourse="handleSaveEditCourse"
       />
       <VueFlow
+        title="test"
         :default-viewport="{ zoom: 1.0, x: 0, y: 0 }"
         :class="{ dark }"
         :fit-view-on-init="true"

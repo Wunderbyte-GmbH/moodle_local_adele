@@ -4,7 +4,7 @@
       v-model="testSearch"
       type="text"
       class="form-control mb-3"
-      placeholder="Search tests"
+      :placeholder="store.state.strings.search_tests"
       @focus="showDropdown = true"
       @blur="handleBlur"
     >

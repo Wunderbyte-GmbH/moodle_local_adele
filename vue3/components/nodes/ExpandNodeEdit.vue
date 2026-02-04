@@ -155,6 +155,7 @@ onMounted(() => {
             <div class="overlay">
               <button
                 class="icon-link"
+                :title="store.state.strings.go_to_course"
                 @click="goToCourse"
               >
                 <i class="fas fa-play" />

@@ -160,6 +160,7 @@ const editLearningpath = async (singlelearningpathid) => {
           <textarea
             id="goalsubjectplaceholder"
             v-model="goaldescription"
+            :name="store.state.strings.goalsubjectplaceholder"
             v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"
             class="form-control fancy-input"
             :placeholder="store.state.strings.goalsubjectplaceholder"

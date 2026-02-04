@@ -41,6 +41,7 @@
         v-for="singlelearningpath in filteredLpItem"
         :key="singlelearningpath.id"
         class="learningcard"
+        :title="singlelearningpath.name"
       >
         <div
           v-if="
@@ -100,6 +101,7 @@
                     "
                     class="icon-link"
                     href=""
+                    :title="store.state.strings.duplicate"
                     v-tooltip="store.state.strings.duplicate"
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
@@ -114,6 +116,7 @@
                     "
                     class="icon-link"
                     href=""
+                    :title="store.state.strings.edit"
                     v-tooltip="store.state.strings.edit"
                     @click.prevent="editLearningpath(singlelearningpath.id)"
                   >
@@ -127,6 +130,7 @@
                     "
                     class="icon-link"
                     href=""
+                    :title="store.state.strings.delete"
                     v-tooltip="store.state.strings.delete"
                     @click.prevent="showDeleteConfirm(singlelearningpath.id)"
                   >
@@ -209,6 +213,7 @@
                   <a
                     class="icon-link"
                     href=""
+                    :title="store.state.strings.view"
                     v-tooltip="store.state.strings.view"
                     @click.prevent="viewLearningpath(viewablelearningpath.id)"
                   >

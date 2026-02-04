@@ -281,6 +281,7 @@ const deleteCondition = () => {
               >
                 <button
                   class="icon-link"
+                  :title="store.state.strings.nodes_edit_restriction"
                   @click="setRestrictionView"
                 >
                   <i class="fas fa-lock" />
@@ -291,6 +292,7 @@ const deleteCondition = () => {
               >
                 <button
                   class="icon-link"
+                  :title="store.state.strings.edit_node_pretest"
                   @click="setPretestView"
                 >
                   <i
@@ -303,6 +305,7 @@ const deleteCondition = () => {
               >
                 <button
                   class="icon-link"
+                  :title="store.state.strings.edit_course_node"
                   data-toggle="modal"
                   data-target="#nodeModal"
                   @click="setNodeModal"
@@ -317,6 +320,7 @@ const deleteCondition = () => {
             >
               <button
                 class="icon-link"
+                :title="courseExpanded ? store.state.strings.collapse_courses : store.state.strings.expand_courses"
                 :disabled="isBlocked"
                 @click.stop="expandCourses"
               >

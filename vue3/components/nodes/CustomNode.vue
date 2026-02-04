@@ -231,6 +231,7 @@ const zoomOnParent = () => {
             >
               <button
                 class="icon-link"
+                :title="store.state.strings.nodes_edit_restriction"
                 @click="setRestrictionView"
               >
                 <i class="fas fa-lock" />
@@ -241,6 +242,7 @@ const zoomOnParent = () => {
             >
               <button
                 class="icon-link"
+                :title="store.state.strings.edit_node_pretest"
                 @click="setPretestView"
               >
                 <i
@@ -253,6 +255,7 @@ const zoomOnParent = () => {
             >
               <button
                 class="icon-link"
+                :title="store.state.strings.edit_course_node"
                 data-toggle="modal"
                 data-target="#nodeModal"
                 data-placement="right"
@@ -271,6 +274,7 @@ const zoomOnParent = () => {
             >
               <button
                 class="icon-link"
+                :title="store.state.strings.locked"
               >
                 <i class="fas fa-lock" />
               </button>

@@ -61,7 +61,8 @@
           <textarea
             v-if="store.state.view !== 'student' && store.state.view !== 'teacher'"
             v-model="dataFeedbackarea.feedback"
-            placeholder="Edit feedback here..."
+            :name="store.state.strings.edit_feedback"
+            :placeholder="store.state.strings.edit_feedback"
           />
           <p v-else>
             {{ dataFeedbackarea.feedback }}

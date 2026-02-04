@@ -193,6 +193,7 @@ const expandCourses = () => {
             <button
               v-if="active"
               class="icon-link"
+              :title="courseExpanded ? store.state.strings.collapse_courses : store.state.strings.expand_courses"
               :disabled="isBlocked"
               @click.stop="expandCourses"
             >
@@ -201,6 +202,7 @@ const expandCourses = () => {
             <button
               v-else
               class="icon-link"
+              :title="store.state.strings.locked"
             >
               <i :class="'fas fa-lock'" />
             </button>

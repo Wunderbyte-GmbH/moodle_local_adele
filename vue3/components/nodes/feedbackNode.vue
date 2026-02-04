@@ -213,8 +213,9 @@ defineExpose({
                 {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
-                id="exampleFormControlTextarea1"
+                id="feedback_before_textarea"
                 v-model="feedback.feedback_before"
+                :name="store.state.strings.nodes_no_feedback"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
@@ -237,8 +238,9 @@ defineExpose({
                 {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
-                id="exampleFormControlTextarea1"
+                id="feedback_inbetween_textarea"
                 v-model="feedback.feedback_inbetween"
+                :name="store.state.strings.nodes_no_feedback"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"
@@ -261,8 +263,9 @@ defineExpose({
                 {{ store.state.strings.nodes_feedback_use_default }}
               </label>
               <textarea
-                id="exampleFormControlTextarea1"
+                id="feedback_after_textarea"
                 v-model="feedback.feedback_after"
+                :name="store.state.strings.nodes_no_feedback"
                 class="form-control"
                 style="resize: none;"
                 :placeholder="store.state.strings.nodes_no_feedback"

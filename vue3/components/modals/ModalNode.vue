@@ -76,6 +76,7 @@
               <textarea
                 id="description"
                 v-model="description"
+                :name="store.state.strings.modals_no_description"
                 class="form-control"
                 :placeholder="store.state.strings.modals_no_description"
                 rows="5"
