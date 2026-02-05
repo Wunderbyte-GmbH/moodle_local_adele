@@ -42,10 +42,8 @@ Feature: As an admin I perform editing of the adele learning plan.
     And I click on "[data-id='dndnode_2'] .icon-link .fa-tasks" "css_element"
     And I wait "1" seconds
     ## GitHub - ensure Catquiz installed 
-    And I should see "Catquiz Quiz" in the ".learning-path-nodes-container .nodes > :nth-child(2)" "css_element"
-    And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes > :nth-child(4)" "css_element"
-    ## Local - might be without Catquiz
-    ## And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes > :nth-child(3)" "css_element"
+    And I should see "Catquiz Quiz" in the ".learning-path-nodes-container .nodes [data-draggable=\"Catquiz Quiz\"]" "css_element"
+    And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes [data-draggable=\"Node completion checkbox\"]" "css_element"
     ## Add and remove OR condition
     And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(4)" to "[data-id='condition_1']" as "[data-id='source_or']"
     And I should see "Node completion checkbox" in the "[data-id='condition_2']" "css_element"
@@ -57,7 +55,7 @@ Feature: As an admin I perform editing of the adele learning plan.
     And I wait "1" seconds
     And I pan vue flow to "[data-id='condition_2']"
     And I set the field "Enable Textarea" to "checked"
-    And I set the field with xpath "//div[@data-id='condition_2']//textarea[@class='form-control']" to "must be completed by teacher"
+    And I set the field "completion-condition_2-info" to "must be completed by teacher"
     And I click on "Update Information" "button" in the "[data-id='condition_2']" "css_element"
     And I wait "1" seconds
     And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
@@ -66,29 +64,21 @@ Feature: As an admin I perform editing of the adele learning plan.
     And I pan vue flow to "[data-id='condition_2']"
     ## Validate the AND condition.
     And I should see "Node completion checkbox" in the "[data-id='condition_2']" "css_element"
-    And the field "Information text (Not Feedback!)" matches value "must be completed by teacher"
+    And the field "completion-condition_2-info" matches value "must be completed by teacher"
     And I should see "AND" in the ".vue-flow__edge-labels" "css_element"
     And I press "Go Back to Learningpath"
     ## Edit restriction for course 3 manually.
     And I click on "[data-id='dndnode_3'] .icon-link .fa-lock" "css_element"
     And I wait "1" seconds
-    ## TODO: not working - problems with selectors
-    ##And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(2)" to "[data-id='condition_1']" as "[data-id='source_and']"
-    ##And I wait "1" seconds
-    ##And I pan vue flow to "[data-id='condition_2']"
-    ##And I set the field with xpath "//div[@data-id='condition_2']//select[@class='form-control']" to "Since node subscription"
-    ##And I set the field with xpath "//div[@data-id='condition_2']//input[@class='form-control']" to "2"
-    ##And I wait "31" seconds
     And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :nth-child(1)" to "[data-id='condition_1']" as "[data-id='source_and']"
     And I wait "1" seconds
     And I pan vue flow to "[data-id='condition_2']"
-    And I set the field with xpath "//div[@data-id='condition_2']//input[@class='form-control']" to "2056-02-25T22:05"
+    And I set the field "restriction-condition_2-start" to "2056-05-20T14:30" using javascript
     And I wait "1" seconds
     And I click on "Save" "button" in the ".vue-flow__panel.save-restore-controls" "css_element"
     And I wait "1" seconds
     And I click on "[data-id='dndnode_3'] .icon-link .fa-lock" "css_element"
     And I should see "According to parent nodes" in the "[data-id='condition_1']" "css_element"
     And I should see "Node start/end date" in the "[data-id='condition_2']" "css_element"
-    ## TODO: Fix below step to validate textarea content (element ids/names issue?).
-    ##And the field "//div[@data-id='condition_2']//input[@class='form-control']" matches value "2056-02-25T22:05"
+    And the field "restriction-condition_2-start" matches value "2056-05-20T14:30"
     And I press "Go Back to Learningpath"
