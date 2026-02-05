@@ -6,7 +6,9 @@
         <TimeWarning />
       </span>
       <input
+        :id="`restriction-${restriction.node_id}-start`"
         type="datetime-local"
+        :name="`restriction-${restriction.node_id}-start`"
         class="form-control"
         style="
           width: 80%;
@@ -22,7 +24,9 @@
         <TimeWarning />
       </span>
       <input
+        :id="`restriction-${restriction.node_id}-end`"
         type="datetime-local"
+        :name="`restriction-${restriction.node_id}-end`"
         class="form-control"
         style="
           width: 80%;

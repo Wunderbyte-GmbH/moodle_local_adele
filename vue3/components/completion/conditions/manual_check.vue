@@ -11,9 +11,10 @@
       <label for="enableTextarea">{{ store.state.strings.enabletextarea_manual_check }}</label>
     </div>
     <textarea
+      :id="`completion-${completion.node_id}-info`"
       class="form-control"
       v-model="textInput"
-      :name="store.state.strings.info_placeholder_manual_check"
+      :name="`completion-${completion.node_id}-info`"
       :disabled="!isTextareaEnabled"
       rows="4"
       @input="resetButtonColor"

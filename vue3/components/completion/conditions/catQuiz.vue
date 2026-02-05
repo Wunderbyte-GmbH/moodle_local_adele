@@ -12,7 +12,9 @@
       />
       <div v-if="parentscales.length > 0">
         <select
+          :id="`completion-${completion.node_id}-parent-scale`"
           v-model="selectedparentscale"
+          :name="`completion-${completion.node_id}-parent-scale`"
           @change="updateScales"
         >
           <option
@@ -56,23 +58,25 @@
                     v-if="scales.parent && scales.parent.showDetails"
                     class="dynamic-content-container"
                   >
-                    <label for="scalevalue">
+                    <label :for="`completion-${completion.node_id}-scale-value`">
                       {{ store.state.strings.conditions_scale_value }}
                     </label>
                     <input
-                      id="scalevalue"
+                      :id="`completion-${completion.node_id}-scale-value`"
                       v-model="scalevalue"
+                      :name="`completion-${completion.node_id}-scale-value`"
                       class="form-control"
                     >
                     <label
-                      for="attempts"
+                      :for="`completion-${completion.node_id}-attempts`"
                       class="mt-3"
                     >
                       {{ store.state.strings.conditions_attempts }}
                     </label>
                     <input
-                      id="attempts"
+                      :id="`completion-${completion.node_id}-attempts`"
                       v-model="attempts"
+                      :name="`completion-${completion.node_id}-attempts`"
                       class="form-control"
                     >
                     <button
@@ -134,23 +138,25 @@
                     v-if="scale.showDetails"
                     class="dynamic-content-container"
                   >
-                    <label for="scalevalue">
+                    <label :for="`completion-${completion.node_id}-sub-scale-value`">
                       {{ store.state.strings.conditions_scale_value }}
                     </label>
                     <input
-                      id="scalevalue"
+                      :id="`completion-${completion.node_id}-sub-scale-value`"
                       v-model="scalevalue"
+                      :name="`completion-${completion.node_id}-sub-scale-value`"
                       class="form-control"
                     >
                     <label
-                      for="attempts"
+                      :for="`completion-${completion.node_id}-sub-attempts`"
                       class="mt-3"
                     >
                       {{ store.state.strings.conditions_attempts }}
                     </label>
                     <input
-                      id="attempts"
+                      :id="`completion-${completion.node_id}-sub-attempts`"
                       v-model="attempts"
+                      :name="`completion-${completion.node_id}-sub-attempts`"
                       class="form-control"
                     >
                     <button

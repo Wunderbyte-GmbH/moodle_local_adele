@@ -360,6 +360,7 @@ function changeTab(index) {
             :key="course.id"
             class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
             :draggable="true"
+            :data-draggable="course.course_node_id[0]"
             :data="course"
             style="width: 100%; padding: 0rem; margin-left: 0.025rem; height: 3rem"
             @dragstart="onDragStart($event, course)"

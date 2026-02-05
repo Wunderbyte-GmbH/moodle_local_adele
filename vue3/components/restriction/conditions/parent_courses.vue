@@ -5,12 +5,14 @@
       <div v-if="data.courses_id && data.courses_id.length > 0">
         <label
           class="form-label"
-          for="courseSelect"
+          :for="`restriction-${restriction.node_id}-min`"
         >
           {{ store.state.strings.restriction_select_number }}
         </label>
         <select
+          :id="`restriction-${restriction.node_id}-min`"
           v-model="data.min_courses"
+          :name="`restriction-${restriction.node_id}-min`"
           class="form-select"
           @change="emitSelectedParentCourse"
         >

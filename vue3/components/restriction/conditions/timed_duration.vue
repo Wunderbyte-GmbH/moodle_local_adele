@@ -2,7 +2,9 @@
   <div class="form-group">
     <div class="input-group mb-3">
       <select 
+        :id="`restriction-${restriction.node_id}-option`"
         v-model="data.selectedOption"
+        :name="`restriction-${restriction.node_id}-option`"
         class="form-select"
         @change="onChange()"
       >
@@ -27,13 +29,17 @@
       style="margin-left: 0;"
     >
       <input
+        :id="`restriction-${restriction.node_id}-duration`"
         v-model="data.selectedDuration"
+        :name="`restriction-${restriction.node_id}-duration`"
         class="col-md-6 form-control"
         :placeholder="store.state.strings.course_name_condition_timed_duration_duration_value"
         @change="onChange()"
       >
       <select 
+        :id="`restriction-${restriction.node_id}-format`"
         v-model="data.durationValue"
+        :name="`restriction-${restriction.node_id}-format`"
         class="col-md-6 form-select ml-0" 
         @change="onChange()"
       >

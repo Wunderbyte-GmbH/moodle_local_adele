@@ -325,6 +325,7 @@ const filteredConditions = computed(() => {
           :key="condition.description"
           class="vue-flow__node-input mt-1 row align-items-center justify-content-center"
           :draggable="true"
+          :data-draggable="condition.name"
           :data="condition"
           style="width: 95%; margin-left: 0.025rem;"
           @dragstart="onDragStart($event, condition, this)"
