@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_catquiz_parent_scale extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -60,8 +59,7 @@ class get_catquiz_parent_scale extends external_api {
           'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
           'sacleid'  => new external_value(PARAM_INT, 'sacleid', VALUE_REQUIRED),
           'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-          ]
-        );
+          ]);
     }
 
     /**
@@ -105,8 +103,7 @@ class get_catquiz_parent_scale extends external_api {
             new external_single_structure([
                     'id' => new external_value(PARAM_TEXT, 'id'),
                     'name' => new external_value(PARAM_TEXT, 'componentid'),
-                ]
-            )
+                ])
         );
     }
 }

@@ -302,7 +302,7 @@ class relation_update {
                     } else if ($label == 'course_completed') {
                         $completednodecourses = 0;
                         if (
-                          isset($completioncriteria[$label]['completed'])
+                            isset($completioncriteria[$label]['completed'])
                         ) {
                             foreach ($completioncriteria[$label]['completed'] as $coursecompleted) {
                                 if ($coursecompleted) {
@@ -451,8 +451,10 @@ class relation_update {
         switch ($node['data']['label']) {
             case 'timed':
             case 'timed_duration':
-                if (isset($restrictioncriteria[$node['data']['label']][$node['id']]) &&
-                 $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']) {
+                if (
+                    isset($restrictioncriteria[$node['data']['label']][$node['id']]) &&
+                    $restrictioncriteria[$node['data']['label']][$node['id']]['isafter']
+                ) {
                     return false;
                 } else {
                     return true;
@@ -532,14 +534,16 @@ class relation_update {
                 if (self::istypetimedandcolumnvalid($restnode, $restrictioncriteria)) {
                     $isvalid = true;
                     $childconditionid = $restnode['childCondition'][1] ?? null;
-                    $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                    $filterednodes = array_filter($node['restriction']['nodes'], function ($item) use ($childconditionid) {
                         return isset($item['id']) && $item['id'] === $childconditionid;
                     });
                     $childcondition = reset($filterednodes);
-                    while ($childcondition !== null &&
-                        $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)) {
+                    while (
+                        $childcondition !== null &&
+                        $childcondition !== false && self::istypetimedandcolumnvalid($childcondition, $restrictioncriteria)
+                    ) {
                         $childconditionid = $childcondition['childCondition'][0] ?? null;
-                        $filterednodes = array_filter($node['restriction']['nodes'], function($item) use ($childconditionid) {
+                        $filterednodes = array_filter($node['restriction']['nodes'], function ($item) use ($childconditionid) {
                             return isset($item['id']) && $item['id'] === $childconditionid;
                         });
                         $childcondition = $filterednodes[0] ?? null;
@@ -839,7 +843,7 @@ class relation_update {
      * @param array $condition Optional array of conditions with placeholder data
      * @return string The string with all placeholders replaced with their values
      */
-    public static function render_placeholders_single_restriction($string, $id, $nodes, $condition = [] ) {
+    public static function render_placeholders_single_restriction($string, $id, $nodes, $condition = []) {
         if (isset($condition['placeholders'])) {
             foreach ($condition['placeholders'] as $placeholder => $text) {
                 if (is_array($text)) {
@@ -888,7 +892,7 @@ class relation_update {
      * @param array $nodes
      * @return string
      */
-    public static function render_placeholders($string, $placeholders , $id, $nodes) {
+    public static function render_placeholders($string, $placeholders, $id, $nodes) {
         $id = str_replace('_feedback', '', $id);
         while ($id != null) {
             foreach ($placeholders as $condition) {

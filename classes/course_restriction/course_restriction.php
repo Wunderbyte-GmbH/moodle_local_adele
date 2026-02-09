@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface course_restriction {
-
     /**
      * Obtains a string describing this restriction (whether or not
      * it actually applies). Used to obtain information that is displayed to
@@ -79,5 +78,4 @@ interface course_restriction {
      * @return int Information array of importancy.
      */
     public function get_restriction_description_before();
-
 }

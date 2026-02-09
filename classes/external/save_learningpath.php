@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_learningpath extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -63,8 +62,7 @@ class save_learningpath extends external_api {
             'json'  => new external_value(PARAM_RAW, 'json', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
             'image'  => new external_value(PARAM_TEXT, 'image', VALUE_DEFAULT, ''),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -133,9 +131,7 @@ class save_learningpath extends external_api {
                     'timemodified' => new external_value(PARAM_TEXT, 'Condition label'),
                     'createdby' => new external_value(PARAM_TEXT, 'Condition label'),
                     'json' => new external_value(PARAM_RAW, 'Condition label'),
-                ]
-            ),
-            ]
-        );
+                ]),
+            ]);
     }
 }

@@ -36,7 +36,6 @@ use context_course;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_path_courses {
-
     /**
      * Start a new attempt for a user.
      *
@@ -100,8 +99,14 @@ class learning_path_courses {
             $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'itemid, filepath, filename', false);
             $entry->selected_course_image = null;
             if ($file = reset($files)) {
-                $path = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                                                        '', $file->get_filepath(), $file->get_filename());
+                $path = moodle_url::make_pluginfile_url(
+                    $file->get_contextid(),
+                    $file->get_component(),
+                    $file->get_filearea(),
+                    '',
+                    $file->get_filepath(),
+                    $file->get_filename()
+                );
                 $entry->selected_course_image = $path->out();
             }
         }
@@ -155,7 +160,7 @@ class learning_path_courses {
                 $filtercount = count($configfilter);
                 if ($index == 'category') {
                     if ($filtercount > 0) {
-                        list($inorequal, $categoryparams) = $DB->get_in_or_equal($configfilter, SQL_PARAMS_NAMED);
+                        [$inorequal, $categoryparams] = $DB->get_in_or_equal($configfilter, SQL_PARAMS_NAMED);
                         $where[] = " s1.category $inorequal  ";
                     }
                     // Because we always get an array with key 0 and empty string from settings.php.
@@ -169,13 +174,14 @@ class learning_path_courses {
                             $filter,
                             $filter . ",%",
                             "%, " . $filter,
-                            "%, " . $filter .",%",
+                            "%, " . $filter . ",%",
                         ];
                         foreach ($tagqueries as $indexquery => $tagquery) {
                             $wherequery .= str_replace(
                                 ['OPERATOR', 'TAG', 'OPERATION'],
                                 [$operator, $index . $indexfilter, $operation],
-                                $tagquery);
+                                $tagquery
+                            );
 
                             $params[$index . $indexfilter] = $tagwildcards[$indexquery];
                             $indexfilter += 1;

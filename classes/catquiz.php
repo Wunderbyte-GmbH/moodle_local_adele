@@ -37,12 +37,10 @@ use local_catquiz\testenvironment;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz {
-
     /**
      * Entities constructor.
      */
     public function __construct() {
-
     }
 
     /**
@@ -93,7 +91,7 @@ class catquiz {
                 }
             }
             if (!empty($scaleids)) {
-                list($insql, $params) = $DB->get_in_or_equal($scaleids);
+                [$insql, $params] = $DB->get_in_or_equal($scaleids);
                 $scales['sub'] = $DB->get_records_select('local_catquiz_catscales', "id $insql", $params);
                 $scales['sub'] = array_map(function ($scale) {
                     return (array)$scale;

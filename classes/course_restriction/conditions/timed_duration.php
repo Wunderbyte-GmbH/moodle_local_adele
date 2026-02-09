@@ -162,7 +162,7 @@ class timed_duration implements course_restriction {
                         if (
                             isset($this->durationvaluearray[$durationvalue]) &&
                             !is_string($starttime)
-                          ) {
+                        ) {
                             $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
                             $endtime = clone $starttime;
                             $endtime->modify("+{$totalseconds} seconds");
@@ -197,7 +197,6 @@ class timed_duration implements course_restriction {
                     $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange ?? '';
                     $timed[$restrictionnode['id']]['isafter'] = $isafterrange ?? '';
-
                 } else {
                     $timed[$restrictionnode['id']] = [
                       'completed' => false,

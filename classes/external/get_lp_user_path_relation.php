@@ -47,7 +47,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_lp_user_path_relation extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -58,8 +57,7 @@ class get_lp_user_path_relation extends external_api {
             'learningpathid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'userpathid'  => new external_value(PARAM_INT, 'userpathid', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
     /**
      * Webservice for the local catquiz plugin to get next question.
@@ -104,7 +102,6 @@ class get_lp_user_path_relation extends external_api {
                     'json' => new external_value(PARAM_RAW, 'Flow Chart'),
                     'last_seen_by_owner' => new external_value(PARAM_TEXT, 'Last seen'),
                     'image' => new external_value(PARAM_RAW, 'image'),
-            ]
-        );
+            ]);
     }
 }

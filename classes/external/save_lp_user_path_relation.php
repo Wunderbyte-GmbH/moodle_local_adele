@@ -47,7 +47,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_lp_user_path_relation extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -59,8 +58,7 @@ class save_lp_user_path_relation extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'params'  => new external_value(PARAM_RAW, 'params', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -101,7 +99,6 @@ class save_lp_user_path_relation extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
                 'success' => new external_value(PARAM_BOOL, 'Item id'),
-            ]
-        );
+            ]);
     }
 }

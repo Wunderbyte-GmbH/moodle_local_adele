@@ -257,8 +257,10 @@ class behat_local_adele extends behat_base {
                 throw new Error('Vue Flow target node not found: ' + $targetsel);
               }
 
-              const sourceHandle = sourceNode.querySelector('.vue-flow__handle.source') || sourceNode.querySelector('.vue-flow__handle');
-              const targetHandle = targetNode.querySelector('.vue-flow__handle.target') || targetNode.querySelector('.vue-flow__handle');
+              const sourceHandle = sourceNode.querySelector('.vue-flow__handle.source')
+                  || sourceNode.querySelector('.vue-flow__handle');
+              const targetHandle = targetNode.querySelector('.vue-flow__handle.target')
+                  || targetNode.querySelector('.vue-flow__handle');
               if (!sourceHandle) {
                 throw new Error('Vue Flow source handle not found for: ' + $sourcesel);
               }
@@ -293,6 +295,34 @@ class behat_local_adele extends behat_base {
               targetHandle.dispatchEvent(
                 new MouseEvent('mouseup', {bubbles: true, cancelable: true, clientX: endX, clientY: endY, button: 0})
               );
+            })();
+            JS;
+        $this->getSession()->executeScript($script);
+    }
+  
+    /**
+     * Set a field value using JavaScript and dispatch input/change events.
+     *
+     * @When /^I set the field "(?P<field>[^"]+)" to "(?P<value>[^"]+)" using javascript$/
+     *
+     * @param string $field Field name or ID.
+     * @param string $value Value to set.
+     */
+    public function i_set_field_value_using_javascript(string $field, string $value): void {
+        $fieldjson = json_encode($field, JSON_UNESCAPED_SLASHES);
+        $valuejson = json_encode($value, JSON_UNESCAPED_SLASHES);
+        $script = <<<JS
+            (function() {
+              const selector = `[name=\${$fieldjson}]`;
+              const element = document.getElementById($fieldjson)
+                || document.querySelector(selector)
+                || document.querySelector($fieldjson);
+              if (!element) {
+                throw new Error('Field not found for: ' + $fieldjson);
+              }
+              element.value = $valuejson;
+              element.dispatchEvent(new Event('input', { bubbles: true }));
+              element.dispatchEvent(new Event('change', { bubbles: true }));
             })();
             JS;
         $this->getSession()->executeScript($script);

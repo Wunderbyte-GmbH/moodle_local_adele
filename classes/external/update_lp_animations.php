@@ -49,7 +49,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_lp_animations extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -62,8 +61,7 @@ class update_lp_animations extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'nodeid'  => new external_value(PARAM_TEXT, 'nodeid', VALUE_REQUIRED),
             'animations'  => new external_value(PARAM_TEXT, 'animations', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -88,10 +86,10 @@ class update_lp_animations extends external_api {
         require_capability('local/adele:view', $context);
 
         return learning_path_update::update_animations(
-          $learningpathid,
-          $userid,
-          $nodeid,
-          $animations
+            $learningpathid,
+            $userid,
+            $nodeid,
+            $animations
         );
     }
 
@@ -103,7 +101,6 @@ class update_lp_animations extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
                     'success' => new external_value(PARAM_INT, 'Condition description'),
-                ]
-        );
+                ]);
     }
 }

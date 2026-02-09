@@ -44,7 +44,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_potential_completion implements course_completion {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_CATQUIZ;
     /** @var string $label of the redered condition in frontend. */

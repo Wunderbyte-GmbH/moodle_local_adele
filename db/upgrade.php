@@ -39,7 +39,6 @@ function xmldb_local_adele_upgrade($oldversion) {
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
     if ($oldversion < 2024010304) {
-
         // Define table local_adele_path_user to be created.
         $table = new xmldb_table('local_adele_path_user');
 
@@ -69,7 +68,6 @@ function xmldb_local_adele_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024052300) {
-
         // Define field course_id to be added to local_adele_path_user.
         $table = new xmldb_table('local_adele_path_user');
         $field = new xmldb_field('course_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'user_id');
@@ -84,7 +82,6 @@ function xmldb_local_adele_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024060304) {
-
         // Define field course_id to be added to local_adele_path_user.
         $table = new xmldb_table('local_adele_learning_paths');
         $field = new xmldb_field('image', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'json');
@@ -98,7 +95,6 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024060304, 'local', 'adele');
     }
     if ($oldversion < 2024080901) {
-
         // Define field course_id to be added to local_adele_path_user.
         $table = new xmldb_table('local_adele_path_user');
         $field = new xmldb_field('last_seen_by_owner', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');

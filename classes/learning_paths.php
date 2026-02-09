@@ -46,12 +46,10 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_paths {
-
     /**
      * Entities constructor.
      */
     public function __construct() {
-
     }
 
     /**
@@ -136,10 +134,10 @@ class learning_paths {
     public static function get_learning_paths($hascapability, $sessionvalue) {
         global $DB;
         $response = $DB->get_records(
-          'local_adele_learning_paths',
-          null,
-          '' ,
-          'id, name, description, image, visibility'
+            'local_adele_learning_paths',
+            null,
+            '',
+            'id, name, description, image, visibility'
         );
         $learningpaths = [
             'edit' => [],
@@ -200,8 +198,11 @@ class learning_paths {
             return $learningpath;
         }
         global $DB;
-        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
-            'id, name, description, image, json');
+        $learningpath = $DB->get_record(
+            'local_adele_learning_paths',
+            ['id' => $params['learningpathid']],
+            'id, name, description, image, json'
+        );
         $learningpath = self::get_image_paths($learningpath);
         return (array) $learningpath;
     }
@@ -223,8 +224,12 @@ class learning_paths {
                     $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'itemid, filepath, filename', false);
                     if ($file = reset($files)) {
                         $path = moodle_url::make_pluginfile_url(
-                          $file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                          $file->get_itemid(), $file->get_filepath(), $file->get_filename()
+                            $file->get_contextid(),
+                            $file->get_component(),
+                            $file->get_filearea(),
+                            $file->get_itemid(),
+                            $file->get_filepath(),
+                            $file->get_filename()
                         );
                         $imagepaths[$coursenodeid] = str_replace('/0/', '/', $path->out());
                     }
@@ -255,8 +260,11 @@ class learning_paths {
     public static function duplicate_learning_path($params) {
         global $DB, $USER;
 
-        $learningpath = $DB->get_record('local_adele_learning_paths', ['id' => $params['learningpathid']],
-            'name, description, image, json');
+        $learningpath = $DB->get_record(
+            'local_adele_learning_paths',
+            ['id' => $params['learningpathid']],
+            'name, description, image, json'
+        );
         if (isset($learningpath)) {
             $copyindex = 1;
             $copiedname = $learningpath->name .= ' copy';
@@ -264,7 +272,8 @@ class learning_paths {
                 if ($copyindex > 1) {
                     $existinglearningpath = $DB->get_record(
                         'local_adele_learning_paths',
-                        ['name' => $copiedname . ' ' . $copyindex], 'id'
+                        ['name' => $copiedname . ' ' . $copyindex],
+                        'id'
                     );
                 } else {
                     $existinglearningpath = $DB->get_record('local_adele_learning_paths', ['name' => $copiedname], 'id');
@@ -366,7 +375,7 @@ class learning_paths {
                     'progress' => $progress ?? null,
                 ];
             }
-            usort($userpathlist, function($a, $b) {
+            usort($userpathlist, function ($a, $b) {
                 if ($a['progress']['completed_nodes'] === $b['progress']['completed_nodes']) {
                     return $b['progress']['progress'] <=> $a['progress']['progress'];
                 }
@@ -375,9 +384,11 @@ class learning_paths {
             $rank = 1;
             $prevuser = null;
             foreach ($userpathlist as $index => &$user) {
-                if ($prevuser &&
+                if (
+                    $prevuser &&
                     $prevuser['progress']['completed_nodes'] === $user['progress']['completed_nodes'] &&
-                    $prevuser['progress']['progress'] === $user['progress']['progress']) {
+                    $prevuser['progress']['progress'] === $user['progress']['progress']
+                ) {
                     $user['rank'] = $prevuser['rank'];
                 } else {
                     $user['rank'] = $rank;
@@ -452,7 +463,6 @@ class learning_paths {
                 'completed_nodes' => $validnodes,
                 'progress' => round(100 * $progress, 2),
             ];
-
         } catch (Exception $e) {
             debugging('Error in getnodeprogress: ' . $e->getMessage());
             return [
@@ -797,9 +807,10 @@ class learning_paths {
     public static function check_access() {
 
         // First fast check if we show the button in the navbar.
-        if (has_capability('local/adele:canmanage', context_system::instance())
+        if (
+            has_capability('local/adele:canmanage', context_system::instance())
             || has_capability('local/adele:assist', context_system::instance())
-            ) {
+        ) {
             $iseditor = true;
         } else {
             $learningpaths = self::return_learningpaths();

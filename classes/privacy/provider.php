@@ -52,7 +52,6 @@ class provider implements
 
     // This plugin is capable of determining which users have data within it.
     \core_privacy\local\request\core_userlist_provider {
-
     /**
      * Returns metadata about the data stored by this plugin.
      *
@@ -116,7 +115,9 @@ class provider implements
                  WHERE c.contextlevel = :contextlevel
                    AND (
                        EXISTS (SELECT 1 FROM {local_adele_learning_paths} lap WHERE lap.createdby = :userid1)
-                       OR EXISTS (SELECT 1 FROM {local_adele_path_user} lpu WHERE lpu.user_id = :userid2 OR lpu.createdby = :userid3)
+                       OR EXISTS (
+                            SELECT 1 FROM {local_adele_path_user} lpu WHERE lpu.user_id = :userid2 OR lpu.createdby = :userid3
+                       )
                        OR EXISTS (SELECT 1 FROM {local_adele_lp_editors} lpe WHERE lpe.userid = :userid4)
                    )";
 
@@ -252,7 +253,10 @@ class provider implements
                     'learningpathid' => $editor->learningpathid,
                 ];
             }
-            writer::with_context($systemcontext)->export_data(['learning_path_editor_permissions'], (object) ['permissions' => $data]);
+            writer::with_context($systemcontext)->export_data(
+                ['learning_path_editor_permissions'],
+                (object) ['permissions' => $data]
+            );
         }
     }
 
@@ -329,7 +333,7 @@ class provider implements
             return;
         }
 
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         // Delete learning paths created by these users.
         $DB->delete_records_select('local_adele_learning_paths', "createdby $insql", $inparams);

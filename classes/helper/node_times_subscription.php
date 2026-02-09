@@ -34,7 +34,6 @@ namespace local_adele\helper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class node_times_subscription {
-
     /**
      * Get learning paths that contain course.
      *

@@ -54,7 +54,15 @@ class users {
         $values = explode(' ', $query);
 
         $fullsql = $DB->sql_concat(
-            '\' \'', 'u.id', '\' \'', 'u.firstname', '\' \'', 'u.lastname', '\' \'', 'u.email', '\' \''
+            '\' \'',
+            'u.id',
+            '\' \'',
+            'u.firstname',
+            '\' \'',
+            'u.lastname',
+            '\' \'',
+            'u.email',
+            '\' \''
         );
 
         $sql = "SELECT * FROM (
@@ -69,7 +77,6 @@ class users {
             $firstrun = true;
             $counter = 1;
             foreach ($values as $value) {
-
                 $sql .= $firstrun ? ' WHERE ' : ' AND ';
                 $sql .= " " . $DB->sql_like('fulltextstring', ':param' . $counter, false) . " ";
                 // If it's numeric, we search for the full number - so we need to add blanks.
@@ -105,5 +112,4 @@ class users {
                 'list' => count($list) > 100 ? [] : $list,
         ];
     }
-
 }

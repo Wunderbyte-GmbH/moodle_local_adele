@@ -50,7 +50,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_learningpath extends external_api {
-
     /**
      * Describes the parameters for get_next_question webservice.
      *
@@ -61,8 +60,7 @@ class get_learningpath extends external_api {
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'learningpathid'  => new external_value(PARAM_INT, 'learningpathid', VALUE_REQUIRED),
             'contextid'  => new external_value(PARAM_INT, 'contextid', VALUE_REQUIRED),
-            ]
-        );
+            ]);
     }
 
     /**
@@ -87,8 +85,8 @@ class get_learningpath extends external_api {
         $learningpaths = learning_paths::return_learningpaths();
 
         if (
-          !isset($learningpaths[$params['learningpathid']]) &&
-          !has_capability('local/adele:edit', $context)
+            !isset($learningpaths[$params['learningpathid']]) &&
+            !has_capability('local/adele:edit', $context)
         ) {
             throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', 'error');
         }
@@ -117,7 +115,6 @@ class get_learningpath extends external_api {
             'description' => new external_value(PARAM_TEXT, 'Item name'),
             'image' => new external_value(PARAM_TEXT, 'Item image'),
             'json' => new external_value(PARAM_RAW, 'Additional JSON data'),
-        ]
-        );
+        ]);
     }
 }

@@ -42,7 +42,6 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class parent_courses implements course_restriction {
-
     /** @var int $id Standard Conditions have hardcoded ids. */
     public $id = COURSES_COND_TIMED;
     /** @var string $type of the redered condition in frontend. */
@@ -127,7 +126,7 @@ class parent_courses implements course_restriction {
             $restrictions = $node['restriction']['nodes'];
             foreach ($restrictions as $restriction) {
                 $courselist = [];
-                if ( isset($restriction['data']['label']) && $restriction['data']['label'] == 'parent_courses') {
+                if (isset($restriction['data']['label']) && $restriction['data']['label'] == 'parent_courses') {
                     $coursescompleted = false;
                     $coursestable = [];
                     if (isset($restriction['data']['value']['courses_id'])) {
