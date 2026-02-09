@@ -43,6 +43,7 @@ $string['adele:canmanage'] = 'Is allowed to manage Learning path Plugins';
 $string['adele:edit'] = 'Edit learning path';
 $string['adele:teacheredit'] = 'Teacher edit';
 $string['adele:view'] = 'View learning path';
+$string['adeleassistantdescription'] = 'Learning path Assistant';
 $string['adeleroledescription'] = 'Learning path Manager';
 $string['all_quiz'] = 'Among all attempts, all scales have to be fullfilled at least once.';
 $string['all_quiz_global'] = 'Among all attempts with a given global value, all scales have to be fullfilled at least once.';

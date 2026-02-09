@@ -43,6 +43,7 @@ $string['adele:canmanage'] = 'Darf Lernpfad-Plugins verwalten';
 $string['adele:edit'] = 'Lernpfad bearbeiten';
 $string['adele:teacheredit'] = 'TrainerIn bearbeiten';
 $string['adele:view'] = 'Lernpfad anzeigen';
+$string['adeleassistantdescription'] = 'Lernpfad-Assistent';
 $string['adeleroledescription'] = 'Lernpfad-Manager';
 $string['all_quiz'] = 'Über alle Versuche hinweg muss jede Skala mindestens einmal erfüllt werden.';
 $string['all_quiz_global'] = 'Über alle Versuche mit einem bestimmten globalen Wert hinweg muss jede Skala mindestens einmal erfüllt werden.';
