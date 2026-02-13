@@ -299,7 +299,7 @@ class behat_local_adele extends behat_base {
             JS;
         $this->getSession()->executeScript($script);
     }
-  
+
     /**
      * Set a field value using JavaScript and dispatch input/change events.
      *
