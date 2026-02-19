@@ -1,7 +1,7 @@
 
  <template>
   <div>
-    <button @click="toggleTable" class="btn-primary toggle-button">
+    <button id="adele-userlist-toggle" @click="toggleTable" class="btn-primary toggle-button">
       {{ isTableVisible ? store.state.strings.user_view_user_list_hide : store.state.strings.user_view_user_list_show }}
       {{ store.state.strings.user_view_user_list }}
     </button>
@@ -10,42 +10,48 @@
         v-if="isTableVisible"
         class="table-container"
       >
-        <table class="table">
+        <table id="adele-userlist-table" class="table" :title="store.state.strings.user_view_user_list">
           <thead>
-            <tr>
+            <tr id="adele-userlist-header-row">
               <th
                 v-if="store.state.view !== 'student'"
                 @click="sortTable('id')"
                 :class="getSortClass('id')"
                 :style="{ width: columnWidth }"
+                :title="store.state.strings.user_view_id"
               >
                 {{ store.state.strings.user_view_id }}
               </th>
-              <th @click="sortTable('firstname')" :class="getSortClass('firstname')" :style="{ width: columnWidth }">
+              <th @click="sortTable('firstname')" :class="getSortClass('firstname')" :style="{ width: columnWidth }" :title="store.state.strings.user_view_firstname">
                 {{ store.state.strings.user_view_firstname }}
               </th>
-              <th @click="sortTable('lastname')" :class="getSortClass('lastname')" :style="{ width: columnWidth }">
+              <th @click="sortTable('lastname')" :class="getSortClass('lastname')" :style="{ width: columnWidth }" :title="store.state.strings.user_view_lastname">
                 {{ store.state.strings.user_view_lastname }}
               </th>
-              <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')" :style="{ width: columnWidth }">
+              <th @click="sortTable('progress.progress')" :class="getSortClass('progress.progress')" :style="{ width: columnWidth }" :title="store.state.strings.user_view_progress">
                 {{ store.state.strings.user_view_progress }}
               </th>
-              <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')" :style="{ width: columnWidth }">
+              <th @click="sortTable('progress.completed_nodes')" :class="getSortClass('progress.completed_nodes')" :style="{ width: columnWidth }" :title="store.state.strings.user_view_nodes">
                 {{ store.state.strings.user_view_nodes }}
               </th>
-              <th @click="sortTable('rank')" :class="getSortClass('rank')" :style="{ width: columnWidth }">
+              <th @click="sortTable('rank')" :class="getSortClass('rank')" :style="{ width: columnWidth }" :title="store.state.strings.userlistranking">
                 {{ store.state.strings.userlistranking }}
               </th>
             </tr>
           </thead>
             <transition-group name="list" tag="tbody">
               <tr
-                v-for="relation in sortedRelations"
+                v-for="(relation, index) in sortedRelations"
                 :key="relation.id"
+                :id="'adele-userlist-row-r' + (index + 1)"
                 :class="{ 'highlighted-row': relation.id === focusEntry }"
               >
                 <td v-if="store.state.view !== 'student'" :style="{ width: columnWidth }">
-                  <router-link :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}">
+                  <router-link
+                    :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
+                    :id="'adele-userlist-link-' + relation.id"
+                    :title="relation.firstname + ' ' + relation.lastname"
+                  >
                     {{ relation.id }}
                   </router-link>
                 </td>
