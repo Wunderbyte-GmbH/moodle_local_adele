@@ -590,9 +590,9 @@ class learning_paths {
             'restriction',
         ];
         foreach ($conditions as $condition) {
-            if ($node->{$condition} && $node->{$condition}->nodes) {
+            if (!empty($node->{$condition}) && !empty($node->{$condition}->nodes)) {
                 foreach ($node->{$condition}->nodes as $conditionnode) {
-                    if ($conditionnode->data->label == 'manual') {
+                    if (!empty($conditionnode->data->label) && $conditionnode->data->label == 'manual') {
                         $node->data->{ 'manual' . $condition} = true;
                     }
                 }
@@ -646,7 +646,7 @@ class learning_paths {
         }
         arsort($courseprogrressarray);
         $sortedcourseprogress = array_values($courseprogrressarray);
-        if ($node->data->completion->master->completion) {
+        if (!empty($node->data->completion->master->completion)) {
             $completioncolumnprogress[] = 100;
         } else {
             foreach ($node->completion->nodes as $completionnode) {
