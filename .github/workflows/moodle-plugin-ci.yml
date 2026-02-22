@@ -3,13 +3,13 @@ name: Moodle Plugin CI
 on: [push, pull_request]
 
 jobs:
-  moodle405:
+  moodle500to501:
     uses: Wunderbyte-GmbH/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     with:
       # Change these based on your plugin's requirements
       disable_release: true  # Use true if using the tag-based release workflow
-      moodle_branches: "MOODLE_405_STABLE"  # Optional: Only test specific Moodle versions
-      min_php: '8.1'  # Optional: Set minimum PHP version
+      moodle_branches: "MOODLE_500_STABLE MOODLE_501_STABLE"  # Optional: Only test specific Moodle versions
+      min_php: '8.2'  # Optional: Set minimum PHP version
 
       # Command to install more dependencies
       extra_plugin_runners: |
@@ -20,7 +20,7 @@ jobs:
         moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
-      # ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'
+      ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'
 
       # Specify paths to ignore for mustache lint
       mustache_ignore_names: 'initview.mustache'
@@ -48,7 +48,6 @@ jobs:
       codechecker_max_warnings: 0
 
       # Override to exclude stale AMD file check (similar to your current workaround)
-      # This might not be needed with the reusable workflow as it might handle this already
 #      workarounds: |
 #        # WORKAROUND 17/04/2025: The following code is a workaround for the "File is stale and needs to be rebuilt" error
 #        # This occurs when AMD modules import Moodle core dependencies
@@ -117,24 +116,24 @@ jobs:
           echo "Vue3 directory not found. Skipping Vue3 tests."
         fi
         echo "::endgroup::"
-  moodle401:
+  moodle405:
     uses: Wunderbyte-GmbH/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     with:
       # Change these based on your plugin's requirements
       disable_release: true  # Use true if using the tag-based release workflow
-      moodle_branches: "MOODLE_401_STABLE"  # Optional: Only test specific Moodle versions
-      min_php: '7.4'  # Optional: Set minimum PHP version
+      moodle_branches: "MOODLE_405_STABLE"  # Optional: Only test specific Moodle versions
+      min_php: '8.1'  # Optional: Set minimum PHP version
 
       # Command to install more dependencies
       extra_plugin_runners: |
-        moodle-plugin-ci add-plugin --branch MOODLE_401_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
+        moodle-plugin-ci add-plugin --branch MOODLE_405_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
         moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
         moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_catquiz
         moodle-plugin-ci add-plugin --branch catmodel_main Wunderbyte-GmbH/moodle-mod_adaptivequiz
         moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
-      # ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'
+      ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'
 
       # Specify paths to ignore for mustache lint
       mustache_ignore_names: 'initview.mustache'
