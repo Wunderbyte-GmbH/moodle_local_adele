@@ -15,8 +15,8 @@ jobs:
       extra_plugin_runners: |
         moodle-plugin-ci add-plugin --branch MOODLE_405_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
         moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
-        moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_catquiz
-        moodle-plugin-ci add-plugin --branch catmodel_main Wunderbyte-GmbH/moodle-mod_adaptivequiz
+        moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-local_catquiz
+        moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-mod_adaptivequiz
         moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
@@ -128,8 +128,8 @@ jobs:
       extra_plugin_runners: |
         moodle-plugin-ci add-plugin --branch MOODLE_405_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
         moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
-        moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_catquiz
-        moodle-plugin-ci add-plugin --branch catmodel_main Wunderbyte-GmbH/moodle-mod_adaptivequiz
+        moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-local_catquiz
+        moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-mod_adaptivequiz
         moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
