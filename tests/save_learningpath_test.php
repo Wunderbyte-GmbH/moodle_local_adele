@@ -37,6 +37,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
+ *
  */
 #[RunTestsInSeparateProcesses]
 #[CoversClass(course_module_created::class)]
