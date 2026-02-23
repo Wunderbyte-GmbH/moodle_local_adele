@@ -41,7 +41,7 @@ Feature: As an admin I perform editing of the adele learning plan.
     ## Edit completion for course 2 - add customized "manual completion" checkbox.
     And I click on "[data-id='dndnode_2'] .icon-link .fa-tasks" "css_element"
     And I wait "1" seconds
-    ## GitHub - ensure Catquiz installed 
+    ## GitHub - ensure Catquiz installed
     And I should see "Catquiz Quiz" in the ".learning-path-nodes-container .nodes [data-draggable=\"Catquiz Quiz\"]" "css_element"
     And I should see "Node completion checkbox" in the ".learning-path-nodes-container .nodes [data-draggable=\"Node completion checkbox\"]" "css_element"
     ## Add and remove OR condition

@@ -13,6 +13,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
       | Course 1 | C1        | LP Course 1 |
       | Course 2 | C2        | LP Course 2 |
       | Course 3 | C3        | LP Course 3 |
+      | Course 4 | C4        | LP Course 4 |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | user     | C1     | student        |
@@ -31,7 +32,7 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I set the field "goalsubjectplaceholder" to "Test Learning Path Description"
     And I click on "Select learning path image" "button"
     And I click on ".image-selection-container .image-option-img" "css_element"
-    ## Create learning part in visual way. 
+    ## Create learning part in visual way.
     And I drag and drop HTML5 from ".learning-path-nodes-container .nodes > :first-child" to "[data-id='starting_node']"
     And I pan vue flow to "[data-id='starting_node']"
     And I click on "[data-id='starting_node']" "css_element"
@@ -65,3 +66,4 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I should see "Course 3" in the ".vue-flow.learning-path-flow" "css_element"
     And "[data-id=\"dndnode_2dndnode_1\"]" "css_element" should exist
     And "[data-id=\"dndnode_3dndnode_2\"]" "css_element" should exist
+    And I wait "300" seconds
