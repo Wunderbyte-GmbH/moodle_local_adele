@@ -17,15 +17,18 @@
 namespace local_adele\course_completion\conditions;
 
 use advanced_testcase;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
- * PHPUnit test case for the 'modquiz' class in local_adele.
+ * PHPUnit test case for the 'modquiz' completion condition in local_adele.
  *
  * @package     local_adele
  * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(modquiz::class)]
 final class modquiz_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
@@ -37,7 +40,6 @@ final class modquiz_test extends advanced_testcase {
 
     /**
      * Test the get_completion_priority function.
-     * @covers \local_adele\course_completion\conditions\modquiz::get_completion_priority
      */
     public function test_get_completion_priority(): void {
         $modquiz = new modquiz();
@@ -47,7 +49,6 @@ final class modquiz_test extends advanced_testcase {
 
     /**
      * Test the get_description function.
-     * @covers \local_adele\course_completion\conditions\modquiz::get_description
      */
     public function test_get_description(): void {
         $modquiz = new modquiz();
@@ -64,7 +65,6 @@ final class modquiz_test extends advanced_testcase {
 
     /**
      * Test the get_completion_status function.
-     * @covers \local_adele\course_completion\conditions\modquiz::get_completion_status
      */
     public function test_get_completion_status(): void {
         global $DB;
@@ -82,7 +82,7 @@ final class modquiz_test extends advanced_testcase {
             ->getMock();
 
         $modquiz->method('get_modquiz_records')
-            ->will($this->returnValue([65 => (object)['grade' => 65]]));
+            ->willReturn([65 => (object)['grade' => 65]]);
 
         // Test incomplete node data (expecting no completion).
         $nodeincomplete = [

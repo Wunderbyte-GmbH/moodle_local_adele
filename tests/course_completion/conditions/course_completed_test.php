@@ -18,16 +18,20 @@ namespace local_adele\course_completion\conditions;
 
 use advanced_testcase;
 use stdClass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
- * PHPUnit test case for the 'modquiz' class in local_adele.
+ * PHPUnit test case for the 'course_completed' completion condition in local_adele.
  *
  * @package     local_adele
  * @author       local_adele
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @runTestsInSeparateProcesses
  */
+#[CoversClass(course_completed::class)]
+#[RunTestsInSeparateProcesses]
 final class course_completed_test extends advanced_testcase {
     /**
      * Set up function to reset all database changes after each test.
@@ -39,7 +43,6 @@ final class course_completed_test extends advanced_testcase {
 
     /**
      * Test the get_completion_priority function.
-     * @covers \local_adele\course_completion\conditions\modquiz::get_completion_priority
      */
     public function test_get_completion_priority(): void {
         $coursecompleted = new course_completed();
@@ -49,7 +52,6 @@ final class course_completed_test extends advanced_testcase {
 
     /**
      * Test the get_description function.
-     * @covers \local_adele\course_completion\conditions\modquiz::get_description
      */
     public function test_get_description(): void {
         $coursecompleted = new course_completed();
@@ -65,7 +67,6 @@ final class course_completed_test extends advanced_testcase {
 
     /**
      * Test the get_node_progress function.
-     * @covers \local_adele\course_completion\conditions\course_completed::get_node_progress
      */
     public function test_get_node_progress(): void {
         $coursecompleted = new course_completed();
@@ -86,7 +87,6 @@ final class course_completed_test extends advanced_testcase {
 
     /**
      * Test the get_completion_status function with mocked progress.
-     * @covers \local_adele\course_completion\conditions\course_completed::get_completion_status
      */
     public function test_get_completion_status(): void {
         // Reset the database after the test.

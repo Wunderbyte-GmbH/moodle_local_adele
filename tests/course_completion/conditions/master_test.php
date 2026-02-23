@@ -18,18 +18,20 @@ namespace local_adele\course_completion\conditions;
 
 use advanced_testcase;
 use local_adele\course_completion\conditions\master;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
- * Unit tests for the master class.
+ * Unit tests for the master completion condition in local_adele.
  *
  * @package     local_adele
  * @copyright   2023 Wunderbyte GmbH
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(master::class)]
 final class master_test extends advanced_testcase {
     /**
      * Test get_description method.
-     * @covers \local_adele\course_completion\conditions\master
      */
     public function test_get_description(): void {
         $this->resetAfterTest(true);
@@ -47,7 +49,6 @@ final class master_test extends advanced_testcase {
 
     /**
      * Test get_completion_status method.
-     * @covers \local_adele\course_completion\conditions\master
      */
     public function test_get_completion_status(): void {
         $this->resetAfterTest(true);

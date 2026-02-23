@@ -28,25 +28,28 @@ namespace local_adele;
 use local_adele\helper\user_path_relation;
 use local_adele\event\user_path_updated;
 use local_adele\completion;
+use local_adele\relation_update;
 use advanced_testcase;
 use context_system;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
- * Tests strategy
+ * PHPUnit test case for the completion class in local_adele.
  *
  * @package    local_adele
  * @author Jacob Viertel
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_adele
  */
+#[CoversMethod(relation_update::class, 'searchnestedarray')]
 final class completion_test extends advanced_testcase {
     /**
      * Test the searchnestedarray method.
-     *
-     * @runInSeparateProcess
      */
+    #[RunInSeparateProcess]
     public function test_searchnestedarray(): void {
         $haystack = [
             ['id' => 1, 'name' => 'Item 1'],

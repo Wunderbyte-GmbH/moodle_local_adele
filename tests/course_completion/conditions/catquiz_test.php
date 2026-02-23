@@ -17,14 +17,18 @@
 namespace local_adele\course_completion\conditions;
 
 use advanced_testcase;
+use PHPUnit\Framework\Attributes\CoversClass;
+
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
- * PHPUnit test case for the 'modquiz' class in local_adele.
+ * PHPUnit test case for the 'catquiz' completion condition in local_adele.
  *
  * @package     local_adele
  * @author       local_adele
  * @copyright  2023 Christian Badusch <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(catquiz::class)]
 final class catquiz_test extends advanced_testcase {
     /**
      * Mock database object used for simulating database interactions.
@@ -178,7 +182,6 @@ final class catquiz_test extends advanced_testcase {
      * 'completed' keys, where condition_2 is set to true. The test uses mock quiz attempts
      * and database interactions to simulate a real scenario.
      *
-     * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
     public function test_get_completion_status_is_true(): void {
@@ -209,7 +212,6 @@ final class catquiz_test extends advanced_testcase {
      * 'completed' keys, where condition_2 is set to false. The test uses empty mock quiz attempts
      * and database interactions to simulate a scenario with no attempts.
      *
-     * @covers \local_adele\course_completion\conditions\catquiz
      * @return void
      */
     public function test_get_completion_status_is_false(): void {

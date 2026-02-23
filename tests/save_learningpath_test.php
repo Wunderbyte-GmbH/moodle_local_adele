@@ -16,17 +16,17 @@
 
 namespace local_adele;
 
-use advanced_testcase;
 use core\event\course_module_created;
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
 use local_adele\event\user_path_updated;
 use local_adele\node_completion;
 use mod_adele_observer;
-use moodle_database;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+require_once(__DIR__ . '/adele_learningpath_testcase.php'); // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState
 
 // phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 // Coverage is declared via PHP 8 attributes on the class instead of @covers docblock annotations.
@@ -34,8 +34,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * PHPUnit test case for the 'catquiz' class in local_adele.
  *
  * @package     local_adele
- * @author       local_adele
- * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @author       Christian Badusch
+ * @copyright  2026 Christian Badusch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * @runInSeparateProcess
@@ -49,57 +49,28 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversMethod(mod_adele_observer::class, 'saved_module')]
 #[CoversMethod(relation_update::class, 'validatenodecompletion')]
 #[CoversMethod(node_completion::class, 'enrol_child_courses')]
-final class save_learningpath_test extends advanced_testcase {
+final class save_learningpath_test extends adele_learningpath_testcase {
     /**
-     * @var array Array of course IDs created during test setup, storing IDs for 5 test courses.
+     * Uses the main access-path fixture: two-node LP with course_completed +
+     * parent_courses/manual restriction conditions.
      */
-    private $courseids;
+    protected function fixturefile(): string {
+        return 'alise_zugangs_lp_einfach.json';
+    }
+
     /**
-     * @var \phpunit_event_sink Event sink for capturing and testing events during test execution.
+     * Assign real course IDs to the fixture tree nodes.
+     *
+     * dndnode_1 (starting node A): courseids[0] + courseids[3] — two courses so
+     *   that the min_courses=2 completion criterion can be tested.
+     * dndnode_2 (child node B):    courseids[2] alone — unambiguous for enrollment
+     *   assertions (distinct from node A's courses).
+     *
+     * @param array $nodes Reference to $nodedata['tree']['nodes'].
      */
-    private $sink;
-    /**
-     * @var int The ID of the course designated as the starting point for the learning path.
-     */
-    private $startingcourseid;
-    /**
-     * @var object The instance of the Adele activity created in the starting course during setup.
-     */
-    private $adelestart;
-    protected function setUp(): void {
-        global $DB;
-        parent::setUp();
-
-        // Reset Moodle database.
-        $this->resetAfterTest(true);
-
-        // Create 5 courses.
-        $generator = self::getDataGenerator();
-        $this->courseids = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $course = $generator->create_course(['fullname' => 'Test Course ' . $i, 'enablecompletion' => 1]);
-            $this->courseids[] = $course->id;
-        }
-
-        // Add users to the first course.
-        $user1 = $generator->create_user();
-        $user2 = $generator->create_user();
-        $generator->enrol_user($user1->id, $this->courseids[0]);
-        $generator->enrol_user($user2->id, $this->courseids[0]);
-
-        // Choose the first course as the "starting course".
-        $this->startingcourseid = $this->courseids[0];
-
-        $jsonstring = file_get_contents(__DIR__ . '/fixtures/' . 'alise_zugangs_lp_einfach.json');
-
-        $jsonarray = json_decode($jsonstring, true);
-
-        $nodedata = json_decode($jsonarray['json'], true);
-
-        foreach ($nodedata['tree']['nodes'] as &$node) {
+    protected function patch_node_ids(array &$nodes): void {
+        foreach ($nodes as &$node) {
             if (isset($node['data']['course_node_id'])) {
-                // Dndnode_1 (starting node A): two courses, to satisfy min_courses=2 completion.
-                // Dndnode_2 (child node B): one distinct course for unambiguous enrollment assertions.
                 if ($node['id'] === 'dndnode_2') {
                     $node['data']['course_node_id'] = [$this->courseids[2]];
                 } else {
@@ -110,20 +81,6 @@ final class save_learningpath_test extends advanced_testcase {
                 }
             }
         }
-        $jsonarray['json'] = json_encode($nodedata);
-
-        $lpid = $generator->get_plugin_generator('local_adele')->create_adele_learningpaths($jsonarray);
-
-        // Redirect events to an event sink.
-        $this->sink = $this->redirectEvents();
-
-        // Create an instance of mod_adele in the starting course.
-        $this->adelestart = $generator->get_plugin_generator('mod_adele')->create_instance([
-            'course' => $this->startingcourseid,
-            'name' => 'Adele Activity',
-            'participantslist' => [1],
-            'learningpathid' => $lpid,
-        ]);
     }
 
     /**
@@ -193,19 +150,12 @@ final class save_learningpath_test extends advanced_testcase {
      */
     public function test_user_path_starting_node_enrollment(): void {
         global $DB;
-        // Fetch events.
-        $events = $this->sink->get_events();
-        // Verify course module creation event was captured exactly once.
-        $createdevents = array_filter($events, fn($event) => $event->eventname === '\core\event\course_module_created');
-        $eventsingle = $createdevents[0];
-        mod_adele_observer::saved_module($eventsingle);
+        $this->subscribe_users_to_lp();
 
-        $eventsnew = $this->sink->get_events();
-        $updateevents = array_values(array_filter($eventsnew, fn($event) =>
-            $event->eventname === '\local_adele\event\user_path_updated'));
-
+        $updateevents = $this->get_update_events();
         relation_update::updated_single($updateevents[0]);
         relation_update::updated_single($updateevents[1]);
+
         $contextcourseb = \context_course::instance($this->courseids[3]);
         $enrolledusers = get_enrolled_users($contextcourseb);
 
@@ -237,23 +187,14 @@ final class save_learningpath_test extends advanced_testcase {
         global $DB;
 
         // Step 1: Subscribe users to the learning path.
-        $events = $this->sink->get_events();
-        $createdevents = array_values(array_filter(
-            $events,
-            fn($event) => $event->eventname === '\\core\\event\\course_module_created'
-        ));
-        mod_adele_observer::saved_module($createdevents[0]);
+        $this->subscribe_users_to_lp();
 
         // Step 2: Enroll users in node A (starting node, dndnode_1).
         // The first two user_path_updated events (indices 0,1) were fired by saved_module.
         // Calling updated_single on them saves user_path_relation to the DB and fires two
         // more "creation" user_path_updated events (indices 2,3) that carry the persisted
         // userpaths - those are the ones we'll reuse in step 4.
-        $allevents = $this->sink->get_events();
-        $updateevents = array_values(array_filter(
-            $allevents,
-            fn($event) => $event->eventname === '\\local_adele\\event\\user_path_updated'
-        ));
+        $updateevents = $this->get_update_events();
         relation_update::updated_single($updateevents[0]);
         relation_update::updated_single($updateevents[1]);
 
@@ -269,21 +210,13 @@ final class save_learningpath_test extends advanced_testcase {
         // Step 4: Re-evaluate paths using the persisted "creation" events from step 2.
         // Those events (at indices 2 and 3) hold userpaths that already have user_path_relation
         // set (creation = false), so updated_single will detect completion and fire node_finished.
-        $alleventsnew = $this->sink->get_events();
-        $allupdateevents = array_values(array_filter(
-            $alleventsnew,
-            fn($event) => $event->eventname === '\\local_adele\\event\\user_path_updated'
-        ));
+        $allupdateevents = $this->get_update_events();
         // Indices 0,1 = original enrollment events; 2,3 = creation events from step 2.
         relation_update::updated_single($allupdateevents[2]);
         relation_update::updated_single($allupdateevents[3]);
 
         // Step 5: Verify node_finished was fired once per user.
-        $latestevents = $this->sink->get_events();
-        $nodefinishedevents = array_values(array_filter(
-            $latestevents,
-            fn($event) => $event->eventname === '\\local_adele\\event\\node_finished'
-        ));
+        $nodefinishedevents = $this->get_node_finished_events();
         $this->assertCount(
             2,
             $nodefinishedevents,
@@ -304,38 +237,245 @@ final class save_learningpath_test extends advanced_testcase {
             "Expected both users to be enrolled in node B's course (courseids[2]) after node A completion."
         );
 
+        // Step 8: Verify dndnode_2 restriction state flipped to 'inbetween' (accessible).
+        // When dndnode_1 is complete, parent_courses.get_restriction_status() sees
+        // $usernode['data']['completion']['feedback']['status'] == 'completed' for dndnode_1,
+        // which satisfies the parent_courses restriction (min_courses=1).
+        // getnodestatusforrestriciton then returns 'inbetween' because restrictionnodepaths
+        // is non-empty (the OR-path through condition_1 is now satisfied).
+        //
+        // UserInformation.vue renders:
+        // store.state.strings['node_access_restriction_inbetween']
+        // = 'Der Kurs/Der Stapel ist freigeschaltet:'.
+        $finalrecords = $DB->get_records('local_adele_path_user');
+        foreach ($finalrecords as $record) {
+            $json = json_decode($record->json, true);
+            $fb2 = $json['user_path_relation']['dndnode_2']['feedback'];
+
+            $this->assertEquals(
+                'inbetween',
+                $fb2['status_restriction'],
+                "Expected dndnode_2 status_restriction='inbetween' for user {$record->user_id} after parent completion."
+            );
+            $this->assertEquals(
+                'accessible',
+                $fb2['status'],
+                "Expected dndnode_2 status='accessible' for user {$record->user_id} after parent completion."
+            );
+        }
+
         $this->sink->close();
     }
 
     /**
-     * Insert a course_completions record to simulate a user completing a course.
-     * The course must already have enablecompletion = 1 (set in setUp via the generator).
+     * Test that completing only one of two required courses puts node A into
+     * the "inbetween" feedback state, which is what NodeInformation.vue renders
+     * via data.completion.feedback.completion.inbetween.
      *
-     * @param int $courseid
-     * @param int $userid
+     * setUp assigns courseids[0,3] to dndnode_1 with min_courses=2.
+     * Only courseids[0] is marked complete here, so the criterion is partially
+     * met: completed=false but inbetween=true (at least one course has progress).
+     *
+     * Expected DB state after re-evaluation:
+     *   user_path_relation['dndnode_1']['feedback']['status_completion'] === 'inbetween'
+     *   user_path_relation['dndnode_1']['feedback']['completion']['inbetween']  is non-empty
+     *   user_path_relation['dndnode_1']['feedback']['completion']['after']      is empty/null
+     *
+     * @return void
      */
-    private function mark_course_complete_in_db(int $courseid, int $userid): void {
+    public function test_partial_course_completion_produces_inbetween_feedback(): void {
         global $DB;
-        if (!$DB->record_exists('course_completions', ['course' => $courseid, 'userid' => $userid])) {
-            $DB->insert_record('course_completions', (object)[
-                'course'        => $courseid,
-                'userid'        => $userid,
-                'timeenrolled'  => time(),
-                'timestarted'   => time(),
-                'timecompleted' => time(),
-                'reaggregate'   => 0,
-            ]);
-        } else {
-            $DB->set_field(
-                'course_completions',
-                'timecompleted',
-                time(),
-                ['course' => $courseid, 'userid' => $userid]
+
+        // Step 1: Subscribe users to the learning path.
+        $this->subscribe_users_to_lp();
+
+        // Step 2: Enroll users in node A — triggers two "creation" events (indices 2,3)
+        // that carry the persisted userpaths used in step 4.
+        $updateevents = $this->get_update_events();
+        relation_update::updated_single($updateevents[0]);
+        relation_update::updated_single($updateevents[1]);
+
+        // Step 3: Mark ONLY courseids[0] complete — courseids[3] is intentionally left incomplete.
+        // With min_courses=2, this satisfies 1 of 2: completed=false, inbetween=true.
+        $userpathrecords = $DB->get_records('local_adele_path_user');
+        foreach ($userpathrecords as $record) {
+            $this->mark_course_complete_in_db((int)$this->courseids[0], (int)$record->user_id);
+        }
+
+        // Step 4: Re-evaluate paths using the "creation" events from step 2 (indices 2,3).
+        $allupdateevents = $this->get_update_events();
+        relation_update::updated_single($allupdateevents[2]);
+        relation_update::updated_single($allupdateevents[3]);
+
+        // Step 5: Verify no node_finished events were fired — node A is not fully complete.
+        $nodefinishedevents = $this->get_node_finished_events();
+        $this->assertCount(
+            0,
+            $nodefinishedevents,
+            'Expected no node_finished events when only one of two required courses is complete.'
+        );
+
+        // Step 6: Read back DB and assert the feedback structure for dndnode_1.
+        // This is the data NodeInformation.vue consumes via data.completion.feedback.
+        //
+        // The fixture stores these templates in condition_1_feedback:
+        // feedback_before:    "[EN_215]{item} erfolgreich bearbeiten "
+        // feedback_inbetween: "[EN_216]{item} erfolgreich bearbeiten"
+        // feedback_after:     "[EN_217]{item} erfolgreich bearbeitet haben"
+        //
+        // {item} is assembled in course_completed.php for the inbetween branch:
+        // $counttodo (=1) . ' ' . get_string('course_restricition_before_condition_from')
+        // . $numbcourses (=2) . ' '
+        // . get_string('course_description_before_condition_course_completed_kursen')
+        // => "1 from 2 Kursen".
+        $finished   = 1;
+        $minvalue   = 2;
+        $numbcourses = 2; // Courseids[0] and courseids[3] assigned to dndnode_1.
+        $counttodo  = $minvalue - $finished; // 1
+        $expecteditem = $counttodo . ' '
+            . get_string('course_restricition_before_condition_from', 'local_adele')
+            . $numbcourses . ' '
+            . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
+        // Result: "1 from 2 Kursen".
+
+        $expectedbefore    = '[EN_215]' . $expecteditem . ' erfolgreich bearbeiten ';
+        $expectedinbetween = '[EN_216]' . $expecteditem . ' erfolgreich bearbeiten';
+        $expectedafter     = '[EN_217]' . $expecteditem . ' erfolgreich bearbeitet haben';
+
+        $updatedrecords = $DB->get_records('local_adele_path_user');
+        foreach ($updatedrecords as $record) {
+            $json = json_decode($record->json, true);
+            $nodefeedback = $json['user_path_relation']['dndnode_1']['feedback'];
+
+            // Status_completion must be 'inbetween': one course done, not enough yet.
+            $this->assertEquals(
+                'inbetween',
+                $nodefeedback['status_completion'],
+                "Expected status_completion 'inbetween' for user {$record->user_id} when 1 of 2 courses complete."
+            );
+
+            // The inbetween feedback slot (shown in NodeInformation.vue via
+            // data.completion.feedback.completion.inbetween) must contain the
+            // fully rendered string — {item} replaced with the course-count phrase.
+            $this->assertEquals(
+                $expectedinbetween,
+                $nodefeedback['completion']['inbetween'][0],
+                "Expected rendered inbetween string for user {$record->user_id}: '{$expectedinbetween}'."
+            );
+
+            // Before[0] is also rendered with {item} (the "you still need to do X" prompt).
+            $this->assertEquals(
+                $expectedbefore,
+                $nodefeedback['completion']['before'][0],
+                "Expected rendered before string for user {$record->user_id}: '{$expectedbefore}'."
+            );
+
+            // After_all['condition_1'] holds the rendered "when complete" label;
+            // it is always set regardless of completion state (not the same as 'after').
+            $this->assertEquals(
+                $expectedafter,
+                $nodefeedback['completion']['after_all']['condition_1'],
+                "Expected rendered after_all string for condition_1 for user {$record->user_id}: '{$expectedafter}'."
+            );
+
+            // The 'after' slot must remain null — it is only set when the node
+            // is fully complete or the master flag overrides completion.
+            $this->assertNull(
+                $nodefeedback['completion']['after'],
+                "Expected 'after' to be null when node A is only partially complete."
             );
         }
-        // Purge the MUC coursecompletion cache so completion_completion::fetch()
-        // reads the freshly inserted record instead of a stale false value.
-        $cache = \cache::make('core', 'coursecompletion');
-        $cache->delete($userid . '_' . $courseid);
+
+        $this->sink->close();
     }
+
+    /**
+     * Test that dndnode_2 is locked with status_restriction='before' right after enrollment,
+     * before its parent node (dndnode_1) has been completed.
+     *
+     * dndnode_2 has two OR-linked restrictions:
+     *   condition_1 (parent_courses)  — requires dndnode_1 to be complete
+     *   condition_2 (manual)          — requires a teacher's manual unlock
+     *
+     * Neither is satisfied after enrollment, so:
+     *   status_restriction = 'before'   (locked, restrictions not yet met)
+     *   status             = 'not_accessible'
+     *
+     * The rendered restriction.before strings come from the *_feedback nodes:
+     *   condition_1_feedback.feedback_before:
+     *     template: "[EN_233]Sie {node_name} abgeschlossen haben"
+     *     {node_name} = dndnode_1.data.fullname = '[EN_386]Collection' (fixture)
+     *     rendered:  "[EN_233]Sie [EN_386]Collection abgeschlossen haben"
+     *   condition_2_feedback.feedback_before:
+     *     "[EN_232]eine manuelle Freigabe durch den Lehrenden stattgefunden hat"
+     *     (no placeholders — literal string)
+     *
+     * The UserInformation.vue component shows:
+     *   store.state.strings['node_access_restriction_before']
+     *   = 'Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:'
+     * followed by UserFeedbackBlock rendering Object.values(restriction.before_active).
+     *
+     * @return void
+     */
+    public function test_child_node_is_locked_before_parent_completes(): void {
+        global $DB;
+
+        // Step 1: Subscribe users to the learning path.
+        $this->subscribe_users_to_lp();
+
+        // Step 2: Enroll users in the starting node — triggers the initial path evaluation
+        // for all nodes, including dndnode_2 whose restriction is not yet met.
+        $updateevents = $this->get_update_events();
+        relation_update::updated_single($updateevents[0]);
+        relation_update::updated_single($updateevents[1]);
+
+        // Step 3: Assert dndnode_2 is locked with 'before' restriction state.
+        $expectedparent = '[EN_233]Sie [EN_386]Collection abgeschlossen haben';
+        $expectedmanual = '[EN_232]eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
+
+        $userpathrecords = $DB->get_records('local_adele_path_user');
+        foreach ($userpathrecords as $record) {
+            $json = json_decode($record->json, true);
+            $fb = $json['user_path_relation']['dndnode_2']['feedback'];
+
+            // Neither restriction column is satisfied yet.
+            $this->assertEquals(
+                'before',
+                $fb['status_restriction'],
+                "Expected dndnode_2 status_restriction='before' for user {$record->user_id}."
+            );
+
+            // No restriction path is satisfied and no timed expiry → not_accessible.
+            // UserInformation.vue gates all course content on status != 'not_accessible'.
+            $this->assertEquals(
+                'not_accessible',
+                $fb['status'],
+                "Expected dndnode_2 status='not_accessible' for user {$record->user_id}."
+            );
+
+            // Before_valid holds restriction columns still reachable (no time expiry).
+            // Both OR-columns are reachable so before_valid must be non-empty.
+            $this->assertNotEmpty(
+                $fb['restriction']['before_valid'],
+                "Expected before_valid non-empty for user {$record->user_id}."
+            );
+
+            // Parent_courses column: {node_name} replaced with dndnode_1's fullname.
+            $this->assertEquals(
+                $expectedparent,
+                $fb['restriction']['before']['condition_1_feedback'],
+                "Expected rendered parent_courses restriction string for user {$record->user_id}."
+            );
+
+            // Manual column: no placeholder — exact fixture string passes through unchanged.
+            $this->assertEquals(
+                $expectedmanual,
+                $fb['restriction']['before']['condition_2_feedback'],
+                "Expected rendered manual restriction string for user {$record->user_id}."
+            );
+        }
+
+        $this->sink->close();
+    }
+
 }

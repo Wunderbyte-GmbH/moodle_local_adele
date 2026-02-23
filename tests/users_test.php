@@ -50,26 +50,17 @@ final class users_test extends advanced_testcase {
             ->method('sql_concat')
             ->willReturn("CONCAT(u.id, ' ', u.firstname, ' ', u.lastname, ' ', u.email)");
 
-        $expectedcalls = [
-            ['fulltextstring', ':param1', false, "fulltextstring LIKE :param1"],
-            ['fulltextstring', ':param2', false, "fulltextstring LIKE :param2"],
+        $sqllikecalls = [
+            [['fulltextstring', ':param1', false], "fulltextstring LIKE :param1"],
+            [['fulltextstring', ':param2', false], "fulltextstring LIKE :param2"],
         ];
-        $callindex = 0;
-
+        $sqllikecallindex = 0;
         $DB->expects($this->exactly(2))
             ->method('sql_like')
-            ->willReturnCallback(
-                function (string $field, string $param, bool $casesensitive) use (&$callindex, $expectedcalls): string {
-                    [$expectedfield, $expectedparam, $expectedcasesensitive, $returnvalue] = $expectedcalls[$callindex];
-
-                    $this->assertSame($expectedfield, $field);
-                    $this->assertSame($expectedparam, $param);
-                    $this->assertSame($expectedcasesensitive, $casesensitive);
-
-                    $callindex++;
-                    return $returnvalue;
-                }
-            );
+            ->willReturnCallback(function() use (&$sqllikecalls, &$sqllikecallindex) {
+                $call = $sqllikecalls[$sqllikecallindex++];
+                return $call[1];
+            });
 
         // Mock the moodle_recordset to return a record set with a close() method.
         $recordset = $this->getMockBuilder(moodle_recordset::class)

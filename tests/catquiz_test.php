@@ -18,7 +18,9 @@ namespace local_adele;
 
 use advanced_testcase;
 use stdClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 
+// phpcs:disable moodle.PHPUnit.TestCaseCovers.Missing
 /**
  * PHPUnit test case for the 'catquiz' class in local_adele.
  *
@@ -27,20 +29,14 @@ use stdClass;
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(catquiz::class)]
 final class catquiz_test extends advanced_testcase {
     protected function setUp(): void {
-        global $DB;
         parent::setUp();
-
-        // Mock the global $DB object to ensure get_records_sql can be called.
-        $DB = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['get_records_sql'])
-            ->getMock();
     }
 
     /**
      * Test the get_catquiz_tests function.
-     * @covers \local_adele\catquiz::get_catquiz_tests
      */
     public function test_get_catquiz_tests_class_does_not_exist(): void {
         $this->mock_class_exists('local_catquiz\testenvironment', false);
@@ -52,7 +48,6 @@ final class catquiz_test extends advanced_testcase {
 
     /**
      * Test the get_catquiz_tests function.
-     * @covers \local_adele\catquiz::get_catquiz_tests
      */
     public function test_get_catquiz_tests_class_exists_with_records(): void {
         global $DB;
@@ -61,6 +56,11 @@ final class catquiz_test extends advanced_testcase {
         if (!class_exists('local_catquiz\testenvironment')) {
             $this->markTestSkipped('Class local_catquiz\testenvironment does not exist in this environment.');
         }
+
+        // Create a fresh DB mock scoped to this test only.
+        $DB = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['get_records_sql'])
+            ->getMock();
 
         // Mock class_exists to return true.
         $this->mock_class_exists('local_catquiz\testenvironment', true);
