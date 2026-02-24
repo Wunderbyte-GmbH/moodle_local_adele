@@ -66,4 +66,3 @@ Feature: As an admin I perform basic adele actions - create, update, duplicate, 
     And I should see "Course 3" in the ".vue-flow.learning-path-flow" "css_element"
     And "[data-id=\"dndnode_2dndnode_1\"]" "css_element" should exist
     And "[data-id=\"dndnode_3dndnode_2\"]" "css_element" should exist
-    And I wait "300" seconds
