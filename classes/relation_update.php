@@ -478,6 +478,14 @@ class relation_update {
         foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
             $smallestenddate = 0;
             $istimerestricted = false;
+            // Defensive: in AND-chain graphs the walker can place a scalar
+            // (feedback-node id string) directly into $restrictionnodepaths
+            // alongside the path arrays. Skip anything that is not an array
+            // so the inner foreach never tries to iterate a string.
+            // No logic change – pure null-safety guard. (Tier 2 AND-chain tests)
+            if (!is_array($signlerestrictionpatharray)) {
+                continue;
+            }
             foreach ($signlerestrictionpatharray as $restrictionlabelid) {
                 if (strpos($restrictionlabelid, 'time') === 0) {
                     $nodelabelid = explode('_condition_', $restrictionlabelid);
@@ -733,8 +741,11 @@ class relation_update {
           'restriction' => [
             'information' => null,
             'before' => null,
-            'before_active' => isset($node["data"]["completion"]) ?
-            $node["data"]["completion"]["feedback"]["restriction"]["before_active"] : '',
+            // Defensive: the old isset($node["data"]["completion"]) guard only
+            // checked one level; deeper keys could still be absent. Replaced
+            // with a null-coalescing chain that short-circuits the whole path.
+            // No logic change – pure null-safety guard. (Tier 2 AND-chain tests)
+            'before_active' => $node["data"]["completion"]["feedback"]["restriction"]["before_active"] ?? '',
           ],
         ];
 

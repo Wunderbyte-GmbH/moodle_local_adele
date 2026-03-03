@@ -174,6 +174,7 @@ class catquiz implements course_completion {
                         100,
                         $componentid,
                         $testidcourseid,
+                        0,
                         $userid
                     );
                     $catquizzes['inbetween'][$complitionnode['id']] = false;
