@@ -26,7 +26,7 @@ import { createApp } from 'vue';
 import VueInputAutowidth from 'vue-input-autowidth';
 import { createAppStore } from './store';
 import Notifications from '@kyvg/vue3-notification'
-import router from './router/router'
+import { createAppRouter } from './router/router'
 import tooltipDirective from './directives/tooltip';
 
 
@@ -65,7 +65,8 @@ function init() {
             const store = createAppStore();
             store.dispatch('loadComponentStrings');
             app.use(store);
-            app.use(router);
+            const appRouter = createAppRouter();
+            app.use(appRouter);
             const viewAttributeValue = localAdeleAppElement.getAttribute('view');
             store.state.view = viewAttributeValue;
             const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');

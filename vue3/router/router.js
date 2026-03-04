@@ -22,7 +22,7 @@
  */
 
 // Import needed libraries
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import notFound from '../components/NotFound';
 import learningpathsEdit from '../components/LearningpathsEdit';
 import userPath from '../components/user_view/UserPath';
@@ -77,23 +77,24 @@ const routes = [
         component: notFound
     },
 ];
-const currenturl = window.location.pathname;
-const base = currenturl;
 
-// Creating router
-const router = createRouter({
-    history: createWebHashHistory(),
-    routes,
-    base
-});
+// Factory function: creates a fresh isolated router per app instance.
+// Using createMemoryHistory so multiple instances on the same page
+// don't share window.location.hash and don't affect each other.
+export function createAppRouter() {
+    const router = createRouter({
+        history: createMemoryHistory(),
+        routes,
+    });
 
-router.beforeEach((to, from, next) => {
-    const store = useStore()
-    // Find a translation for the title.
-    if (to.meta && to.meta.title && store.state.strings[to.meta.title]) {
-        document.title = store.state.strings[to.meta.title];
-    }
-    next();
-});
+    router.beforeEach((to, from, next) => {
+        const store = useStore();
+        // Find a translation for the title.
+        if (to.meta && to.meta.title && store.state.strings[to.meta.title]) {
+            document.title = store.state.strings[to.meta.title];
+        }
+        next();
+    });
 
-export default router
+    return router;
+}

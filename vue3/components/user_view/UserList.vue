@@ -49,7 +49,7 @@
                 <td v-if="store.state.view !== 'student'" :style="{ width: columnWidth }">
                   <router-link
                     :to="{ name: 'userDetails', params: { learningpathId: store.state.learningPathID, userId: relation.id }}"
-                    :id="'adele-userlist-link-' + relation.id"
+                    :id="'adele-userlist-link-' + relation.id + '-' + store.state.learningPathID"
                     :title="relation.firstname + ' ' + relation.lastname"
                   >
                     {{ relation.id }}
