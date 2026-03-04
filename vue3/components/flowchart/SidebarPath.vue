@@ -372,14 +372,14 @@ function changeTab(index) {
               style="padding-left: 2rem;"
               :title="course.fullname"
             >
-              {{ truncatedText(course.fullname, 32) }}
-              <a
+                          <a
                 :href="store.state.wwwroot + '/course/view.php?id=' + course.course_node_id[0]"
                 style="position: relative; padding-left: 0.25rem;"
                 target="_blank"
               >
                 <i class="fas fa-link" />
               </a>
+              {{ truncatedText(course.fullname, 32) }}
             </div>
           </div>
         </div>
