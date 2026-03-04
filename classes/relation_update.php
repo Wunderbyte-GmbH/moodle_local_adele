@@ -588,7 +588,7 @@ class relation_update {
         }
         if (
             $restrictionnodepaths ||
-            is_null($feedback['restriction']['before'])
+            (is_null($feedback['restriction']['before']) && !isset($node['restriction']))
         ) {
             return 'accessible';
         }
