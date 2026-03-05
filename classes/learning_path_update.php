@@ -73,10 +73,12 @@ class learning_path_update {
      */
     public static function updated_learning_path($event) {
         // Get the user path relations.
+        global $DB;
         $userpathrelation = new user_path_relation();
         $records = $userpathrelation->get_user_path_relations($event->other['learningpathid']);
+        $lp = $DB->get_record('local_adele_learning_paths', ['id' => $event->other['learningpathid']], 'json');
         foreach ($records as $userpath) {
-            $userpath->json = self::passnodevalues($event->other['json'], $userpath->json, $userpath->user_id);
+            $userpath->json = self::passnodevalues($lp->json, $userpath->json, $userpath->user_id);
             $eventsingle = user_path_updated::create([
                 'objectid' => $userpath->id,
                 'context' => context_system::instance(),
@@ -235,8 +237,6 @@ class learning_path_update {
                     $node['data']['manualcompletionvalue'] = $oldvalues[$node['id']]['manualcompletionvalue'];
                 }
             }
-            $nodeobj = json_decode(json_encode($node));
-            $node = json_decode(json_encode(learning_paths::checknodeprogression($nodeobj, $userid)), true);
         }
         return $userpathjson;
     }

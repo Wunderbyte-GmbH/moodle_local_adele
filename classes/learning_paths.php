@@ -93,19 +93,14 @@ class learning_paths {
                     'learningpathname' => $data->name,
                     'learningpathid' => $data->id,
                     'userid' => $USER->id,
-                    'json' => $data->json,
                 ],
             ]);
         }
+        $result = ($id > 0) ? $DB->get_record('local_adele_learning_paths', ['id' => $id]) : 0;
+
         $event->trigger();
 
-        if ($id > 0) {
-            return $DB->get_record(
-                'local_adele_learning_paths',
-                ['id' => $id]
-            );
-        }
-        return 0;
+        return $result;
     }
 
     /**
