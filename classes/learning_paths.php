@@ -93,7 +93,6 @@ class learning_paths {
                     'learningpathname' => $data->name,
                     'learningpathid' => $data->id,
                     'userid' => $USER->id,
-                    'json' => $data->json,
                 ],
             ]);
         }

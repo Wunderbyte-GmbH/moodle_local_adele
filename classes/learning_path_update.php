@@ -72,20 +72,9 @@ class learning_path_update {
      * @param object $event
      */
     public static function updated_learning_path($event) {
-        // Get the user path relations.
-        $userpathrelation = new user_path_relation();
-        $records = $userpathrelation->get_user_path_relations($event->other['learningpathid']);
-        foreach ($records as $userpath) {
-            $userpath->json = self::passnodevalues($event->other['json'], $userpath->json, $userpath->user_id);
-            $eventsingle = user_path_updated::create([
-                'objectid' => $userpath->id,
-                'context' => context_system::instance(),
-                'other' => [
-                    'userpath' => $userpath,
-                ],
-            ]);
-            $eventsingle->trigger();
-        }
+        $task = new \local_adele\task\update_lp_users();
+        $task->set_custom_data(['learningpathid' => $event->other['learningpathid']]);
+        \core\task\manager::queue_adhoc_task($task);
     }
 
     /**
