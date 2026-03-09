@@ -75,7 +75,17 @@ class local_adele_observer {
      * @param base $event
      */
     public static function learnpath_updated(base $event) {
-        $observer = learning_path_update::updated_learning_path($event);
+        try {
+            $observer = learning_path_update::updated_learning_path($event);
+        } catch (\Throwable $e) {
+            debugging(
+                'Error in learnpath_updated observer: ' . $e->getMessage()
+                . "\nClass: " . get_class($e)
+                . "\nFile: " . $e->getFile() . ' (Line: ' . $e->getLine() . ')'
+                . "\nTrace:\n" . $e->getTraceAsString(),
+                DEBUG_DEVELOPER
+            );
+        }
     }
 
 
