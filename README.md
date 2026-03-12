@@ -4,7 +4,7 @@ Adele is a Moodle local plugin for building and operating adaptive **learning pa
 
 The plugin provides a graphical interface for defining path structures of independent Moodle courses, assigning users to learning paths, configuring node completion and access restrictions, and reacting to Moodle events such as course completion, quiz attempts, enrolments, and path updates.
 
-The plugin further introduces corresponding roles and capabilities in Moodle. For using the adele functionality in moodle, you also need to install **mod_adele** as the front end course activity.
+The plugin further introduces corresponding roles and capabilities in Moodle. For using the adele functionality in moodle, you also need to install **mod_adele** as the front end course activity. It also supports the **local_catquiz** plugin for computerized adaptive testing (CAT).
 
 ## Key features ##
 
