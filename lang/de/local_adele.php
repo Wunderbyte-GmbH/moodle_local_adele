@@ -174,6 +174,7 @@ $string['course_information_master'] = 'Master Condition';
 $string['course_master_condition_completion'] = 'Master-Checkbox Abschluss';
 $string['course_master_condition_restriction'] = 'Master Zugangs-Checkbox';
 $string['course_master_condition_restriction'] = 'Master-Checkbox Zugang';
+$string['course_master_conditions'] = 'Master Checkboxen';
 $string['course_name_condition_catquiz'] = 'CAT-Quiz';
 $string['course_name_condition_completion_manual'] = 'manueller Abschluss';
 $string['course_name_condition_completion_manual_checkbox_status'] = 'nicht';
