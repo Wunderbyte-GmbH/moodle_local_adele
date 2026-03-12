@@ -110,14 +110,17 @@ class enrollment {
      */
     public static function buildsqlquerypath($courseid) {
         global $DB;
-        // Using named parameter :courseid in the SQL query.
-        $likecourseid = $DB->sql_like('lp.json', ':courseidpattern');
+        // Only create a user path when the user is enrolled in a course that hosts
+        // the LP as a mod_adele activity (the "home course"). This prevents spurious
+        // user-path records being created whenever the LP auto-enrols the user into
+        // each individual node course inside the learning path.
         $sql = "SELECT lp.id, lp.json
         FROM {local_adele_learning_paths} lp
-        WHERE {$likecourseid}";
+        JOIN {adele} a ON a.learningpathid = lp.id
+        WHERE a.course = :courseid";
 
         // Providing the named parameter in the $params array.
-        $params = ['courseidpattern' => '%course_node_id____' . $courseid . '__,%'];
+        $params = ['courseid' => (int)$courseid];
 
         // Using get_records_sql function to execute the query with parameters.
         $records = $DB->get_records_sql($sql, $params);
