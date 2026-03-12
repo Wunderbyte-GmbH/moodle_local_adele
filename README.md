@@ -1,8 +1,20 @@
-# Adele #
+# AdeLe - Adaptive eLearning Paths (backend plugin) #
 
-TODO Describe the plugin shortly here.
+Adele is a Moodle local plugin for building and operating adaptive **learning paths** in moodle. 
 
-TODO Provide more detailed description here.
+The plugin provides a graphical interface for defining path structures of independent Moodle courses, assigning users to learning paths, configuring node completion and access restrictions, and reacting to Moodle events such as course completion, quiz attempts, enrolments, and path updates.
+
+The plugin further introduces corresponding roles and capabilities in Moodle. For using the adele functionality in moodle, you also need to install **mod_adele** as the front end course activity.
+
+## Key features ##
+
+- Create and maintain learning paths with a dedicated graphical editor.
+- Automatically ssign users to learning paths and track user–path relations.
+- Configure **completion logic** and **restriction logic** for nodes.
+- Filter the pool of selectable courses by role-based visibility, tags, categories, and restriction types.
+- Integrate with Moodle quiz events and adaptive quiz / catquiz-related events.
+- Control enrolment behavior, including which role is assigned through a learning path and whether an additional “assistant” role is granted.
+- Use a Vue 3 frontend with Vue Router, Vuex, notifications, and Vue Flow-based graph tooling.
 
 ## Installing via uploaded ZIP file ##
 
@@ -29,7 +41,7 @@ to complete the installation from the command line.
 
 ## License ##
 
-2023 Wunderbyte GmbH <info@wunderbyte.at>
+2026 Wunderbyte GmbH <info@wunderbyte.at>
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
