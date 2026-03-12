@@ -60,10 +60,25 @@ class update_user_path extends \core\task\adhoc_task {
      */
     public function execute() {
 
+        global $DB;
         $taskdata = $this->get_custom_data();
 
-        $helper = new user_path_relation();
-        $currentuserpath = $helper->get_user_path_relation($taskdata->learning_path_id, $taskdata->user_id, $taskdata->course_id);
+        // Look up the user path by primary key when available (preferred, unambiguous).
+        // Fall back to the 3-field combo for backward compatibility with tasks that
+        // were queued before userpath_id was stored.
+        if (!empty($taskdata->userpath_id)) {
+            $currentuserpath = $DB->get_record(
+                'local_adele_path_user',
+                ['id' => $taskdata->userpath_id, 'status' => 'active']
+            );
+        } else {
+            $helper = new user_path_relation();
+            $currentuserpath = $helper->get_user_path_relation(
+                $taskdata->learning_path_id,
+                $taskdata->user_id,
+                $taskdata->course_id
+            );
+        }
         try {
             $currentuserpath->json = json_decode($currentuserpath->json, true);
             learning_path_update::trigger_user_path_update($currentuserpath);

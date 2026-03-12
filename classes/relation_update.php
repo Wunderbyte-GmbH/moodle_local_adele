@@ -64,6 +64,7 @@ class relation_update {
                 $creation = true;
             }
             self::subscribe_user_starting_node($userpath);
+            self::reschedule_timed_restrictions_for_all_nodes($userpath);
             if (!empty($userpath->json['tree']['nodes'])) {
                 foreach ($userpath->json['tree']['nodes'] as &$node) {
                     $completioncriteria = $completionclass->get_condition_status($node, $userpath->user_id);
@@ -988,6 +989,34 @@ class relation_update {
     }
 
     /**
+     * Reschedule timed-restriction adhoc tasks for every node in the user path.
+     *
+     * subscribe_user_starting_node() only touches starting nodes (because it also
+     * does course enrollment for them).  Child nodes that were already unlocked
+     * (parent completed earlier) would never have their tasks updated when an
+     * admin moves a restriction date forward in the LP editor.
+     *
+     * This method iterates ALL non-dropzone nodes and calls
+     * set_scheduled_adhoc_tasks() for each, which internally skips any date that
+     * has already passed.  Starting nodes appear here too, but
+     * reschedule_or_queue_adhoc_task() is idempotent (same dedup key = no
+     * duplicate), so the double call is harmless.
+     *
+     * @param object $userpath  The user-path object (json already decoded as array).
+     */
+    public static function reschedule_timed_restrictions_for_all_nodes(&$userpath): void {
+        if (empty($userpath->json['tree']['nodes'])) {
+            return;
+        }
+        foreach ($userpath->json['tree']['nodes'] as $node) {
+            if ($node['type'] === 'dropzone') {
+                continue;
+            }
+            adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
+        }
+    }
+
+    /**
      * Subscribe to starting nodes
      * @param object $userpath
      */
@@ -1004,8 +1033,12 @@ class relation_update {
                         foreach ($node['data']['course_node_id'] as $courseid) {
                             if (!isset($node['data']['first_enrolled'])) {
                                 $node['data']['first_enrolled'] = time();
-                                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                             }
+                            // Schedule tasks for any future restriction dates.
+                            // set_scheduled_adhoc_tasks skips past dates internally,
+                            // so calling this every evaluation handles both initial
+                            // enrollment and LP date changes correctly.
+                            adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
                             if (isset($instances[$courseid])) {
                                 $instance = $instances[$courseid];
                             } else {

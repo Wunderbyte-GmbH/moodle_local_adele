@@ -48,25 +48,43 @@ class adhoc_task_helper {
 
         if (isset($node['restriction'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                $dates = [];
-                if (isset($restrictionnode['data']['value']['start'])) {
-                    $dates[] = $restrictionnode['data']['value']['start'];
-                }
-                if (isset($restrictionnode['data']['value']['end'])) {
-                    $dates[] = $restrictionnode['data']['value']['end'];
-                }
-
-                foreach ($dates as $date) {
+                // Iterate over named date slots so the dedup key can encode the
+                // slot identity (node + start|end + userpath) rather than the
+                // date value itself.  If we encoded the date value, every date
+                // change would yield a different customdata hash, causing
+                // reschedule_or_queue_adhoc_task to insert a new row and leave
+                // the old stale task in the queue instead of updating it.
+                foreach (['start', 'end'] as $datetype) {
+                    $date = $restrictionnode['data']['value'][$datetype] ?? '';
+                    if (empty($date)) {
+                        continue;
+                    }
+                    $timestamp = strtotime($date);
+                    // No point scheduling a task for a date that has already passed.
+                    // Access for past-dated restrictions is granted synchronously by
+                    // updated_single() (via reschedule_timed_restrictions_for_all_nodes),
+                    // which re-evaluates every node whenever the learning path or user
+                    // path changes. Scheduling an immediate task here would create a
+                    // perpetual loop: the task fires → updated_single() runs →
+                    // set_scheduled_adhoc_tasks() sees past date → schedules another
+                    // immediate task → repeat every 60 seconds indefinitely.
+                    if ($timestamp <= time()) {
+                        continue;
+                    }
                     $taskdata = new stdClass();
                     $taskdata->learning_path_id = $userpath->learning_path_id;
                     $taskdata->user_id = $userpath->user_id;
                     $taskdata->course_id = $userpath->course_id;
-                    $taskdata->userpath = $userpath;
-                    $timestamp = strtotime($date);
-                    $runtime = strtotime('+2 minutes', $timestamp);
-                    $taskdata->time = $runtime . $userpath->id;
+                    $taskdata->userpath_id = $userpath->id;
+                    // Stable slot-based dedup key: identifies this task by the
+                    // restriction-node id + date type (start/end) + userpath id.
+                    // This value does NOT change when the admin edits the date,
+                    // so reschedule_or_queue_adhoc_task reliably finds and updates
+                    // the existing row (adjusting nextruntime) rather than inserting
+                    // a duplicate. Do NOT include the runtime/timestamp here.
+                    $taskdata->time = $restrictionnode['id'] . '_' . $datetype . '_' . $userpath->id;
+                    $runtime = $timestamp + 120;
                     $updateuserpathtask = new update_user_path();
-                            // Set details for the task.
                     $updateuserpathtask->set_userid($taskdata->user_id);
                     $updateuserpathtask->set_custom_data($taskdata);
                     $updateuserpathtask->set_next_run_time($runtime);

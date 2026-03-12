@@ -95,12 +95,16 @@ class node_completion {
 
                     if (!isset($node->data->first_enrolled)) {
                         $node->data->first_enrolled = time();
-                        adhoc_task_helper::set_scheduled_adhoc_tasks(
-                            json_decode(json_encode($node), true),
-                            $event->other['userpath']
-                        );
                         $firstenrollededit = true;
                     }
+                    // Schedule tasks for any future restriction dates.
+                    // set_scheduled_adhoc_tasks skips past dates internally,
+                    // so calling this every evaluation handles both initial
+                    // enrollment and LP date changes correctly.
+                    adhoc_task_helper::set_scheduled_adhoc_tasks(
+                        json_decode(json_encode($node), true),
+                        $event->other['userpath']
+                    );
                     $selectedrole = get_config('local_adele', 'enroll_as_setting');
                     $context = \context_course::instance($subscribecourse);
                     $isenrolled = is_enrolled($context, $event->other['userpath']->user_id);
