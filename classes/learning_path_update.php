@@ -300,9 +300,9 @@ class learning_path_update {
         $record = $DB->get_record(
             'local_adele_path_user',
             [
-            'user_id' => $userid,
-            'learning_path_id' => $learningpathid,
-            'status' => 'active',
+                'user_id' => $userid,
+                'learning_path_id' => $learningpathid,
+                'status' => 'active',
             ],
             'id, json',
         );

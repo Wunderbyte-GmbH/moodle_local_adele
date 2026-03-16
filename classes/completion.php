@@ -51,12 +51,26 @@ class completion {
     public static function completed($event) {
         $params = $event;
         $userpathrelation = new user_path_relation();
-        $learningpaths = $userpathrelation->get_learning_paths($params->userid);
+        $learningpaths = $userpathrelation->get_learning_paths($params->relateduserid);
+        
+        file_put_contents('/var/www/html/moodle01/trigger.log',  print_r($event, true));
+ 
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
                 $learningpath->json = json_decode($learningpath->json, true);
+                $matched = false;
                 foreach ($learningpath->json['tree']['nodes'] as $node) {
-                    if (is_array($node['data']['course_node_id']) && in_array($params->courseid, $node['data']['course_node_id'])) {
+                       
+                    if (
+                        isset($node['data']['course_node_id']) &&
+                        is_array($node['data']['course_node_id']) &&
+                        (
+                            in_array($params->courseid, $node['data']['course_node_id']) ||
+                            in_array((int)$params->courseid, $node['data']['course_node_id']) ||
+                            in_array((string)$params->courseid, $node['data']['course_node_id'])
+                        )
+                    ) {
+                        $matched = true;
                         $eventsingle = user_path_updated::create([
                             'objectid' => $learningpath->id,
                             'context' => context_system::instance(),
@@ -64,7 +78,11 @@ class completion {
                                 'userpath' => $learningpath,
                             ],
                         ]);
+                        
+                        file_put_contents('/var/www/html/moodle01/trigger.log', print_r($eventsingle, true), FILE_APPEND);
+ 
                         $eventsingle->trigger();
+                        break; // One match per learning path is sufficient.
                     }
                 }
             }

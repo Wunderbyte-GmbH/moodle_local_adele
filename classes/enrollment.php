@@ -53,7 +53,7 @@ class enrollment {
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
-                self::subscribe_user_to_learning_path($learningpath, $params, $params->courseid);
+                self::subscribe_user_to_learning_path($learningpath, $params);
             }
         }
     }
@@ -63,20 +63,18 @@ class enrollment {
      *
      * @param object $learningpath
      * @param object $params
-     * @param int $courseid
      * @return array
      */
-    public static function subscribe_user_to_learning_path($learningpath, $params, $courseid) {
+    public static function subscribe_user_to_learning_path($learningpath, $params) {
         global $DB;
         if ($learningpath) {
             if (is_string($learningpath->json)) {
                 $learningpath->json = json_decode($learningpath->json, true);
             }
-            $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid, $courseid);
+            $userpath = self::buildsqlqueryuserpath($learningpath->id, $params->relateduserid);
             if (!$userpath) {
                 $id = $DB->insert_record('local_adele_path_user', [
                     'user_id' => $params->relateduserid,
-                    'course_id' => $courseid,
                     'learning_path_id' => $learningpath->id,
                     'status' => 'active',
                     'timecreated' => time(),
@@ -95,7 +93,6 @@ class enrollment {
                 'context' => context_system::instance(),
                 'other' => [
                     'userpath' => $userpath,
-                    'course_id' => $courseid,
                 ],
             ]);
             $eventsingle->trigger();
@@ -130,28 +127,23 @@ class enrollment {
      *
      * @param int $learningpathid
      * @param int $userid
-     * @param int $courseid
      * @return array
      */
-    public static function buildsqlqueryuserpath($learningpathid, $userid, $courseid) {
+    public static function buildsqlqueryuserpath($learningpathid, $userid) {
         global $DB;
-        // Using named parameter :courseid in the SQL query.
         $sql = "SELECT *
         FROM {local_adele_path_user} lpu
         WHERE lpu.learning_path_id = :learningpathid
         AND lpu.status = 'active'
         AND lpu.user_id = :userid
-        AND lpu.course_id = :courseid
         ORDER BY lpu.id DESC";
 
         // Providing the named parameter in the $params array.
         $params = [
             'learningpathid' => (int)$learningpathid,
             'userid' => (int)$userid,
-            'courseid' => (int)$courseid,
         ];
 
-        // Using get_records_sql function to execute the query with parameters.
         $record = $DB->get_record_sql($sql, $params);
 
         return $record;

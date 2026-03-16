@@ -41,8 +41,7 @@ class adhoc_task_helper {
      * Sets scheduled adhoc tasks for a learning path node.
      *
      * @param array $node The learning path node containing restriction data
-     * @param stdClass $userpath The user path object containing learning_path_id, user_id, and course_id
-     * @return void
+    * @param stdClass $userpath The user path object containing learning_path_id and user_id     * @return void
      */
     public static function set_scheduled_adhoc_tasks($node, $userpath) {
 
@@ -60,7 +59,6 @@ class adhoc_task_helper {
                     $taskdata = new stdClass();
                     $taskdata->learning_path_id = $userpath->learning_path_id;
                     $taskdata->user_id = $userpath->user_id;
-                    $taskdata->course_id = $userpath->course_id;
                     $taskdata->userpath = $userpath;
                     $timestamp = strtotime($date);
                     $runtime = strtotime('+2 minutes', $timestamp);

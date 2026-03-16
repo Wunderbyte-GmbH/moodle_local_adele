@@ -132,31 +132,33 @@ class node_completion {
         $paths = self::get_possible_paths($userpath->nodes);
         if (self::check_user_path_completed($userpath, $paths)) {
             global $DB;
-            $table = 'adele';
-            $adeleinstance = $DB->get_record(
-                $table,
-                [
-                    'learningpathid' => $learningpath->learning_path_id,
-                    'course' => $learningpath->course_id,
-                ]
-            );
-            if (!$adeleinstance) {
-                return false;
-            }
-            $cm = get_coursemodule_from_instance('adele', $adeleinstance->id, $learningpath->course_id);
-            if (!$cm) {
-                return false;
-            }
-            $completion = new completion_info(get_course($learningpath->course_id));
-            if (!$completion->is_enabled($cm)) {
-                return false;
-            }
 
-            if (!$adeleinstance->completionlearningpathfinished) {
+            // Find all mod_adele instances that reference this learning path.
+            $adeleinstances = $DB->get_records(
+                'adele',
+                ['learningpathid' => $learningpath->learning_path_id]
+            );
+            if (!$adeleinstances) {
                 return false;
             }
-            $completion->update_state($cm, COMPLETION_COMPLETE, $learningpath->user_id);
-            return true;
+            // Mark completion in all mod_adele instances that have completion enabled.
+            $completed = false;
+            foreach ($adeleinstances as $adeleinstance) {
+                $cm = get_coursemodule_from_instance('adele', $adeleinstance->id, $adeleinstance->course);
+                if (!$cm) {
+                    continue;
+                }
+                $completion = new completion_info(get_course($adeleinstance->course));
+                if (!$completion->is_enabled($cm)) {
+                    continue;
+                }
+                if (!$adeleinstance->completionlearningpathfinished) {
+                    continue;
+                }
+                $completion->update_state($cm, COMPLETION_COMPLETE, $learningpath->user_id);
+                $completed = true;
+            }
+            return $completed;
         }
         return false;
     }
@@ -264,11 +266,26 @@ class node_completion {
               'status' => 'active',
               'user_id' => $event->other['userpath']->user_id,
               'learning_path_id' => $event->other['userpath']->learning_path_id,
-              'course_id' => $event->other['userpath']->course_id,
             ]
         );
 
-        $latestrecord->json = json_decode(json_encode($userpath), true);
+        if (!$latestrecord) {
+            return;
+        }
+
+        // Decode the full JSON from the database record.
+        $fulljson = json_decode($latestrecord->json, true);
+        // Update only the tree portion with the new enrollment data,
+        // preserving user_path_relation, modules, and all other fields.
+        $updatedtree = json_decode(json_encode($userpath), true);
+        if (isset($updatedtree['tree'])) {
+            $fulljson['tree'] = $updatedtree['tree'];
+        } else {
+            // $userpath IS the tree (not wrapped in a 'tree' key).
+            $fulljson['tree'] = $updatedtree;
+        }
+        $latestrecord->json = $fulljson;
+
         $eventsingle = user_path_updated::create([
             'objectid' => $event->other['userpath']->id,
             'context' => context_system::instance(),

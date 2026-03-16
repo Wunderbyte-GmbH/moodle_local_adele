@@ -350,7 +350,6 @@ class learning_paths {
 
         $params = [
             'learning_path_id' => (int)$data['learningpathid'],
-            'course_id' => (int)$data['courseid'],
         ];
 
         $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
@@ -358,7 +357,6 @@ class learning_paths {
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
             WHERE lpu.learning_path_id = :learning_path_id
-            AND lpu.course_id = :course_id
             AND lpu.status = 'active'";
 
         $userpathlist = [];
@@ -527,7 +525,6 @@ class learning_paths {
         $params = [
             'learning_path_id' => (int)$data['learningpathid'],
             'userpathid' => (int)$data['userpathid'],
-            'courseid' => (int)$data['courseid'],
         ];
 
         $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, usr.username,
@@ -537,7 +534,6 @@ class learning_paths {
             LEFT JOIN {local_adele_learning_paths} lap ON lpu.learning_path_id = lap.id
             WHERE lpu.learning_path_id = :learning_path_id
             AND lpu.status = 'active'
-            AND lpu.course_id = :courseid
             AND lpu.user_id = :userpathid ";
 
         $record = $DB->get_record_sql($sql, $params);
@@ -610,9 +606,8 @@ class learning_paths {
      */
     public static function save_learning_user_relation($params) {
         $userpathrelation = new user_path_relation();
-        $courseid = $params['courseid'] ?: 0;
         $params = json_decode($params['params']);
-        $userpath = $userpathrelation->get_user_path_relation($params->route->learningpathId, $params->route->userId, $courseid);
+        $userpath = $userpathrelation->get_user_path_relation($params->route->learningpathId, $params->route->userId);
         if ($userpath) {
             $userpath->json = json_decode($userpath->json, true);
             $userpath->json['tree']['nodes'] = json_decode(json_encode($params->nodes), true);
@@ -621,7 +616,6 @@ class learning_paths {
                 'context' => context_system::instance(),
                 'other' => [
                     'userpath' => $userpath,
-                    'courseid' => $courseid,
                 ],
             ]);
             $event->trigger();

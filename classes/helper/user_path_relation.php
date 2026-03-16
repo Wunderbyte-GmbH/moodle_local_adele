@@ -99,25 +99,22 @@ class user_path_relation {
      *
      * @param int $learningpathid
      * @param int $userid
-     * @param int $courseid
      * @return object
      *
      */
-    public function get_user_path_relation($learningpathid, $userid, $courseid) {
+    public function get_user_path_relation($learningpathid, $userid) {
         global $DB;
 
         $sql = "SELECT *
             FROM {local_adele_path_user} lpu
             WHERE lpu.learning_path_id = :learningpathid
             AND lpu.status = 'active'
-            AND lpu.course_id = :courseid
             AND lpu.user_id = :userid";
 
         // Providing the named parameter in the $params array.
         $params = [
             'learningpathid' => (int)$learningpathid,
             'userid' => (int)$userid,
-            'courseid' => (int)$courseid,
         ];
         // Using get_records_sql function to execute the query with parameters.
         $record = $DB->get_record_sql($sql, $params);
@@ -135,19 +132,24 @@ class user_path_relation {
     public function get_active_user_path_relation($userid, $courseid) {
         global $DB;
 
-        $sql = "SELECT *
-            FROM {local_adele_path_user} lpu
-            WHERE lpu.status = 'active'
-            AND lpu.course_id = :courseid
-            AND lpu.user_id = :userid";
-
-        // Providing the named parameter in the $params array.
-        $params = [
-            'userid' => (int)$userid,
-            'courseid' => (int)$courseid,
-        ];
-        // Using get_records_sql function to execute the query with parameters.
-        $records = $DB->get_records_sql($sql, $params);
+        // Look up which learning paths are embedded in this course via mod_adele instances.
+        $adeleinstances = $DB->get_records('adele', ['course' => $courseid]);
+        $records = [];
+        foreach ($adeleinstances as $instance) {
+            $sql = "SELECT *
+                FROM {local_adele_path_user} lpu
+                WHERE lpu.status = 'active'
+                AND lpu.learning_path_id = :learningpathid
+                AND lpu.user_id = :userid";
+            $params = [
+                'userid' => (int)$userid,
+                'learningpathid' => (int)$instance->learningpathid,
+            ];
+            $found = $DB->get_records_sql($sql, $params);
+            foreach ($found as $record) {
+                $records[$record->id] = $record;
+            }
+        }
         return $records;
     }
 
@@ -175,7 +177,6 @@ class user_path_relation {
         } else {
             return $DB->insert_record('local_adele_path_user', [
                 'user_id' => $userpath->user_id,
-                'course_id' => $userpath->course_id,
                 'learning_path_id' => $userpath->learning_path_id,
                 'status' => 'active',
                 'timecreated' => $userpath->timecreated,
