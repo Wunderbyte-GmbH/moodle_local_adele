@@ -15,17 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base class for a single booking option availability condition.
- *
- * All bo condition types must extend this class.
+ * Timed restriction condition for learning path nodes.
  *
  * @package     local_adele
  * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_adele\course_restriction\conditions;
+namespace local_adele\course_restriction\conditions;
 
 use DateTime;
 use local_adele\course_restriction\course_restriction;
@@ -39,7 +37,7 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  *
  * @package     local_adele
  * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class timed implements course_restriction {
@@ -49,14 +47,7 @@ class timed implements course_restriction {
     public $label = 'timed';
 
     /**
-     * Obtains a string describing this restriction (whether or not
-     * it actually applies). Used to obtain information that is displayed to
-     * students if the activity is not available to them, and for staff to see
-     * what conditions are.
-     *
-     * The $full parameter can be used to distinguish between 'staff' cases
-     * (when displaying all information about the activity) and 'student' cases
-     * (when displaying only conditions they don't meet).
+     * Obtains a string describing this restriction.
      *
      * @return array availability and Information string (for admin) about all restrictions on
      *   this item
@@ -82,8 +73,7 @@ class timed implements course_restriction {
      * @return string
      */
     private function get_information_string() {
-        $information = get_string('course_information_condition_timed', 'local_adele');
-        return $information;
+        return get_string('course_information_condition_timed', 'local_adele');
     }
 
     /**
@@ -92,8 +82,7 @@ class timed implements course_restriction {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_timed', 'local_adele');
-        return $description;
+        return get_string('course_description_condition_timed', 'local_adele');
     }
 
     /**
@@ -111,77 +100,120 @@ class timed implements course_restriction {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_timed', 'local_adele');
-        return $description;
+        return get_string('course_name_condition_timed', 'local_adele');
     }
 
     /**
-     * Helper function to return localized description strings.
+     * Get the Moodle server timezone object for consistent date handling.
+     *
+     * @return \DateTimeZone
+     */
+    private function get_timezone(): \DateTimeZone {
+        return \core_date::get_server_timezone_object();
+    }
+
+    /**
+     * Evaluate the timed restriction status for a node.
+     *
+     * The timed condition supports three scenarios:
+     * 1. Only start date: Access opens at start date, never closes.
+     * 2. Only end date: Access is open from the beginning, closes at end date.
+     * 3. Both start and end date: Access is open between start and end.
+     *
+     * State flags:
+     * - isbefore: true ONLY if a start date exists AND has not been reached yet.
+     * - isafter: true ONLY if an end date exists AND has been passed.
+     * - completed/inbetween: true if the current time is within the valid window.
+     *
      * @param array $node
      * @param object $userpath
-     * @return boolean
+     * @return array
      */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed') {
-                    $validstart = true;
-                    $validtime = false;
-                    $isbeforerange = true;
+                    $tz = $this->get_timezone();
+                    $currenttimestamp = new DateTime('now', $tz);
+
+                    // Parse start and end dates.
+                    $startdate = $this->isvaliddate(
+                        $restrictionnode['data']['value']['start'] ?? null,
+                        'Y-m-d\TH:i',
+                        $tz
+                    );
+                    $enddate = $this->isvaliddate(
+                        $restrictionnode['data']['value']['end'] ?? null,
+                        'Y-m-d\TH:i',
+                        $tz
+                    );
+
+                    // Determine the state flags.
+                    // isbefore: Only true if a start date exists and is in the future.
+                    $isbeforerange = false;
+                    // isafter: Only true if an end date exists and has been passed.
                     $isafterrange = false;
-                    $currenttimestamp = new DateTime();
-                    $startdate = $this->isvaliddate($restrictionnode['data']['value']['start']);
+                    // validtime/completed: true if current time is within the valid window.
+                    $validtime = false;
+
+                    // Evaluate start date.
+                    $startreached = true; // No start date = start is always reached.
                     if ($startdate) {
                         if ($startdate <= $currenttimestamp) {
-                            $validtime = true;
-                            $isbeforerange = false;
+                            $startreached = true;
                         } else {
-                            $validstart = false;
+                            $startreached = false;
+                            $isbeforerange = true;
                         }
-                    } else {
-                        $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                        get_string('course_restricition_timed_no_date', 'local_adele');
                     }
-                    $enddate = $this->isvaliddate($restrictionnode['data']['value']['end']);
+
+                    // Evaluate end date.
+                    $endnotpassed = true; // No end date = end never passes.
                     if ($enddate) {
-                        if ($enddate < $currenttimestamp) {
+                        if ($enddate >= $currenttimestamp) {
+                            $endnotpassed = true;
+                        } else {
+                            $endnotpassed = false;
                             $isafterrange = true;
                         }
-                        if (
-                            $enddate >= $currenttimestamp &&
-                            $validstart
-                        ) {
-                            $validtime = true;
-                        } else {
-                            $validtime = false;
-                        }
-                    } else {
-                        // Assign placeholder for missing start date.
-                        $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                        get_string('course_restricition_timed_no_date', 'local_adele');
                     }
+
+                    // The time window is valid if start has been reached AND end has not passed.
+                    $validtime = $startreached && $endnotpassed;
+
+                    // Build placeholders for display.
+                    $startdateformatted = false;
+                    $enddateformatted = false;
+
                     if ($startdate) {
-                        $startdate = $startdate->format('d.m.Y H:i');
+                        $startdateformatted = $startdate->format('d.m.Y H:i');
+                        $timed[$restrictionnode['id']]['placeholders']['start_date'] = $startdateformatted;
+                    } else {
                         $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                            $startdate;
+                            get_string('course_restricition_timed_no_date', 'local_adele');
                     }
+
                     if ($enddate) {
-                        $enddate = $enddate->format('d.m.Y H:i');
-                        $timed[$restrictionnode['id']]['placeholders']['end_date'] = $enddate;
+                        $enddateformatted = $enddate->format('d.m.Y H:i');
+                        $timed[$restrictionnode['id']]['placeholders']['end_date'] = $enddateformatted;
+                    } else {
+                        $timed[$restrictionnode['id']]['placeholders']['end_date'] =
+                            get_string('course_restricition_timed_no_date', 'local_adele');
                     }
+
                     $timed[$restrictionnode['id']]['completed'] = $validtime;
                     $timed[$restrictionnode['id']]['inbetween'] = $validtime;
                     $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
                     $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
                     $timed[$restrictionnode['id']]['inbetween_info'] = [
-                      'starttime' => $startdate,
-                      'endtime' => $enddate,
+                        'starttime' => $startdateformatted,
+                        'endtime' => $enddateformatted,
                     ];
                 } else {
                     $timed[$restrictionnode['id']] = [
-                      'completed' => false,
-                      'inbetween_info' => null,
+                        'completed' => false,
+                        'inbetween_info' => null,
                     ];
                 }
             }
@@ -190,16 +222,20 @@ class timed implements course_restriction {
     }
 
     /**
-     * Helper function to return localized description strings.
-     * @param string $datestring
+     * Validate and parse a date string.
+     *
+     * @param string|null $datestring
      * @param string $format
-     * @return boolean
+     * @param \DateTimeZone|null $tz
+     * @return DateTime|false
      */
-    public function isvaliddate($datestring, $format = 'Y-m-d\TH:i') {
+    public function isvaliddate($datestring, $format = 'Y-m-d\TH:i', $tz = null) {
         if ($datestring !== null) {
-            $datetime = DateTime::createFromFormat($format, $datestring);
+            if ($tz === null) {
+                $tz = $this->get_timezone();
+            }
+            $datetime = DateTime::createFromFormat($format, $datestring, $tz);
             if ($datetime && $datetime->format($format) === $datestring) {
-                $datetime->format('d.m.Y H:i');
                 return $datetime;
             }
         }

@@ -15,28 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adhoc Task to remove expired items from the shopping cart.
+ * Adhoc Task to update user learning path when timed restrictions change.
  *
  * @package    local_adele
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
+ * @copyright  2026 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_adele\task;
 
-use core\message\message;
 use local_adele\helper\user_path_relation;
 use local_adele\learning_path_update;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
 /**
- * Adhoc Task to remove expired items from the shopping cart.
+ * Adhoc Task to re-evaluate a user's learning path when a timed
+ * restriction window opens or closes.
  *
  * @package    local_adele
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
+ * @copyright  2026 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_user_path extends \core\task\adhoc_task {
@@ -51,23 +49,40 @@ class update_user_path extends \core\task\adhoc_task {
     }
 
     /**
-     * Execution function.
+     * Execution function. Loads the current user path from the database
+     * and triggers a full re-evaluation of all restrictions and completions.
+     * This will fire user_path_updated → updated_single() → node_finished
+     * → enrol_child_courses() if any nodes have become accessible.
      *
-     * {@inheritdoc}
      * @throws \coding_exception
      * @throws \dml_exception
-     * @see \core\task\task_base::execute()
      */
     public function execute() {
-
         $taskdata = $this->get_custom_data();
 
+        if (empty($taskdata->learning_path_id) || empty($taskdata->user_id)) {
+            mtrace('ADELE update_user_path: Missing learning_path_id or user_id in task data.');
+            return;
+        }
+
         $helper = new user_path_relation();
-        $currentuserpath = $helper->get_user_path_relation($taskdata->learning_path_id, $taskdata->user_id);try {
+        $currentuserpath = $helper->get_user_path_relation($taskdata->learning_path_id, $taskdata->user_id);
+
+        if (!$currentuserpath) {
+            mtrace('ADELE update_user_path: No active user path found for '
+                . 'learning_path_id=' . $taskdata->learning_path_id
+                . ' user_id=' . $taskdata->user_id);
+            return;
+        }
+
+        try {
             $currentuserpath->json = json_decode($currentuserpath->json, true);
             learning_path_update::trigger_user_path_update($currentuserpath);
+            mtrace('ADELE update_user_path: Successfully triggered update for '
+                . 'learning_path_id=' . $taskdata->learning_path_id
+                . ' user_id=' . $taskdata->user_id);
         } catch (\Exception $e) {
-            return true;
+            mtrace('ADELE update_user_path: Exception during update: ' . $e->getMessage());
         }
     }
 }

@@ -15,17 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base class for a single booking option availability condition.
- *
- * All bo condition types must extend this class.
+ * Timed duration restriction condition for learning path nodes.
  *
  * @package     local_adele
  * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_adele\course_restriction\conditions;
+namespace local_adele\course_restriction\conditions;
 
 use DateTime;
 use local_adele\course_restriction\course_restriction;
@@ -39,7 +37,7 @@ require_once($CFG->dirroot . '/local/adele/lib.php');
  *
  * @package     local_adele
  * @author      Jacob Viertel
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class timed_duration implements course_restriction {
@@ -51,25 +49,29 @@ class timed_duration implements course_restriction {
     private $durationplaceholder;
 
     /**
+     * Maps duration types to their equivalent durations in seconds.
+     *
+     * @var array
+     */
+    private $durationvaluearray = [
+        '0' => 86400,   // Days.
+        '1' => 604800,  // Weeks.
+        '2' => 2629746, // Months (average).
+    ];
+
+    /**
      * Entities constructor.
      */
     public function __construct() {
         $this->durationplaceholder = [
-            '0' => get_string('course_select_condition_timed_duration_days', 'local_adele'), // Days.
-            '1' => get_string('course_select_condition_timed_duration_weeks', 'local_adele'), // Weeks.
-            '2' => get_string('course_select_condition_timed_duration_months', 'local_adele'), // Months.
+            '0' => get_string('course_select_condition_timed_duration_days', 'local_adele'),
+            '1' => get_string('course_select_condition_timed_duration_weeks', 'local_adele'),
+            '2' => get_string('course_select_condition_timed_duration_months', 'local_adele'),
         ];
     }
 
     /**
-     * Obtains a string describing this restriction (whether or not
-     * it actually applies). Used to obtain information that is displayed to
-     * students if the activity is not available to them, and for staff to see
-     * what conditions are.
-     *
-     * The $full parameter can be used to distinguish between 'staff' cases
-     * (when displaying all information about the activity) and 'student' cases
-     * (when displaying only conditions they don't meet).
+     * Obtains a string describing this restriction.
      *
      * @return array availability and Information string (for admin) about all restrictions on
      *   this item
@@ -95,8 +97,7 @@ class timed_duration implements course_restriction {
      * @return string
      */
     private function get_information_string() {
-        $information = get_string('course_information_condition_timed_duration', 'local_adele');
-        return $information;
+        return get_string('course_information_condition_timed_duration', 'local_adele');
     }
 
     /**
@@ -105,8 +106,7 @@ class timed_duration implements course_restriction {
      * @return string
      */
     private function get_description_string() {
-        $description = get_string('course_description_condition_timed_duration', 'local_adele');
-        return $description;
+        return get_string('course_description_condition_timed_duration', 'local_adele');
     }
 
     /**
@@ -124,28 +124,41 @@ class timed_duration implements course_restriction {
      * @return string
      */
     private function get_name_string() {
-        $description = get_string('course_name_condition_timed_duration', 'local_adele');
-        return $description;
+        return get_string('course_name_condition_timed_duration', 'local_adele');
     }
 
     /**
-     * Helper function to return localized description strings.
+     * Get the Moodle server timezone object for consistent date handling.
+     *
+     * @return \DateTimeZone
+     */
+    private function get_timezone(): \DateTimeZone {
+        return \core_date::get_server_timezone_object();
+    }
+
+    /**
+     * Evaluate the timed_duration restriction status for a node.
+     *
      * @param array $node
      * @param object $userpath
-     * @return boolean
+     * @return array
      */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
-        $currenttime = new DateTime();
-        $currenttime->setTimestamp(time());
+        $tz = $this->get_timezone();
+        $currenttime = new DateTime('now', $tz);
+
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed_duration') {
                     $iscurrenttimeinrange = false;
-                    $starttime = new DateTime();
+                    $isbeforerange = false;
+                    $isafterrange = false;
+                    $starttime = new DateTime('now', $tz);
                     $endtime = null;
                     $durationvalue = '';
                     $selectedduration = '';
+
                     if (isset($restrictionnode['data']['value']['selectedOption'])) {
                         if ($restrictionnode['data']['value']['selectedOption'] == '1') {
                             if (isset($node['data']['first_enrolled'])) {
@@ -158,6 +171,7 @@ class timed_duration implements course_restriction {
                         }
                         $durationvalue = $restrictionnode['data']['value']['durationValue'];
                         $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
+
                         // Check if the duration type is valid and calculate the end time.
                         if (
                             isset($this->durationvaluearray[$durationvalue]) &&
@@ -172,53 +186,40 @@ class timed_duration implements course_restriction {
                             $isbeforerange = $currenttime < $starttime;
                         }
                     }
+
                     if ($endtime) {
                         $endtime = $endtime->format('d.m.Y H:i');
                     }
                     if (is_string($starttime)) {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
-                          $starttime;
+                            $starttime;
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
-                          'starttime' => $starttime,
-                          'endtime' => $endtime,
+                            'starttime' => $starttime,
+                            'endtime' => $endtime,
                         ];
                     } else {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
-                          get_string('course_condition_timed_duration_since', 'local_adele') .
-                          $starttime->format('d.m.Y H:i');
+                            get_string('course_condition_timed_duration_since', 'local_adele') .
+                            $starttime->format('d.m.Y H:i');
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
-                          'starttime' => $starttime->format('d.m.Y H:i') ?? null,
-                          'endtime' => $endtime,
+                            'starttime' => $starttime->format('d.m.Y H:i') ?? null,
+                            'endtime' => $endtime,
                         ];
                     }
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
-                    $selectedduration . ' ' . ($this->durationplaceholder[$durationvalue] ?? '');
+                        $selectedduration . ' ' . ($this->durationplaceholder[$durationvalue] ?? '');
                     $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
                     $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange ?? '';
-                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange ?? '';
+                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange;
+                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange;
                 } else {
                     $timed[$restrictionnode['id']] = [
-                      'completed' => false,
-                      'inbetween_info' => null,
+                        'completed' => false,
+                        'inbetween_info' => null,
                     ];
                 }
             }
         }
         return $timed;
     }
-
-    /**
-     * Maps duration types to their equivalent durations in seconds.
-     *
-     * @var array The keys represent the duration types as follows:
-     *            '0' for days, with each day being 86400 seconds;
-     *            '1' for weeks, with each week being 604800 seconds;
-     *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
-     */
-    private $durationvaluearray = [
-        '0' => 86400, // Days.
-        '1' => 604800, // Weeks.
-        '2' => 2629746, // Months.
-    ];
 }

@@ -18,18 +18,18 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     local_adele
- * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright   2026 Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_adele';
-$plugin->release = '0.3.7';
+$plugin->release = '0.8';
 $plugin->version = 2026031600;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->supported = [401, 405];
 $plugin->dependencies = [
-    'mod_adele' => 2024060300,
+    'mod_adele' => 2026031600,
 ];
