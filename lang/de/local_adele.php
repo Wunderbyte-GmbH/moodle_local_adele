@@ -278,6 +278,7 @@ $string['fromlearningtitelplaceholder'] = 'Titel angeben';
 $string['goalnameplaceholder'] = 'Lernpfadtitel eingeben';
 $string['goalsubjectplaceholder'] = 'Lernpfadbeschreibung eingeben';
 $string['goalsubjectplaceholder'] = 'Lernpfadbeschreibung';
+$string['go_to_course'] = 'zum Kurs';
 $string['image_description_save'] = 'Bild Node gespeichert';
 $string['image_title_save'] = 'Bild Node gespeichert';
 $string['info_placeholder_manual_check'] = 'Informationstext (Kein Feedback!)';
