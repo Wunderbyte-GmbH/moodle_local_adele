@@ -566,16 +566,70 @@ class learning_paths {
      * @return array
      */
     public static function addnodemanualcondition($json, $userid) {
+        global $DB;
         $json = json_decode($json);
+
+        // Resolve the real names of every course referenced in the path, so the
+        // views can label nodes/cards without depending on the editor's
+        // availablecourses pool. That pool is filtered server-side (e.g.
+        // activefilter=only_subscribed), so students saw "Subcourse" for courses
+        // they were not enrolled in (issue #457). A user assigned to the path is
+        // entitled to see the names of the courses it contains.
+        $courseids = [];
+        foreach ($json->tree->nodes as $node) {
+            if (!empty($node->data->course_node_id) && is_array($node->data->course_node_id)) {
+                foreach ($node->data->course_node_id as $courseid) {
+                    $courseids[(int)$courseid] = (int)$courseid;
+                }
+            }
+        }
+        $coursenames = $courseids
+            ? $DB->get_records_list('course', 'id', array_values($courseids), '', 'id, fullname')
+            : [];
+
         foreach ($json->tree->nodes as $node) {
             $node->draggable = false;
             $node->deletable = false;
             $node->data->completion = $json->user_path_relation->{$node->id} ?? false;
             $node->data->manual = false;
+            self::attachcoursenames($node, $coursenames);
             $node = self::checkmanualcondition($node);
             $node = self::checknodeprogression($node, $userid);
         }
         return json_encode($json);
+    }
+
+    /**
+     * Attach resolved course full names to a node's course_node_id_description,
+     * so the frontend can label course cards independently of the filtered
+     * availablecourses pool (issue #457). Existing (teacher-given) names are kept.
+     *
+     * @param object $node The decoded learning-path node.
+     * @param array $coursenames Map of courseid => record with ->fullname.
+     * @return void
+     */
+    public static function attachcoursenames($node, $coursenames) {
+        if (empty($node->data->course_node_id) || !is_array($node->data->course_node_id)) {
+            return;
+        }
+        if (!isset($node->data->course_node_id_description) || !is_object($node->data->course_node_id_description)) {
+            $node->data->course_node_id_description = new \stdClass();
+        }
+        foreach ($node->data->course_node_id as $courseid) {
+            $courseid = (int)$courseid;
+            if (!isset($coursenames[$courseid])) {
+                continue;
+            }
+            $key = (string)$courseid;
+            if (!isset($node->data->course_node_id_description->{$key})) {
+                $node->data->course_node_id_description->{$key} = new \stdClass();
+            }
+            if (empty($node->data->course_node_id_description->{$key}->fullname)) {
+                // Use the raw fullname, matching how get_availablecourses already
+                // exposes course names (c.fullname, PARAM_TEXT, no format_string).
+                $node->data->course_node_id_description->{$key}->fullname = $coursenames[$courseid]->fullname;
+            }
+        }
     }
 
     /**

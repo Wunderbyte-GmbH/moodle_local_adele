@@ -107,6 +107,23 @@ const courses = computed(() => {
     })
   )}
 );
+
+// Resolve the displayed course name independently of the filtered
+// availablecourses pool: prefer the name carried in the node data
+// (course_node_id_description, now populated server-side for students too),
+// then the availablecourses entry, then a generic fallback (issue #457).
+const courseTitle = computed(() => {
+  const cid = props.data.course_id;
+  const desc = props.data.course_node_id_description;
+  if (desc && desc[cid] && desc[cid].fullname) {
+    return desc[cid].fullname;
+  }
+  if (courses.value[0]) {
+    return courses.value[0].givenname || courses.value[0].fullname;
+  }
+  return 'Subcourse';
+});
+
 onMounted(() => {
   setTimeout(() => {
     props.data.showCard = true
@@ -130,11 +147,8 @@ onMounted(() => {
           />
           <div class="row justify-content-center">
             <div class="col-10">
-              <h5 v-if="courses[0]" style="color: #000;">
-                {{ courses[0].givenname || courses[0].fullname }}
-              </h5>
-              <h5 v-else style="color: #000;">
-                Subcourse
+              <h5 style="color: #000;">
+                {{ courseTitle }}
               </h5>
             </div>
           </div>
