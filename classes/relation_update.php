@@ -195,6 +195,15 @@ class relation_update {
                         $validatenodecompletion['singlecompletionnode'];
                     $userpath->json['user_path_relation'][$node['id']]['feedback'] = $validatenodecompletion['feedback'];
 
+                    // Keep enrolment in sync with displayed accessibility: a node shown
+                    // 'accessible' must have the user enrolled into its course, otherwise
+                    // clicking it yields "you can't enrol yourself" (GitHub #452 / #443).
+                    // Starting nodes are already handled above; this also covers nodes that
+                    // are accessible because they carry no (or satisfied) access criteria.
+                    if (($validatenodecompletion['feedback']['status'] ?? '') === 'accessible') {
+                        self::enrol_user_into_node($node, $userpath);
+                    }
+
                     $node['data']['completion'] = $userpath->json['user_path_relation'][$node['id']];
                 }
                 $userpathid = user_path_relation::revision_user_path_relation($userpath);
@@ -997,50 +1006,67 @@ class relation_update {
      * @param object $userpath
      */
     public static function subscribe_user_starting_node(&$userpath) {
-        global $DB;
-        $instances = [];
         if (!empty($userpath->json['tree']['nodes'])) {
             foreach ($userpath->json['tree']['nodes'] as &$node) {
                 if (
                     $node['type'] != 'dropzone' && isset($node['parentCourse']) &&
                     in_array('starting_node', $node['parentCourse'])
                 ) {
-                    if (!is_int($node['data']['course_node_id'])) {
-                        foreach ($node['data']['course_node_id'] as $courseid) {
-                            if (!isset($node['data']['first_enrolled'])) {
-                                $node['data']['first_enrolled'] = time();
-                                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
-                            }
-                            if (isset($instances[$courseid])) {
-                                $instance = $instances[$courseid];
-                            } else {
-                                if (!enrol_is_enabled('manual')) {
-                                    break;
-                                }
-                                if (!$enrol = enrol_get_plugin('manual')) {
-                                    break;
-                                }
-                                $instance = $DB->get_record(
-                                    'enrol',
-                                    [
-                                        'courseid' => $courseid,
-                                        'enrol' => 'manual',
-                                    ]
-                                );
-                                $instances[$courseid] = $instance;
-                            }
-                            if (!$instance) {
-                                continue;
-                            }
-                            $context = \context_course::instance($courseid);
-                            $isenrolled = is_enrolled($context, $userpath->user_id);
-                            if (!$isenrolled) {
-                                $selectedrole = get_config('local_adele', 'enroll_as_setting');
-                                $enrol->enrol_user($instance, $userpath->user_id, $selectedrole);
-                            }
-                        }
-                    }
+                    self::enrol_user_into_node($node, $userpath);
                 }
+            }
+        }
+    }
+
+    /**
+     * Enrol the user into every course backing a single node (idempotently).
+     *
+     * Extracted verbatim from the former starting-node loop so that both
+     * starting nodes (subscribed up front) and any node the recompute finds
+     * 'accessible' share one enrolment path — keeping displayed accessibility
+     * and real enrolment in sync (GitHub #452 / #443).
+     *
+     * @param array $node Node array, modified by reference (stamps first_enrolled).
+     * @param object $userpath The user path the node belongs to.
+     * @return void
+     */
+    public static function enrol_user_into_node(&$node, $userpath) {
+        global $DB;
+        if (!isset($node['data']['course_node_id']) || is_int($node['data']['course_node_id'])) {
+            return;
+        }
+        $instances = [];
+        foreach ($node['data']['course_node_id'] as $courseid) {
+            if (!isset($node['data']['first_enrolled'])) {
+                $node['data']['first_enrolled'] = time();
+                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
+            }
+            if (isset($instances[$courseid])) {
+                $instance = $instances[$courseid];
+            } else {
+                if (!enrol_is_enabled('manual')) {
+                    break;
+                }
+                if (!$enrol = enrol_get_plugin('manual')) {
+                    break;
+                }
+                $instance = $DB->get_record(
+                    'enrol',
+                    [
+                        'courseid' => $courseid,
+                        'enrol' => 'manual',
+                    ]
+                );
+                $instances[$courseid] = $instance;
+            }
+            if (!$instance) {
+                continue;
+            }
+            $context = \context_course::instance($courseid);
+            $isenrolled = is_enrolled($context, $userpath->user_id);
+            if (!$isenrolled) {
+                $selectedrole = get_config('local_adele', 'enroll_as_setting');
+                $enrol->enrol_user($instance, $userpath->user_id, $selectedrole);
             }
         }
     }
