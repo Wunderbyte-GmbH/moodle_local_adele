@@ -227,11 +227,20 @@ function setFlowchart() {
 // Zoom in node
 function onNodeClickCall(event) {
   zoomstep.value = onNodeClick(event, setCenter, store);
-  // Find all expand buttons and click if they are ExpandedCourses.
+  // Clicking one of a stack's expanded child cards (or its "i"/feedback icons)
+  // must NOT auto-collapse the stack. Vue-flow fires node-click for the child
+  // node too, and collapsing here would unmount the children and instantly
+  // close the info window the user just opened (issue #454). Only auto-collapse
+  // expanded stacks when the user clicks a different, non-child node.
+  if (event && event.node && typeof event.node.id === 'string' &&
+      event.node.id.includes('_expanded_courses_')) {
+    return;
+  }
+  // Collapse any expanded stacks when navigating to another node.
   nextTick(() => {
-    // Query all elements with the 'fa-minus-circle' class
+    // Query all elements with the 'fa-minus-circle' class (a stack's collapse button)
     const buttons = document.querySelectorAll('.fa-minus-circle');
-    
+
     // For each found button, simulate a click event
     buttons.forEach(button => {
         button.click();
