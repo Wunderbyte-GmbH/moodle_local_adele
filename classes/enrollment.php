@@ -32,8 +32,6 @@ use context_system;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/externallib.php');
-
 /**
  * External Service for local adele.
  *
@@ -110,19 +108,22 @@ class enrollment {
      */
     public static function buildsqlquerypath($courseid) {
         global $DB;
-        // Using named parameter :courseid in the SQL query.
-        $likecourseid = $DB->sql_like('lp.json', ':courseidpattern');
+        // Only subscribe a user to a learning path when they are enrolled into the
+        // course that HOSTS the learning path as a mod_adele activity (the "home
+        // course"). This prevents spurious user-path records — and the resulting
+        // cascade of auto-enrolments into unrelated starting-node courses — that
+        // happened when the old code matched any course referenced anywhere in the
+        // LP JSON (GitHub issue #444; aligns with the origin/dev_chris fix for the
+        // related #433 "duplicate user learningpathes"). local_adele declares a
+        // dependency on mod_adele, so joining {adele} is safe.
         $sql = "SELECT lp.id, lp.json
         FROM {local_adele_learning_paths} lp
-        WHERE {$likecourseid}";
+        JOIN {adele} a ON a.learningpathid = lp.id
+        WHERE a.course = :courseid";
 
-        // Providing the named parameter in the $params array.
-        $params = ['courseidpattern' => '%course_node_id____' . $courseid . '__,%'];
+        $params = ['courseid' => (int) $courseid];
 
-        // Using get_records_sql function to execute the query with parameters.
-        $records = $DB->get_records_sql($sql, $params);
-
-        return $records;
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**

@@ -37,8 +37,6 @@ use local_adele\event\user_path_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/externallib.php');
-
 /**
  * External Service for local adele.
  *
