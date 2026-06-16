@@ -158,24 +158,24 @@ const emit = defineEmits([
   'zoomOnParent'
 ]);
 
-const zoomOnParent = () => {
+const zoomOnParent = (payload = {}) => {
+  // Default to opening for backwards compatibility with callers that emit no state.
+  const open = payload.open !== false;
   if (customNodeEdit.value) {
-    // Starting from the custom node, traverse the DOM upwards
+    // Walk up to this node's vue-flow wrapper and raise ONLY this node while its
+    // feedback dropdown is open, so the dropdown paints above the neighbouring
+    // nodes; clear it again on close so vue-flow takes back control.
+    //
+    // We must NOT bump the *sibling* nodes' z-index (the previous code set every
+    // sibling to '10'). Doing so pulled the learning-module "background"
+    // rectangle node (e.g. `0_module`, 540x500) up to the same z-index as the
+    // course nodes sitting on top of it; being later in DOM order it then
+    // painted over them and swallowed their clicks. That was the real cause of
+    // the stack/"Lernpaket" click-blocking (issues #425 / #436 / #453).
     let parentElement = customNodeEdit.value.parentElement;
-
-    // Traversing up until the desired parent is found or root is reached
     while (parentElement) {
-      // Check if this is the parent you wish to style (adjust condition as needed)
       if (parentElement.classList.contains('vue-flow__node')) {
-        let containerElement = parentElement.parentElement;
-        if (containerElement) {
-          const siblings = Array.from(containerElement.children);
-
-          siblings.forEach((sibling) => {
-            sibling.style.zIndex = '10';
-          });
-        }
-        parentElement.style.zIndex = '1001'
+        parentElement.style.zIndex = open ? '1001' : '';
         break; // Exit once the desired parent is styled
       }
       parentElement = parentElement.parentElement;

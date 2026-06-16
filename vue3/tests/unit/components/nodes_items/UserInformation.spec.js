@@ -73,6 +73,33 @@ describe('UserInformation.vue', () => {
     expect(wrapper.vm.showFeedbackarea).toBe(false);
   });
 
+  // Reproduces issue #453: opening the feedback ("Sprachblase") on one node
+  // permanently raised that node's z-index because closing emitted no signal
+  // for the parent (CustomNodeEdit.zoomOnParent) to lower it again, leaving the
+  // raised node overlapping and blocking clicks on the other nodes in a stack.
+  // The parent can only reset the z-index if it is told the feedback closed,
+  // so the component must emit focusChanged with an explicit open state.
+  it('emits focusChanged with the open state on open AND on close', async () => {
+    const toggleButton = wrapper.find('.toggle-button');
+
+    // Open: parent is told to raise this node.
+    await toggleButton.trigger('click');
+    expect(wrapper.vm.showFeedbackarea).toBe(true);
+
+    // Close: parent MUST be told so it can lower the node and stop blocking
+    // clicks on the neighbouring nodes' info / feedback controls.
+    await toggleButton.trigger('click');
+    expect(wrapper.vm.showFeedbackarea).toBe(false);
+
+    const events = wrapper.emitted('focusChanged');
+    expect(events).toBeTruthy();
+
+    const openEvents = events.filter((e) => e[0] && e[0].open === true);
+    const closeEvents = events.filter((e) => e[0] && e[0].open === false);
+    expect(openEvents.length).toBeGreaterThan(0);
+    expect(closeEvents.length).toBeGreaterThan(0);
+  });
+
   it('renders the feedback area with correct styling when shown', async () => {
     const toggleButton = wrapper.find('.toggle-button');
     await toggleButton.trigger('click');

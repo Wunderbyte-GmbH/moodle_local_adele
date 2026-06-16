@@ -64,6 +64,10 @@ const toggleFeedbackarea = () => {
   showFeedbackarea.value = !showFeedbackarea.value;
   if (!showFeedbackarea.value) {
     cardStyle.value.zIndex = 2;
+    // Feedback was closed: tell the parent so it can lower this node again
+    // and stop overlapping (and blocking clicks on) the neighbouring nodes.
+    emit('focusChanged', { open: false });
+    return;
   }
   handleFocus()
 };
@@ -99,7 +103,7 @@ const handleFocus = () => {
     } else {
       cardStyle.value.zIndex = 2;
     }
-    emit('focusChanged', {});
+    emit('focusChanged', { open: showFeedbackarea.value });
   }
 };
 
