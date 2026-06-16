@@ -186,15 +186,19 @@ class learning_path_update {
         $oldvalues = [];
 
         foreach ($oldpath['tree']['nodes'] as $node) {
+            // Null-coalesce every read: nodes legitimately omit these keys (e.g. a
+            // node with no completion/restriction or manual condition), and the
+            // raw accesses emitted a cascade of "Undefined array key" / "access
+            // array offset on null" warnings on every learning-path edit.
             $oldvalues[$node['id']] = [
                 'firstcompleted' => $node['firstcompleted'] ?? false,
-                'manualcompletion' => $node['data']['manualcompletion'],
-                'manualcompletionvalue' => $node['data']['manualcompletionvalue'],
-                'manualrestriction' => $node['data']['manualrestriction'],
-                'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'],
-                'mastercompletion' => $node["data"]["completion"]["master"]["completion"],
-                'masterrescrtriction' => $node["data"]["completion"]["master"]["restriction"],
-                'first_enrolled' => $node["data"]["first_enrolled"],
+                'manualcompletion' => $node['data']['manualcompletion'] ?? null,
+                'manualcompletionvalue' => $node['data']['manualcompletionvalue'] ?? null,
+                'manualrestriction' => $node['data']['manualrestriction'] ?? null,
+                'manualrestrictionvalue' => $node['data']['manualrestrictionvalue'] ?? null,
+                'mastercompletion' => $node['data']['completion']['master']['completion'] ?? null,
+                'masterrescrtriction' => $node['data']['completion']['master']['restriction'] ?? null,
+                'first_enrolled' => $node['data']['first_enrolled'] ?? null,
             ];
         }
 
@@ -212,18 +216,19 @@ class learning_path_update {
                 $node['data']['first_enrolled'] = $oldvalues[$node['id']]['first_enrolled'];
             }
             $manualrestriction = false;
-            foreach ($node['restriction']['nodes'] as $restrictionnode) {
-                if ($restrictionnode['data']['label'] == 'manual') {
+            foreach (($node['restriction']['nodes'] ?? []) as $restrictionnode) {
+                // Feedback nodes carry no 'label'; coalesce to avoid a warning.
+                if (($restrictionnode['data']['label'] ?? '') == 'manual') {
                     $manualrestriction = true;
                 }
             }
             $manualcompletion = false;
-            foreach ($node['completion']['nodes'] as $completionnode) {
-                if ($completionnode['data']['label'] == 'manual') {
+            foreach (($node['completion']['nodes'] ?? []) as $completionnode) {
+                if (($completionnode['data']['label'] ?? '') == 'manual') {
                     $manualcompletion = true;
                 }
             }
-            if ($oldvalues[$node['id']]) {
+            if (isset($oldvalues[$node['id']])) {
                 if ($manualrestriction) {
                     $node['data']['manualrestriction'] = $oldvalues[$node['id']]['manualrestriction'];
                     $node['data']['manualrestrictionvalue'] = $oldvalues[$node['id']]['manualrestrictionvalue'];

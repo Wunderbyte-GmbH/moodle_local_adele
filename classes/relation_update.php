@@ -529,7 +529,10 @@ class relation_update {
         $node,
         $restrictionnodepathsall
     ) {
-        if (count($restrictionnodepaths) > 0 || !isset($node['restriction']) ||  $node['restriction'] === null) {
+        // Treat a present-but-empty restriction (no condition nodes) the same as
+        // no restriction at all, so removing all access criteria opens the node
+        // (issue #449).
+        if (count($restrictionnodepaths) > 0 || empty($node['restriction']['nodes'])) {
             self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
             return 'inbetween';
         }
@@ -586,11 +589,15 @@ class relation_update {
         }
         if (
             $restrictionnodepaths ||
-            (is_null($feedback['restriction']['before']) && !isset($node['restriction']))
+            // A present-but-empty restriction (no condition nodes) means the node
+            // is unrestricted, exactly like a node with no restriction key at all.
+            // Without this, removing all access criteria left the node locked
+            // (issue #449): the empty restriction fell through to 'closed'.
+            (is_null($feedback['restriction']['before']) && empty($node['restriction']['nodes']))
         ) {
             return 'accessible';
         }
-        if (isset($node['restriction'])) {
+        if (!empty($node['restriction']['nodes'])) {
             foreach ($node['restriction']['nodes'] as $restrictionall) {
                 if (strpos($restrictionall['id'], '_feedback')) {
                     $hastimedcondition = false;

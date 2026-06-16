@@ -757,7 +757,9 @@ class learning_paths {
         }
         arsort($completioncolumnprogress);
         $completioncolumnprogress = array_values($completioncolumnprogress);
-        $node->data->progress = round($completioncolumnprogress[0], 2);
+        // A node with no completion criteria has no progress entries; default to
+        // 0 instead of reading an undefined index 0 (warning / round(null)).
+        $node->data->progress = round($completioncolumnprogress[0] ?? 0, 2);
         return $node;
     }
 
