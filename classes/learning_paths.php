@@ -542,6 +542,25 @@ class learning_paths {
 
         $record = $DB->get_record_sql($sql, $params);
         if ($record) {
+            // The per-user path snapshot is deliberately kept when the master learning
+            // path is deleted (it holds the user's progress). Signal the deletion so the
+            // student view shows the same "not found" notice the editor shows, instead of
+            // rendering a path that no longer exists (GitHub #446). json is emptied so the
+            // frontend does not try to JSON.parse a stale snapshot.
+            if (!$DB->record_exists('local_adele_learning_paths', ['id' => $params['learning_path_id']])) {
+                return [
+                    'id' => (int)$record->id,
+                    'user_id' => (int)$record->user_id,
+                    'username' => $record->username ?? '',
+                    'firstname' => $record->firstname ?? '',
+                    'lastname' => $record->lastname ?? '',
+                    'email' => $record->email ?? '',
+                    'json' => '',
+                    'last_seen_by_owner' => (string)($record->last_seen_by_owner ?? ''),
+                    'image' => '',
+                    'lp_deleted' => true,
+                ];
+            }
             $record->json = self::addnodemanualcondition($record->json, $record->user_id);
             return (array)$record;
         }
@@ -552,9 +571,10 @@ class learning_paths {
             'firstname' => 'not found',
             'lastname' => 'not found',
             'email' => 'not found',
-            'json' => 'not found',
+            'json' => '',
             'last_seen_by_owner' => 'not found',
             'image' => 'not found',
+            'lp_deleted' => true,
         ];
     }
 

@@ -23,7 +23,10 @@
  */ -->
 
 <template>
-  <div v-if="userLearningpath">
+  <div v-if="notFound" class="adele-lp-not-found">
+    {{ store.state.strings.not_found }}
+  </div>
+  <div v-else-if="userLearningpath">
     <div v-if="isMobile">
       <MobileViews
         :selected-tab="selectedTab"
@@ -58,6 +61,7 @@ const learningpath = ref(null)
 const userLearningpaths = ref(null)
 const selectedTab = ref(true)
 const userLearningpath = ref(null)
+const notFound = ref(false)
 
 
 const isMobile = ref(window.innerWidth <= 600)
@@ -85,6 +89,9 @@ onMounted(async() => {
     params = route.params
   }
   userLearningpath.value = await store.dispatch('fetchUserPathRelation', params)
+  // The master learning path was deleted but this user's snapshot is kept; show the
+  // same "not found" notice the editor shows instead of rendering a dead path (#446).
+  notFound.value = userLearningpath.value?.lp_deleted === true
   learningpath.value = await store.dispatch('fetchLearningpath')
   userLearningpaths.value = await store.dispatch('fetchUserPathRelations')
   window.addEventListener('resize', updateDeviceType)

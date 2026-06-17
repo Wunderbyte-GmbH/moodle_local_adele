@@ -102,6 +102,11 @@ class get_lp_user_path_relation extends external_api {
                     'json' => new external_value(PARAM_RAW, 'Flow Chart'),
                     'last_seen_by_owner' => new external_value(PARAM_TEXT, 'Last seen'),
                     'image' => new external_value(PARAM_RAW, 'image'),
+                    'lp_deleted' => new external_value(
+                        PARAM_BOOL,
+                        'True when the master learning path has been deleted but this user snapshot is kept',
+                        VALUE_OPTIONAL
+                    ),
             ]);
     }
 }
