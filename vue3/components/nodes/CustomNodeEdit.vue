@@ -74,6 +74,16 @@ onMounted(() => {
           if (restrictionnode.data.label == 'timed') {
             date.value = restrictionnode.data.value
           }
+          // Only a real timed / timed_duration restriction shows the timed "ring"
+          // affordance around the play button. (The backend timed restrictioncriteria
+          // object also holds entries for non-timed restriction nodes, so its
+          // non-emptiness cannot be used to detect an actual timed condition - #445 follow-up.)
+          if (
+            restrictionnode.data.label == 'timed' ||
+            restrictionnode.data.label == 'timed_duration'
+          ) {
+            hasTimedCondition.value = true
+          }
         })
       }
       if (node.parentCourse.includes('starting_node')) {
@@ -104,17 +114,9 @@ onMounted(() => {
   }
 
   const triggerAnimation = () => {
-    // Check if there's a timed condition in restrictioncriteria.timed or timed_duration objects
-    hasTimedCondition.value = false;
-    if (props.data.completion?.restrictioncriteria) {
-      const timedObj = props.data.completion.restrictioncriteria.timed;
-      const timedDurationObj = props.data.completion.restrictioncriteria.timed_duration;
-      
-      if ((timedObj && Object.keys(timedObj).length > 0) || 
-          (timedDurationObj && Object.keys(timedDurationObj).length > 0)) {
-        hasTimedCondition.value = true;
-      }
-    }
+    // hasTimedCondition is determined above from the node's actual timed /
+    // timed_duration restriction nodes (see onMounted), not from the polluted
+    // restrictioncriteria object.
     if (
       props.data.completion.feedback &&
       props.data.completion.feedback.status !== 'closed' &&
