@@ -131,8 +131,10 @@ class parent_courses implements course_restriction {
                     $coursestable = [];
                     if (isset($restriction['data']['value']['courses_id'])) {
                         foreach ($restriction['data']['value']['courses_id'] as $coursesid) {
+                            $nodeexists = false;
                             foreach ($userpath->json['tree']['nodes'] as $usernode) {
                                 if ($usernode['id'] == $coursesid) {
+                                    $nodeexists = true;
                                     $courselist[] = $usernode['data']['fullname'];
                                     if (
                                         isset($usernode['data']['completion']) &&
@@ -141,6 +143,14 @@ class parent_courses implements course_restriction {
                                         $coursestable[] = $coursesid;
                                     }
                                 }
+                            }
+                            // A referenced parent node that no longer exists in the path was
+                            // deleted in the editor; it can never be completed, so it must not
+                            // keep this node locked forever. Treat the dangling reference as
+                            // satisfied so the dependent node is not permanently blocked
+                            // (GitHub #445).
+                            if (!$nodeexists) {
+                                $coursestable[] = $coursesid;
                             }
                         }
                         if ($restriction['data']['value']['min_courses'] <= count($coursestable)) {
