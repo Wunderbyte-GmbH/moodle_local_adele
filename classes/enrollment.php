@@ -81,7 +81,11 @@ class enrollment {
                     'timemodified' => time(),
                     'createdby' => $params->userid,
                     'json' => json_encode([
-                        'tree' => $learningpath->json['tree'],
+                        // An empty learning path has no 'tree' yet; default to an empty
+                        // tree so adding it to a course does not raise "Undefined array
+                        // key tree" (GitHub #448). Downstream recompute already guards
+                        // against empty nodes.
+                        'tree' => $learningpath->json['tree'] ?? ['nodes' => [], 'edges' => []],
                         'modules' => $learningpath->json['modules'] ?? null,
                     ]),
                 ]);
