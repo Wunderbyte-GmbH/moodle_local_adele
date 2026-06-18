@@ -78,7 +78,8 @@ class duplicate_learningpath extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:canmanage', $context);
+        // Duplicating a path requires being an editor of THAT path (or a manager/admin) (#458).
+        learning_paths::require_lp_editor_access($params['learningpathid'], $context);
 
         return learning_paths::duplicate_learning_path($params);
     }

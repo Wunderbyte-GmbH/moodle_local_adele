@@ -36,6 +36,8 @@ use local_adele\external\save_learningpath;
 use local_adele\external\update_lp_visiblity;
 use local_adele\external\create_lp_edit_users;
 use local_adele\external\get_lp_edit_users;
+use local_adele\external\delete_learningpath;
+use local_adele\external\duplicate_learningpath;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 defined('MOODLE_INTERNAL') || die();
@@ -212,5 +214,87 @@ final class issue458_per_lp_authorization_test extends advanced_testcase {
         $this->setUser($b);
         $editors = get_lp_edit_users::execute($ctxid, 0);
         $this->assertIsArray($editors);
+    }
+
+    /**
+     * The owner can delete their own LP, and its editor rows are cleaned up (#458).
+     *
+     * @return void
+     */
+    public function test_owner_can_delete_own_lp_and_editors_cleaned(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $a = $this->getDataGenerator()->create_user();
+        $lpa = $this->make_lp('Owned by A', $a->id);
+        $ctxid = context_system::instance()->id;
+
+        $this->setUser($a);
+        delete_learningpath::execute($a->id, $lpa, $ctxid);
+
+        $this->assertFalse($DB->record_exists('local_adele_learning_paths', ['id' => $lpa]));
+        $this->assertFalse(
+            $DB->record_exists('local_adele_lp_editors', ['learningpathid' => $lpa]),
+            'Deleting a path must remove its editor rows (no orphans).'
+        );
+    }
+
+    /**
+     * A non-owner cannot delete another's LP (#458).
+     *
+     * @return void
+     */
+    public function test_non_owner_cannot_delete_others_lp(): void {
+        $this->resetAfterTest(true);
+        $a = $this->getDataGenerator()->create_user();
+        $b = $this->getDataGenerator()->create_user();
+        $lpa = $this->make_lp('Owned by A', $a->id);
+        $this->make_lp('Owned by B', $b->id);
+        $ctxid = context_system::instance()->id;
+
+        $this->setUser($b);
+        $this->expectException(\core\exception\required_capability_exception::class);
+        delete_learningpath::execute($b->id, $lpa, $ctxid);
+    }
+
+    /**
+     * The owner can duplicate their own LP, and becomes editor of the copy so it
+     * shows in their editable list (#458).
+     *
+     * @return void
+     */
+    public function test_owner_can_duplicate_own_and_owns_copy(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $a = $this->getDataGenerator()->create_user();
+        $lpa = $this->make_lp('Owned by A', $a->id);
+        $ctxid = context_system::instance()->id;
+
+        $this->setUser($a);
+        duplicate_learningpath::execute($a->id, $lpa, $ctxid);
+
+        $copy = $DB->get_record('local_adele_learning_paths', ['name' => 'Owned by A copy']);
+        $this->assertNotFalse($copy, 'The duplicate must be created.');
+        $this->assertTrue(
+            $DB->record_exists('local_adele_lp_editors', ['learningpathid' => $copy->id, 'userid' => $a->id]),
+            'The duplicating user must own the copy (be its editor).'
+        );
+    }
+
+    /**
+     * A non-owner cannot duplicate another's LP (#458).
+     *
+     * @return void
+     */
+    public function test_non_owner_cannot_duplicate_others_lp(): void {
+        $this->resetAfterTest(true);
+        $a = $this->getDataGenerator()->create_user();
+        $b = $this->getDataGenerator()->create_user();
+        $lpa = $this->make_lp('Owned by A', $a->id);
+        $this->make_lp('Owned by B', $b->id);
+        $ctxid = context_system::instance()->id;
+
+        $this->setUser($b);
+        $this->expectException(\core\exception\required_capability_exception::class);
+        duplicate_learningpath::execute($b->id, $lpa, $ctxid);
     }
 }

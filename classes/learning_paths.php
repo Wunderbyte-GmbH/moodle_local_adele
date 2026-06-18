@@ -305,6 +305,9 @@ class learning_paths {
                 ],
             ]);
             $event->trigger();
+            // The duplicating user owns the copy, so it appears in their editable
+            // list and they can edit it (mirrors create on save) (#458).
+            learning_path_editors::create_editors($id, $USER->id);
             return ['success' => true];
         }
         return ['success' => false];
@@ -321,6 +324,10 @@ class learning_paths {
 
         $result = $DB->delete_records('local_adele_learning_paths', ['id' => $params['learningpathid']]);
         if ($result) {
+            // Clean up editor membership for the deleted path (the per-user path_user
+            // snapshots are deliberately kept - see #446 - so students still get the
+            // "not found" notice instead of silently losing progress).
+            $DB->delete_records('local_adele_lp_editors', ['learningpathid' => $params['learningpathid']]);
             // Trigger catscale created event.
             $event = learnpath_deleted::create([
                 'objectid' => $params['learningpathid'],
