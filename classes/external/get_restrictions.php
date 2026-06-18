@@ -68,7 +68,12 @@ class get_restrictions extends external_api {
     public static function execute($contextid): array {
         require_login();
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:canmanage', $context);
+        // Managers keep full access; editing-teachers may read the condition
+        // palette via the dedicated teacheredit capability (#431) without the
+        // over-broad canmanage.
+        if (!has_capability('local/adele:canmanage', $context)) {
+            require_capability('local/adele:teacheredit', $context);
+        }
 
         return course_restriction_info::get_restrictions(true);
     }

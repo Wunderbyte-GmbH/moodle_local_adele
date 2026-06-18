@@ -81,7 +81,11 @@ class save_lp_user_path_relation extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        require_capability('local/adele:canmanage', $context);
+        // Managers keep full access; editing-teachers may set a user's node status
+        // (manual completion / master toggle) via teacheredit, without canmanage (#431).
+        if (!has_capability('local/adele:canmanage', $context)) {
+            require_capability('local/adele:teacheredit', $context);
+        }
         if ($context->contextlevel == CONTEXT_COURSE) {
             $params['courseid'] = $context->instanceid;
         } else {
