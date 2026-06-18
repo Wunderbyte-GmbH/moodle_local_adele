@@ -84,10 +84,18 @@ class learning_path_editors {
         global $DB;
         $result = null;
         if ($lpid != 0) {
-            $data = new stdClass();
-            $data->learningpathid = $lpid;
-            $data->userid = $userid;
-            $result = $DB->insert_record('local_adele_lp_editors', $data);
+            // Idempotent: never create a second editor row for the same (path, user).
+            // Duplicates fan out get_records_sql keys elsewhere (return_learningpaths,
+            // get_editable_learning_paths) and break the navbar / module form.
+            $existing = $DB->get_record('local_adele_lp_editors', ['learningpathid' => $lpid, 'userid' => $userid]);
+            if ($existing) {
+                $result = $existing->id;
+            } else {
+                $data = new stdClass();
+                $data->learningpathid = $lpid;
+                $data->userid = $userid;
+                $result = $DB->insert_record('local_adele_lp_editors', $data);
+            }
         }
         return ['success' => $result];
     }

@@ -164,7 +164,9 @@ class learning_paths {
      */
     public static function get_editable_learning_paths() {
         global $DB, $USER;
-        $sql = "SELECT lp.id, lp.id as learningpathid, lp.name
+        // DISTINCT so duplicate editor rows for the same path don't fan out the
+        // JOIN and collide the get_records_sql key on lp.id.
+        $sql = "SELECT DISTINCT lp.id, lp.id as learningpathid, lp.name
             FROM {local_adele_learning_paths} lp";
 
         if (!is_siteadmin()) {
@@ -843,7 +845,9 @@ class learning_paths {
             'userid' => (int)$USER->id,
         ];
 
-        $sql = "SELECT lpe.learningpathid
+        // DISTINCT so a user with duplicate editor rows for the same path does not
+        // collide the get_records_sql key (learningpathid is not unique here).
+        $sql = "SELECT DISTINCT lpe.learningpathid
             FROM {local_adele_lp_editors} lpe
             WHERE lpe.userid = :userid";
         $records = $DB->get_records_sql($sql, $params);
