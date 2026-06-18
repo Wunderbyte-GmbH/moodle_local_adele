@@ -490,6 +490,11 @@ class learning_paths {
         }
 
         foreach ($node['childCourse'] as $childid) {
+            // Guard against loops (e.g. A->B->C->B): never revisit a node already on
+            // the current path, which would recurse forever (GitHub #447).
+            if (in_array($childid, $currentpath)) {
+                continue;
+            }
             $childnode = self::findnodebyid($childid, $nodes);
             if ($childnode) {
                 self::findpaths($childnode, $currentpath, $paths, $nodes);
