@@ -36,6 +36,7 @@ use local_adele\helper\user_path_relation;
 use core_completion\progress;
 use Exception;
 use moodle_url;
+use required_capability_exception;
 
 /**
  * Class learning_paths
@@ -903,5 +904,34 @@ class learning_paths {
         }
 
         return $iseditor;
+    }
+
+    /**
+     * Require that the current user may edit the given learning path.
+     *
+     * Managers and site admins have full access; everyone else must be an editor
+     * of THIS specific path (lp_editors membership - i.e. its creator or a named
+     * person added to it). check_access() alone is not enough: it only proves the
+     * user is an editor/assistant of *something*, which let any editor overwrite
+     * any path by id via the web service (IDOR, #458).
+     *
+     * @param int $learningpathid
+     * @param \context $context
+     * @return void
+     * @throws required_capability_exception when the user does not own the path
+     */
+    public static function require_lp_editor_access($learningpathid, $context) {
+        global $USER, $DB;
+
+        if (has_capability('local/adele:canmanage', $context) || is_siteadmin()) {
+            return;
+        }
+        if ($DB->record_exists('local_adele_lp_editors', [
+            'learningpathid' => $learningpathid,
+            'userid' => $USER->id,
+        ])) {
+            return;
+        }
+        throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', '');
     }
 }

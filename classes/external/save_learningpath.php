@@ -98,15 +98,14 @@ class save_learningpath extends external_api {
 
         require_login();
         $context = context::instance_by_id($contextid);
-        $sessionvalue = learning_paths::check_access();
-        // If the user doesn't have the capability and the session value is empty, handle the error.
-        if (empty($sessionvalue)) {
-            throw new required_capability_exception(
-                $context,
-                'local/adele:canmanage',
-                'nopermission',
-                'You do not have the required capability and the session key is not set.'
-            );
+        if ($params['learningpathid'] == 0) {
+            // Creating a new path: any editor/assistant/manager may create.
+            if (empty(learning_paths::check_access())) {
+                throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', '');
+            }
+        } else {
+            // Editing an existing path: must be an editor of THAT path (#458).
+            learning_paths::require_lp_editor_access($params['learningpathid'], $context);
         }
 
         $result = learning_paths::save_learning_path($params);

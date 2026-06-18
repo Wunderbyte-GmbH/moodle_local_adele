@@ -86,14 +86,10 @@ class get_learningpaths extends external_api {
         $learningpaths = learning_paths::return_learningpaths();
         $pathscreatedfornamedperson = learning_paths::return_learningpaths_owned();
         $sessionvalue = learning_paths::check_access();
-        // If the user doesn't have the capability and the session value is empty, handle the error.
+        // Listing learning paths requires general editor access; the set is filtered
+        // to the user's own paths below for non-managers (clean denial, #458).
         if (empty($sessionvalue)) {
-            throw new required_capability_exception(
-                $context,
-                'local/adele:canmanage',
-                'nopermission',
-                'You do not have the required capability and the session key is not set.'
-            );
+            throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', '');
         }
 
         $role = $DB->get_record('role', ['shortname' => 'adelemanager']);
