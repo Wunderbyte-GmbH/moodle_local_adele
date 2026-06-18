@@ -35,6 +35,7 @@ use context_system;
 use local_adele\external\save_learningpath;
 use local_adele\external\update_lp_visiblity;
 use local_adele\external\create_lp_edit_users;
+use local_adele\external\get_lp_edit_users;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 defined('MOODLE_INTERNAL') || die();
@@ -192,5 +193,24 @@ final class issue458_per_lp_authorization_test extends advanced_testcase {
         $this->setUser($b);
         $this->expectException(\core\exception\required_capability_exception::class);
         create_lp_edit_users::execute($ctxid, $lpa, $victim->id);
+    }
+
+    /**
+     * A brand-new, unsaved learning path (learningpathid = 0) has no owner yet,
+     * so any editor/assistant must still be able to work with it (e.g. the editor
+     * loading the empty editors panel while creating a new LP). Per-LP ownership
+     * must NOT be required for id 0 (#458 regression).
+     *
+     * @return void
+     */
+    public function test_new_unsaved_lp_does_not_require_ownership(): void {
+        $this->resetAfterTest(true);
+        $b = $this->getDataGenerator()->create_user();
+        $this->make_lp('Owned by B', $b->id); // B passes check_access (editor of something).
+        $ctxid = context_system::instance()->id;
+
+        $this->setUser($b);
+        $editors = get_lp_edit_users::execute($ctxid, 0);
+        $this->assertIsArray($editors);
     }
 }

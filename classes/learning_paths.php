@@ -926,7 +926,14 @@ class learning_paths {
         if (has_capability('local/adele:canmanage', $context) || is_siteadmin()) {
             return;
         }
-        if ($DB->record_exists('local_adele_lp_editors', [
+        // A brand-new, unsaved learning path (id 0) has no owner yet, so any
+        // editor/assistant may work with it (creating one is gated by check_access;
+        // the creator is then auto-added as its editor on save).
+        if (empty($learningpathid)) {
+            if (!empty(self::check_access())) {
+                return;
+            }
+        } else if ($DB->record_exists('local_adele_lp_editors', [
             'learningpathid' => $learningpathid,
             'userid' => $USER->id,
         ])) {
