@@ -154,8 +154,13 @@ class relation_update {
                                         $activecolumnfeedback
                                     );
                                 $restrictionnodepathsall[] = $allconditions;
-                                $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
-                                $activefeedbackfornode;
+                                // $feedback is null when the condition's feedback node is not
+                                // wired up (empty childCondition); there is then nothing to key
+                                // the per-feedback-node hint by, so skip it instead of fataling.
+                                if (isset($feedback['id'])) {
+                                    $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
+                                    $activefeedbackfornode;
+                                }
                             }
                         }
                     }
@@ -571,9 +576,13 @@ class relation_update {
                     }
                 }
                 if ($isvalid) {
-                    $childconditionid = $restnode['childCondition'][0];
-                    $feedback['restriction']['before_valid'][$childconditionid] =
-                    $feedback['restriction']['before'][$childconditionid];
+                    // childCondition can be empty when the feedback node is not wired
+                    // (auto-created restriction left unedited); skip rather than fatal.
+                    $childconditionid = $restnode['childCondition'][0] ?? null;
+                    if ($childconditionid !== null && isset($feedback['restriction']['before'][$childconditionid])) {
+                        $feedback['restriction']['before_valid'][$childconditionid] =
+                        $feedback['restriction']['before'][$childconditionid];
+                    }
                 }
             }
         }

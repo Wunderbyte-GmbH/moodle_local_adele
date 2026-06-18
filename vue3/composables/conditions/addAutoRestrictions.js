@@ -42,7 +42,7 @@ function createRestriction (node_id, parent_node_id, store) {
     ],
     "nodes": [
       {
-        "childCondition": [],
+        "childCondition": ['condition_1_feedback'],
         "data": {
           "description": store.state.strings.course_description_condition_parent_courses,
           "description_before": store.state.strings.course_restricition_before_condition_parent_courses,
@@ -77,6 +77,7 @@ function createRestriction (node_id, parent_node_id, store) {
           "visibility": true,
           "feedback_before": store.state.strings.course_restricition_before_condition_parent_courses,
           "feedback_before_checkmark": true,
+          "information": store.state.strings.course_information_condition_parent_courses,
         },
         "draggable": false,
         "deletable": false,

@@ -61,6 +61,7 @@ const  addAutoCompletions = (node, store) => {
               "feedback_before_checkmark": true,
               "feedback_after_checkmark": true,
               "feedback_inbetween_checkmark": true,
+              "information": store.state.strings.course_information_condition_course_completed,
             },
             "draggable": false,
             "deletable": false,
