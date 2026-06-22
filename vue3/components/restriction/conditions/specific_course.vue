@@ -60,7 +60,10 @@ const emit = defineEmits(['update:modelValue'])
 
 onMounted(async () => {
   store.state.learningpath.json.tree.nodes.forEach(node => {
-    if (store.state.node.id != node.id) {
+    // Exclude the node itself - it must not require its own completion (#451).
+    // node_id (not id) is how the current node is identified everywhere else,
+    // so the previous store.state.node.id never matched and self was selectable.
+    if (store.state.node.node_id != node.id) {
       courses.value.push({
         id: node.id,
         name: node.data.fullname
