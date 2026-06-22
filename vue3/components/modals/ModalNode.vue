@@ -176,15 +176,15 @@
                 {{store.state.strings.modals_select_stock_image}}
               </button>
               <div
-                v-if="selectedImagePath"
+                v-if="previewImage"
                 class="image-preview-container"
               >
                 <img
-                  :src="selectedImagePath"
+                  :src="previewImage"
                   alt="Selected Image"
                   class="image-preview"
                 >
-                <button @click="selectedImagePath = ''" class="deselect-btn">Deselect</button>
+                <button v-if="selectedImagePath" @click="selectedImagePath = ''" class="deselect-btn">Deselect</button>
               </div>
               <div v-if="showImageSelection" class="image-selection-container">
                 <div v-for="path in imagePaths" :key="path" class="image-option" @click="selectImage(path.path)">
@@ -219,7 +219,7 @@
 <script setup>
 // import dependancies
 import { useStore } from 'vuex'
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 
 // define constants
 const store = useStore();
@@ -244,6 +244,12 @@ const selectedImagePath = ref('')
 const showCourseImageSelection = ref(false)
 const selectedCourseImagePath = ref('')
 const imagePaths = ref({})
+
+// Show the node's own image if it has one, otherwise fall back to the learning
+// path's default image (store.state.learningpath.image) - display only, so the
+// node's own selection stays empty and keeps inheriting the LP default, exactly
+// like the student view renders it (#459).
+const previewImage = computed(() => selectedImagePath.value || store.state.learningpath.image);
 
 const selectImage = (path) => {
   selectedImagePath.value = path;
