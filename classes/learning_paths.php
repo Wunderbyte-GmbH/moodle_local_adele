@@ -61,6 +61,10 @@ class learning_paths {
      */
     public static function save_learning_path($params) {
         global $DB, $USER;
+        // Refuse to persist a path with an incomplete condition (e.g. a
+        // "specific node completed" criterion with no node selected) - it would
+        // render the {node_name} placeholder and break the path (#450).
+        self::assert_conditions_complete($params['json']);
         $data = new stdClass();
         $data->name = $params['name'];
         $data->description = $params['description'];
@@ -107,6 +111,45 @@ class learning_paths {
             );
         }
         return 0;
+    }
+
+    /**
+     * Assert that every condition in the learning-path tree is fully configured.
+     *
+     * Currently guards the "specific node completed" restriction (label
+     * specific_course): it must have a node selected (data.value.courseid).
+     * An unselected node renders the literal {node_name} placeholder and breaks
+     * the path (#450). Throws so the save web service is rejected.
+     *
+     * @param string $jsonstring the learning-path json
+     * @return void
+     * @throws \moodle_exception when a condition is incomplete
+     */
+    public static function assert_conditions_complete($jsonstring) {
+        $json = json_decode($jsonstring, true);
+        if (!isset($json['tree']['nodes']) || !is_array($json['tree']['nodes'])) {
+            return;
+        }
+        foreach ($json['tree']['nodes'] as $node) {
+            foreach (['restriction', 'completion'] as $type) {
+                if (!isset($node[$type]['nodes']) || !is_array($node[$type]['nodes'])) {
+                    continue;
+                }
+                foreach ($node[$type]['nodes'] as $condition) {
+                    if (($condition['data']['label'] ?? '') !== 'specific_course') {
+                        continue;
+                    }
+                    if (empty($condition['data']['value']['courseid'])) {
+                        throw new \moodle_exception(
+                            'error_condition_no_node_selected',
+                            'local_adele',
+                            '',
+                            $node['data']['fullname'] ?? ($node['id'] ?? '')
+                        );
+                    }
+                }
+            }
+        }
     }
 
     /**

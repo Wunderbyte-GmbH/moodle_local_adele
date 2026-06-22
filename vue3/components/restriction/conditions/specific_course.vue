@@ -27,6 +27,12 @@
           {{ course.name }}
         </option>
       </select>
+      <div
+        v-if="selectedCourse === null || selectedCourse === undefined"
+        class="adele-condition-warning"
+      >
+        {{ store.state.strings.restriction_no_node_warning }}
+      </div>
     </div>
   </div>
 </template>
@@ -107,6 +113,13 @@ watch(() => data.value, () => {
 
 .form-select {
   max-width: 100%; /* Set a maximum width for the select */
+}
+
+.adele-condition-warning {
+  margin-top: 6px;
+  color: #b94a48;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 /* Add any additional styling as needed */

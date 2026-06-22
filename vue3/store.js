@@ -28,6 +28,21 @@ import moodleAjax from 'core/ajax';
 import moodleStorage from 'core/localstorage';
 import Notification from 'core/notification';
 
+// Returns true if any node carries a "specific node completed" (specific_course)
+// criterion with no node selected - an incomplete config that must not be saved (#450).
+function hasIncompleteSpecificCourse(json) {
+    const nodes = json && json.tree && json.tree.nodes ? json.tree.nodes : [];
+    return nodes.some(node =>
+        ['restriction', 'completion'].some(type => {
+            const conditions = node && node[type] && node[type].nodes ? node[type].nodes : [];
+            return conditions.some(c =>
+                c && c.data && c.data.label === 'specific_course' &&
+                !(c.data.value && c.data.value.courseid)
+            );
+        })
+    );
+}
+
 // Defining store for application
 export function createAppStore() {
     return createStore({
@@ -286,15 +301,34 @@ export function createAppStore() {
                 context.commit('setAvailablecourses', availablecourses);
             },
             async saveLearningpath(context, payload) {
-                const result = await ajax('local_adele_save_learningpath',
-                { userid: context.state.user,
-                  learningpathid: context.state.learningPathID,
-                  name: payload.name,
-                  description: payload.description,
-                  image: payload.image,
-                  json: JSON.stringify(payload.json),
-                  contextid: context.state.contextid,
-                });
+                // Frontend guard (#450): refuse an incomplete "specific node completed"
+                // criterion with a friendly message and without a round-trip. Throwing
+                // aborts the caller's post-save navigate/success steps.
+                if (hasIncompleteSpecificCourse(payload.json)) {
+                    Notification.alert(
+                        context.state.strings.restriction_incomplete_title,
+                        context.state.strings.restriction_no_node_warning
+                    );
+                    throw new Error('local_adele/incomplete-criterion');
+                }
+                let result;
+                try {
+                    result = await ajax('local_adele_save_learningpath',
+                    { userid: context.state.user,
+                      learningpathid: context.state.learningPathID,
+                      name: payload.name,
+                      description: payload.description,
+                      image: payload.image,
+                      json: JSON.stringify(payload.json),
+                      contextid: context.state.contextid,
+                    });
+                } catch (error) {
+                    // Silent backend backstop: if the server guard ever rejects (e.g. a
+                    // bypassed frontend), show its message in the same clean modal -
+                    // never the raw exception dialog with stack trace.
+                    Notification.alert(context.state.strings.restriction_incomplete_title, error.message);
+                    throw error;
+                }
                 context.dispatch('fetchLearningpaths');
                 return result.learningpath.id;
             },
