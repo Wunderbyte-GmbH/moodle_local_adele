@@ -336,6 +336,7 @@ $string['node_access_completion_after_all'] = 'Sie erreichen einen weiteren Absc
 $string['node_access_completion_before'] = 'Um diese Node abzuschließen, müssen Sie:';
 $string['node_access_completion_inbetween'] = 'Um diesen Kurs/Stapel abzuschließen, müssen Sie noch:';
 $string['node_access_not_accessible'] = 'Die Node ist noch nicht zugänglich. Um sie freizuschalten müssen Sie:';
+$string['node_not_accessible'] = 'Knoten nicht zugänglich';
 $string['node_access_nothing_defined'] = 'Kein Feedback verfügbar';
 $string['node_access_restriction_after'] = 'Die Node kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['node_access_restriction_before'] = 'Sie haben keinen Zugang zu dieser Node. Eine Freischaltung erfolgt, wenn:';

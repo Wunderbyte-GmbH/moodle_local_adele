@@ -261,6 +261,14 @@ const goToCourse = () => {
 const iconState = ref('initial');
 const iconClass = ref('fa-lock');
 const hasTimedCondition = ref(false);
+
+// The play button only navigates when the node is reachable (fa-play); when it is
+// locked (fa-lock) the hover hint must say "not accessible", not "go to course" (#462).
+const courseLinkTitle = computed(() =>
+  iconClass.value === 'fa-play'
+    ? store.state.strings.go_to_course
+    : store.state.strings.node_not_accessible
+);
 </script>
 
 <template>
@@ -286,7 +294,7 @@ const hasTimedCondition = ref(false);
             backgroundColor: cover_image ? '' : '#cccccc'
           }">
             <div class="overlay">
-              <button class="icon-link" :title="store.state.strings.go_to_course" @click="goToCourse">
+              <button class="icon-link" :title="courseLinkTitle" @click="goToCourse">
                 <div
                   :class="{ 'icon-with-ring': hasTimedCondition }"
                   :style="hasTimedCondition ? { backgroundImage: 'url(/local/adele/public/ring.png)' } : {}"

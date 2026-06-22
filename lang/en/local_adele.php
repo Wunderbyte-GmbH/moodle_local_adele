@@ -334,6 +334,7 @@ $string['node_access_completion_after_all'] = '[' . __LINE__ . ']Du kannst einen
 $string['node_access_completion_before'] = '[' . __LINE__ . ']Um diesen Kurs/diesen Stapel abzuschließen, musst du:';
 $string['node_access_completion_inbetween'] = '[' . __LINE__ . ']Um diesen Kurs/diesen Stapel abzuschließen, müssen Sie noch:';
 $string['node_access_not_accessible'] = '[' . __LINE__ . ']The node is not accessible yet. The restrictions are:';
+$string['node_not_accessible'] = '[' . __LINE__ . ']Node not accessible';
 $string['node_access_nothing_defined'] = '[' . __LINE__ . ']No user feedback available';
 $string['node_access_restriction_after'] = '[' . __LINE__ . ']Der Kurs/Der Stapel kann nicht (mehr) von Ihnen freigeschaltet werden.';
 $string['node_access_restriction_before'] = '[' . __LINE__ . ']Sie haben keinen Zugang zu diesem Kurs/diesem Stapel. Eine Freischaltung erfolgt, wenn:';
