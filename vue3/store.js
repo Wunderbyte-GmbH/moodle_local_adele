@@ -28,17 +28,31 @@ import moodleAjax from 'core/ajax';
 import moodleStorage from 'core/localstorage';
 import Notification from 'core/notification';
 
-// Returns true if any node carries a "specific node completed" (specific_course)
-// criterion with no node selected - an incomplete config that must not be saved (#450).
-function hasIncompleteSpecificCourse(json) {
+// Criteria that need a manual selection: label => the data.value field that must be set.
+// An empty selection leaks its placeholder / is unsatisfiable, so it must not be saved
+// (#450/#456 specific_course; also modquiz/catquiz).
+const ADELE_REQUIRED_VALUE = {
+    specific_course: 'courseid',
+    modquiz: 'quizid',
+    catquiz: 'testid',
+};
+
+// Returns true if any node carries a criterion that needs a selection but has none.
+function hasIncompleteCondition(json) {
     const nodes = json && json.tree && json.tree.nodes ? json.tree.nodes : [];
     return nodes.some(node =>
         ['restriction', 'completion'].some(type => {
             const conditions = node && node[type] && node[type].nodes ? node[type].nodes : [];
-            return conditions.some(c =>
-                c && c.data && c.data.label === 'specific_course' &&
-                !(c.data.value && c.data.value.courseid)
-            );
+            return conditions.some(c => {
+                const field = c && c.data ? ADELE_REQUIRED_VALUE[c.data.label] : undefined;
+                if (!field) {
+                    return false;
+                }
+                // "not selected" = null / undefined / empty string. A numeric 0 is a
+                // legitimate selection (catquiz parent-scale mode).
+                const v = c.data.value ? c.data.value[field] : undefined;
+                return v === null || v === undefined || v === '';
+            });
         })
     );
 }
@@ -304,10 +318,10 @@ export function createAppStore() {
                 // Frontend guard (#450): refuse an incomplete "specific node completed"
                 // criterion with a friendly message and without a round-trip. Throwing
                 // aborts the caller's post-save navigate/success steps.
-                if (hasIncompleteSpecificCourse(payload.json)) {
+                if (hasIncompleteCondition(payload.json)) {
                     Notification.alert(
                         context.state.strings.restriction_incomplete_title,
-                        context.state.strings.restriction_no_node_warning
+                        context.state.strings.criterion_incomplete_modal
                     );
                     throw new Error('local_adele/incomplete-criterion');
                 }

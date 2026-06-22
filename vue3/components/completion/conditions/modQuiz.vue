@@ -7,6 +7,12 @@
         :tests="quizzes"
         @update:value="updatedTest"
       />
+      <div
+        v-if="!selectedQuiz"
+        class="adele-condition-warning"
+      >
+        {{ store.state.strings.completion_no_quiz_warning }}
+      </div>
     </div>
     <div v-if="selectedQuiz">
       <div class="form-group">
@@ -113,6 +119,13 @@ const updatedTest = (test) => {
   font-size: 14px;
   border: 1px solid #ced4da;
   border-radius: 4px;
+}
+
+.adele-condition-warning {
+  margin-top: 6px;
+  color: #b94a48;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 </style>

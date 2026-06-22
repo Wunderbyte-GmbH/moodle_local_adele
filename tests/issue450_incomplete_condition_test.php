@@ -110,4 +110,79 @@ final class issue450_incomplete_condition_test extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists('local_adele_learning_paths', ['id' => $result['learningpath']->id]));
     }
+
+    /**
+     * Build a tree whose node carries a single completion condition of the given
+     * label and value.
+     *
+     * @param string $label
+     * @param array $value
+     * @return string json
+     */
+    private function tree_with_completion(string $label, array $value): string {
+        return json_encode([
+            'tree' => [
+                'nodes' => [
+                    [
+                        'id' => 'dndnode_1',
+                        'data' => ['fullname' => 'Node A'],
+                        'restriction' => ['nodes' => [], 'edges' => []],
+                        'completion' => [
+                            'nodes' => [
+                                ['id' => 'condition_1', 'data' => ['label' => $label, 'value' => $value]],
+                            ],
+                            'edges' => [],
+                        ],
+                    ],
+                ],
+                'edges' => [],
+            ],
+            'modules' => null,
+        ]);
+    }
+
+    /**
+     * A modquiz completion condition with no quiz selected must be refused (#450).
+     *
+     * @return void
+     */
+    public function test_save_rejects_incomplete_modquiz(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $ctxid = context_system::instance()->id;
+
+        $this->expectException(\moodle_exception::class);
+        save_learningpath::execute(2, 0, 'Broken modquiz', '', $this->tree_with_completion('modquiz', ['quizid' => null]), $ctxid, '');
+    }
+
+    /**
+     * A catquiz completion condition with no test selected must be refused (#450).
+     *
+     * @return void
+     */
+    public function test_save_rejects_incomplete_catquiz(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $ctxid = context_system::instance()->id;
+
+        $this->expectException(\moodle_exception::class);
+        save_learningpath::execute(2, 0, 'Broken catquiz', '', $this->tree_with_completion('catquiz', []), $ctxid, '');
+    }
+
+    /**
+     * catquiz testid = 0 is a legitimate selection (parent-scale mode) and must NOT
+     * be treated as incomplete.
+     *
+     * @return void
+     */
+    public function test_save_accepts_catquiz_test_zero(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $ctxid = context_system::instance()->id;
+
+        $result = save_learningpath::execute(2, 0, 'Catquiz parent scale', '', $this->tree_with_completion('catquiz', ['testid' => 0]), $ctxid, '');
+
+        $this->assertTrue($DB->record_exists('local_adele_learning_paths', ['id' => $result['learningpath']->id]));
+    }
 }

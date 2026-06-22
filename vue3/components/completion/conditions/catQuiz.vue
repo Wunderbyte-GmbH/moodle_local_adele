@@ -10,6 +10,12 @@
         :tests="tests"
         @update:value="updatedTest"
       />
+      <div
+        v-if="selectedTest === null || selectedTest === undefined"
+        class="adele-condition-warning"
+      >
+        {{ store.state.strings.completion_no_test_warning }}
+      </div>
       <div v-if="parentscales.length > 0">
         <select
           :id="`completion-${completion.node_id}-parent-scale`"
@@ -383,6 +389,13 @@ const updatedTest = (test) => {
     display: flex;
     align-items: center;
     cursor: pointer;
+}
+
+.adele-condition-warning {
+  margin-top: 6px;
+  color: #b94a48;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 </style>

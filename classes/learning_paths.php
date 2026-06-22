@@ -130,18 +130,30 @@ class learning_paths {
         if (!isset($json['tree']['nodes']) || !is_array($json['tree']['nodes'])) {
             return;
         }
+        // Criteria that require a manual selection: label => the data.value sub-field
+        // that must be set. An empty selection would leak its placeholder ({node_name},
+        // {quiz_name}) and/or be unsatisfiable, so saving it is refused (#450, #456).
+        $requiredvalue = [
+            'specific_course' => 'courseid', // "specific node completed" - needs a node.
+            'modquiz' => 'quizid',           // mod quiz completion - needs a quiz.
+            'catquiz' => 'testid',           // catquiz completion - needs a test.
+        ];
         foreach ($json['tree']['nodes'] as $node) {
             foreach (['restriction', 'completion'] as $type) {
                 if (!isset($node[$type]['nodes']) || !is_array($node[$type]['nodes'])) {
                     continue;
                 }
                 foreach ($node[$type]['nodes'] as $condition) {
-                    if (($condition['data']['label'] ?? '') !== 'specific_course') {
+                    $label = $condition['data']['label'] ?? '';
+                    if (!isset($requiredvalue[$label])) {
                         continue;
                     }
-                    if (empty($condition['data']['value']['courseid'])) {
+                    // "not selected" = null / unset / empty string. NOT a numeric 0,
+                    // which is a legitimate selection for catquiz (parent-scale mode).
+                    $selected = $condition['data']['value'][$requiredvalue[$label]] ?? null;
+                    if ($selected === null || $selected === '') {
                         throw new \moodle_exception(
-                            'error_condition_no_node_selected',
+                            'error_condition_incomplete',
                             'local_adele',
                             '',
                             $node['data']['fullname'] ?? ($node['id'] ?? '')
