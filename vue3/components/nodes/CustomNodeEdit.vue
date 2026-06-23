@@ -323,7 +323,6 @@ const courseLinkTitle = computed(() =>
             <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
           </div>
         </div>
-                <p v-if="statusMessage">{{ statusMessage }}</p>
       </div>
       <div v-if="data" class="card-footer">
         <UserInformation :data="data" @focusChanged="zoomOnParent" :status="statusMessage" />
