@@ -398,6 +398,7 @@ $string['placeholder_lp_search'] = '[' . __LINE__ . ']Search learning path';
 $string['placeholder_search'] = '[' . __LINE__ . ']Search courses';
 $string['pluginadministration'] = '[' . __LINE__ . ']learning path Administration';
 $string['pluginname'] = '[' . __LINE__ . ']Learning path';
+$string['task_check_timed_restrictions'] = 'Re-evaluate timed learning-path restrictions';
 $string['privacy:metadata:course_node_criteria'] = '[' . __LINE__ . ']Stores information about course node completion criteria for users.';
 $string['privacy:metadata:course_node_criteria:node_id'] = '[' . __LINE__ . ']The ID of the node.';
 $string['privacy:metadata:course_node_criteria:timecreated'] = '[' . __LINE__ . ']The time when the criteria record was created.';

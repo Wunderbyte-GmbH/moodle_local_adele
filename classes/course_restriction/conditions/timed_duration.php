@@ -160,10 +160,10 @@ class timed_duration implements course_restriction {
                         $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
                         // Check if the duration type is valid and calculate the end time.
                         if (
-                            isset($this->durationvaluearray[$durationvalue]) &&
+                            isset(self::DURATION_SECONDS[$durationvalue]) &&
                             !is_string($starttime)
                         ) {
-                            $totalseconds = $this->durationvaluearray[$durationvalue] * $selectedduration;
+                            $totalseconds = self::DURATION_SECONDS[$durationvalue] * $selectedduration;
                             $endtime = clone $starttime;
                             $endtime->modify("+{$totalseconds} seconds");
                             // Check if the current timestamp is between the start and end timestamps.
@@ -216,9 +216,9 @@ class timed_duration implements course_restriction {
      *            '1' for weeks, with each week being 604800 seconds;
      *            '2' for months, with each month approximated to 2629746 seconds (considering an average month duration).
      */
-    private $durationvaluearray = [
+    public const DURATION_SECONDS = [
         '0' => 86400, // Days.
         '1' => 604800, // Weeks.
-        '2' => 2629746, // Months.
+        '2' => 2629746, // Months (average).
     ];
 }

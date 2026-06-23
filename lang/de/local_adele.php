@@ -403,6 +403,7 @@ $string['placeholder_lp_search'] = 'Lernpfad suchen';
 $string['placeholder_search'] = 'Kurs suchen';
 $string['pluginadministration'] = 'Lernpfad-Verwaltung';
 $string['pluginname'] = 'Lernpfad';
+$string['task_check_timed_restrictions'] = 'Zeitgesteuerte Lernpfad-Voraussetzungen neu auswerten';
 $string['privacy:metadata:course_node_criteria'] = 'Speichert Informationen über Abschlusskriterien von Kursknoten für Nutzer.';
 $string['privacy:metadata:course_node_criteria:node_id'] = 'Die ID des Knotens.';
 $string['privacy:metadata:course_node_criteria:timecreated'] = 'Die Zeit, zu der der Kriteriumsdatensatz erstellt wurde.';

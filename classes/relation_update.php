@@ -29,7 +29,6 @@ namespace local_adele;
 
 use local_adele\course_completion\course_completion_status;
 use local_adele\course_restriction\course_restriction_status;
-use local_adele\helper\adhoc_task_helper;
 use local_adele\helper\user_path_relation;
 use local_adele\event\node_finished;
 use context_system;
@@ -1063,7 +1062,6 @@ class relation_update {
         foreach ($node['data']['course_node_id'] as $courseid) {
             if (!isset($node['data']['first_enrolled'])) {
                 $node['data']['first_enrolled'] = time();
-                adhoc_task_helper::set_scheduled_adhoc_tasks($node, $userpath);
             }
             if (isset($instances[$courseid])) {
                 $instance = $instances[$courseid];
