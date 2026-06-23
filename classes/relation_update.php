@@ -913,7 +913,7 @@ class relation_update {
                 }
             }
         }
-        return $string;
+        return self::strip_unresolved_placeholders($string);
     }
 
 
@@ -965,7 +965,22 @@ class relation_update {
             }
             $id = self::findnodebyid($nodes, $id);
         }
-        return $string;
+        return self::strip_unresolved_placeholders($string);
+    }
+
+    /**
+     * Remove any placeholder token ({snake_case}) that no condition resolved.
+     *
+     * A criterion with no node selected (now prevented on save, see #450) or one that
+     * references a since-deleted node never sets its placeholder, so the literal token
+     * would otherwise reach the student's feedback. Strip leftovers so they never show
+     * a raw {node_name} (GitHub #456).
+     *
+     * @param string $string The already-substituted feedback string.
+     * @return string The string with any remaining placeholder tokens removed.
+     */
+    public static function strip_unresolved_placeholders($string) {
+        return preg_replace('/\{[a-z0-9_]+\}/i', '', (string)$string);
     }
 
     /**
