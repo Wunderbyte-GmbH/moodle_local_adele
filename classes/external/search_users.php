@@ -19,6 +19,7 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use local_adele\users;
+use local_adele\learning_paths;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -55,6 +56,19 @@ class search_users extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'query' => $query,
         ]);
+
+        // This search powers the learning-path editor UI only. Restrict it to users
+        // who can edit learning paths (manager/assistant or an editor of some path);
+        // otherwise it was an unauthenticated, site-wide user/email directory dump (#464).
+        require_login();
+        if (!learning_paths::check_access()) {
+            throw new \required_capability_exception(
+                \context_system::instance(),
+                'local/adele:canmanage',
+                'nopermissions',
+                ''
+            );
+        }
 
         return users::load_users($params['query']);
     }
