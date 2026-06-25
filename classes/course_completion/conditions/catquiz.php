@@ -200,7 +200,9 @@ class catquiz implements course_completion {
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] =
                         '<a href="' . $CFG->wwwroot . '/mod/adaptivequiz/view.php?id=' .
                         $coursemoduleid->id .
-                        '" target="_blank">' . $test->name . '</a>';
+                        // #464 H4: escape the test name inside the intended anchor (v-html sink).
+                        '" target="_blank">' . format_string($test->name, true,
+                            ['context' => \context_system::instance()]) . '</a>';
                     } else {
                         $catquizzes[$complitionnode['id']]['placeholders']['quiz_name'] = 'Test';
                     }
@@ -458,7 +460,8 @@ class catquiz implements course_completion {
               'time' => date("j.n.y", $attemptsentries[$attempt['attemptid']]->endtime !== '0'
               ? $attemptsentries[$attempt['attemptid']]->endtime
               : $attemptsentries[$attempt['attemptid']]->timemodified),
-              'scale' => $scalemap[$scale]['name'],
+              // #464 H4: the scale name is rendered via v-html in the attempts list.
+              'scale' => format_string($scalemap[$scale]['name'], true, ['context' => \context_system::instance()]),
               'link' =>
                 $CFG->wwwroot . '/mod/adaptivequiz/attemptfinished.php?attempt=' .
                 $attempt['attemptid'] .

@@ -131,8 +131,11 @@ class specific_course implements course_restriction {
                     if (isset($restriction['data']['value']) && isset($restriction['data']['value']['courseid'])) {
                         foreach ($userpath->json['tree']['nodes'] as $usernode) {
                             if ($usernode['id'] == $restriction['data']['value']['courseid']) {
+                                // #464 H4: node_name is rendered via v-html, so escape the
+                                // name (the id match above is unaffected).
                                 $specificcourses[$restriction['id']]['placeholders']['node_name'] =
-                                    [$usernode['data']['fullname']];
+                                    [format_string($usernode['data']['fullname'], true,
+                                        ['context' => \context_system::instance()])];
                                 if (
                                     isset($usernode['data']['completion']) &&
                                     $usernode['data']['completion']['feedback']['status'] == 'completed'

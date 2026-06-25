@@ -135,7 +135,10 @@ class parent_courses implements course_restriction {
                             foreach ($userpath->json['tree']['nodes'] as $usernode) {
                                 if ($usernode['id'] == $coursesid) {
                                     $nodeexists = true;
-                                    $courselist[] = $usernode['data']['fullname'];
+                                    // #464 H4: node_name list is rendered via v-html; escape
+                                    // the name (the id match above is unaffected).
+                                    $courselist[] = format_string($usernode['data']['fullname'], true,
+                                        ['context' => \context_system::instance()]);
                                     if (
                                         isset($usernode['data']['completion']) &&
                                         $usernode['data']['completion']['feedback']['status'] == 'completed'
