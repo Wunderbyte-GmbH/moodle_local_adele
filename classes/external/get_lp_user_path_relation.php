@@ -73,6 +73,7 @@ class get_lp_user_path_relation extends external_api {
             'userpathid' => $userpathid,
             'contextid' => $contextid,
         ]);
+        global $USER;
         require_login();
         $context = context::instance_by_id($contextid);
         require_capability('local/adele:view', $context);
@@ -81,6 +82,26 @@ class get_lp_user_path_relation extends external_api {
         } else {
             $coursecontext = $context->get_course_context();
             $params['courseid'] = $coursecontext->instanceid;
+        }
+
+        // #464 H2: local/adele:view is granted to the `user` archetype, so every
+        // authenticated user holds it - it is NOT a boundary. This getter returns the
+        // requested user's email plus their full progress snapshot, so reading a path
+        // that is not your own must be restricted to a course teacher (:teacheredit,
+        // resolved up the module/course context) or an editor/manager/assistant
+        // (check_access() - the same gate the editor UI itself uses to grant access);
+        // otherwise any student could read any other student's progress + email by id
+        // (IDOR). The owner viewing their own path is always allowed (StudentView.vue
+        // passes userId == own).
+        if ((int)$params['userpathid'] !== (int)$USER->id
+                && !has_capability('local/adele:teacheredit', $context)
+                && !learning_paths::check_access()) {
+            throw new \required_capability_exception(
+                $context,
+                'local/adele:teacheredit',
+                'nopermissions',
+                ''
+            );
         }
 
         return learning_paths::get_learning_user_relation($params);

@@ -77,6 +77,7 @@ class get_lp_user_path_relations extends external_api {
             'learningpathid' => $learningpathid,
             'contextid' => $contextid,
         ]);
+        global $USER;
         require_login();
 
         $context = context::instance_by_id($contextid);
@@ -87,6 +88,25 @@ class get_lp_user_path_relations extends external_api {
         } else {
             $coursecontext = $context->get_course_context();
             $params['courseid'] = $coursecontext->instanceid;
+        }
+
+        // #464 H2: local/adele:view is held by every authenticated user, so it is not a
+        // boundary. This leaderboard returns the whole participant roster (names +
+        // progress) for the path/course, so restrict it to course teachers / managers /
+        // path editors, or a user actually enrolled in the course it belongs to. The
+        // leaderboard is shown to participants (StudentView.vue) and teachers
+        // (TeacherView.vue), so enrolled participants must still pass; this only blocks
+        // enumeration of unrelated courses/paths.
+        $coursecontext = \context_course::instance($params['courseid']);
+        if (!has_capability('local/adele:teacheredit', $coursecontext)
+                && !learning_paths::check_access()
+                && !is_enrolled($coursecontext, $USER->id)) {
+            throw new \required_capability_exception(
+                $coursecontext,
+                'local/adele:teacheredit',
+                'nopermissions',
+                ''
+            );
         }
 
         return learning_paths::get_learning_user_relations($params);
