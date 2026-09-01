@@ -1,9 +1,9 @@
 Adaptive e-Learning Paths (moodle-local_adele)
-==================
+==============================================
 
-[![Moodle Plugin CI](https://github.com/Wunderbyte-GmbH/moodle-local_adele/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/Wunderbyte-GmbH/moodle-local_adele/actions?query=workflow%3A%22Moodle+Plugin+CI%22)
+[![Moodle Plugin CI](https://github.com/Wunderbyte-GmbH/moodle_local_adele/actions/workflows/moodle-plugin-ci.yml/badge.svg?branch=main)](https://github.com/Wunderbyte-GmbH/moodle_local_adele/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amain)
 
-AdeLe - Adaptive eLearning Paths - lets you build learning paths from independent Moodle courses: a graph of nodes, each with its own completion and access rules, edited graphically and evaluated per learner.
+AdeLe - Adaptive e-Learning Paths - lets you build learning paths from independent Moodle courses: a graph of nodes, each with its own completion and access rules, edited graphically and evaluated per learner.
 
 AdeLe is not a single plugin but a set of three that work as one system. They are developed together and declare each other as dependencies, so they can only be installed and updated as a set.
 
@@ -19,7 +19,7 @@ Because the responsibilities are split this way, no rule exists twice: the learn
 Requirements
 ------------
 
-This plugin requires Moodle 4.5
+This plugin requires Moodle 4.5+
 
 It also requires the other AdeLe plugins. All three are developed together and must be installed in matching versions:
 
@@ -28,7 +28,7 @@ It also requires the other AdeLe plugins. All three are developed together and m
 * **enrol_adele (AdeLe enrolment)** - required dependency, declared in version.php\
   https://github.com/Wunderbyte-GmbH/moodle-enrol_adele
 
-Optionally, **local_catquiz** can be used as a completion condition for computerized adaptive testing. That integration is guarded, so the plugin works without it. Additionally, you might consider to also install **local_instantcoursecompletion** for a faster system response to course completions. (https://marketplace.moodle.com/plugins/local_instantcoursecompletion)
+Optionally, **local_catquiz** can be used as a completion condition for computerized adaptive testing. That integration is guarded, so the plugin works without it.
 
 
 Motivation for this plugin
@@ -87,18 +87,12 @@ This plugin also introduces these additional scheduled tasks:
 Learner state is recomputed in response to Moodle events - course completion, quiz attempts, enrolments, path updates - rather than on a schedule, so a change is visible immediately.
 
 
-How this plugin works / Pitfalls
---------------------------------
+How this plugin works
+---------------------
 
 A learning path is stored as a JSON graph: nodes with the courses they point at, edges between them, and per-node conditions. For each subscribed learner a second record holds their state through that graph - which node is accessible, which is completed, plus any manual overrides a teacher has set.
 
 That per-learner record is the only copy of the learner's progress. It is written when they are enrolled into a course that hosts the path, updated by the recompute pipeline, and removed by enrol_adele when no embedding carries them any more - deferred, and only after a re-check.
-
-**Pitfall:** subscription happens on enrolment into the **host** course, never into a node course. Matching any course referenced anywhere in the graph used to cause spurious subscriptions and a cascade of unrelated auto-enrolments.
-
-**Pitfall:** the frontend is a Vue 3 application compiled into `amd/build/`. The compiled bundle is what Moodle loads and what is shipped; the `vue3/` source tree is build tooling and is not part of a release archive. After changing the frontend, the bundle has to be rebuilt and committed - Moodle does not build it.
-
-**Pitfall:** the Vue components access language strings dynamically through the store, so static analysis cannot tell reliably which strings are unused. Treat any such list with suspicion.
 
 
 Theme support
@@ -114,7 +108,7 @@ Plugin repositories
 This plugin is not published in the Moodle plugins repository.
 
 The latest development version can be found on Github:
-https://github.com/Wunderbyte-GmbH/moodle-local_adele
+https://github.com/Wunderbyte-GmbH/moodle_local_adele
 
 
 Bug and problem reports / Support requests
@@ -177,10 +171,11 @@ Maintainers
 The plugin is maintained by\
 Wunderbyte GmbH
 
+
 Copyright
 ---------
 
 The copyright of this plugin is held by\
-Wunderbyte GmbH 
+Wunderbyte GmbH
 
 Individual copyrights of individual developers are tracked in PHPDoc comments and Git commits.
