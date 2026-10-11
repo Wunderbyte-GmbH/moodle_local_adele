@@ -96,6 +96,13 @@ if (strpos($CFG->wwwroot, 'https://') !== 0) {
 $admin = get_admin();
 $DB->set_field('user', 'password', hash_internal_user_password($adminpassword), ['id' => $admin->id]);
 
+// No user tours on a test site. Core's tours ("Find your way around") open
+// for any account that has not dismissed them yet and lay a backdrop over
+// the page - whether a click lands first or the tour does is a race the
+// browser suite cannot win reliably. They belong to Moodle, not to ADELE.
+$DB->set_field('tool_usertours_tours', 'enabled', 0);
+\cache::make('tool_usertours', 'tourdata')->purge();
+
 // The fixture accounts come from the backup with unknown passwords.
 $fixturepassword = getenv('ADELE_FIXTURE_PASSWORD') ?: 'Playwright!23';
 
@@ -645,25 +652,37 @@ foreach ($imported as $pathid) {
     }
 }
 
-// A second host course, deliberately EMPTY: the chain about the other
-// participant source ("people enrolled in a starting node") must not inherit
-// the members of the first one, or it could not tell the two sources apart.
-$hostcourse2 = $DB->get_record('course', ['shortname' => 'E2EHOST2']);
-if (!$hostcourse2) {
-    $hostcourse2 = create_course((object) [
-        'shortname' => 'E2EHOST2',
-        'fullname' => 'E2E host course (starting node source)',
-        'category' => (int) $options['category'],
-        'summary' => 'Host course for the second participant source. Created by seed_fixtures.php.',
-        'summaryformat' => FORMAT_HTML,
-    ]);
-}
-foreach ($DB->get_records('adele', ['course' => $hostcourse2->id]) as $activity) {
-    $cm = get_coursemodule_from_instance('adele', $activity->id, $hostcourse2->id);
-    if ($cm) {
-        course_delete_module($cm->id);
+// Further host courses, deliberately EMPTY, one per scenario of plan
+// section 16: every scenario embeds the path into a course of its own, so
+// the effects of one participant source or host mode cannot leak into
+// another's assertions.
+// E2EHOST2: source "starting node"            (H2)
+// E2EHOST3: source "any course of the path"   (H2)
+// E2EHOST4: source "starting node", mode hidden  (H3)
+// E2EHOST5: source "starting node", mode none    (H3)
+// E2EHOST6: sources "this course" + "starting node" combined (H2).
+$extrahosts = [];
+foreach ([2, 3, 4, 5, 6] as $number) {
+    $shortname = 'E2EHOST' . $number;
+    $course = $DB->get_record('course', ['shortname' => $shortname]);
+    if (!$course) {
+        $course = create_course((object) [
+            'shortname' => $shortname,
+            'fullname' => 'E2E host course ' . $number,
+            'category' => (int) $options['category'],
+            'summary' => 'Host course for one embedding scenario. Created by seed_fixtures.php.',
+            'summaryformat' => FORMAT_HTML,
+        ]);
     }
+    foreach ($DB->get_records('adele', ['course' => $course->id]) as $activity) {
+        $cm = get_coursemodule_from_instance('adele', $activity->id, $course->id);
+        if ($cm) {
+            course_delete_module($cm->id);
+        }
+    }
+    $extrahosts[$number] = $course;
 }
+$hostcourse2 = $extrahosts[2];
 
 $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
 $manual = enrol_get_plugin('manual');
@@ -674,6 +693,46 @@ $manualinstance = $DB->get_record('enrol', [
 foreach ($hostmembers as $member) {
     if ($manual && $manualinstance && $studentroleid) {
         $manual->enrol_user($manualinstance, $member->id, $studentroleid);
+    }
+}
+
+// A learner who is ONLY in a later node's course of the reference path (T03,
+// node 3), in no host course and on no path: the third participant source
+// ("any course of the learning path") is about exactly this person - and the
+// second source ("starting node") must NOT reach them.
+$nodelearner = $learners[$position + 4] ?? null;
+if ($nodelearner) {
+    $nodecourse = $DB->get_record('course', ['shortname' => 'T03']);
+    if ($nodecourse) {
+        $nodeinstance = $DB->get_record('enrol', [
+            'courseid' => $nodecourse->id,
+            'enrol' => 'manual',
+        ], '*', IGNORE_MULTIPLE);
+        if ($manual && $nodeinstance && $studentroleid) {
+            $manual->enrol_user($nodeinstance, $nodelearner->id, $studentroleid);
+        }
+    }
+    foreach ($imported as $pathid) {
+        $DB->delete_records('local_adele_path_user', [
+            'learning_path_id' => $pathid,
+            'user_id' => $nodelearner->id,
+        ]);
+        if (class_exists('\\enrol_adele\\local\\reconciler')) {
+            \enrol_adele\local\reconciler::purge_user($pathid, $nodelearner->id);
+            \enrol_adele\local\reconciler::purge_all_host_user($pathid, $nodelearner->id);
+        }
+    }
+}
+
+// The combined-sources scenario (E2EHOST6) needs one member of its own.
+$combomember = reset($hostmembers);
+if ($combomember && $manual && $studentroleid) {
+    $comboinstance = $DB->get_record('enrol', [
+        'courseid' => $extrahosts[6]->id,
+        'enrol' => 'manual',
+    ], '*', IGNORE_MULTIPLE);
+    if ($comboinstance) {
+        $manual->enrol_user($comboinstance, $combomember->id, $studentroleid);
     }
 }
 
@@ -745,7 +804,13 @@ foreach (
     }
 }
 printf("export ADELE_FIXTURE_HOST_COURSE='%d'\n", $hostcourse->id);
-printf("export ADELE_FIXTURE_HOST_COURSE_2='%d'\n", $hostcourse2->id);
+foreach ($extrahosts as $number => $course) {
+    printf("export ADELE_FIXTURE_HOST_COURSE_%d='%d'\n", $number, $course->id);
+}
+if ($nodelearner) {
+    printf("export ADELE_FIXTURE_NODE_LEARNER='%s'\n", $nodelearner->username);
+    printf("export ADELE_FIXTURE_NODE_LEARNER_NAME='%s'\n", fullname($nodelearner));
+}
 foreach (array_values($hostmembers) as $index => $member) {
     printf("export ADELE_FIXTURE_HOST_MEMBER_%d='%s'\n", $index + 1, $member->username);
     // The participants list addresses people by display name, not by login.

@@ -45,6 +45,13 @@ class enrollment {
      * @param object $event
      */
     public static function enrolled($event) {
+        // An enrolment ADELE created itself - into a node course or a host
+        // course of some learning path - is not taking part in a course.
+        // Counting it would carry the person into every other path embedded
+        // there, and from there on through shared courses (mod_adele #37).
+        if ((($event->other ?? [])['enrol'] ?? '') === 'adele') {
+            return;
+        }
         $params = $event;
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
