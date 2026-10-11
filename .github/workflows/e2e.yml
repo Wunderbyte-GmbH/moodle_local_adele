@@ -243,6 +243,16 @@ jobs:
           # missing rather than resolving whatever is current that day.
           npm ci
           npx playwright install --with-deps chromium
+          # The server test clock for the time chains (plan section 9):
+          # libfaketime, preloaded into the PHP processes only.
+          sudo apt-get install -y -qq faketime >/dev/null
+          lib="$(dpkg -L libfaketime | grep -m1 '/libfaketime.so.1$')"
+          if [ -z "$lib" ]; then
+            echo "::error::libfaketime.so.1 not found after installing faketime."
+            exit 1
+          fi
+          echo "ADELE_FAKETIME_LIB=$lib" >> "$GITHUB_ENV"
+          echo "ADELE_FAKETIME_FILE=$RUNNER_TEMP/adele-faketime.rc" >> "$GITHUB_ENV"
 
       - name: Run the E2E suite
         run: |
@@ -253,7 +263,11 @@ jobs:
           # The web server runs inside THIS step. One started in an earlier
           # step does not reliably survive into the next, which surfaces as a
           # browser run against a target that has gone away.
-          PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$MOODLE_WEBROOT" \
+          # Under the test clock: the chains move it through
+          # ADELE_FAKETIME_FILE; it starts on the real time.
+          echo "+0s" > "$ADELE_FAKETIME_FILE"
+          LD_PRELOAD="$ADELE_FAKETIME_LIB" FAKETIME_TIMESTAMP_FILE="$ADELE_FAKETIME_FILE" FAKETIME_NO_CACHE=1 \
+            PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$MOODLE_WEBROOT" \
             >"$RUNNER_TEMP/moodle-server.log" 2>&1 &
           server_pid=$!
           sleep 2

@@ -378,6 +378,181 @@ foreach (
     $roleusers[$roleshortname] = $person;
 }
 
+/**
+ * The access criterion of a node with exactly ONE condition, wired the way
+ * the editor wires it: the condition starts the chain (parentCondition
+ * "starting_condition") and points at its feedback node, which points back.
+ *
+ * Built from the fixture's own nodes, so the structure is the editor's
+ * rather than an imitation.
+ *
+ * @param array $first A first condition of some fixture node (wiring template).
+ * @param array $feedback The feedback node belonging to it.
+ * @param array $data The data of the condition to install (label, value, texts).
+ * @return array The restriction: nodes and edges.
+ */
+function local_adele_fixture_single_condition(array $first, array $feedback, array $data): array {
+    $condition = $first;
+    $condition['id'] = 'condition_1';
+    $condition['data'] = $data;
+    $condition['parentCondition'] = ['starting_condition'];
+    $condition['childCondition'] = ['condition_1_feedback'];
+    $feedback['id'] = 'condition_1_feedback';
+    $feedback['data']['childCondition'] = 'condition_1';
+    return [
+        'nodes' => [$condition, $feedback],
+        'edges' => [[
+            'id' => 'condition_1-condition_1_feedback',
+            'source' => 'condition_1',
+            'sourceHandle' => 'target_and',
+            'target' => 'condition_1_feedback',
+            'targetHandle' => 'source_feedback',
+        ]],
+    ];
+}
+
+/**
+ * Create or refresh a fixture path derived from another one, with a new
+ * access criterion on its entry node, and subscribe one dedicated learner.
+ *
+ * @param string $name Name of the path.
+ * @param array $base Decoded JSON of the path to derive from.
+ * @param array $restriction The entry node's new access criterion.
+ * @param string $username The learner's account (created if missing).
+ * @param string $lastname The learner's last name.
+ * @param string $password The fixture password.
+ * @return array [path id, learner record, relation timecreated]
+ */
+function local_adele_fixture_derived_path(
+    string $name,
+    array $base,
+    array $restriction,
+    string $username,
+    string $lastname,
+    string $password
+): array {
+    global $DB, $CFG;
+    foreach ($base['tree']['nodes'] as $n => $node) {
+        if ($node['id'] === 'dndnode_1') {
+            $base['tree']['nodes'][$n]['restriction'] = $restriction;
+        }
+    }
+    $record = (object) [
+        'name' => $name,
+        'description' => 'E2E fixture derived from Linear A1: ' . $name . '.',
+        'json' => json_encode($base),
+        'timemodified' => time(),
+        'createdby' => get_admin()->id,
+        'visibility' => 1,
+    ];
+    $existing = $DB->get_record('local_adele_learning_paths', ['name' => $name]);
+    if ($existing) {
+        $record->id = $existing->id;
+        $DB->update_record('local_adele_learning_paths', $record);
+        $pathid = (int) $existing->id;
+    } else {
+        $record->timecreated = time();
+        $pathid = (int) $DB->insert_record('local_adele_learning_paths', $record);
+    }
+    $learner = $DB->get_record('user', ['username' => $username, 'deleted' => 0]);
+    if (!$learner) {
+        $learner = (object) [
+            'username' => $username,
+            'firstname' => 'Fixture',
+            'lastname' => $lastname,
+            'email' => $username . '@example.invalid',
+            'auth' => 'manual',
+            'confirmed' => 1,
+            'mnethostid' => $CFG->mnet_localhost_id,
+        ];
+        $learner->id = user_create_user($learner, false, false);
+        $learner = $DB->get_record('user', ['id' => $learner->id]);
+    }
+    $DB->set_field('user', 'password', hash_internal_user_password($password), ['id' => $learner->id]);
+    $DB->delete_records('local_adele_path_user', ['learning_path_id' => $pathid, 'user_id' => $learner->id]);
+    if (class_exists('\\enrol_adele\\local\\reconciler')) {
+        \enrol_adele\local\reconciler::purge_user($pathid, $learner->id);
+    }
+    \local_adele\enrollment::subscribe_user_to_learning_path(
+        $DB->get_record('local_adele_learning_paths', ['id' => $pathid]),
+        (object) ['relateduserid' => $learner->id, 'userid' => get_admin()->id]
+    );
+    $created = (int) $DB->get_field(
+        'local_adele_path_user',
+        'timecreated',
+        ['learning_path_id' => $pathid, 'user_id' => $learner->id]
+    );
+    return [$pathid, $learner, $created];
+}
+
+// A learning path whose ENTRY node is open only within a fixed window - for
+// the chains about time (plan section 9). Derived from the imported
+// "Linear A1": same courses and structure, but the entry node's access
+// criterion is replaced by a single timed condition, 2030-01-15 10:00 to
+// 12:00 UTC. The chains move the server's clock there (libfaketime); with the
+// real clock the window lies in the future and the course stays closed.
+// Boundaries are timestamps and half-open (#581).
+/** @var int Start of the fixture window: 2030-01-15 10:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_WINDOW_START = 1894701600;
+/** @var int End of the fixture window: 2030-01-15 12:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_WINDOW_END = 1894708800;
+$timepath = null;
+$timelearner = null;
+$durationpath = null;
+$durationlearner = null;
+$durationcreated = 0;
+if (!empty($imported['Linear A1'])) {
+    $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
+    $timedtemplate = null;
+    $firsttemplate = null;
+    $feedbacktemplate = null;
+    foreach ($base['tree']['nodes'] as $node) {
+        foreach ($node['restriction']['nodes'] ?? [] as $condition) {
+            if (($condition['data']['label'] ?? '') === 'timed' && !$timedtemplate) {
+                $timedtemplate = $condition;
+            }
+            if (($condition['parentCondition'][0] ?? '') === 'starting_condition' && !$firsttemplate) {
+                $firsttemplate = $condition;
+            }
+            if (($condition['id'] ?? '') === 'condition_1_feedback' && !$feedbacktemplate) {
+                $feedbacktemplate = $condition;
+            }
+        }
+    }
+    if ($timedtemplate && $firsttemplate && $feedbacktemplate) {
+        // T1/T2: a fixed window.
+        $data = $timedtemplate['data'];
+        $data['value'] = ['start' => LOCAL_ADELE_FIXTURE_WINDOW_START, 'end' => LOCAL_ADELE_FIXTURE_WINDOW_END];
+        [$timepath, $timelearner] = local_adele_fixture_derived_path(
+            'E2E Zeitfenster',
+            $base,
+            local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $data),
+            'fx_time_learner',
+            'Time',
+            $fixturepassword
+        );
+
+        // T3: a relative window - one day from the learner's assignment to
+        // the path (selectedOption "0"; "1" would count from the first
+        // enrolment into the node).
+        $data = $timedtemplate['data'];
+        $data['label'] = 'timed_duration';
+        $data['name'] = get_string('course_name_condition_timed_duration', 'local_adele');
+        $data['description'] = get_string('course_description_condition_timed_duration', 'local_adele');
+        $data['description_before'] = get_string('course_restricition_before_condition_timed_duration', 'local_adele');
+        $data['information'] = get_string('course_information_condition_timed_duration', 'local_adele');
+        $data['value'] = ['selectedOption' => '0', 'durationValue' => '0', 'selectedDuration' => 1];
+        [$durationpath, $durationlearner, $durationcreated] = local_adele_fixture_derived_path(
+            'E2E Zeitdauer',
+            $base,
+            local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $data),
+            'fx_duration_learner',
+            'Duration',
+            $fixturepassword
+        );
+    }
+}
+
 // A teacher account for the chain about course roles, plus the setting that
 // chain depends on: local_adele turns a configured COURSE role into the
 // system role adeleassistant when it is assigned
@@ -544,6 +719,17 @@ printf("export ADELE_MOODLE_ROOT='%s'\n", $CFG->dirroot);
 if ($entrylearner) {
     printf("export ADELE_FIXTURE_ENTRY_LEARNER='%s'\n", $entrylearner->username);
     printf("export ADELE_FIXTURE_ENTRY_LEARNER_NAME='%s'\n", fullname($entrylearner));
+}
+if ($durationpath && $durationlearner) {
+    printf("export ADELE_FIXTURE_PATH_DURATION='%d'\n", $durationpath);
+    printf("export ADELE_FIXTURE_DURATION_LEARNER='%s'\n", $durationlearner->username);
+    printf("export ADELE_FIXTURE_DURATION_FROM='%d'\n", $durationcreated);
+}
+if ($timepath && $timelearner) {
+    printf("export ADELE_FIXTURE_PATH_TIMEWINDOW='%d'\n", $timepath);
+    printf("export ADELE_FIXTURE_TIME_LEARNER='%s'\n", $timelearner->username);
+    printf("export ADELE_FIXTURE_TIMEWINDOW_START='%d'\n", LOCAL_ADELE_FIXTURE_WINDOW_START);
+    printf("export ADELE_FIXTURE_TIMEWINDOW_END='%d'\n", LOCAL_ADELE_FIXTURE_WINDOW_END);
 }
 printf("export ADELE_FIXTURE_TEACHER='%s'\n", $teacher->username);
 printf("export ADELE_FIXTURE_TEACHER_NAME='%s'\n", fullname($teacher));

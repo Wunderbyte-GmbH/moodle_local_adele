@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
 import { Page, expect } from '@playwright/test';
 
 /**
@@ -90,7 +91,59 @@ export function drainTaskQueue(): void {
   execFileSync('php', ['-d', 'max_input_vars=5000', 'admin/cli/adhoc_task.php', '--execute'], {
     cwd: fixture('ADELE_MOODLE_ROOT'),
     encoding: 'utf8',
+    // The task runner must see the same (possibly shifted) time as the web
+    // server, or a task the server considers due would be refused here.
+    env: { ...process.env, ...serverTimeEnv() },
   });
+}
+
+/**
+ * Environment that puts a PHP process on the shared test clock.
+ *
+ * The test clock is libfaketime, preloaded into the PHP processes only - the
+ * web server and the CLI task runner - and steered through one file. The
+ * browser, the database and the test runner itself keep the real time.
+ * Empty when the suite runs without a test clock.
+ */
+export function serverTimeEnv(): Record<string, string> {
+  const lib = process.env.ADELE_FAKETIME_LIB;
+  const file = process.env.ADELE_FAKETIME_FILE;
+  if (!lib || !file) {
+    return {};
+  }
+  return { LD_PRELOAD: lib, FAKETIME_TIMESTAMP_FILE: file, FAKETIME_NO_CACHE: '1' };
+}
+
+/**
+ * Whether this run has a test clock at all.
+ */
+export const hasServerClock = (): boolean => Object.keys(serverTimeEnv()).length > 0;
+
+/**
+ * Move the server's clock to an absolute instant (Unix seconds).
+ *
+ * Written as an offset from the real time, so the server clock keeps running
+ * forwards from there - a frozen clock would stall Moodle's own waiting loops.
+ *
+ * @param epoch The instant the server should see as "now".
+ */
+export function setServerTime(epoch: number): void {
+  const file = process.env.ADELE_FAKETIME_FILE;
+  if (!file) {
+    throw new Error('No test clock: ADELE_FAKETIME_FILE is not set.');
+  }
+  const offset = Math.round(epoch - Date.now() / 1000);
+  writeFileSync(file, `${offset >= 0 ? '+' : ''}${offset}s\n`);
+}
+
+/**
+ * Put the server back on the real time.
+ */
+export function resetServerTime(): void {
+  const file = process.env.ADELE_FAKETIME_FILE;
+  if (file) {
+    writeFileSync(file, '+0s\n');
+  }
 }
 
 /**
