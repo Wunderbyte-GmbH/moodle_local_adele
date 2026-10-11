@@ -29,8 +29,9 @@
  * nodes, the courses in them, and the edges between them.
  *
  * Note on the interface: the "and" zone is labelled "Alternative node", the
- * "or" zone "Add to node". The behaviour checked here is the code's; the
- * label of the "and" zone suggests the opposite and is reported separately.
+ * "or" zone "Add to node". With #584 the label fits the behaviour: the
+ * parallel node is a further predecessor, and one of them is enough by
+ * default. Only the internal name "and" does not fit; nobody sees it.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
