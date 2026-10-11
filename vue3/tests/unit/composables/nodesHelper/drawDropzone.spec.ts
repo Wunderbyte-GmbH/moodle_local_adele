@@ -96,29 +96,45 @@ describe('drawDropzone', () => {
     }
   });
 
-  it('should offset x-position when parentCourse or childCourse is not empty', async () => {
-    closestNode.parentCourse = ['some_course'];
-    closestNode.childCourse = ['some_course'];
+  // #595: a second successor / predecessor is not offered. The zones for it
+  // used to be drawn 500 units to the side, where they could not be hit.
+  const ids = (result: { nodes: { id: string }[] }): string[] => result.nodes.map(node => node.id).sort();
 
+  it('offers no successor zone at a node that has a successor', async () => {
+    closestNode.parentCourse = ['starting_node'];
+    closestNode.childCourse = ['dndnode_2'];
     const result = await drawDropzone(closestNode, store);
-
-    const parentDropZone = result.nodes.find(node => node.id === 'dropzone_parent');
-    const childDropZone = result.nodes.find(node => node.id === 'dropzone_child');
-
-    expect(parentDropZone).toBeDefined();
-    expect(childDropZone).toBeDefined();
-
-    if (parentDropZone) {
-      // Offset x-position by 500 when courses are defined
-      expect(parentDropZone.position.x).toBe(600); // 100 + 500
-    }
-
-    if (childDropZone) {
-      // Offset x-position by 500 when courses are defined
-      expect(childDropZone.position.x).toBe(600);  // 100 + 500
-    }
+    expect(ids(result)).toEqual(['dropzone_and', 'dropzone_or', 'dropzone_parent']);
+    expect(result.edges.map(edge => edge.id)).toEqual(['node1-parent']);
   });
 
+  it('offers no predecessor zone at a node that has a predecessor', async () => {
+    closestNode.parentCourse = ['dndnode_1'];
+    closestNode.childCourse = [];
+    const result = await drawDropzone(closestNode, store);
+    expect(ids(result)).toEqual(['dropzone_and', 'dropzone_child', 'dropzone_or']);
+  });
 
+  it('offers only the side zones in the middle of a chain', async () => {
+    closestNode.parentCourse = ['dndnode_1'];
+    closestNode.childCourse = ['dndnode_3'];
+    const result = await drawDropzone(closestNode, store);
+    expect(ids(result)).toEqual(['dropzone_and', 'dropzone_or']);
+    expect(result.edges).toEqual([]);
+  });
+
+  it('offers all four at a single node, none of them to the side', async () => {
+    const result = await drawDropzone(closestNode, store);
+    expect(ids(result)).toEqual(['dropzone_and', 'dropzone_child', 'dropzone_or', 'dropzone_parent']);
+    expect(result.nodes.find(node => node.id === 'dropzone_parent')!.position.x).toBe(100);
+    expect(result.nodes.find(node => node.id === 'dropzone_child')!.position.x).toBe(100);
+  });
+
+  it('treats a node without the lists like one with empty lists', async () => {
+    delete closestNode.parentCourse;
+    delete closestNode.childCourse;
+    const result = await drawDropzone(closestNode, store);
+    expect(ids(result)).toEqual(['dropzone_and', 'dropzone_child', 'dropzone_or', 'dropzone_parent']);
+  });
 
 });

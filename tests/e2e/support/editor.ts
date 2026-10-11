@@ -217,6 +217,58 @@ export async function dragOntoZone(page: Page, zone: DropZone): Promise<boolean>
 }
 
 /**
+ * The zones drawn right now, e.g. ["and", "child", "or"].
+ *
+ * @param page The page.
+ */
+export async function offeredZones(page: Page): Promise<string[]> {
+  const ids = await page.locator('.vue-flow__node[data-id^="dropzone_"]')
+    .evaluateAll((els) => els.map((el) => String(el.getAttribute('data-id')).replace('dropzone_', '')));
+  return ids.sort();
+}
+
+/**
+ * During a drag: lead the pointer from the middle of a node to the middle of
+ * one of its zones, the way a hand does - in steps, not in one jump - and
+ * say whether the editor registers the pointer on the zone at the end.
+ *
+ * A jump proves little about reachability: what goes wrong on the way (the
+ * zones handed to another node, or removed for being "too far") only shows
+ * when the way is actually travelled.
+ *
+ * @param page The page.
+ * @param node The node the zones belong to.
+ * @param zone The zone to reach.
+ * @param steps How many steps the way is cut into.
+ * @returns Whether the zone shows the hit.
+ */
+export async function leadOntoZone(page: Page, node: string, zone: DropZone, steps = 14): Promise<boolean> {
+  const zoneLocator = flowNode(page, `dropzone_${zone}`);
+  const from = await boxNow(flowNode(page, node));
+  const to = await boxNow(zoneLocator);
+  const area = await pane(page).boundingBox();
+  if (!from || !to || !area) {
+    return false;
+  }
+  const start = { x: from.x + from.width / 2, y: from.y + from.height / 2 };
+  const end = { x: to.x + to.width / 2, y: to.y + to.height / 2 };
+  for (let step = 1; step <= steps; step++) {
+    await pane(page).hover({
+      position: {
+        x: start.x + ((end.x - start.x) * step) / steps - area.x,
+        y: start.y + ((end.y - start.y) * step) / steps - area.y,
+      },
+      force: true,
+    });
+    // Longer than the 100 ms in which the editor looks at the pointer once.
+    await page.waitForTimeout(140);
+  }
+  await pane(page).hover({ position: { x: end.x - area.x + 1, y: end.y - area.y }, force: true });
+  await page.waitForTimeout(300);
+  return HIT.test(await zoneLocator.first().innerText({ timeout: 1_000 }).catch(() => ''));
+}
+
+/**
  * End a running drag without dropping anything: back to the sidebar, where
  * nothing accepts a drop.
  *

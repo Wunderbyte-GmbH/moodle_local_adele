@@ -135,12 +135,19 @@ const drawDropzone = async (closestNode: ClosestNode, store: Store): Promise<New
 
   const newDrop: NewDrop = { nodes: [], edges: [] };
 
-  await Promise.all(Object.keys(dropZoneCourseNodes).map(async key => {
+  // A node that already has a successor offers no zone for another one, and
+  // a node with a predecessor none for another predecessor (#595). Those
+  // zones used to be drawn 500 units to the side, where they could not be
+  // hit; the same structure is built from the side zones of the neighbour.
+  const offered = Object.keys(dropZoneCourseNodes).filter(key =>
+    (key !== 'child' && key !== 'parent') || isFree(closestNode, key));
+
+  await Promise.all(offered.map(async key => {
     const nodeInfo = dropZoneCourseNodes[key];
     const isConditional = key === 'and' || key === 'or';
 
     const position: Position = {
-      x: isConditional ? baseX + nodeInfo.positionX : getOffsetX(closestNode, key),
+      x: baseX + nodeInfo.positionX,
       y: isConditional ? offsetY : baseY + nodeInfo.positionY,
     };
 
@@ -178,16 +185,14 @@ const drawDropzone = async (closestNode: ClosestNode, store: Store): Promise<New
 
 
 
-const getOffsetX = (closestNode: ClosestNode, relation: string): number => {
-    let relationHandle = closestNode.childCourse
-    if(relation == 'parent'){
-      relationHandle = closestNode.parentCourse
-    }
-    if(relationHandle != undefined && (relationHandle.length == 0 ||
-    relationHandle.indexOf('starting_node') != -1)){
-      return closestNode.position.x
-    }
-    return closestNode.position.x + 500
+/**
+ * Whether the node has room for a predecessor ('parent') or a successor
+ * ('child'): nobody there yet - or, for the predecessor, only the starting
+ * marker.
+ */
+const isFree = (closestNode: ClosestNode, relation: string): boolean => {
+    const taken = (relation === 'parent' ? closestNode.parentCourse : closestNode.childCourse) || []
+    return taken.every(id => id === 'starting_node')
 }
 
 const getOffsetY = (closestNode: ClosestNode): number => {
