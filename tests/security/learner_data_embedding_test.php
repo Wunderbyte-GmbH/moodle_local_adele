@@ -22,6 +22,7 @@ use context_module;
 use context_system;
 use local_adele\external\get_lp_user_path_relation;
 use local_adele\external\get_lp_user_path_relations;
+use local_adele\external\save_lp_user_path_relation;
 
 /**
  * Learner data and the course the request claims to come from.
@@ -40,13 +41,23 @@ use local_adele\external\get_lp_user_path_relations;
  *
  * The rights now count only in a course that embeds the path.
  *
+ * Second half, same chain: authority that comes from the PATH. It was
+ * check_access() - "may edit some path" - and so gave every assistant and
+ * every collaborator of any path the learners of all paths. It is now the
+ * path itself: managers, and the editors of this path. And the write side:
+ * save_user_path_relation accepted the context of any course as well; a
+ * teacher of an unrelated course set a master completion for a learner of a
+ * foreign path (measured).
+ *
  * @package    local_adele
  * @category   test
  * @copyright  2026 Ralf Erlebach
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \local_adele\external\get_lp_user_path_relation
  * @covers \local_adele\external\get_lp_user_path_relations
+ * @covers \local_adele\external\save_lp_user_path_relation
  * @covers \local_adele\learning_paths::is_embedded_in_course
+ * @covers \local_adele\learning_paths::has_path_authority
  * @runTestsInSeparateProcesses
  */
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
@@ -261,5 +272,131 @@ final class learner_data_embedding_test extends advanced_testcase {
         $this->setUser($this->alpha);
         $this->expectException(\required_capability_exception::class);
         $this->roster($systemcontextid);
+    }
+
+    /**
+     * Somebody who may edit SOME path - an assistant by system role, and an
+     * editor of another path on top - has no say over the learners of this
+     * one.
+     */
+    public function test_editor_of_another_path_cannot_read_learner_data(): void {
+        global $DB;
+        $assistant = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('local/adele:assist', CAP_ALLOW, $roleid, context_system::instance());
+        role_assign($roleid, $assistant->id, context_system::instance());
+        $DB->insert_record('local_adele_lp_editors', (object) [
+            'userid' => $assistant->id,
+            'learningpathid' => $this->make_path('Their own path'),
+        ]);
+        $this->setUser($assistant);
+        $this->assertTrue((bool) \local_adele\learning_paths::check_access(), 'The precondition: may edit some path.');
+        $this->assertFalse(\local_adele\learning_paths::has_path_authority($this->lpid));
+
+        $modulecontextid = context_module::instance($this->activity->cmid)->id;
+        foreach ([$modulecontextid, context_system::instance()->id] as $contextid) {
+            try {
+                $this->roster($contextid);
+                $this->fail('The roster must be refused in context ' . $contextid);
+            } catch (\required_capability_exception $e) {
+                $this->assertSame('nopermissions', $e->errorcode);
+            }
+            try {
+                get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $contextid);
+                $this->fail('The snapshot must be refused in context ' . $contextid);
+            } catch (\required_capability_exception $e) {
+                $this->assertSame('nopermissions', $e->errorcode);
+            }
+        }
+    }
+
+    /**
+     * No regression: an editor of THIS path reads its learners, with no
+     * course involved.
+     */
+    public function test_editor_of_this_path_reads_learner_data(): void {
+        global $DB;
+        $editor = $this->getDataGenerator()->create_user();
+        $DB->insert_record('local_adele_lp_editors', (object) ['userid' => $editor->id, 'learningpathid' => $this->lpid]);
+        $this->setUser($editor);
+        $systemcontextid = context_system::instance()->id;
+
+        $this->assertSame([(int) $this->alpha->id, (int) $this->beta->id], $this->roster($systemcontextid));
+        $one = get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $systemcontextid);
+        $this->assertSame((int) $this->beta->id, (int) $one['user_id']);
+    }
+
+    /**
+     * Change a learner's path the way the path view does.
+     *
+     * @param int $contextid The context the client passes.
+     * @param int|null $payloadpath The path named inside the payload; defaults to the path of the call.
+     * @return array
+     */
+    private function save(int $contextid, ?int $payloadpath = null): array {
+        global $USER;
+        return save_lp_user_path_relation::execute(
+            $this->lpid,
+            (int) $USER->id,
+            json_encode([
+                'route' => ['learningpathId' => $payloadpath ?? $this->lpid, 'userId' => (int) $this->beta->id],
+                'nodes' => [],
+            ]),
+            $contextid
+        );
+    }
+
+    /**
+     * A teacher of an unrelated course must not change a learner's path.
+     */
+    public function test_teacher_of_another_course_cannot_change_a_learner_path(): void {
+        $foreign = $this->getDataGenerator()->create_and_enrol($this->other, 'teacher');
+        $this->setUser($foreign);
+        $this->expectException(\required_capability_exception::class);
+        $this->save(context_course::instance($this->other->id)->id);
+    }
+
+    /**
+     * The path that is written is the one named inside the payload - so the
+     * permission must be about that one. A teacher whose own course embeds
+     * some path must not write a foreign path by naming their own in the call.
+     */
+    public function test_payload_must_belong_to_the_path_of_the_call(): void {
+        $ownpath = $this->make_path('Embedded in the other course');
+        $this->embed($this->other, $ownpath, 1);
+        $foreign = $this->getDataGenerator()->create_and_enrol($this->other, 'editingteacher');
+        $this->setUser($foreign);
+        $this->expectException(\invalid_parameter_exception::class);
+        save_lp_user_path_relation::execute(
+            $ownpath,
+            (int) $foreign->id,
+            json_encode([
+                'route' => ['learningpathId' => $this->lpid, 'userId' => (int) $this->beta->id],
+                'nodes' => [],
+            ]),
+            context_course::instance($this->other->id)->id
+        );
+    }
+
+    /**
+     * A participant must not change anybody's path, the own one included.
+     */
+    public function test_participant_cannot_change_a_learner_path(): void {
+        $this->setUser($this->alpha);
+        $this->expectException(\required_capability_exception::class);
+        $this->save(context_module::instance($this->activity->cmid)->id);
+    }
+
+    /**
+     * No regression: the teacher of the embedding course and a manager
+     * change a learner's path.
+     */
+    public function test_teacher_of_the_embedding_course_changes_a_learner_path(): void {
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->host, 'editingteacher');
+        $this->setUser($teacher);
+        $this->assertTrue($this->save(context_module::instance($this->activity->cmid)->id)['success']);
+
+        $this->setAdminUser();
+        $this->assertTrue($this->save(context_system::instance()->id)['success']);
     }
 }

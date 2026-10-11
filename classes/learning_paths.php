@@ -1131,6 +1131,32 @@ class learning_paths {
     }
 
     /**
+     * Whether the current user has authority over a learning path AS A PATH,
+     * independent of any course: site administrators and managers
+     * (local/adele:canmanage in the system) over every path, everybody else
+     * over exactly the paths they are an editor of (lp_editors: the creator
+     * and the people added to it).
+     *
+     * This is what decides about the learner data of a path where no course
+     * right applies. check_access() is not enough for that: it only says the
+     * person may edit SOME path, and so gave every assistant and every
+     * collaborator of any path the learners of all paths.
+     *
+     * @param int $learningpathid The learning path.
+     * @return bool
+     */
+    public static function has_path_authority(int $learningpathid): bool {
+        global $DB, $USER;
+        if (is_siteadmin() || has_capability('local/adele:canmanage', context_system::instance())) {
+            return true;
+        }
+        return $learningpathid > 0 && $DB->record_exists('local_adele_lp_editors', [
+            'learningpathid' => $learningpathid,
+            'userid' => $USER->id,
+        ]);
+    }
+
+    /**
      * Require that the current user may edit the given learning path.
      *
      * Managers and site admins have full access; everyone else must be an editor

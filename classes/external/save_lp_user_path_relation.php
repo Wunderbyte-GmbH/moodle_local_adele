@@ -85,16 +85,33 @@ class save_lp_user_path_relation extends external_api {
         // get_lp_user_path_relation.php — canmanage/teacheredit is
         // system-/course-role-based, not course-enrolment-based; a manager
         // acting on a course they are not enrolled in is the normal case.
-        // Managers keep full access; editing-teachers may set a user's node status
+        // Managers keep full access; teachers may set a user's node status
         // (manual completion / master toggle) via teacheredit, without canmanage (#431).
-        if (!has_capability('local/adele:canmanage', $context)) {
-            require_capability('local/adele:teacheredit', $context);
+        // The context is client input: a right that comes from a course counts
+        // only in a course that EMBEDS this path. It used to count in any course,
+        // so a teacher of an unrelated course could complete nodes for the
+        // learners of every path - and thereby open their courses.
+        // The path that is actually written is named INSIDE the payload
+        // (route.learningpathId); the check below must be about that path.
+        $payload = json_decode($params['params']);
+        if (
+            !is_object($payload)
+            || (int) ($payload->route->learningpathId ?? 0) !== (int) $params['learningpathid']
+        ) {
+            throw new \invalid_parameter_exception('The payload does not belong to the learning path given.');
         }
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            $params['courseid'] = $context->instanceid;
-        } else {
-            $coursecontext = $context->get_course_context();
-            $params['courseid'] = $coursecontext->instanceid;
+        $coursecontext = $context->get_course_context(false);
+        $params['courseid'] = $coursecontext ? (int) $coursecontext->instanceid : 0;
+        if (!is_siteadmin() && !has_capability('local/adele:canmanage', \context_system::instance())) {
+            if (
+                !$coursecontext
+                || !learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid'])
+            ) {
+                throw new \required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');
+            }
+            if (!has_capability('local/adele:canmanage', $context)) {
+                require_capability('local/adele:teacheredit', $context);
+            }
         }
         return learning_paths::save_learning_user_relation($params);
     }
