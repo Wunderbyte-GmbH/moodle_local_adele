@@ -173,3 +173,41 @@ describe('LearningPathList.vue ownerless handling (#571)', () => {
   });
 });
 
+
+describe('LearningPathList.vue opening a path (#585)', () => {
+  it('leaves loading the path to the editor - the list does not request it', async () => {
+    const store = {
+      state: {
+        learningpaths: [{ id: 42, name: 'Path', description: 'd', visibility: 1, image: '', isowner: 'true' }],
+        viewlearningpaths: [],
+        editablepaths: {},
+        view: 'manager',
+        undoNodes: [],
+        contextid: 1,
+        user: 2,
+        learningPathID: 0,
+        strings: new Proxy({}, { get: (_t, k) => String(k) }),
+      },
+      dispatch: jest.fn().mockResolvedValue(undefined),
+      commit: jest.fn(),
+    };
+    const push = jest.fn();
+    useStore.mockReturnValue(store);
+    useRouter.mockReturnValue({ push });
+    const wrapper = mount(LearningPathList, {
+      global: { stubs: { HelpingSlider: true }, directives: { tooltip: {} } },
+    });
+    await wrapper.vm.$nextTick();
+
+    const edit = wrapper.findAll('button').find((button) => (button.attributes('aria-label') || '').startsWith('edit'));
+    expect(edit).toBeTruthy();
+    await edit.trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(store.state.learningPathID).toBe(42);
+    expect(push).toHaveBeenCalledWith({ name: 'learningpath-edit', params: { learningpathId: 42 } });
+    // Two loads of the same path raced; the later answer overwrote the title
+    // the person had typed in the meantime.
+    expect(store.dispatch).not.toHaveBeenCalledWith('fetchLearningpath');
+  });
+});

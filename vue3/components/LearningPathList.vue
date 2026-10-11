@@ -400,20 +400,20 @@ const showDeleteConfirm = (index) => {
   clicked.value[index] = true;
 };
 
-// Edit learning path deletion
+// The path itself is loaded by the view the route leads to
+// (LearningpathsEdit.showForm) - once. Loading it here as well meant two
+// requests, and the later answer overwrote what had been typed meanwhile (#585).
 const viewLearningpath = async (singlelearningpathid) => {
   store.state.learningPathID = singlelearningpathid
-  await store.dispatch('fetchLearningpath')
   router.push({
     name: 'learningpath-view',
     params: { learningpathId: singlelearningpathid  }
   })
 };
 
-// Edit learning path deletion
+// Open a learning path for editing (it is loaded by the target, see above).
 const editLearningpath = async (singlelearningpathid) => {
   store.state.learningPathID = singlelearningpathid
-  await store.dispatch('fetchLearningpath')
   router.push({
     name: 'learningpath-edit',
     params: { learningpathId: singlelearningpathid  }

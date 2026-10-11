@@ -49,7 +49,7 @@
           class="card p-4"
         >
           <div class="card-body">
-            <div v-if="store.state.learningpath">
+            <div v-if="pathLoaded && store.state.learningpath">
               <h2>
                 {{store.state.learningpath.name}}
               </h2>
@@ -113,7 +113,7 @@
             {{ store.state.strings.learningpath_form_title_edit }}
           </h2>
           <div>
-            <div v-if="store.state.learningpath">
+            <div v-if="pathLoaded && store.state.learningpath">
               <TextInputs
                 :goal="store.state.learningpath"
                 @change-GoalName="changeGoalName"
@@ -181,6 +181,10 @@ const goalname = ref('')
 const goaldescription = ref('')
 const learningpath = ref('')
 const copiedLearningpath = ref({})
+// Whether the path the route asks for has arrived (#585), and the running
+// number of the request that will say so.
+const pathLoaded = ref(false)
+let formRequest = 0
 const showBackConfirmation = ref(false)
 
 
@@ -261,9 +265,19 @@ const showForm = async (learningpathId = null) => {
   if (learningpathId) {
     store.state.learningPathID = learningpathId;
   }
-  learningpath.value = await store.dispatch('fetchLearningpath')
+  // The form is offered only once THIS path has arrived: until then the store
+  // still holds whatever was open before, and input typed into it would be
+  // overwritten by the answer (#585). A newer call supersedes an older one.
+  const request = ++formRequest
+  pathLoaded.value = false
+  const loaded = await store.dispatch('fetchLearningpath')
+  if (request !== formRequest) {
+    return
+  }
+  learningpath.value = loaded
   copiedLearningpath.value = JSON.parse(JSON.stringify(learningpath.value))
   store.state.editingadding = true
+  pathLoaded.value = true
   window.scrollTo(0, 0)
 };
 
