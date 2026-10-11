@@ -24,11 +24,18 @@
  *   assistant + collaborator, collaboration revoked -> the editor remains
  *                                                      reachable, this path
  *                                                      does not
- *   collaborator only, collaboration revoked -> access is gone
+ *   assistant + collaborator, assistant revoked -> the collaboration still
+ *                                                  opens its path
+ *   collaborator only, collaboration revoked -> nothing is left
+ *   owner + collaborator, collaboration revoked -> the owner keeps the path
+ *                                                  (known defect, see below)
  *
- * The other three rows need the revocation of a SYSTEM role, which the
- * plugin does not currently offer as a counterpart to its automatic
- * assignment - see docs/e2e-suite.md.
+ * "assistant only, assistant revoked" is decided at the end of
+ * roles-teacher-becomes-assistant.
+ *
+ * The assistant role is never revoked by the plugin (decision on
+ * local_adele #503/#509); "revoked" means an administrator takes the system
+ * role away on Moodle's own page.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -36,8 +43,11 @@
  */
 
 import { test, expect, Page, Locator } from '@playwright/test';
-import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import { env, loginAs } from '../support/env';
+import {
+  callService, fixture, fixturePassword, referencePath, saveLearningPath, setSystemRole, waitForEditorLoaded,
+} from '../support/fixtures';
+import { knownDefect } from '../support/feedback';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -186,5 +196,150 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
       await expect(own.getByRole('button', { name: /^(Edit|Bearbeiten):/ }),
         'an unrelated collaboration must not be swept up').toHaveCount(1);
     });
+  });
+
+  test('without the assistant role the collaboration still opens its path - and without that, nothing is left', async ({ page }) => {
+    const manager = fixture('ADELE_FIXTURE_MANAGER');
+    const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
+    const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
+    const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
+    const own = fixture('ADELE_FIXTURE_PATH_LINEAR_A2');
+    const renamed = `Linear A2 ohne Assistentenrolle ${Date.now()}`;
+    /** What the server answers when the person asks for the editors of their path. */
+    const editorsOfOwn = (): Promise<{ data?: unknown; error?: string }> =>
+      callService(page, 'local_adele_get_lp_edit_users', { contextid: 1, lpid: Number(own) });
+
+    await test.step('an administrator takes the system role away by hand', async () => {
+      await loginAs(page, env.adminUser, env.adminPassword);
+      await setSystemRole(page, 'Adele Assistant', assistantName, false);
+    });
+
+    try {
+      await test.step('collaborator only: no new paths, no foreign paths - but the path of the collaboration', async () => {
+        await loginAs(page, assistant, fixturePassword());
+        await openOverview(page);
+        await expect(rowOf(page, own)).toBeVisible({ timeout: 30_000 });
+        await expect(app(page).locator('[data-testid="learningpath-create"]'),
+          'creating paths came with the role and goes with it').toHaveCount(0);
+        await expect(rowOf(page, referencePath.id),
+          'a path the person does not collaborate on is no longer listed').toHaveCount(0);
+
+        await openEditor(page, own);
+        await renameAndReload(page, own, renamed);
+        await openEditor(page, own);
+        await renameAndReload(page, own, 'Linear A2');
+        expect((await editorsOfOwn()).error, 'the server answers a collaborator').toBeUndefined();
+      });
+
+      await test.step('the collaboration is revoked as well', async () => {
+        await loginAs(page, manager, fixturePassword());
+        await openEditor(page, own);
+        // A second person first: the interface protects the last editor.
+        await addCollaborator(page, managerName);
+        await removeCollaborator(page, assistantName);
+      });
+
+      await test.step('nothing is left of it: the path is not listed, and the server refuses', async () => {
+        await loginAs(page, assistant, fixturePassword());
+        await openOverview(page);
+        await expect(app(page).locator('[data-testid="learningpath-create"]')).toHaveCount(0);
+        // Given time to arrive: an empty list and a list not yet loaded look alike.
+        await page.waitForLoadState('networkidle');
+        await expect(rowOf(page, own),
+          'with neither role nor collaboration the path is not listed any more').toHaveCount(0);
+        await expect(rowOf(page, referencePath.id)).toHaveCount(0);
+        expect((await editorsOfOwn()).error, 'the server must refuse for lack of permission').toBe('nopermissions');
+      });
+    } finally {
+      // The other chains rely on this person being an assistant and the one
+      // editor of Linear A2.
+      await test.step('role and collaboration are given back', async () => {
+        await loginAs(page, env.adminUser, env.adminPassword);
+        await setSystemRole(page, 'Adele Assistant', assistantName, true);
+        await openEditor(page, own);
+        const cards = app(page).locator('.card-user');
+        await expect(cards.first()).toBeVisible({ timeout: 30_000 });
+        if ((await cards.filter({ hasText: assistantName }).count()) === 0) {
+          await addCollaborator(page, assistantName);
+        }
+        if ((await cards.filter({ hasText: managerName }).count()) > 0) {
+          await removeCollaborator(page, managerName);
+        }
+        await expect(cards).toHaveCount(1);
+        await expect(cards).toContainText(assistantName);
+      });
+    }
+  });
+
+  // Known defect: owning a path counts only together with a row on its list
+  // of editors (learning_paths::return_learningpaths_owned, and
+  // require_lp_editor_access asks the list alone). Taken off the list, the
+  // owner no longer even sees their own hidden path. Issue draft:
+  // local_adele-issue-owner-loses-path-with-editor-row.md.
+  knownDefect('an owner who is taken off the list of editors keeps their path', async ({ page }) => {
+    const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
+    const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
+    const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
+    const title = `R5 Eigentum ${Date.now()}`;
+    const renamed = `${title} umbenannt`;
+    const card = (name: string): Locator => app(page).locator('[data-testid^="learningpath-row-"]')
+      .filter({ has: page.locator('h5', { hasText: name }) });
+    const openOwn = async (name: string): Promise<void> => {
+      await openOverview(page);
+      await expect(card(name), `the owner must still be shown "${name}"`).toHaveCount(1, { timeout: 30_000 });
+      await card(name).getByRole('button', { name: /^(Edit|Bearbeiten):/ }).click();
+      await waitForEditorLoaded(page);
+    };
+    page.on('dialog', (dialog) => dialog.accept());
+
+    try {
+    await test.step('an assistant creates a path: owner, and first on its list of editors', async () => {
+      await loginAs(page, assistant, fixturePassword());
+      await openOverview(page);
+      await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
+      await app(page).locator('[data-testid="learningpath-title"]').fill(title);
+      await app(page).locator('[data-testid="learningpath-description"]').fill('Angelegt von der E2E-Kette R5.');
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
+      await openOwn(title);
+      await expect(app(page).locator('.card-user').filter({ hasText: assistantName }),
+        'whoever creates a path is put on its list of editors').toHaveCount(1, { timeout: 30_000 });
+    });
+
+    await test.step('a second editor joins, the owner is taken off the list', async () => {
+      // A second person first: the interface protects the last editor.
+      await addCollaborator(page, managerName);
+      const own = app(page).locator('.card-user').filter({ hasText: assistantName });
+      await own.locator('button.text-danger').click();
+      await expect(own).toHaveCount(0);
+    });
+
+    await test.step('the path is still the owner\'s to edit', async () => {
+      await openOwn(title);
+      await app(page).locator('[data-testid="learningpath-title"]').fill(renamed);
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
+      await openOverview(page);
+      await expect(card(renamed), 'the rename must have reached the server').toHaveCount(1, { timeout: 30_000 });
+    });
+
+    await test.step('and the owner\'s to delete', async () => {
+      await card(renamed).getByRole('button', { name: /^(Delete|Löschen):/ }).click();
+      await card(renamed).locator('.deletealert .btn-danger').click();
+      await expect(card(renamed)).toHaveCount(0, { timeout: 30_000 });
+    });
+    } finally {
+      // Whatever became of it: a manager sees every path and clears it away.
+      await loginAs(page, fixture('ADELE_FIXTURE_MANAGER'), fixturePassword());
+      await openOverview(page);
+      // The list arrives after the page: wait for a path that is always there.
+      await expect(rowOf(page, referencePath.id)).toBeVisible({ timeout: 30_000 });
+      const left = app(page).locator('[data-testid^="learningpath-row-"]')
+        .filter({ has: page.locator('h5', { hasText: title }) });
+      if (await left.count()) {
+        await left.first().getByRole('button', { name: /^(Delete|Löschen):/ }).click();
+        await left.first().locator('.deletealert .btn-danger').click();
+        await expect(left).toHaveCount(0, { timeout: 30_000 });
+      }
+    }
   });
 });

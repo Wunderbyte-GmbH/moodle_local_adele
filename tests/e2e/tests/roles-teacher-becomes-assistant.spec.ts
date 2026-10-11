@@ -20,6 +20,17 @@
  *     -> no editor access
  *     -> enrolled as a teacher in a course
  *     -> editor access, own learning path can be created
+ *     -> taken out of the course again
+ *     -> editor access STAYS
+ *     -> an administrator takes the system role away by hand
+ *     -> no editor access
+ *
+ * The plan's last line reads "removing the teacher enrolment removes the
+ * assistant access, unless another source exists". The decision on
+ * local_adele #503/#509 is the opposite for the automatic part: the plugin
+ * never revokes the role it has assigned ("kein Entzug realisieren"). So the
+ * chain pins both halves - the role survives the course, and the way to end
+ * it is Moodle's own page for system roles.
  *
  * The mechanism under test is local_adele's own: assigning the COURSE role
  * named in the setting `enrollassistant` grants the system role
@@ -38,7 +49,20 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  callService, fixture, fixturePassword, saveLearningPath, setSystemRole, unenrolFromCourse, waitForEditorLoaded,
+} from '../support/fixtures';
+
+/** What saving a new, empty path through the web service is answered with. */
+const createThroughService = (page: Page, name: string): Promise<{ data?: unknown; error?: string }> =>
+  callService(page, 'local_adele_save_learningpath', {
+    userid: 0,
+    learningpathid: 0,
+    name,
+    description: 'E2E R3',
+    json: JSON.stringify({ tree: { nodes: [], edges: [] } }),
+    contextid: 1,
+  });
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -117,5 +141,41 @@ test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', ()
       await card.locator('.deletealert .btn-danger').click();
       await expect(card).toHaveCount(0, { timeout: 30_000 });
     });
+
+    await test.step('taken out of the course again, the teacher keeps the editor', async () => {
+      await loginAs(page, env.adminUser, env.adminPassword);
+      await unenrolFromCourse(page, course, teachername);
+
+      await loginAs(page, teacher, fixturePassword());
+      await openOverview(page);
+      await expect(app(page).locator('[data-testid="learningpath-create"]'),
+        'the assistant role is not revoked with the course role (local_adele #503/#509)')
+        .toBeVisible({ timeout: 30_000 });
+    });
+
+    await test.step('the administrator takes the system role away by hand: the editor is gone', async () => {
+      await loginAs(page, env.adminUser, env.adminPassword);
+      await setSystemRole(page, 'Adele Assistant', teachername, false);
+
+      await loginAs(page, teacher, fixturePassword());
+      await openOverview(page);
+      await expect(app(page).locator('[data-testid="learningpath-create"]'),
+        'without the role, and with no other reason, there is no editor').toHaveCount(0);
+      await expect(page.locator('[data-draggable]'), 'and no courses to build with').toHaveCount(0);
+      // Not merely hidden: the server refuses to create a path for them.
+      const answer = await createThroughService(page, `Unerlaubter Pfad ${Date.now()}`);
+      expect(answer.data, 'no path may be created').toBeUndefined();
+      expect(answer.error, 'the server must refuse for lack of permission').toBe('nopermissions');
+    });
+  });
+
+  test('refusing to create a path, the server names the missing permission', async ({ page }) => {
+    // The refusal used to be a PHP error ("generalexceptionmessage"): the
+    // exception the service means to throw was not imported in
+    // save_learningpath.php (local_adele #594).
+    await loginAs(page, fixture('ADELE_FIXTURE_CONTROL_USER'), fixturePassword());
+    const answer = await createThroughService(page, `Unerlaubter Pfad ${Date.now()}`);
+    expect(answer.data, 'no path may be created').toBeUndefined();
+    expect(answer.error, 'the server must refuse for lack of permission').toBe('nopermissions');
   });
 });

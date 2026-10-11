@@ -668,3 +668,58 @@ export async function setCourseRoles(page: Page, courseid: string, person: strin
     await expect(cell, `${person} must now be shown as ${role}`).toContainText(role);
   }
 }
+
+/**
+ * Give or take a SYSTEM role by hand, on Moodle's own page (Site
+ * administration > Users > Permissions > Assign system roles).
+ *
+ * This is the route an administrator has for taking the ADELE assistant
+ * role away again: the plugin assigns it automatically and, by decision
+ * (local_adele #503/#509), never revokes it.
+ *
+ * @param page The page, logged in as an administrator.
+ * @param rolename The role as the page names it, e.g. "Adele Assistant".
+ * @param person A text that identifies the person in the lists (name or e-mail).
+ * @param held Whether the person is to hold the role afterwards.
+ */
+export async function setSystemRole(page: Page, rolename: string, person: string, held: boolean): Promise<void> {
+  await page.goto('/admin/roles/assign.php?contextid=1');
+  await page.getByRole('link', { name: rolename, exact: true }).first().click();
+  const holders = page.locator('select#removeselect');
+  const others = page.locator('select#addselect');
+  await expect(holders).toBeVisible({ timeout: 30_000 });
+  const holds = async (): Promise<boolean> => (await holders.locator('option').filter({ hasText: person }).count()) > 0;
+  if ((await holds()) !== held) {
+    const [list, search, button] = held
+      ? [others, page.locator('#addselect_searchtext'), page.locator('#add')]
+      : [holders, page.locator('#removeselect_searchtext'), page.locator('#remove')];
+    // Searched for: a long list is not shown in full.
+    await search.fill(person);
+    const option = list.locator('option').filter({ hasText: person });
+    await expect(option, `${person} must be offered in the list`).toHaveCount(1, { timeout: 30_000 });
+    await list.selectOption({ label: (await option.innerText()).trim() });
+    await button.click();
+    await expect(holders).toBeVisible({ timeout: 30_000 });
+  }
+  expect(await holds(), `${person} ${held ? 'must hold' : 'must no longer hold'} the system role ${rolename}`).toBe(held);
+}
+
+/**
+ * Take somebody out of a course on Moodle's participants page.
+ *
+ * @param page The page, logged in as somebody who may unenrol.
+ * @param courseid The course.
+ * @param person A text that identifies the person's row.
+ */
+export async function unenrolFromCourse(page: Page, courseid: string, person: string): Promise<void> {
+  await page.goto(`/user/index.php?id=${courseid}&perpage=5000`);
+  const row = page.locator('table#participants tbody tr').filter({ hasText: person });
+  await expect(row, `${person} must be listed in course ${courseid}`).toHaveCount(1, { timeout: 30_000 });
+  await page.waitForLoadState('networkidle');
+  await row.locator('a[data-action="unenrol"]').first().click();
+  const dialog = page.locator('.modal.show');
+  await expect(dialog).toBeVisible({ timeout: 15_000 });
+  await dialog.getByRole('button', { name: /^(Unenrol|Abmelden)$/ }).click();
+  await expect(page.locator('table#participants tbody tr').filter({ hasText: person }),
+    `${person} must be gone from the participants of course ${courseid}`).toHaveCount(0, { timeout: 30_000 });
+}
