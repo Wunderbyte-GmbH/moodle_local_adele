@@ -485,12 +485,7 @@ class learning_paths {
         // the path's. Ranks are given below, within whatever set this yields.
         $scopejoin = '';
         if (!empty($data['scopecourseid'])) {
-            [$enrolledsql, $enrolledparams] = get_enrolled_sql(
-                \context_course::instance((int) $data['scopecourseid']),
-                '',
-                0,
-                false
-            );
+            [$enrolledsql, $enrolledparams] = self::roster_members_sql((int) $data['scopecourseid']);
             $scopejoin = "JOIN ({$enrolledsql}) scope ON scope.id = lpu.user_id";
             $params = array_merge($params, $enrolledparams);
         }
@@ -1186,29 +1181,67 @@ class learning_paths {
     }
 
     /**
-     * Whether the current user has authority over a learning path AS A PATH,
-     * independent of any course: site administrators and managers
-     * (local/adele:canmanage in the system) over every path, everybody else
-     * over exactly the paths they are an editor of (lp_editors: the creator
-     * and the people added to it).
+     * Whether the current user may read and change the data of learners
+     * WITHOUT being a teacher of a course that embeds the path: site
+     * administrators, and nobody else.
      *
-     * This is what decides about the learner data of a path where no course
-     * right applies. check_access() is not enough for that: it only says the
-     * person may edit SOME path, and so gave every assistant and every
-     * collaborator of any path the learners of all paths.
+     * Building a path and using it in a course are two different things
+     * (#586, addendum of 2026-10-07): whoever creates or edits a path - its
+     * owner, the people added to it, an ADELE assistant, an ADELE manager
+     * (local/adele:canmanage) - gets no view of the learners by that. The
+     * learners of a course are for the teachers of that course
+     * (can_view_participants(), local/adele:teacheredit).
      *
-     * @param int $learningpathid The learning path.
      * @return bool
      */
-    public static function has_path_authority(int $learningpathid): bool {
-        global $DB, $USER;
-        if (is_siteadmin() || has_capability('local/adele:canmanage', context_system::instance())) {
-            return true;
+    public static function has_learner_data_authority(): bool {
+        return is_siteadmin();
+    }
+
+    /**
+     * Who is on the roster of a course: everybody with an ACTIVE enrolment
+     * there, by whatever method - and everybody ADELE itself has enrolled
+     * there, active or suspended.
+     *
+     * A suspension is one flag with two meanings. ADELE's own: "enrolled,
+     * without access" - the host mode "hidden" keeps its learners that way on
+     * purpose, they belong on their teacher's list. Everybody else's: a
+     * person or another system took this participant out - they keep their
+     * path (a suspension in the host course is without consequence for it),
+     * but they are not shown among the course's learners (#588, addendum of
+     * 2026-10-07).
+     *
+     * @param int $courseid The course.
+     * @return array [sql selecting the column "id", params]
+     */
+    public static function roster_members_sql(int $courseid): array {
+        [$activesql, $params] = get_enrolled_sql(\context_course::instance($courseid), '', 0, true);
+        $sql = "SELECT active.id
+                  FROM ({$activesql}) active
+                 UNION
+                SELECT rosterue.userid
+                  FROM {user_enrolments} rosterue
+                  JOIN {enrol} rostere ON rostere.id = rosterue.enrolid
+                 WHERE rostere.courseid = :rostercourseid AND rostere.enrol = 'adele'";
+        $params['rostercourseid'] = $courseid;
+        return [$sql, $params];
+    }
+
+    /**
+     * Whether a person is on the roster of a course - see roster_members_sql().
+     *
+     * @param int $courseid The course.
+     * @param int $userid The person.
+     * @return bool
+     */
+    public static function is_roster_member(int $courseid, int $userid): bool {
+        global $DB;
+        if ($userid <= 0) {
+            return false;
         }
-        return $learningpathid > 0 && $DB->record_exists('local_adele_lp_editors', [
-            'learningpathid' => $learningpathid,
-            'userid' => $USER->id,
-        ]);
+        [$sql, $params] = self::roster_members_sql($courseid);
+        $params['rosteruserid'] = $userid;
+        return $DB->record_exists_sql("SELECT 1 FROM ({$sql}) roster WHERE roster.id = :rosteruserid", $params);
     }
 
     /**

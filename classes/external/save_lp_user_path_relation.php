@@ -81,12 +81,11 @@ class save_lp_user_path_relation extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        // See the identical comment in
-        // get_lp_user_path_relation.php — canmanage/teacheredit is
-        // system-/course-role-based, not course-enrolment-based; a manager
-        // acting on a course they are not enrolled in is the normal case.
-        // Managers keep full access; teachers may set a user's node status
-        // (manual completion / master toggle) via teacheredit, without canmanage (#431).
+        // No validate_context(): for a course context it requires an
+        // ENROLMENT, and a right held through a role assigned above the
+        // course (or by a site administrator) comes without one.
+        // Teachers may set a user's node status (manual completion / master
+        // toggle) via teacheredit, without canmanage (#431).
         // The context is client input: a right that comes from a course counts
         // only in a course that EMBEDS this path. It used to count in any course,
         // so a teacher of an unrelated course could complete nodes for the
@@ -102,7 +101,10 @@ class save_lp_user_path_relation extends external_api {
         }
         $coursecontext = $context->get_course_context(false);
         $params['courseid'] = $coursecontext ? (int) $coursecontext->instanceid : 0;
-        if (!is_siteadmin() && !has_capability('local/adele:canmanage', \context_system::instance())) {
+        // Only a site administrator acts without a course. An ADELE manager
+        // (local/adele:canmanage) used to as well; managing paths gives no
+        // right over the learners of a course (#586, addendum).
+        if (!learning_paths::has_learner_data_authority()) {
             if (
                 !$coursecontext
                 || !learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid'])
@@ -116,7 +118,7 @@ class save_lp_user_path_relation extends external_api {
             require_capability('local/adele:teacheredit', $context);
             // A course right covers the learners of that course - not the
             // ones another course brought to the same path (#588).
-            if (!is_enrolled($coursecontext, (int) ($payload->route->userId ?? 0))) {
+            if (!learning_paths::is_roster_member((int) $params['courseid'], (int) ($payload->route->userId ?? 0))) {
                 throw new \required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');
             }
         }

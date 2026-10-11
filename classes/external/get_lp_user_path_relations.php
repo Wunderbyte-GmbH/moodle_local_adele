@@ -94,9 +94,10 @@ class get_lp_user_path_relations extends external_api {
         // Local/adele:view is held by every authenticated user, so it is not a
         // boundary. This leaderboard returns the whole participant roster (names +
         // progress) of the path. Who may read it:
-        // - managers and the editors of THIS path (has_path_authority()):
-        // their authority is about the path, not about a course. Being
-        // allowed to edit some other path (check_access()) is not enough;
+        // - site administrators (has_learner_data_authority()). NOT the people
+        // who build or manage paths - ADELE managers, the owner and the
+        // editors of this path, assistants: building a path gives no view of
+        // the learners (#586, addendum);
         // - teachers of a course (local/adele:viewparticipants) and its enrolled
         // participants (StudentView.vue) - but only of a course that EMBEDS
         // this path. The check used to accept any course: a participant or
@@ -106,7 +107,7 @@ class get_lp_user_path_relations extends external_api {
         // context of a node course ADELE itself had enrolled them in.
         $embedded = $coursecontext
             && learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid']);
-        $isprivileged = learning_paths::has_path_authority((int) $params['learningpathid'])
+        $isprivileged = learning_paths::has_learner_data_authority()
             || ($embedded && learning_paths::can_view_participants($coursecontext));
         if (!$isprivileged && !($embedded && is_enrolled($coursecontext, $USER->id))) {
             throw new \required_capability_exception(
@@ -119,7 +120,7 @@ class get_lp_user_path_relations extends external_api {
 
         // Asked for through a course that embeds the path, the roster is that
         // course's: its enrolled learners of the path, ranked among themselves
-        // (#588). Path authority outside such a course gets the path's roster.
+        // (#588). An administrator asking outside such a course gets the path's roster.
         if ($embedded) {
             $params['scopecourseid'] = (int) $params['courseid'];
         }

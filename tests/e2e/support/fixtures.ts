@@ -472,6 +472,37 @@ export interface ParticipantRow {
 }
 
 /**
+ * Suspend or reactivate somebody's enrolment in a course on Moodle's own
+ * participants page - what a teacher does to take a participant out without
+ * unenrolling them.
+ *
+ * @param page The page, logged in as somebody who may edit enrolments.
+ * @param courseid The course.
+ * @param person A text that identifies the person's row.
+ * @param status The new status.
+ */
+export async function setEnrolmentStatus(
+  page: Page,
+  courseid: string,
+  person: string,
+  status: 'Active' | 'Suspended'
+): Promise<void> {
+  await page.goto(`/user/index.php?id=${courseid}&perpage=5000`);
+  const row = page.locator('table#participants tbody tr').filter({ hasText: person }).first();
+  await expect(row, `${person} must be listed in course ${courseid}`).toBeVisible({ timeout: 30_000 });
+  await page.waitForLoadState('networkidle');
+  await row.locator('a[data-action="editenrolment"]').first().click();
+  const dialog = page.getByRole('dialog').filter({ has: page.locator('select[name="status"]') });
+  await expect(dialog).toBeVisible({ timeout: 30_000 });
+  await dialog.locator('select[name="status"]').selectOption({ label: status });
+  await dialog.getByRole('button', { name: 'Save changes' }).click();
+  await expect(dialog).toBeHidden({ timeout: 30_000 });
+  await expect
+    .poll(() => enrolmentStatus(page, courseid, person), { timeout: 30_000, intervals: [1_000, 2_000] })
+    .toBe(status);
+}
+
+/**
  * The participant list as the page shows it right now, one line per row:
  * "<last name> | <percent> | <route> | rank <rank>", with " | link" where the
  * row leads to the learner's detail view.

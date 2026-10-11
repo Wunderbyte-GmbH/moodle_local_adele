@@ -57,7 +57,7 @@ use local_adele\external\save_lp_user_path_relation;
  * @covers \local_adele\external\get_lp_user_path_relations
  * @covers \local_adele\external\save_lp_user_path_relation
  * @covers \local_adele\learning_paths::is_embedded_in_course
- * @covers \local_adele\learning_paths::has_path_authority
+ * @covers \local_adele\learning_paths::has_learner_data_authority
  * @runTestsInSeparateProcesses
  */
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
@@ -260,10 +260,10 @@ final class learner_data_embedding_test extends advanced_testcase {
 
     /**
      * A context outside any course carries no course rights - and is no
-     * coding error: a manager, whose authority is about paths, gets the
-     * roster; a learner is turned away.
+     * coding error: a site administrator gets the roster; a learner is
+     * turned away.
      */
-    public function test_system_context_serves_path_authority_only(): void {
+    public function test_system_context_serves_administrators_only(): void {
         $systemcontextid = context_system::instance()->id;
 
         $this->setAdminUser();
@@ -275,55 +275,114 @@ final class learner_data_embedding_test extends advanced_testcase {
     }
 
     /**
-     * Somebody who may edit SOME path - an assistant by system role, and an
-     * editor of another path on top - has no say over the learners of this
-     * one.
+     * The people who build and manage paths, none of them a teacher of the
+     * embedding course.
+     *
+     * @return \stdClass[] By what they are.
      */
-    public function test_editor_of_another_path_cannot_read_learner_data(): void {
+    private function path_people(): array {
         global $DB;
-        $assistant = $this->getDataGenerator()->create_user();
-        $roleid = $this->getDataGenerator()->create_role();
-        assign_capability('local/adele:assist', CAP_ALLOW, $roleid, context_system::instance());
-        role_assign($roleid, $assistant->id, context_system::instance());
+        $gen = $this->getDataGenerator();
+        $system = context_system::instance();
+        $people = [];
+
+        $people['ADELE manager'] = $gen->create_user();
+        $managerrole = $gen->create_role();
+        assign_capability('local/adele:canmanage', CAP_ALLOW, $managerrole, $system);
+        role_assign($managerrole, $people['ADELE manager']->id, $system);
+
+        $people['assistant, editor of another path'] = $gen->create_user();
+        $assistantrole = $gen->create_role();
+        assign_capability('local/adele:assist', CAP_ALLOW, $assistantrole, $system);
+        role_assign($assistantrole, $people['assistant, editor of another path']->id, $system);
         $DB->insert_record('local_adele_lp_editors', (object) [
-            'userid' => $assistant->id,
+            'userid' => $people['assistant, editor of another path']->id,
             'learningpathid' => $this->make_path('Their own path'),
         ]);
-        $this->setUser($assistant);
-        $this->assertTrue((bool) \local_adele\learning_paths::check_access(), 'The precondition: may edit some path.');
-        $this->assertFalse(\local_adele\learning_paths::has_path_authority($this->lpid));
 
-        $modulecontextid = context_module::instance($this->activity->cmid)->id;
-        foreach ([$modulecontextid, context_system::instance()->id] as $contextid) {
-            try {
-                $this->roster($contextid);
-                $this->fail('The roster must be refused in context ' . $contextid);
-            } catch (\required_capability_exception $e) {
-                $this->assertSame('nopermissions', $e->errorcode);
-            }
-            try {
-                get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $contextid);
-                $this->fail('The snapshot must be refused in context ' . $contextid);
-            } catch (\required_capability_exception $e) {
-                $this->assertSame('nopermissions', $e->errorcode);
+        $people['editor of this path'] = $gen->create_user();
+        $DB->insert_record('local_adele_lp_editors', (object) [
+            'userid' => $people['editor of this path']->id,
+            'learningpathid' => $this->lpid,
+        ]);
+        return $people;
+    }
+
+    /**
+     * Building or managing paths gives no view of the learners and no say
+     * over their paths (#586, addendum of 2026-10-07): the ADELE manager, an
+     * assistant who edits another path, an editor of THIS path - none reads
+     * the roster or a learner, none changes a learner's path, through the
+     * embedding activity or without a course.
+     */
+    public function test_building_or_managing_paths_gives_no_access_to_learner_data(): void {
+        $contexts = [
+            'the embedding activity' => context_module::instance($this->activity->cmid)->id,
+            'no course' => context_system::instance()->id,
+        ];
+        foreach ($this->path_people() as $who => $person) {
+            $this->setUser($person);
+            $this->assertTrue((bool) \local_adele\learning_paths::check_access(), $who . ': may work in the editor');
+            $this->assertFalse(\local_adele\learning_paths::has_learner_data_authority(), $who);
+            foreach ($contexts as $where => $contextid) {
+                $calls = [
+                    'roster' => function () use ($contextid) {
+                        $this->roster($contextid);
+                    },
+                    'learner' => function () use ($contextid) {
+                        get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $contextid);
+                    },
+                    'change' => function () use ($contextid) {
+                        $this->save($contextid);
+                    },
+                ];
+                foreach ($calls as $what => $call) {
+                    try {
+                        $call();
+                        $this->fail("{$who}, {$what}, through {$where}: must be refused");
+                    } catch (\required_capability_exception $e) {
+                        $this->assertSame('nopermissions', $e->errorcode, "{$who}, {$what}, through {$where}");
+                    }
+                }
             }
         }
     }
 
     /**
-     * No regression: an editor of THIS path reads its learners, with no
-     * course involved.
+     * The same people AS TEACHERS of the embedding course have what a teacher
+     * has - from the course role, not from the path: they read the course's
+     * learners there, still nothing without a course, and change a learner's
+     * path only with local/adele:teacheredit.
      */
-    public function test_editor_of_this_path_reads_learner_data(): void {
-        global $DB;
-        $editor = $this->getDataGenerator()->create_user();
-        $DB->insert_record('local_adele_lp_editors', (object) ['userid' => $editor->id, 'learningpathid' => $this->lpid]);
-        $this->setUser($editor);
-        $systemcontextid = context_system::instance()->id;
+    public function test_path_people_who_teach_the_course_have_the_teachers_rights(): void {
+        $gen = $this->getDataGenerator();
+        $modulecontextid = context_module::instance($this->activity->cmid)->id;
+        foreach ($this->path_people() as $who => $person) {
+            $gen->enrol_user($person->id, $this->host->id, 'teacher');
+            $this->setUser($person);
+            $this->assertSame(
+                [(int) $this->alpha->id, (int) $this->beta->id],
+                $this->roster($modulecontextid),
+                $who . ' as a teacher without editing rights: the roster of the course'
+            );
+            $one = get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $modulecontextid);
+            $this->assertSame((int) $this->beta->id, (int) $one['user_id'], $who);
+            try {
+                $this->roster(context_system::instance()->id);
+                $this->fail($who . ': no roster without a course');
+            } catch (\required_capability_exception $e) {
+                $this->assertSame('nopermissions', $e->errorcode);
+            }
+            try {
+                $this->save($modulecontextid);
+                $this->fail($who . ' without editing rights must not change a learner path');
+            } catch (\required_capability_exception $e) {
+                $this->assertSame('nopermissions', $e->errorcode);
+            }
 
-        $this->assertSame([(int) $this->alpha->id, (int) $this->beta->id], $this->roster($systemcontextid));
-        $one = get_lp_user_path_relation::execute($this->lpid, (int) $this->beta->id, $systemcontextid);
-        $this->assertSame((int) $this->beta->id, (int) $one['user_id']);
+            $gen->enrol_user($person->id, $this->host->id, 'editingteacher');
+            $this->assertTrue($this->save($modulecontextid)['success'], $who . ' as an editing teacher');
+        }
     }
 
     /**
@@ -388,8 +447,8 @@ final class learner_data_embedding_test extends advanced_testcase {
     }
 
     /**
-     * No regression: the teacher of the embedding course and a manager
-     * change a learner's path.
+     * No regression: the teacher of the embedding course changes a learner's
+     * path, and so does a site administrator without any course.
      */
     public function test_teacher_of_the_embedding_course_changes_a_learner_path(): void {
         $teacher = $this->getDataGenerator()->create_and_enrol($this->host, 'editingteacher');

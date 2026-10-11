@@ -134,10 +134,12 @@ final class user_path_relation_access_test extends advanced_testcase {
     }
 
     /**
-     * A path editor (lp_editors member, not a course teacher) may read a student's
-     * path — check_access() is the same gate the editor UI uses; no regression.
+     * A path editor (lp_editors member, not a course teacher) may NOT read a
+     * student's path: building a path and teaching a course that uses it are
+     * two different things (#586, addendum of 2026-10-07). This test used to
+     * assert the opposite.
      */
-    public function test_path_editor_can_read_user_path(): void {
+    public function test_path_editor_cannot_read_user_path(): void {
         global $DB;
         $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
         $editor = $this->getDataGenerator()->create_user();
@@ -145,9 +147,8 @@ final class user_path_relation_access_test extends advanced_testcase {
         $this->make_relation($student->id);
 
         $this->setUser($editor);
-        $result = get_lp_user_path_relation::execute($this->lpid, $student->id, $this->context->id);
-
-        $this->assertEquals($student->id, $result['user_id']);
+        $this->expectException(\required_capability_exception::class);
+        get_lp_user_path_relation::execute($this->lpid, $student->id, $this->context->id);
     }
 
     // Plural getter.

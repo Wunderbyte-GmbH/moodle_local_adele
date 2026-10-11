@@ -186,24 +186,69 @@ final class roster_course_scope_test extends advanced_testcase {
     }
 
     /**
-     * A suspended enrolment still is an enrolment: host mode "hidden" keeps
-     * its learners suspended in the host course, and the teacher must see them.
+     * A suspension ADELE made itself is "enrolled, without access": host mode
+     * "hidden" keeps its learners that way on purpose, and their teacher must
+     * see them.
      */
-    public function test_suspended_enrolment_stays_in_the_roster(): void {
+    public function test_a_learner_adele_keeps_suspended_stays_on_the_roster(): void {
         global $DB;
-        $DB->set_field('user_enrolments', 'status', ENROL_USER_SUSPENDED, ['userid' => $this->xavier->id]);
-        $this->setAdminUser();
-        $this->assertArrayHasKey(
-            (int) $this->xavier->id,
-            $this->roster(context_module::instance($this->activityx->cmid)->id)
-        );
+        // Hidden mode: in the course through an enrolment of ADELE's own
+        // method only, suspended.
+        $hidden = $this->getDataGenerator()->create_user();
+        $enrolid = $DB->insert_record('enrol', (object) [
+            'enrol' => 'adele', 'courseid' => $this->coursex->id, 'status' => ENROL_INSTANCE_ENABLED,
+        ]);
+        $DB->insert_record('user_enrolments', (object) [
+            'enrolid' => $enrolid, 'userid' => $hidden->id, 'status' => ENROL_USER_SUSPENDED,
+            'timestart' => 0, 'timeend' => 0, 'modifierid' => 2, 'timecreated' => 1, 'timemodified' => 1,
+        ]);
+        $this->snapshot((int) $hidden->id, false);
+
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->coursex, 'editingteacher');
+        $this->setUser($teacher);
+        $contextid = context_module::instance($this->activityx->cmid)->id;
+        $this->assertArrayHasKey((int) $hidden->id, $this->roster($contextid));
+        $one = get_lp_user_path_relation::execute($this->lpid, (int) $hidden->id, $contextid);
+        $this->assertSame((int) $hidden->id, (int) $one['user_id'], 'and the teacher opens their path');
     }
 
     /**
-     * Authority over the path, asked outside any course: the path's roster,
+     * A suspension somebody else made - by hand, by another enrolment method -
+     * takes the participant off the roster of the course. They keep their
+     * path; they are not shown among the course's learners, and the course's
+     * teacher neither opens nor changes their path (#588, addendum of
+     * 2026-10-07). This test used to assert that they stay.
+     */
+    public function test_a_learner_suspended_by_hand_is_off_the_roster(): void {
+        global $DB;
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->coursex, 'editingteacher');
+        $contextid = context_module::instance($this->activityx->cmid)->id;
+        $this->setUser($teacher);
+        $this->assertArrayHasKey((int) $this->xavier->id, $this->roster($contextid), 'the precondition: listed');
+
+        $DB->set_field('user_enrolments', 'status', ENROL_USER_SUSPENDED, ['userid' => $this->xavier->id]);
+
+        $this->assertArrayNotHasKey((int) $this->xavier->id, $this->roster($contextid));
+        $this->assertTrue(
+            $DB->record_exists('local_adele_path_user', ['user_id' => $this->xavier->id, 'status' => 'active']),
+            'the path itself is untouched'
+        );
+        try {
+            get_lp_user_path_relation::execute($this->lpid, (int) $this->xavier->id, $contextid);
+            $this->fail('The path of a participant taken out of the course must not open for its teacher.');
+        } catch (\required_capability_exception $e) {
+            $this->assertSame('nopermissions', $e->errorcode);
+        }
+        // A site administrator, asking outside the course, still finds them on the path.
+        $this->setAdminUser();
+        $this->assertArrayHasKey((int) $this->xavier->id, $this->roster(context_system::instance()->id));
+    }
+
+    /**
+     * A site administrator, asking outside any course: the path's roster,
      * ranked across the courses.
      */
-    public function test_path_authority_outside_a_course_gets_the_whole_path(): void {
+    public function test_administrator_outside_a_course_gets_the_whole_path(): void {
         $this->setAdminUser();
         $this->assertSame(
             [(int) $this->xavier->id => 2, (int) $this->yara->id => 1],
