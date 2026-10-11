@@ -56,6 +56,16 @@ final class user_path_relation_access_test extends advanced_testcase {
         $this->lpid = $DB->insert_record('local_adele_learning_paths', (object) [
             'name' => 'Path', 'json' => '{"tree":{"nodes":[]}}', 'visibility' => 1, 'createdby' => 2,
         ]);
+
+        // The course EMBEDS the path: rights that come from the course count
+        // only there (learner_data_embedding_test has the other half).
+        $this->getDataGenerator()->create_module('adele', [
+            'course' => $this->course->id,
+            'learningpathid' => $this->lpid,
+            'view' => 1,
+            'userlist' => 1,
+            'participantslist' => '0',
+        ]);
     }
 
     /**
@@ -65,6 +75,10 @@ final class user_path_relation_access_test extends advanced_testcase {
      */
     private function make_relation(int $userid): void {
         global $DB;
+        // Enrolling into a course that embeds the path subscribes already.
+        if ($DB->record_exists('local_adele_path_user', ['user_id' => $userid, 'learning_path_id' => $this->lpid])) {
+            return;
+        }
         $DB->insert_record('local_adele_path_user', (object) [
             'user_id' => $userid,
             'course_id' => $this->course->id,
@@ -177,6 +191,7 @@ final class user_path_relation_access_test extends advanced_testcase {
         $this->setUser($teacher);
         $result = get_lp_user_path_relations::execute($teacher->id, $this->lpid, $this->context->id);
 
-        $this->assertCount(1, $result);
+        // The teacher's own enrolment subscribed the teacher as well.
+        $this->assertContains((int) $student->id, array_map('intval', array_column($result, 'id')));
     }
 }

@@ -525,7 +525,8 @@ function local_adele_fixture_host_course(
     string $activityname,
     int $pathid,
     stdClass $learner,
-    int $category
+    int $category,
+    int $userlist = 1
 ): stdClass {
     global $DB;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
@@ -550,7 +551,22 @@ function local_adele_fixture_host_course(
     if ($manual && $instance && $roleid) {
         $manual->enrol_user($instance, $learner->id, $roleid);
     }
-    create_module((object) [
+    local_adele_fixture_embed($course, $activityname, $pathid, $userlist);
+    return $course;
+}
+
+/**
+ * Embed a path into a course: one mod_adele activity, the way the form
+ * creates it.
+ *
+ * @param stdClass $course The embedding course.
+ * @param string $activityname The activity's name.
+ * @param int $pathid The path.
+ * @param int $userlist "Participant results": 1 all participants, 2 only own.
+ * @return int The course module id.
+ */
+function local_adele_fixture_embed(stdClass $course, string $activityname, int $pathid, int $userlist = 1): int {
+    $module = create_module((object) [
         'modulename' => 'adele',
         'course' => $course->id,
         'section' => 0,
@@ -561,10 +577,38 @@ function local_adele_fixture_host_course(
         'learningpathid' => $pathid,
         'participantslist' => '1',
         'hostenrolmentmode' => 'visible',
-        'userlist' => 1,
+        'userlist' => $userlist,
         'view' => 1,
     ]);
-    return $course;
+    return (int) $module->coursemodule;
+}
+
+/**
+ * A fixture person, created once and given the fixture password.
+ *
+ * @param string $username Login.
+ * @param string $lastname Last name; the first name is "Fixture".
+ * @param string $password The fixture password.
+ * @return stdClass The user record.
+ */
+function local_adele_fixture_person(string $username, string $lastname, string $password): stdClass {
+    global $DB, $CFG;
+    $person = $DB->get_record('user', ['username' => $username, 'deleted' => 0]);
+    if (!$person) {
+        $person = (object) [
+            'username' => $username,
+            'firstname' => 'Fixture',
+            'lastname' => $lastname,
+            'email' => $username . '@example.invalid',
+            'auth' => 'manual',
+            'confirmed' => 1,
+            'mnethostid' => $CFG->mnet_localhost_id,
+        ];
+        $person->id = user_create_user($person, false, false);
+        $person = $DB->get_record('user', ['id' => $person->id]);
+    }
+    $DB->set_field('user', 'password', hash_internal_user_password($password), ['id' => $person->id]);
+    return $person;
 }
 
 /**
@@ -719,6 +763,8 @@ $mastercompletionpath = null;
 $masteraccesspath = null;
 $masteraccesstimepath = null;
 $masterbothpath = null;
+$privacypath = null;
+$privacysecond = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -1017,6 +1063,22 @@ if (!empty($imported['Linear A1'])) {
             $masteraccess,
             'fx_o4_both',
             'Master both',
+            $fixturepassword
+        );
+        // P: learner data. ONE path with TWO learners - the chain gives them
+        // different progress and then asks who may see whose.
+        $privacypath = local_adele_fixture_store_path(
+            'E2E Lernerdaten',
+            $masteraccess,
+            'fx_p_a',
+            'Privacy Alpha',
+            $fixturepassword
+        );
+        $privacysecond = local_adele_fixture_store_path(
+            'E2E Lernerdaten',
+            $masteraccess,
+            'fx_p_b',
+            'Privacy Beta',
             $fixturepassword
         );
         $windowonly = $timedtemplate['data'];
@@ -1459,6 +1521,96 @@ $c3host = $c3path ? local_adele_fixture_host_course(
     (int) $options['category']
 ) : null;
 
+// P: the path embedded TWICE into one course - once with "Only own results",
+// once with "Results of all other participants" - and the people the chain
+// asks about: a teacher with and one without editing rights, a collaborator of
+// exactly this path who sits in the course as a participant, and two people
+// of ANOTHER course that embeds no path at all - a participant and a teacher -
+// who have nothing to do with the path.
+$privacy = null;
+if ($privacypath && $privacysecond) {
+    [$privacyid, $privacya] = $privacypath;
+    $privacyb = $privacysecond[1];
+    $privacyhost = local_adele_fixture_host_course(
+        'E2EP',
+        'E2E P own results',
+        $privacyid,
+        $privacya,
+        (int) $options['category'],
+        2
+    );
+    $privacycms = [
+        'OWN' => (int) get_coursemodule_from_instance(
+            'adele',
+            $DB->get_field('adele', 'id', ['course' => $privacyhost->id, 'name' => 'E2E P own results']),
+            $privacyhost->id
+        )->id,
+        'ALL' => local_adele_fixture_embed($privacyhost, 'E2E P all results', $privacyid, 1),
+    ];
+    $privacyother = $DB->get_record('course', ['shortname' => 'E2EPX']);
+    if (!$privacyother) {
+        $privacyother = create_course((object) [
+            'shortname' => 'E2EPX',
+            'fullname' => 'E2E course without a learning path',
+            'category' => (int) $options['category'],
+            'summary' => 'Embeds no learning path. Created by seed_fixtures.php.',
+            'summaryformat' => FORMAT_HTML,
+        ]);
+    }
+    $privacypeople = [
+        'TEACHER' => local_adele_fixture_person('fx_p_teacher', 'Privacy Teacher', $fixturepassword),
+        'TUTOR' => local_adele_fixture_person('fx_p_tutor', 'Privacy Tutor', $fixturepassword),
+        'COLLABORATOR' => local_adele_fixture_person('fx_p_collab', 'Privacy Collaborator', $fixturepassword),
+        'OUTSIDER' => local_adele_fixture_person('fx_p_out', 'Privacy Outsider', $fixturepassword),
+        'FOREIGN' => local_adele_fixture_person('fx_p_foreign', 'Privacy Foreign', $fixturepassword),
+    ];
+    $privacymanual = enrol_get_plugin('manual');
+    $privacyenrol = static function (stdClass $course, stdClass $person, string $role) use ($DB, $privacymanual): void {
+        $instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', IGNORE_MULTIPLE);
+        $roleid = $DB->get_field('role', 'id', ['shortname' => $role]);
+        if ($privacymanual && $instance && $roleid) {
+            $privacymanual->enrol_user($instance, $person->id, $roleid);
+        }
+    };
+    $privacyenrol($privacyhost, $privacyb, 'student');
+    $privacyenrol($privacyhost, $privacypeople['TEACHER'], 'editingteacher');
+    $privacyenrol($privacyhost, $privacypeople['TUTOR'], 'teacher');
+    $privacyenrol($privacyhost, $privacypeople['COLLABORATOR'], 'student');
+    $privacyenrol($privacyother, $privacypeople['OUTSIDER'], 'student');
+    // A teacher - of the OTHER course only. Without editing rights: an
+    // editing teacher would become an ADELE assistant (enrollassistant).
+    $privacyenrol($privacyother, $privacypeople['FOREIGN'], 'teacher');
+    \local_adele\learning_path_editors::create_editors($privacyid, (int) $privacypeople['COLLABORATOR']->id);
+    $privacy = [
+        'path' => $privacyid,
+        'host' => $privacyhost,
+        'other' => $privacyother,
+        'cms' => $privacycms,
+        'people' => ['A' => $privacya, 'B' => $privacyb] + $privacypeople,
+    ];
+}
+
+if ($privacy) {
+    printf("export ADELE_FIXTURE_PATH_P='%d'\n", $privacy['path']);
+    printf("export ADELE_FIXTURE_P_HOST='%d'\n", $privacy['host']->id);
+    printf("export ADELE_FIXTURE_P_HOST_CONTEXT='%d'\n", context_course::instance($privacy['host']->id)->id);
+    printf("export ADELE_FIXTURE_P_OTHER='%d'\n", $privacy['other']->id);
+    printf("export ADELE_FIXTURE_P_OTHER_CONTEXT='%d'\n", context_course::instance($privacy['other']->id)->id);
+    // A node course of the path: its learners are enrolled there by ADELE,
+    // and it embeds nothing.
+    $privacynode = $DB->get_field('course', 'id', ['shortname' => 'T01']);
+    if ($privacynode) {
+        printf("export ADELE_FIXTURE_P_NODE_CONTEXT='%d'\n", context_course::instance($privacynode)->id);
+    }
+    foreach ($privacy['cms'] as $key => $cmid) {
+        printf("export ADELE_FIXTURE_P_CM_%s='%d'\n", $key, $cmid);
+        printf("export ADELE_FIXTURE_P_CM_%s_CONTEXT='%d'\n", $key, context_module::instance($cmid)->id);
+    }
+    foreach ($privacy['people'] as $key => $person) {
+        printf("export ADELE_FIXTURE_P_%s='%s'\n", $key, $person->username);
+        printf("export ADELE_FIXTURE_P_%s_ID='%d'\n", $key, $person->id);
+    }
+}
 foreach ($c1paths as $variant => [$pathid, $learner]) {
     $key = strtoupper($variant);
     printf("export ADELE_FIXTURE_PATH_C1_%s='%d'\n", $key, $pathid);

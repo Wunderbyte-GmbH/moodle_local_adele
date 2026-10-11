@@ -1105,6 +1105,32 @@ class learning_paths {
     }
 
     /**
+     * Whether a learning path is embedded in a course: whether a mod_adele
+     * activity of that course shows it.
+     *
+     * This is what ties a path to a course. The web services that hand out
+     * learner data take the context from the client; rights that come from a
+     * course (teaching it, being enrolled in it) may only count where the
+     * path is actually shown - otherwise any course somebody belongs to would
+     * open the learner data of every path.
+     *
+     * @param int $learningpathid The learning path.
+     * @param int $courseid The course.
+     * @return bool
+     */
+    public static function is_embedded_in_course(int $learningpathid, int $courseid): bool {
+        global $DB;
+        if ($learningpathid <= 0 || $courseid <= 0) {
+            return false;
+        }
+        // The embedding lives in mod_adele; without it nothing is embedded.
+        if (!$DB->get_manager()->table_exists('adele')) {
+            return false;
+        }
+        return $DB->record_exists('adele', ['course' => $courseid, 'learningpathid' => $learningpathid]);
+    }
+
+    /**
      * Require that the current user may edit the given learning path.
      *
      * Managers and site admins have full access; everyone else must be an editor

@@ -411,3 +411,84 @@ export async function enrolmentStatus(page: Page, courseid: string, learner: str
   const text = (await row.first().innerText()).replace(/\s+/g, ' ');
   return /Suspended/.test(text) ? 'Suspended' : /Active/.test(text) ? 'Active' : text;
 }
+
+/** One row of the participant list of an embedded path (UserList.vue). */
+export interface ParticipantRow {
+  /** Last name. */
+  name: string;
+  /** Percentage as the progress bar announces it (aria-valuenow). */
+  percent: string;
+  /** Best route, "completed/total". */
+  route: string;
+  /** Rank. */
+  rank: string;
+  /** Whether the row links to the learner's detail view (teacher view only). */
+  link: boolean;
+}
+
+/**
+ * The participant list as the page shows it right now, one line per row:
+ * "<last name> | <percent> | <route> | rank <rank>", with " | link" where the
+ * row leads to the learner's detail view.
+ *
+ * Read from the END of each row: the teacher's view has a leading ID column
+ * the participant's view lacks.
+ *
+ * @param page A page showing an embedded path.
+ */
+export async function participantList(page: Page): Promise<string[]> {
+  const rows: ParticipantRow[] = await page.locator('#adele-userlist-table tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => {
+      const cells = Array.from(tr.querySelectorAll('td'));
+      const text = (index: number) => (cells[cells.length - index]?.textContent || '').trim();
+      const bar = cells[cells.length - 3]?.querySelector('[role="progressbar"]');
+      return {
+        name: text(4),
+        percent: bar?.getAttribute('aria-valuenow') || '',
+        route: text(2),
+        rank: text(1),
+        link: Boolean(tr.querySelector('a')),
+      };
+    })
+  );
+  return rows.map((row) => `${row.name} | ${row.percent} | ${row.route} | rank ${row.rank}${row.link ? ' | link' : ''}`);
+}
+
+/**
+ * Call a Moodle web service the way the page's own JavaScript does: with the
+ * session of the person logged in, through lib/ajax/service.php.
+ *
+ * For the negative tests of the plan: what the interface does not offer may
+ * still be asked for directly, and what the server answers THEN is the
+ * boundary - not the absence of a button.
+ *
+ * @param page The page, logged in as the person asking.
+ * @param methodname The web service function.
+ * @param args Its arguments.
+ * @returns The data, or the error code the server refused with.
+ */
+export async function callService(
+  page: Page,
+  methodname: string,
+  args: Record<string, unknown>
+): Promise<{ data?: unknown; error?: string }> {
+  const ready = () => page.evaluate(() => Boolean((window as unknown as { M?: { cfg?: { sesskey?: string } } }).M?.cfg?.sesskey))
+    .catch(() => false);
+  if (!(await ready())) {
+    // Any page of the site carries the session key.
+    await page.goto('/user/preferences.php');
+  }
+  return page.evaluate(async ([method, parameters]) => {
+    const sesskey = (window as unknown as { M: { cfg: { sesskey: string } } }).M.cfg.sesskey;
+    const response = await fetch(`/lib/ajax/service.php?sesskey=${sesskey}&info=${method}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ index: 0, methodname: method, args: parameters }]),
+    });
+    const answer = (await response.json())[0];
+    if (answer.error) {
+      return { error: String(answer.exception?.errorcode || 'error') };
+    }
+    return { data: answer.data };
+  }, [methodname, args] as const);
+}
