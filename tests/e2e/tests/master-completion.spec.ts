@@ -30,10 +30,8 @@
  * completion, follow-up releases), route progress and percentage (L4, O3),
  * real access to T02 and its enrolment (suspend, not delete).
  *
- * NOT checked: the completion of the embedding mod_adele activity ("learning
- * path finished"). mod_adele offers that rule but has no custom_completion
- * class, so Moodle never evaluates it - see
- * docs/issues/mod_adele-issue-completion-rule-learningpath-finished.md.
+ * The completion of the embedding mod_adele activity ("learning path
+ * finished") is chain Z's subject: final-completion.spec.ts, Z4.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach

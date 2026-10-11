@@ -492,3 +492,50 @@ export async function callService(
     return { data: answer.data };
   }, [methodname, args] as const);
 }
+
+/**
+ * The completion of an activity as the person logged in sees it on the course
+ * page: Moodle's button ("To do" / "Done") and the conditions behind it, e.g.
+ * "Done | Done: Finish the learning path".
+ *
+ * @param page The page, logged in as the learner.
+ * @param courseid The course.
+ * @param activityname The activity's name.
+ */
+export async function activityCompletion(page: Page, courseid: string, activityname: string): Promise<string> {
+  await page.goto(`/course/view.php?id=${courseid}`);
+  const info = page.locator(`[data-region="activity-information"][data-activityname="${activityname}"]`).first();
+  await expect(info, `the course page must show the completion of "${activityname}"`).toBeVisible({ timeout: 30_000 });
+  const clean = (text: string) => text.replace(/\s+/g, ' ').trim();
+  const button = clean(await info.locator('button.dropdown-toggle').first().innerText());
+  // The conditions sit in a closed dropdown: read the text, not the rendering.
+  const conditions = await info.locator('.completion-dialog [role="listitem"]')
+    .evaluateAll((items) => items.map((item) => (item.textContent || '').replace(/\s+/g, ' ').trim()));
+  return `${button} | ${conditions.join(' ; ')}`;
+}
+
+/**
+ * The completion of an activity for one person as the teacher's activity
+ * completion report states it: "Completed" or "Not completed".
+ *
+ * @param page The page, logged in as somebody who may see the report.
+ * @param courseid The course.
+ * @param activityname The activity's name.
+ * @param person A text that identifies the person's row (e.g. the last name).
+ */
+export async function completionReport(page: Page, courseid: string, activityname: string, person: string): Promise<string> {
+  await page.goto(`/report/progress/index.php?course=${courseid}`);
+  const cell = page.locator('tr').filter({ hasText: person }).first()
+    .locator(`[data-activityname="${activityname}"] img`).first();
+  await expect(cell, `the report must list ${person} for "${activityname}"`).toBeVisible({ timeout: 30_000 });
+  const alt = (await cell.getAttribute('alt')) || '';
+  // "<person>, <activity>: Completed <date>" or "...: Not completed" - the
+  // latter with a date as well once a completion has been taken back.
+  const state = alt.slice(alt.lastIndexOf(`${activityname}: `) + activityname.length + 2).trim();
+  for (const known of ['Not completed', 'Completed']) {
+    if (state.startsWith(known)) {
+      return known;
+    }
+  }
+  return state;
+}

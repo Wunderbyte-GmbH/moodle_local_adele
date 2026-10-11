@@ -518,6 +518,8 @@ function local_adele_fixture_two_conditions(array $first, array $feedback, array
  * @param int $pathid The learning path.
  * @param stdClass $learner The learner.
  * @param int $category Course category.
+ * @param int $userlist "Participant results": 1 all participants, 2 only own.
+ * @param bool $completionrule Whether the activity completes when the learning path is finished.
  * @return stdClass The host course.
  */
 function local_adele_fixture_host_course(
@@ -526,7 +528,8 @@ function local_adele_fixture_host_course(
     int $pathid,
     stdClass $learner,
     int $category,
-    int $userlist = 1
+    int $userlist = 1,
+    bool $completionrule = false
 ): stdClass {
     global $DB;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
@@ -551,7 +554,7 @@ function local_adele_fixture_host_course(
     if ($manual && $instance && $roleid) {
         $manual->enrol_user($instance, $learner->id, $roleid);
     }
-    local_adele_fixture_embed($course, $activityname, $pathid, $userlist);
+    local_adele_fixture_embed($course, $activityname, $pathid, $userlist, $completionrule);
     return $course;
 }
 
@@ -563,9 +566,23 @@ function local_adele_fixture_host_course(
  * @param string $activityname The activity's name.
  * @param int $pathid The path.
  * @param int $userlist "Participant results": 1 all participants, 2 only own.
+ * @param bool $completionrule Whether the activity completes when the learning path is finished.
  * @return int The course module id.
  */
-function local_adele_fixture_embed(stdClass $course, string $activityname, int $pathid, int $userlist = 1): int {
+function local_adele_fixture_embed(
+    stdClass $course,
+    string $activityname,
+    int $pathid,
+    int $userlist = 1,
+    bool $completionrule = false
+): int {
+    global $DB;
+    if ($completionrule && empty($course->enablecompletion)) {
+        // Completion tracking is a course setting; the rule needs it.
+        $DB->set_field('course', 'enablecompletion', 1, ['id' => $course->id]);
+        $course->enablecompletion = 1;
+        rebuild_course_cache($course->id, true);
+    }
     $module = create_module((object) [
         'modulename' => 'adele',
         'course' => $course->id,
@@ -579,6 +596,9 @@ function local_adele_fixture_embed(stdClass $course, string $activityname, int $
         'hostenrolmentmode' => 'visible',
         'userlist' => $userlist,
         'view' => 1,
+        'completion' => $completionrule ? COMPLETION_TRACKING_AUTOMATIC : COMPLETION_TRACKING_NONE,
+        'completionview' => 0,
+        'completionlearningpathfinished' => $completionrule ? 1 : 0,
     ]);
     return (int) $module->coursemodule;
 }
@@ -765,6 +785,7 @@ $masteraccesstimepath = null;
 $masterbothpath = null;
 $privacypath = null;
 $privacysecond = null;
+$finalpaths = [];
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -1079,6 +1100,54 @@ if (!empty($imported['Linear A1'])) {
             $masteraccess,
             'fx_p_b',
             'Privacy Beta',
+            $fixturepassword
+        );
+        // Z: overall completion. Four paths, each with a learner of its own,
+        // each embedded with the completion rule "learning path finished":
+        // Z1 regular (linear), Z2 alternative route (the diamond of chain A),
+        // Z3 manual completion on EVERY node, Z4 master completion (linear).
+        $finalpaths['Z1'] = local_adele_fixture_store_path(
+            'E2E Abschluss regulär',
+            $masteraccess,
+            'fx_z_regular',
+            'Final regular',
+            $fixturepassword
+        );
+        if (!empty($routepaths)) {
+            $finalpaths['Z2'] = local_adele_fixture_store_path(
+                'E2E Abschluss Route',
+                $diamond,
+                'fx_z_route',
+                'Final route',
+                $fixturepassword
+            );
+        }
+        $manualall = $masteraccess;
+        foreach ($manualall['tree']['nodes'] as $n => $node) {
+            foreach ($node['completion']['nodes'] ?? [] as $c => $condition) {
+                if (($condition['data']['label'] ?? '') === 'course_completed') {
+                    $data = $condition['data'];
+                    $data['label'] = 'manual';
+                    $data['name'] = get_string('course_name_condition_completion_manual', 'local_adele');
+                    $data['description'] = get_string('course_description_condition_completion_manual', 'local_adele');
+                    $data['information'] = get_string('course_information_condition_completion_manual', 'local_adele');
+                    $data['value'] = null;
+                    $manualall['tree']['nodes'][$n]['completion']['nodes'][$c]['data'] = $data;
+                }
+            }
+        }
+        $finalpaths['Z3'] = local_adele_fixture_store_path(
+            'E2E Abschluss manuell',
+            $manualall,
+            'fx_z_manual',
+            'Final manual',
+            $fixturepassword
+        );
+        $finalpaths['Z4'] = local_adele_fixture_store_path(
+            'E2E Abschluss Master',
+            $masteraccess,
+            'fx_z_master',
+            'Final master',
             $fixturepassword
         );
         $windowonly = $timedtemplate['data'];
@@ -1588,6 +1657,22 @@ if ($privacypath && $privacysecond) {
         'cms' => $privacycms,
         'people' => ['A' => $privacya, 'B' => $privacyb] + $privacypeople,
     ];
+}
+
+// Z: each path in a host course of its own, the activity completing when the
+// learning path is finished.
+foreach ($finalpaths as $key => [$pathid, $learner]) {
+    $finalhost = local_adele_fixture_host_course(
+        'E2E' . $key,
+        'E2E ' . $key . ' final',
+        $pathid,
+        $learner,
+        (int) $options['category'],
+        1,
+        true
+    );
+    printf("export ADELE_FIXTURE_%s_LEARNER='%s'\n", $key, $learner->username);
+    printf("export ADELE_FIXTURE_%s_HOST='%d'\n", $key, $finalhost->id);
 }
 
 if ($privacy) {

@@ -29,9 +29,9 @@
  *
  * The row "0 1" is what the plan leaves to the implementation. Measured
  * first, then pinned: a master completion on a LOCKED node completes it and
- * releases its successor, without any master access. Whether that is the
- * intended semantics is an open question (session protocol, part 29); if it
- * is decided otherwise, this row changes and nothing else.
+ * releases its successor, without any master access. Decided on 2026-10-07:
+ * that is intended - a master completion always works, whatever the
+ * prerequisites say.
  *
  * Checked in every combination: node states and route progress as the
  * learner sees them, and real access to T02 and T03.
@@ -114,7 +114,7 @@ test.describe('ADELE-E2E-O4 — both master checkboxes, all four combinations', 
         'nothing set');
     });
 
-    await test.step('access 0, completion 1: node 2 completed, node 3 released (as implemented)', async () => {
+    await test.step('access 0, completion 1: node 2 completed, node 3 released - master completion needs no access', async () => {
       await setOnNode2(page, 'Master completion checkbox', true);
       await expectCombination(page, 'accessible completed accessible | 1/3', true, true,
         'master completion alone');
