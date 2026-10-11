@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * zz-time-conditions - chain T of the E2E plan (section 9), T1 to T3.
+ * zz-time-conditions - chain T of the E2E plan (section 9), T1 to T5.
  *
  *     before the window   -> the entry course stays closed
  *     inside the window   -> it opens
@@ -46,6 +46,7 @@
 import { test } from '@playwright/test';
 import { loginAs } from '../support/env';
 import {
+  completeCourse,
   drainTaskQueue,
   expectCourseClosed,
   expectCourseClosedAfterTasks,
@@ -54,6 +55,7 @@ import {
   fixtureCourse,
   fixturePassword,
   hasServerClock,
+  runCompletion,
   resetServerTime,
   setServerTime,
 } from '../support/fixtures';
@@ -73,7 +75,8 @@ test.describe('ADELE-E2E-T — a fixed time window opens and closes the entry co
   // due by then run - for ALL learners, not just this chain's. T1/T2 jump to
   // 2030, which would also fire the closing task of T3's one-day period and
   // leave that learner closed with nothing to reopen them once the clock is
-  // back. So the shorter jump (T3, one day) runs first. For the same reason
+  // back. So the shorter jump (T3, one day) runs first, then T1/T2 (2030),
+  // then T4/T5 with a window of their own (2031). For the same reason
   // this file has to run after every chain that does not move the clock -
   // the "zz-" prefix sorts it last in the suite, whatever files are added.
   test('T3: a relative period - open from the assignment, closed one day later', async ({ page }) => {
@@ -118,6 +121,55 @@ test.describe('ADELE-E2E-T — a fixed time window opens and closes the entry co
       setServerTime(end + AFTER_BUFFER);
       await loginAs(page, learner, fixturePassword());
       await expectCourseClosedAfterTasks(page, entry, 'the window has closed, so must the course');
+    });
+  });
+
+  test('T4/T5: the window AND / OR a completed predecessor', async ({ page }) => {
+    // Node 2 (T02) of two fixture paths: "E2E Zeit UND Vorgänger" and
+    // "E2E Zeit ODER Vorgänger". Two learners each - "first" completes T01
+    // before the window, "late" only inside it - so every row of the plan's
+    // truth tables is walked. ALL steps on the real clock come first, then
+    // one jump: a jump runs every task due by then, for every learner. Their
+    // window (2031) lies after T1/T2's (2030), so neither chain can consume
+    // the other's re-evaluation tasks - which is why this test runs last.
+    const t02 = fixtureCourse('T02');
+    const who = (key: string): string => fixture(`ADELE_FIXTURE_T_${key}`);
+
+    await test.step('neither: everybody locked out of T02', async () => {
+      drainTaskQueue();
+      for (const key of ['AND_FIRST', 'AND_LATE', 'OR_FIRST', 'OR_LATE']) {
+        await loginAs(page, who(key), fixturePassword());
+        await expectCourseClosed(page, t02, `${key}: no predecessor, no window`);
+      }
+    });
+
+    await test.step('predecessor only: AND stays locked, OR opens', async () => {
+      for (const key of ['AND_FIRST', 'OR_FIRST']) {
+        await loginAs(page, who(key), fixturePassword());
+        await completeCourse(page, fixtureCourse('T01'));
+      }
+      runCompletion();
+      await loginAs(page, who('OR_FIRST'), fixturePassword());
+      await expectCourseOpenAfterTasks(page, t02, 'OR: the completed predecessor is enough');
+      await loginAs(page, who('AND_FIRST'), fixturePassword());
+      await expectCourseClosed(page, t02, 'AND: the window is still missing');
+    });
+
+    await test.step('window only: AND stays locked, OR opens', async () => {
+      setServerTime(Number(fixture('ADELE_FIXTURE_TIMEWINDOW2_START')) + AFTER_BUFFER);
+      await loginAs(page, who('OR_LATE'), fixturePassword());
+      await expectCourseOpenAfterTasks(page, t02, 'OR: the open window is enough');
+      await loginAs(page, who('AND_LATE'), fixturePassword());
+      await expectCourseClosed(page, t02, 'AND: the predecessor is still missing');
+    });
+
+    await test.step('both: AND opens', async () => {
+      await loginAs(page, who('AND_FIRST'), fixturePassword());
+      await expectCourseOpenAfterTasks(page, t02, 'AND: predecessor completed and window open');
+      await loginAs(page, who('AND_LATE'), fixturePassword());
+      await completeCourse(page, fixtureCourse('T01'));
+      runCompletion();
+      await expectCourseOpenAfterTasks(page, t02, 'AND: completed inside the window');
     });
   });
 });

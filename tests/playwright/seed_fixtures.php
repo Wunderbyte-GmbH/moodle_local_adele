@@ -419,6 +419,64 @@ function local_adele_fixture_single_condition(array $first, array $feedback, arr
 }
 
 /**
+ * The access criterion of a node with TWO conditions, joined the way the
+ * restriction editor joins them (RestrictionFlow.vue):
+ *   and: the second condition hangs below the first (source_and ->
+ *        target_and) - one chain, one feedback node, both must hold;
+ *   or:  the second condition starts a chain of its own with its own
+ *        feedback node, linked to the first by source_or -> target_or -
+ *        either chain suffices.
+ *
+ * @param array $first A first condition of some fixture node (wiring template).
+ * @param array $feedback The feedback node belonging to it.
+ * @param array $data1 Data of the first condition.
+ * @param array $data2 Data of the second condition.
+ * @param string $relation "and" or "or".
+ * @return array The restriction: nodes and edges.
+ */
+function local_adele_fixture_two_conditions(array $first, array $feedback, array $data1, array $data2, string $relation): array {
+    $restriction = local_adele_fixture_single_condition($first, $feedback, $data1);
+    $second = $first;
+    $second['id'] = 'condition_2';
+    $second['data'] = $data2;
+    $edgebase = $restriction['edges'][0];
+    if ($relation === 'and') {
+        $second['parentCondition'] = ['condition_1'];
+        $second['childCondition'] = [];
+        $restriction['nodes'][0]['childCondition'] = ['condition_1_feedback', 'condition_2'];
+        $restriction['nodes'][] = $second;
+        $restriction['edges'][] = array_merge($edgebase, [
+            'id' => 'condition_1-condition_2',
+            'source' => 'condition_1',
+            'sourceHandle' => 'source_and',
+            'target' => 'condition_2',
+            'targetHandle' => 'target_and',
+        ]);
+        return $restriction;
+    }
+    $second['parentCondition'] = ['starting_condition'];
+    $second['childCondition'] = ['condition_2_feedback'];
+    $secondfeedback = $feedback;
+    $secondfeedback['id'] = 'condition_2_feedback';
+    $secondfeedback['data']['childCondition'] = 'condition_2';
+    $restriction['nodes'][] = $second;
+    $restriction['nodes'][] = $secondfeedback;
+    $restriction['edges'][] = array_merge($edgebase, [
+        'id' => 'condition_2-condition_2_feedback',
+        'source' => 'condition_2',
+        'target' => 'condition_2_feedback',
+    ]);
+    $restriction['edges'][] = array_merge($edgebase, [
+        'id' => 'condition_1-condition_2',
+        'source' => 'condition_1',
+        'sourceHandle' => 'source_or',
+        'target' => 'condition_2',
+        'targetHandle' => 'target_or',
+    ]);
+    return $restriction;
+}
+
+/**
  * A host course of its own for one fixture path: one mod_adele activity
  * (source "this course"), the learner as its only member. Activities from an
  * earlier run are removed first.
@@ -609,6 +667,10 @@ function local_adele_fixture_store_path(
 const LOCAL_ADELE_FIXTURE_WINDOW_START = 1894701600;
 /** @var int End of the fixture window: 2030-01-15 12:00:00 UTC. */
 const LOCAL_ADELE_FIXTURE_WINDOW_END = 1894708800;
+/** @var int Start of the second window (T4/T5): 2031-01-15 10:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_WINDOW2_START = 1926237600;
+/** @var int End of the second window (T4/T5): 2031-01-15 12:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_WINDOW2_END = 1926244800;
 $timepath = null;
 $timelearner = null;
 $durationpath = null;
@@ -616,6 +678,8 @@ $durationlearner = null;
 $durationcreated = 0;
 $c1paths = [];
 $c3path = null;
+$timecombined = [];
+$routepaths = [];
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -751,6 +815,91 @@ if (!empty($imported['Linear A1'])) {
             'Manual release',
             $fixturepassword
         );
+
+        // A: alternative routes - a diamond. T01 opens T02 and T03; T04
+        // needs either of them (1 of 2, the editor's default). Each variant
+        // of the plan has a learner of its own: only T02, only T03, both,
+        // neither.
+        $courset04 = $DB->get_record('course', ['shortname' => 'T04']);
+        $diamond = $base;
+        $nodes = [];
+        foreach ($diamond['tree']['nodes'] as $node) {
+            $nodes[$node['id']] = $node;
+        }
+        if ($courset04 && isset($nodes['dndnode_1'], $nodes['dndnode_2'], $nodes['dndnode_3'])) {
+            $fourth = $nodes['dndnode_3'];
+            $fourth['id'] = 'dndnode_4';
+            $fourth['data']['node_id'] = 'dndnode_4';
+            $fourth['data']['course_node_id'] = [(string) $courset04->id];
+            $fourth['data']['fullname'] = $courset04->fullname;
+            $fourth['data']['shortname'] = $courset04->shortname;
+            $fourth['parentCourse'] = ['dndnode_2', 'dndnode_3'];
+            $fourth['childCourse'] = [];
+            $fourth['restriction'] = $parentcriterion(['dndnode_2', 'dndnode_3'], 1);
+            $fourth['position'] = ['x' => 300, 'y' => 1200];
+            $nodes['dndnode_1']['childCourse'] = ['dndnode_2', 'dndnode_3'];
+            $nodes['dndnode_2']['childCourse'] = ['dndnode_4'];
+            $nodes['dndnode_2']['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            $nodes['dndnode_2']['position'] = ['x' => 0, 'y' => 600];
+            $nodes['dndnode_3']['parentCourse'] = ['dndnode_1'];
+            $nodes['dndnode_3']['childCourse'] = ['dndnode_4'];
+            $nodes['dndnode_3']['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            $nodes['dndnode_3']['position'] = ['x' => 600, 'y' => 600];
+            $nodes['dndnode_4'] = $fourth;
+            $diamond['tree']['nodes'] = array_values($nodes);
+            $diamond['tree']['edges'] = [
+                $edge('dndnode_1', 'dndnode_2'),
+                $edge('dndnode_1', 'dndnode_3'),
+                $edge('dndnode_2', 'dndnode_4'),
+                $edge('dndnode_3', 'dndnode_4'),
+            ];
+            foreach (['t02', 't03', 'both', 'none'] as $variant) {
+                $routepaths[$variant] = local_adele_fixture_store_path(
+                    'E2E Alternative Routen',
+                    $diamond,
+                    'fx_a_' . $variant,
+                    'Route ' . $variant,
+                    $fixturepassword
+                );
+            }
+        }
+
+        // T4/T5: predecessor AND / OR the fixed window. Node 2 of the linear
+        // path; two learners per path, so both middle rows of the plan's
+        // truth table are walked: one completes T01 first, one reaches the
+        // window first.
+        $windowdata = $timedtemplate['data'];
+        // A window of their own, a year after T1/T2's: a clock jump runs every
+        // task due by then, so two chains sharing one window would consume
+        // each other's re-evaluations.
+        $windowdata['value'] = ['start' => LOCAL_ADELE_FIXTURE_WINDOW2_START, 'end' => LOCAL_ADELE_FIXTURE_WINDOW2_END];
+        $predecessordata = $firsttemplate['data'];
+        $predecessordata['value'] = ['courses_id' => ['dndnode_1'], 'min_courses' => 1];
+        foreach (['and' => 'E2E Zeit UND Vorgänger', 'or' => 'E2E Zeit ODER Vorgänger'] as $relation => $name) {
+            $combined = $base;
+            foreach ($combined['tree']['nodes'] as $n => $node) {
+                if ($node['id'] === 'dndnode_2') {
+                    $combined['tree']['nodes'][$n]['restriction'] = local_adele_fixture_two_conditions(
+                        $firsttemplate,
+                        $feedbacktemplate,
+                        $predecessordata,
+                        $windowdata,
+                        $relation
+                    );
+                } else if ($node['id'] === 'dndnode_3') {
+                    $combined['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+                }
+            }
+            foreach (['first' => 'completes first', 'late' => 'window first'] as $who => $lastname) {
+                $timecombined[$relation][$who] = local_adele_fixture_store_path(
+                    $name,
+                    $combined,
+                    'fx_t_' . $relation . '_' . $who,
+                    'Time ' . $relation . ' ' . $lastname,
+                    $fixturepassword
+                );
+            }
+        }
     }
 }
 
@@ -987,6 +1136,16 @@ foreach ($c1paths as $variant => [$pathid, $learner]) {
         (int) $options['category']
     );
 }
+$routehosts = [];
+foreach ($routepaths as $variant => [$pathid, $learner]) {
+    $routehosts[$variant] = local_adele_fixture_host_course(
+        'E2EA' . strtoupper($variant),
+        'E2E A ' . $variant,
+        $pathid,
+        $learner,
+        (int) $options['category']
+    );
+}
 $c3host = $c3path ? local_adele_fixture_host_course(
     'E2EC3',
     'E2E C3 manual',
@@ -1001,11 +1160,22 @@ foreach ($c1paths as $variant => [$pathid, $learner]) {
     printf("export ADELE_FIXTURE_C1_%s_LEARNER='%s'\n", $key, $learner->username);
     printf("export ADELE_FIXTURE_C1_%s_HOST='%d'\n", $key, $c1hosts[$variant]->id);
 }
+foreach ($routepaths as $variant => [$pathid, $learner]) {
+    $key = strtoupper($variant);
+    printf("export ADELE_FIXTURE_A_%s_LEARNER='%s'\n", $key, $learner->username);
+    printf("export ADELE_FIXTURE_A_%s_LEARNER_NAME='%s'\n", $key, fullname($learner));
+    printf("export ADELE_FIXTURE_A_%s_HOST='%d'\n", $key, $routehosts[$variant]->id);
+}
 if ($c3path && $c3host) {
     printf("export ADELE_FIXTURE_PATH_C3='%d'\n", $c3path[0]);
     printf("export ADELE_FIXTURE_C3_LEARNER='%s'\n", $c3path[1]->username);
     printf("export ADELE_FIXTURE_C3_LEARNER_NAME='%s'\n", fullname($c3path[1]));
     printf("export ADELE_FIXTURE_C3_HOST='%d'\n", $c3host->id);
+}
+foreach ($timecombined as $relation => $learners) {
+    foreach ($learners as $who => [$pathid, $learner]) {
+        printf("export ADELE_FIXTURE_T_%s_%s='%s'\n", strtoupper($relation), strtoupper($who), $learner->username);
+    }
 }
 if ($durationpath && $durationlearner) {
     printf("export ADELE_FIXTURE_PATH_DURATION='%d'\n", $durationpath);
@@ -1017,6 +1187,7 @@ if ($timepath && $timelearner) {
     printf("export ADELE_FIXTURE_TIME_LEARNER='%s'\n", $timelearner->username);
     printf("export ADELE_FIXTURE_TIMEWINDOW_START='%d'\n", LOCAL_ADELE_FIXTURE_WINDOW_START);
     printf("export ADELE_FIXTURE_TIMEWINDOW_END='%d'\n", LOCAL_ADELE_FIXTURE_WINDOW_END);
+    printf("export ADELE_FIXTURE_TIMEWINDOW2_START='%d'\n", LOCAL_ADELE_FIXTURE_WINDOW2_START);
 }
 printf("export ADELE_FIXTURE_TEACHER='%s'\n", $teacher->username);
 printf("export ADELE_FIXTURE_TEACHER_NAME='%s'\n", fullname($teacher));

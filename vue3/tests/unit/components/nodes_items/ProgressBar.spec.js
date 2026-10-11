@@ -54,6 +54,17 @@ describe('ProgressBar.vue', () => {
     expect(label.text()).toBe('No progress yet');
   });
 
+  // aria-valuenow was written as "{{ props.progress }}" - mustache syntax does
+  // not interpolate inside attributes, so assistive technology was handed
+  // that literal text instead of a number.
+  it('exposes the value to assistive technology as a number', () => {
+    const wrapper = factory({ progress: 66.67, status: 'b' });
+    const bar = wrapper.find('[role="progressbar"]');
+    expect(bar.attributes('aria-valuenow')).toBe('66.67');
+    expect(bar.attributes('aria-valuemin')).toBe('0');
+    expect(bar.attributes('aria-valuemax')).toBe('100');
+  });
+
   it('sets the bar width from the progress prop', () => {
     const wrapper = factory({ progress: 73, status: 'c' });
     const bar = wrapper.find('.progress-bar');
