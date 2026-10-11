@@ -120,6 +120,116 @@ async function zoneBelongsTo(page: Page, zone: DropZone, target: string): Promis
 }
 
 /**
+ * Whether the zones currently drawn are those of the given node.
+ *
+ * Stricter than zoneBelongsTo(): the zone for "parallel" is drawn at a fixed
+ * place relative to its node - 450 canvas units right of the node's left
+ * edge, its middle at the height of the node's middle (drawDropzone.ts). The
+ * zone itself is 200 units high, which gives the scale. That tells apart the
+ * nodes of a column and the nodes of a row, where "to the right of it" does
+ * neither.
+ *
+ * @param page The page.
+ * @param target The node the zones should belong to.
+ */
+export async function zonesAround(page: Page, target: string): Promise<boolean> {
+  const z = await boxNow(flowNode(page, 'dropzone_and'));
+  const t = await boxNow(flowNode(page, target));
+  if (!z || !t) {
+    return false;
+  }
+  const tolerance = Math.max(4, z.height * 0.15);
+  const unit = z.height / 200;
+  return Math.abs(z.x - t.x - 450 * unit) < tolerance
+    && Math.abs(z.y + z.height / 2 - (t.y + t.height / 2)) < tolerance;
+}
+
+/**
+ * Start dragging a course out of the sidebar. The mouse button stays down;
+ * end with page.mouse.up().
+ *
+ * @param page The page showing the editor.
+ * @param shortname The fixture course.
+ * @returns The course name as the sidebar shows it.
+ */
+export async function startDrag(page: Page, shortname: string): Promise<string> {
+  await fitCanvas(page);
+  const { source, label } = await settledSidebarCourse(page, shortname);
+  await source.hover();
+  await page.mouse.down();
+  return label;
+}
+
+/**
+ * During a drag: jump with the pointer onto the middle of a node.
+ *
+ * @param page The page.
+ * @param target The node.
+ * @param nudge Pixels to the right of the middle - a second jump to the very
+ *              same spot would not be a movement.
+ */
+export async function dragOverNode(page: Page, target: string, nudge = 0): Promise<void> {
+  const dst = await boxNow(flowNode(page, target));
+  const area = await pane(page).boundingBox();
+  expect(dst && area, `node ${target} and the canvas must be on screen`).toBeTruthy();
+  await pane(page).hover({
+    position: { x: dst!.x + dst!.width / 2 - area!.x + nudge, y: dst!.y + dst!.height / 2 - area!.y },
+    force: true,
+  });
+  await page.waitForTimeout(300);
+}
+
+/**
+ * During a drag: move the pointer onto a zone until the editor confirms the
+ * hit ("Drop to connect").
+ *
+ * Aims into the VISIBLE part of the zone, re-measured each time. Bounded: a
+ * zone that cannot be hit is a defect worth a red test, not a hang.
+ *
+ * @param page The page.
+ * @param zone The zone.
+ * @returns Whether the editor registered the pointer on the zone.
+ */
+export async function dragOntoZone(page: Page, zone: DropZone): Promise<boolean> {
+  const zoneLocator = flowNode(page, `dropzone_${zone}`);
+  let hit = false;
+  for (let attempt = 0; attempt < 10 && !hit; attempt++) {
+    const box = await boxNow(zoneLocator);
+    const area = await pane(page).boundingBox();
+    if (box && area) {
+      const top = Math.max(box.y, area.y) + 1;
+      const bottom = Math.min(box.y + box.height, area.y + area.height) - 1;
+      const left = Math.max(box.x, area.x) + 1;
+      const right = Math.min(box.x + box.width, area.x + area.width) - 1;
+      if (bottom > top && right > left) {
+        await pane(page).hover({
+          position: { x: (left + right) / 2 - area.x + (attempt % 2), y: Math.min(top + 30, (top + bottom) / 2) - area.y },
+          force: true,
+        });
+      }
+    }
+    await page.waitForTimeout(250);
+    // With a timeout of its own: a zone that has gone would otherwise be
+    // waited for until the test's time is up.
+    hit = HIT.test(await zoneLocator.first().innerText({ timeout: 1_000 }).catch(() => ''));
+  }
+  return hit;
+}
+
+/**
+ * End a running drag without dropping anything: back to the sidebar, where
+ * nothing accepts a drop.
+ *
+ * @param page The page.
+ * @param shortname The fixture course being dragged.
+ */
+export async function abandonDrag(page: Page, shortname: string): Promise<void> {
+  await sidebarCourse(page, shortname).hover({ force: true });
+  await page.mouse.up();
+  await expect(page.locator('.vue-flow__node[data-id^="dropzone_"]'), 'the zones must go when the drag ends').toHaveCount(0);
+}
+
+/**
  * Bring the whole path into view with room to spare.
  *
  * The editor fits the view when it opens and when the canvas resizes, but
@@ -218,73 +328,37 @@ export async function dropFirstCourse(page: Page, shortname: string): Promise<vo
  * @param shortname The fixture course to drag.
  * @param target The business id of the node to attach to, e.g. "dndnode_1".
  * @param zone The relation.
+ * @param via A node to pass on the way, the way a hand coming from the
+ *            sidebar passes other nodes: the zones appear there first and
+ *            have to follow the pointer to the target (#580).
  */
-export async function dropCourseAt(page: Page, shortname: string, target: string, zone: DropZone): Promise<void> {
+export async function dropCourseAt(
+  page: Page, shortname: string, target: string, zone: DropZone, via: string | null = null
+): Promise<void> {
   const nodes = app(page).locator('[data-testid^="learningpath-node-"]');
   const before = await nodes.count();
-  await fitCanvas(page);
-  const { source, label } = await settledSidebarCourse(page, shortname);
+  const label = await startDrag(page, shortname);
 
-  await source.hover();
-  await page.mouse.down();
+  if (via) {
+    await dragOverNode(page, via);
+    expect(await zonesAround(page, via), `the zones must first appear at ${via}, the node passed on the way`).toBe(true);
+  }
 
-  // The zones are drawn around the node CLOSEST to the pointer and then stay
-  // there until the pointer moves far away. Travelling towards the target in
-  // small steps passes other nodes first and pins the zones to them - so the
-  // pointer jumps straight onto the target, and the zones are checked to lie
-  // around THAT node before anything is dropped.
-  const zoneLocator = flowNode(page, `dropzone_${zone}`);
+  // The zones are drawn around the node nearest to the pointer and follow it
+  // from node to node (#580). The pointer jumps onto the target; that the
+  // zones lie around THAT node is checked before anything is dropped. A few
+  // attempts, each a little to the side: the editor looks at the pointer
+  // only every 100 ms, and a jump to the very same spot is no movement.
   let placed = false;
   for (let attempt = 0; attempt < 6 && !placed; attempt++) {
-    const dst = await boxNow(flowNode(page, target));
-    const area = await pane(page).boundingBox();
-    if (!dst || !area) {
-      break;
-    }
-    // On a retry, pass over the starting marker first: that is where the
-    // editor removes any zones it has drawn, and only then does it look for
-    // the closest node again (SidebarPath.onDrag). The first attempt jumps
-    // straight onto the target, so no other node is passed on the way.
-    const marker = attempt > 0 ? await boxNow(flowNode(page, 'starting_node')) : null;
-    if (marker) {
-      await pane(page).hover({
-        position: { x: marker.x + marker.width / 2 - area.x, y: marker.y + marker.height / 2 - area.y },
-        force: true,
-      });
-      await page.waitForTimeout(250);
-    }
-    await pane(page).hover({
-      position: { x: dst.x + dst.width / 2 - area.x + attempt, y: dst.y + dst.height / 2 - area.y },
-      force: true,
-    });
-    await page.waitForTimeout(300);
-    placed = await zoneBelongsTo(page, zone, target);
+    await dragOverNode(page, target, attempt);
+    placed = (await zoneBelongsTo(page, zone, target)) && (await zonesAround(page, target));
   }
   expect(placed, `the ${zone} zone never appeared next to ${target}`).toBe(true);
 
-  // Aim into the VISIBLE part of the zone, re-measured each time, until the
-  // editor confirms the hit. Bounded: a zone that cannot be hit is a defect
-  // worth a red test, not a hang.
-  let hit = false;
-  for (let attempt = 0; attempt < 10 && !hit; attempt++) {
-    const box = await boxNow(zoneLocator);
-    const area = await pane(page).boundingBox();
-    if (box && area) {
-      const top = Math.max(box.y, area.y) + 1;
-      const bottom = Math.min(box.y + box.height, area.y + area.height) - 1;
-      const left = Math.max(box.x, area.x) + 1;
-      const right = Math.min(box.x + box.width, area.x + area.width) - 1;
-      if (bottom > top && right > left) {
-        await pane(page).hover({
-          position: { x: (left + right) / 2 - area.x + (attempt % 2), y: Math.min(top + 30, (top + bottom) / 2) - area.y },
-          force: true,
-        });
-      }
-    }
-    await page.waitForTimeout(250);
-    hit = HIT.test(await zoneLocator.innerText().catch(() => ''));
-  }
+  const hit = await dragOntoZone(page, zone);
   expect(hit, `the editor never registered the pointer on the ${zone} zone of ${target}`).toBe(true);
+  expect(await zonesAround(page, target), `aiming at the ${zone} zone must not move the zones away from ${target}`).toBe(true);
 
   await page.mouse.up();
   // The "or" zone adds the course INTO the existing node (it becomes a stack

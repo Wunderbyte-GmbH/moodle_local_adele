@@ -27,6 +27,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
+import zoneOwner from '../../composables/nodesHelper/zoneOwner'
 import LearningModule from './LearningModule.vue'
 import { useStore } from 'vuex';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
@@ -123,6 +124,17 @@ async function onDrag(event) {
   } else if (!checkDistance(event, closestNode.value)) {
     activeNode.value = null
     closestNode.value = null
+  } else {
+    // The zones follow the pointer to the nearest node (#580) instead of
+    // staying at the node it came near first; see zoneOwner for the two
+    // exceptions. Removed here, they are drawn around the new node below.
+    const owner = zoneOwner(
+      pointerPosition(event), closestNode.value, findClosestNode(event), pointerOnDropzone(event))
+    if (owner.id !== closestNode.value.id) {
+      removeNodes(DROPZONE_IDS)
+      activeNode.value = null
+      closestNode.value = owner
+    }
   }
   //add drop zones to this node
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
@@ -145,6 +157,27 @@ async function onDrag(event) {
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
     prevClosestNode.value = closestNode.value;
   }
+}
+
+const DROPZONE_IDS = ['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or']
+
+// The pointer of a drag event in canvas coordinates. Some browsers report
+// 0/0 on drag events; the last dragover position stands in then.
+function pointerPosition(event) {
+  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  let x = event.clientX
+  let y = event.clientY
+  if (x == 0 && y == 0) {
+    x = mousePosition.value.x
+    y = mousePosition.value.y
+  }
+  return project({ x: x - left, y: y - top })
+}
+
+// Whether the pointer is on one of the four zones currently drawn.
+function pointerOnDropzone(event) {
+  const position = pointerPosition(event)
+  return nodes.value.some((node) => DROPZONE_IDS.includes(node.id) && areNodesIntersecting(position, node))
 }
 
 function checkDistance(event, closestNode) {

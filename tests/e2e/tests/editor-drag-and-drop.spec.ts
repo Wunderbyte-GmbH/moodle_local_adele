@@ -23,8 +23,9 @@
  * exercise the drop handling at all.
  *
  * Covered here: steps 1, 2, 11, 12 and 13 of the plan - create, drop the
- * first course, save, leave, reopen. Chaining further courses onto an
- * existing node is NOT covered yet; see docs/e2e-suite.md for why.
+ * first course, chain further courses onto existing nodes, save, leave,
+ * reopen - and that the drop zones are offered at the node the pointer is
+ * at (#580).
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -34,7 +35,9 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
 import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
-import { VIEWPORT, dropCourseAt, dropFirstCourse } from '../support/editor';
+import {
+  VIEWPORT, abandonDrag, dragOntoZone, dragOverNode, dropCourseAt, dropFirstCourse, startDrag, zonesAround,
+} from '../support/editor';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -101,6 +104,92 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
       await card.getByRole('button', { name: /^(Delete|Löschen):/ }).click();
       await card.locator('.deletealert .btn-danger').click();
       await expect(card).toHaveCount(0, { timeout: 30_000 });
+    });
+  });
+
+  test('the drop zones follow the pointer from node to node (#580)', async ({ page }) => {
+    // Somebody dragging a course from the sidebar to a node further down
+    // passes other nodes on the way. The zones used to stay at the node
+    // passed first; they have to be at the node the pointer is at.
+    page.on('dialog', (dialog) => dialog.accept());
+    await loginAs(page, env.adminUser, env.adminPassword);
+    const edges = (): Promise<(string | null)[]> => page.locator('.vue-flow__edge').evaluateAll(
+      (els) => els.map((e) => e.getAttribute('data-id')).filter((id) => /^dndnode_\d+dndnode_\d+$/.test(id || '')).sort());
+
+    await test.step('a path of two nodes, T01 -> T02 (not saved: nothing to clean up)', async () => {
+      await page.goto('/local/adele/index.php');
+      await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
+      await dropFirstCourse(page, 'T01');
+      await dropCourseAt(page, 'T02', 'dndnode_1', 'child');
+      expect(await edges()).toEqual(['dndnode_2dndnode_1']);
+    });
+
+    await test.step('T03 is dragged past T01 to T02 and dropped as its successor', async () => {
+      await dropCourseAt(page, 'T03', 'dndnode_2', 'child', 'dndnode_1');
+      expect(await edges(), 'T03 must hang from T02, the node it was dropped at')
+        .toEqual(['dndnode_2dndnode_1', 'dndnode_3dndnode_2']);
+    });
+
+    await test.step('back and forth: the zones are at the node the pointer is at', async () => {
+      await startDrag(page, 'T04');
+      for (const node of ['dndnode_1', 'dndnode_3', 'dndnode_2', 'dndnode_1']) {
+        let there = false;
+        for (let attempt = 0; attempt < 6 && !there; attempt++) {
+          await dragOverNode(page, node, attempt);
+          there = await zonesAround(page, node);
+        }
+        expect(there, `with the pointer on ${node}, the zones must be around it`).toBe(true);
+      }
+      await abandonDrag(page, 'T04');
+      await expect(app(page).locator('[data-testid^="learningpath-node-"]')).toHaveCount(3);
+    });
+  });
+
+  test('a zone that lies nearer to a neighbouring node stays under the pointer (#580)', async ({ page }) => {
+    // The exception to "the zones are at the nearest node": T01 and T02 side
+    // by side, both leading to T03. The zone for "parallel to T01" is drawn
+    // to the right of T01 - where T02 is. Aiming at it brings the pointer
+    // nearer to T02 than to T01, and the zone must not vanish under it.
+    page.on('dialog', (dialog) => dialog.accept());
+    await loginAs(page, env.adminUser, env.adminPassword);
+    const centre = async (id: string): Promise<{ x: number; y: number }> => {
+      const box = await page.locator(`.vue-flow__node[data-id="${id}"]`).first().boundingBox();
+      expect(box, `${id} must be on screen`).not.toBeNull();
+      return { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+    };
+    const distance = (a: { x: number; y: number }, b: { x: number; y: number }): number => Math.hypot(a.x - b.x, a.y - b.y);
+
+    await test.step('T01 and T02 in parallel, both before T03 (not saved)', async () => {
+      await page.goto('/local/adele/index.php');
+      await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
+      await dropFirstCourse(page, 'T01');
+      await dropCourseAt(page, 'T03', 'dndnode_1', 'child');
+      await dropCourseAt(page, 'T02', 'dndnode_1', 'and');
+      await expect(app(page).locator('[data-testid="learningpath-node-dndnode_3"]')).toContainText('Testkurs 02');
+    });
+
+    await test.step('the pointer on the parallel zone of T01: nearer to T02, and the zones stay', async () => {
+      await startDrag(page, 'T04');
+      await dragOverNode(page, 'dndnode_1');
+      expect(await zonesAround(page, 'dndnode_1'), 'the zones must be around T01').toBe(true);
+      const zone = await centre('dropzone_and');
+      expect(distance(zone, await centre('dndnode_3')), 'the precondition: the zone is nearer to T02 than to T01, its own node')
+        .toBeLessThan(distance(zone, await centre('dndnode_1')));
+
+      expect(await dragOntoZone(page, 'and'), 'the editor must register the pointer on the zone').toBe(true);
+      expect(await zonesAround(page, 'dndnode_1'), 'the zones must still be those of T01').toBe(true);
+
+      // And off the zone, on T02, they are T02's.
+      let there = false;
+      for (let attempt = 0; attempt < 6 && !there; attempt++) {
+        await dragOverNode(page, 'dndnode_3', attempt);
+        there = await zonesAround(page, 'dndnode_3');
+      }
+      expect(there, 'with the pointer on T02 itself, the zones must be around T02').toBe(true);
+      await abandonDrag(page, 'T04');
+      await expect(app(page).locator('[data-testid^="learningpath-node-"]')).toHaveCount(3);
     });
   });
 
