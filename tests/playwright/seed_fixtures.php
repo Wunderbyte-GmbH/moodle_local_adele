@@ -681,6 +681,7 @@ $c3path = null;
 $timecombined = [];
 $routepaths = [];
 $runningpath = null;
+$linear4path = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -863,6 +864,45 @@ if (!empty($imported['Linear A1'])) {
                     $fixturepassword
                 );
             }
+        }
+
+        // L1: a linear path with FOUR required steps, T01 -> T02 -> T03 ->
+        // T04, each completing on its course. The reference path's three
+        // nodes plus a fourth on T04; no time conditions.
+        $courset04l = $DB->get_record('course', ['shortname' => 'T04']);
+        $linear4 = $base;
+        $byid = [];
+        foreach ($linear4['tree']['nodes'] as $node) {
+            $byid[$node['id']] = $node;
+        }
+        if ($courset04l && isset($byid['dndnode_3'])) {
+            $fourth = $byid['dndnode_3'];
+            $fourth['id'] = 'dndnode_4';
+            $fourth['data']['node_id'] = 'dndnode_4';
+            $fourth['data']['course_node_id'] = [(string) $courset04l->id];
+            $fourth['data']['fullname'] = $courset04l->fullname;
+            $fourth['data']['shortname'] = $courset04l->shortname;
+            $fourth['parentCourse'] = ['dndnode_3'];
+            $fourth['childCourse'] = [];
+            $fourth['restriction'] = $parentcriterion(['dndnode_3'], 1);
+            $fourth['position'] = ['x' => 0, 'y' => 1800];
+            $byid['dndnode_2']['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            $byid['dndnode_3']['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            $byid['dndnode_3']['childCourse'] = ['dndnode_4'];
+            $byid['dndnode_4'] = $fourth;
+            $linear4['tree']['nodes'] = array_values($byid);
+            $linear4['tree']['edges'] = [
+                $edge('dndnode_1', 'dndnode_2'),
+                $edge('dndnode_2', 'dndnode_3'),
+                $edge('dndnode_3', 'dndnode_4'),
+            ];
+            $linear4path = local_adele_fixture_store_path(
+                'E2E Linear vier Schritte',
+                $linear4,
+                'fx_l_linear',
+                'Linear four',
+                $fixturepassword
+            );
         }
 
         // M: changing a running path. Node 2 starts WITHOUT an access
@@ -1246,6 +1286,13 @@ foreach ($routepaths as $variant => [$pathid, $learner]) {
         (int) $options['category']
     );
 }
+$linear4host = $linear4path ? local_adele_fixture_host_course(
+    'E2EL1',
+    'E2E L linear',
+    $linear4path[0],
+    $linear4path[1],
+    (int) $options['category']
+) : null;
 $runninghost = $runningpath ? local_adele_fixture_host_course(
     'E2EM',
     'E2E M running',
@@ -1283,6 +1330,10 @@ if ($diagnosis) {
         printf("export ADELE_FIXTURE_D_%s_LEARNER_NAME='%s'\n", $key, fullname($learner));
         printf("export ADELE_FIXTURE_D_%s_HOST='%d'\n", $key, $host->id);
     }
+}
+if ($linear4path && $linear4host) {
+    printf("export ADELE_FIXTURE_L1_LEARNER='%s'\n", $linear4path[1]->username);
+    printf("export ADELE_FIXTURE_L1_HOST='%d'\n", $linear4host->id);
 }
 if ($runningpath && $runninghost) {
     printf("export ADELE_FIXTURE_PATH_M='%d'\n", $runningpath[0]);
