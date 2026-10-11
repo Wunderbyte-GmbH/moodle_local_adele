@@ -502,16 +502,30 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100707, 'local', 'adele');
     }
 
-    // Who takes part in a course - and so becomes a learner of the paths it
-    // embeds - is decided by local/adele:participate now (#587). The
-    // capability is registered here, ahead of Moodle's own pass, because the
-    // step needs it: besides the 'student' archetype, which Moodle serves
-    // itself, the site's gradebook roles get it, so that learners under a
-    // role without archetype do not lose their subscriptions to the sweep.
+    // Issue #587 introduced local/adele:participate here and gave it to the
+    // site's gradebook roles.
+    // Since #593 the capability is gone again (see the next step); a site
+    // coming from before 2026100708 has nothing to do here.
     if ($oldversion < 2026100708) {
-        update_capabilities('local_adele');
-        \local_adele\helper\capability_migration::grant_participate_to_gradebook_roles();
         upgrade_plugin_savepoint(true, 2026100708, 'local', 'adele');
+    }
+
+    // Who takes part is decided by the site's graded roles now (#593), not by
+    // local/adele:participate; Moodle removes the capability after these
+    // steps. Roles that had it without being a graded role are named - their
+    // holders stop taking part, and nothing here decides that for the site.
+    if ($oldversion < 2026100713) {
+        $losing = \local_adele\helper\capability_migration::roles_losing_participation();
+        if ($losing) {
+            $message = 'local_adele: participation in learning paths now follows the graded roles '
+                . '(Site administration > Grades > General settings > Graded roles). '
+                . 'These roles took part so far and are not graded roles: ' . implode(', ', $losing)
+                . '. Their holders stop being learners of embedded learning paths; add the roles to the '
+                . 'graded roles if they are to stay.';
+            upgrade_log(UPGRADE_LOG_NOTICE, 'local_adele', $message);
+            mtrace($message);
+        }
+        upgrade_plugin_savepoint(true, 2026100713, 'local', 'adele');
     }
 
     return true;

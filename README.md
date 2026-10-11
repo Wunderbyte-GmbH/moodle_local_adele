@@ -182,6 +182,26 @@ Individual copyrights of individual developers are tracked in PHPDoc comments an
 
 ## Upgrade notes
 
+### 2026100713 — who takes part follows the graded roles (#593)
+
+A learner of an embedded learning path is who holds, in the embedding course,
+one of the site's **graded roles** (*Site administration → Grades → General
+settings → Graded roles*) — the same list Moodle uses for grades and
+completion reports. Teachers are not learners (#587).
+
+- **Before installing, check that setting.** Every role your learners are
+  enrolled with must be on it. A role that is not on it does not take part:
+  its holders disappear from the learning path's lists at once, and the
+  nightly reconcile of `enrol_adele` removes their subscription and progress
+  after its period of grace.
+- The capability `local/adele:participate` (introduced with 2026100708) is
+  removed. The upgrade names, in its output and in the upgrade log, every role
+  that took part through it and is not a graded role.
+- **Changing the setting later** takes effect immediately. When a role is
+  added, the people who already hold it become learners in the background
+  (`mod_adele`, ad-hoc task); when a role is removed, see above.
+- With no graded role at all, nobody takes part.
+
 ### 2026100502 — timed access conditions store timestamps (#581)
 
 Fixed start and end times of the "timed" access condition are now stored as

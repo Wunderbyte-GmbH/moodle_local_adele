@@ -46,7 +46,6 @@ $string['activefilter_desc'] = 'Die Filter wirken sich auf die verfügbaren Kurs
 $string['adele:assist'] = 'Bei Lernpfaden assistieren';
 $string['adele:canmanage'] = 'Darf Lernpfad-Plugins verwalten';
 $string['adele:edit'] = 'Lernpfad bearbeiten';
-$string['adele:participate'] = 'An den Lernpfaden eines Kurses teilnehmen';
 $string['adele:teacheredit'] = 'TrainerIn bearbeiten';
 $string['adele:view'] = 'Lernpfad anzeigen';
 $string['adele:viewparticipants'] = 'Lernende eines Lernpfads und ihre Pfade sehen';

@@ -27,7 +27,7 @@ use local_adele\external\get_lp_user_path_relations;
  * Every enrolment into a course that embeds a path used to subscribe to it,
  * whatever the role: teachers stood on the roster with 0 % and a rank, got a
  * learner path and were enrolled into the starting courses. A learner now is
- * who takes part in the course - local/adele:participate through a role of
+ * who takes part in the course - one of the site's graded roles (#593), through a role of
  * their own.
  *
  * @package    local_adele
@@ -131,7 +131,8 @@ final class issue587_participants_test extends advanced_testcase {
     }
 
     /**
-     * What "takes part" means: the capability, through a role of one's own.
+     * What "takes part" means: one of the site's graded roles, through a
+     * role assignment of one's own.
      */
     public function test_is_participant(): void {
         $gen = $this->getDataGenerator();
@@ -149,11 +150,10 @@ final class issue587_participants_test extends advanced_testcase {
         role_assign($this->role('student'), $carried->id, $context->id, 'enrol_adele', 1);
         $this->assertFalse(enrol_state::is_participant($courseid, (int) $carried->id));
 
-        // A role that prohibits the capability settles it.
-        $prohibiting = $gen->create_role();
-        assign_capability(enrol_state::PARTICIPATE, CAP_PROHIBIT, $prohibiting, $context->id);
-        role_assign($prohibiting, $student->id, $context->id);
-        $this->assertFalse(enrol_state::is_participant($courseid, (int) $student->id));
+        // A graded role held above the course counts as well.
+        $above = $gen->create_user();
+        role_assign($this->role('student'), $above->id, \context_coursecat::instance($this->course->category)->id);
+        $this->assertTrue(enrol_state::is_participant($courseid, (int) $above->id));
     }
 
     /**
@@ -192,28 +192,82 @@ final class issue587_participants_test extends advanced_testcase {
     }
 
     /**
-     * Existing sites: besides the 'student' archetype, the site's gradebook
-     * roles are given the capability - learners under a role without
-     * archetype must not lose their subscriptions.
+     * #593: the site's graded roles decide - and a change of the setting
+     * counts at once, without an upgrade step, in both directions.
      */
-    public function test_upgrade_gives_participate_to_the_gradebook_roles(): void {
-        global $CFG;
-        $custom = $this->getDataGenerator()->create_role(['shortname' => 'lernende', 'name' => 'Lernende']);
-        $elsewhere = $this->getDataGenerator()->create_role(['shortname' => 'gast', 'name' => 'Gast']);
-        $CFG->gradebookroles = $this->role('student') . ',' . $custom;
+    public function test_participation_follows_the_graded_roles(): void {
+        $gen = $this->getDataGenerator();
+        $courseid = (int) $this->course->id;
+        $custom = $gen->create_role(['shortname' => 'lernende', 'name' => 'Lernende']);
+        $learner = $gen->create_user();
+        $gen->enrol_user($learner->id, $courseid, $custom);
+        $student = $gen->create_and_enrol($this->course, 'student');
 
-        $granted = \local_adele\helper\capability_migration::grant_participate_to_gradebook_roles();
+        $this->assertSame([$this->role('student')], enrol_state::participant_roleids(), 'the default: the student role');
+        $this->assertFalse(enrol_state::is_participant($courseid, (int) $learner->id), 'a role that is not graded');
+        $this->assertFalse($this->subscribed((int) $learner->id));
 
-        // The student role has the capability from its archetype already.
-        $this->assertSame([$custom], $granted);
-        $user = $this->getDataGenerator()->create_user();
-        $this->getDataGenerator()->enrol_user($user->id, $this->course->id, $custom);
-        $this->assertTrue(enrol_state::is_participant((int) $this->course->id, (int) $user->id));
-        $this->assertTrue($this->subscribed((int) $user->id));
+        // The site adds the role to its graded roles.
+        set_config('gradebookroles', $this->role('student') . ',' . $custom);
+        $this->assertTrue(enrol_state::is_participant($courseid, (int) $learner->id));
+        $this->assertSame(
+            [],
+            enrol_state::get_nonparticipant_userids($courseid, [(int) $learner->id, (int) $student->id]),
+            'the roster keeps both'
+        );
+        // A new holder of the role is subscribed like any participant.
+        $second = $gen->create_user();
+        $gen->enrol_user($second->id, $courseid, $custom);
+        $this->assertTrue($this->subscribed((int) $second->id));
 
-        $other = $this->getDataGenerator()->create_user();
-        $this->getDataGenerator()->enrol_user($other->id, $this->course->id, $elsewhere);
-        $this->assertFalse($this->subscribed((int) $other->id), 'A role that is no gradebook role does not take part.');
-        $this->assertSame([], \local_adele\helper\capability_migration::grant_participate_to_gradebook_roles(), 'Idempotent.');
+        // ... and takes it out again.
+        set_config('gradebookroles', (string) $this->role('student'));
+        $this->assertFalse(enrol_state::is_participant($courseid, (int) $learner->id));
+        $this->assertSame(
+            [(int) $learner->id],
+            enrol_state::get_nonparticipant_userids($courseid, [(int) $learner->id, (int) $student->id]),
+            'off the roster at once'
+        );
+
+        // No graded role at all: nobody takes part.
+        set_config('gradebookroles', '');
+        $this->assertFalse(enrol_state::is_participant($courseid, (int) $student->id));
+    }
+
+    /**
+     * #593, upgrade: roles that took part through the former capability and
+     * are no graded roles are named - their holders stop taking part.
+     */
+    public function test_upgrade_names_the_roles_that_stop_taking_part(): void {
+        global $DB;
+        $gen = $this->getDataGenerator();
+        $graded = $gen->create_role(['shortname' => 'bewertet']);
+        $notgraded = $gen->create_role(['shortname' => 'unbewertet']);
+        $prohibiting = $gen->create_role(['shortname' => 'verboten']);
+        set_config('gradebookroles', $this->role('student') . ',' . $graded);
+        // What a site between #587 and #593 has in its database.
+        $before = [
+            $this->role('student') => CAP_ALLOW,
+            $graded => CAP_ALLOW,
+            $notgraded => CAP_ALLOW,
+            $prohibiting => CAP_PROHIBIT,
+        ];
+        foreach ($before as $roleid => $permission) {
+            $DB->insert_record('role_capabilities', (object) [
+                'contextid' => \context_system::instance()->id,
+                'roleid' => $roleid,
+                'capability' => 'local/adele:participate',
+                'permission' => $permission,
+                'timemodified' => 1,
+                'modifierid' => 2,
+            ]);
+        }
+        $this->assertSame(
+            [$notgraded => 'unbewertet'],
+            \local_adele\helper\capability_migration::roles_losing_participation()
+        );
+
+        set_config('gradebookroles', $this->role('student') . ',' . $graded . ',' . $notgraded);
+        $this->assertSame([], \local_adele\helper\capability_migration::roles_losing_participation());
     }
 }

@@ -46,9 +46,6 @@ class enrol_state {
      */
     const ENTITLING_STATUSES = ['accessible', 'completed'];
 
-    /** The capability that makes somebody a participant of a course's learning paths (#587). */
-    const PARTICIPATE = 'local/adele:participate';
-
     /**
      * Course ids the user is entitled to right now on this learning path.
      *
@@ -296,12 +293,13 @@ class enrol_state {
      * right (#587).
      *
      * Being enrolled is not enough: a teacher is enrolled too. Taking part
-     * is holding local/adele:participate through a role in the course (or
-     * above it) - and not through a role ADELE assigned itself: the student
-     * role enrol_adele gives a learner in a node or host course must not
-     * make that learner a participant there by own right (the same reason
-     * ADELE's own enrolments do not count, mod_adele #37). A role that
-     * prohibits the capability settles it.
+     * is having, in the course (or above it), one of the site's GRADED ROLES
+     * (participant_roleids(), #593) - the list by which Moodle itself decides
+     * who appears in grades and completion reports. And not through a role
+     * ADELE assigned itself: the student role enrol_adele gives a learner in
+     * a node or host course must not make that learner a participant there
+     * by own right (the same reason ADELE's own enrolments do not count,
+     * mod_adele #37).
      *
      * The one definition for every place that asks - subscribing on
      * enrolment (local_adele), the participant sources (mod_adele), whether
@@ -316,23 +314,31 @@ class enrol_state {
         if (!$context) {
             return false;
         }
-        [$needed, $forbidden] = get_roles_with_cap_in_context($context, self::PARTICIPATE);
-        if (!$needed) {
+        $graded = array_flip(self::participant_roleids());
+        if (!$graded) {
             return false;
         }
-        $participant = false;
         foreach (get_user_roles($context, $userid, true) as $assignment) {
-            if ($assignment->component === 'enrol_adele') {
-                continue;
-            }
-            if (isset($forbidden[$assignment->roleid])) {
-                return false;
-            }
-            if (isset($needed[$assignment->roleid])) {
-                $participant = true;
+            if ($assignment->component !== 'enrol_adele' && isset($graded[(int) $assignment->roleid])) {
+                return true;
             }
         }
-        return $participant;
+        return false;
+    }
+
+    /**
+     * The roles whose holders take part in a course's learning paths: the
+     * site's graded roles (Site administration > Grades > General settings >
+     * Graded roles). Read on every call - a change of the setting counts from
+     * the next question on, without an upgrade step (#593).
+     *
+     * @return int[] Role ids.
+     */
+    public static function participant_roleids(): array {
+        global $CFG;
+        return array_values(array_unique(array_filter(
+            array_map('intval', explode(',', (string) ($CFG->gradebookroles ?? '')))
+        )));
     }
 
     /**
@@ -372,9 +378,8 @@ class enrol_state {
         if (!$ownright) {
             return [];
         }
-        [$needed, $forbidden] = get_roles_with_cap_in_context($context, self::PARTICIPATE);
+        $needed = array_flip(self::participant_roleids());
         $participants = [];
-        $prohibited = [];
         if ($needed) {
             [$ctxsql, $ctxparams] = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'ctx');
             [$ownsql, $ownparams] = $DB->get_in_or_equal($ownright, SQL_PARAMS_NAMED, 'own');
@@ -387,9 +392,7 @@ class enrol_state {
                 $ctxparams + $ownparams
             );
             foreach ($assignments as $assignment) {
-                if (isset($forbidden[$assignment->roleid])) {
-                    $prohibited[(int) $assignment->userid] = true;
-                } else if (isset($needed[$assignment->roleid])) {
+                if (isset($needed[(int) $assignment->roleid])) {
                     $participants[(int) $assignment->userid] = true;
                 }
             }
@@ -398,7 +401,7 @@ class enrol_state {
         $staff = [];
         foreach ($ownright as $userid) {
             $userid = (int) $userid;
-            if (empty($participants[$userid]) || !empty($prohibited[$userid])) {
+            if (empty($participants[$userid])) {
                 $staff[] = $userid;
             }
         }

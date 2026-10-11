@@ -59,41 +59,37 @@ class capability_migration {
     }
 
     /**
-     * local/adele:participate decides who is a learner of the paths a course
-     * embeds (#587). Moodle gives a new capability to the roles of its
-     * archetype - 'student' - and to no other. A site that runs its learners
-     * under a role WITHOUT that archetype would lose them all: no role of
-     * theirs would count as taking part, and enrol_adele's sweep removes
-     * subscriptions nothing carries.
+     * Between #587 and #593 a capability of its own, local/adele:participate,
+     * decided who is a learner of the paths a course embeds; since #593 the
+     * site's graded roles do ($CFG->gradebookroles). On a site with default
+     * settings the two name the same roles. Where they do not, the holders of
+     * a role that had the capability and is NOT a graded role stop taking
+     * part - and enrol_adele's nightly sweep removes, after its period of
+     * grace, the subscriptions nothing carries any more.
      *
-     * So the roles the site itself calls its learners get the capability as
-     * well: the gradebook roles ($CFG->gradebookroles), Moodle's own list of
-     * "the people who are graded". Roles that prohibit or already define the
-     * capability are left alone.
+     * The upgrade does not decide that for the site; it names the roles, so
+     * that somebody can add them to the graded roles in time.
      *
-     * Needs the capability to be registered (update_capabilities()).
+     * To be called while the capability still is in the database (Moodle
+     * removes it after the plugin's upgrade steps).
      *
-     * @return int[] The ids of the roles that were given the capability.
+     * @return string[] Role id => short name of the roles concerned.
      */
-    public static function grant_participate_to_gradebook_roles(): array {
-        global $CFG, $DB;
-        $systemcontext = \context_system::instance();
-        $granted = [];
-        foreach (array_filter(array_map('intval', explode(',', (string) ($CFG->gradebookroles ?? '')))) as $roleid) {
-            if (!$DB->record_exists('role', ['id' => $roleid])) {
-                continue;
-            }
-            $defined = $DB->record_exists('role_capabilities', [
-                'roleid' => $roleid,
-                'contextid' => $systemcontext->id,
+    public static function roles_losing_participation(): array {
+        global $DB;
+        $graded = array_flip(\local_adele\enrol_state::participant_roleids());
+        $roles = $DB->get_records_sql_menu(
+            "SELECT r.id, r.shortname
+               FROM {role_capabilities} rc
+               JOIN {role} r ON r.id = rc.roleid
+              WHERE rc.capability = :capability AND rc.contextid = :contextid AND rc.permission = :allow
+           ORDER BY r.id",
+            [
                 'capability' => 'local/adele:participate',
-            ]);
-            if ($defined) {
-                continue;
-            }
-            assign_capability('local/adele:participate', CAP_ALLOW, $roleid, $systemcontext->id);
-            $granted[] = $roleid;
-        }
-        return $granted;
+                'contextid' => \context_system::instance()->id,
+                'allow' => CAP_ALLOW,
+            ]
+        );
+        return array_diff_key($roles, $graded);
     }
 }

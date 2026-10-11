@@ -42,16 +42,6 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
             ],
         ],
-        // TAKE PART in the learning paths a course embeds (#587). Whoever is
-        // enrolled in such a course with a role that holds this becomes a
-        // learner of the path; whoever teaches there does not.
-        'local/adele:participate' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_COURSE,
-            'archetypes' => [
-                'student' => CAP_ALLOW,
-            ],
-        ],
         // SEE the learners of an embedded learning path and their paths
         // (mod_adele #39). Seeing is not changing: a teacher without editing
         // rights holds this one, not local/adele:teacheredit.

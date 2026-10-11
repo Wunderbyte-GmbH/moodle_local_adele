@@ -46,7 +46,6 @@ $string['activefilter_desc'] = 'The filters affect the courses available for cre
 $string['adele:assist'] = 'Assist with learning paths';
 $string['adele:canmanage'] = 'May manage learning path plugins';
 $string['adele:edit'] = 'Edit learning path';
-$string['adele:participate'] = 'Take part in the learning paths of a course';
 $string['adele:teacheredit'] = 'Teacher edit';
 $string['adele:view'] = 'View learning path';
 $string['adele:viewparticipants'] = 'See the learners of a learning path and their paths';
