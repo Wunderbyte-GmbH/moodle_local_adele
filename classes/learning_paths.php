@@ -1153,6 +1153,23 @@ class learning_paths {
     }
 
     /**
+     * Whether the current user may SEE the learners of a learning path in a
+     * course: local/adele:viewparticipants - or local/adele:teacheredit,
+     * since who may change a learner's path may look at it.
+     *
+     * Seeing and changing are two rights (mod_adele #39): a teacher without
+     * editing rights sees everything and changes nothing. Changing is
+     * local/adele:teacheredit alone.
+     *
+     * @param \context $context A course or module context.
+     * @return bool
+     */
+    public static function can_view_participants(\context $context): bool {
+        return has_capability('local/adele:viewparticipants', $context)
+            || has_capability('local/adele:teacheredit', $context);
+    }
+
+    /**
      * Whether the current user has authority over a learning path AS A PATH,
      * independent of any course: site administrators and managers
      * (local/adele:canmanage in the system) over every path, everybody else

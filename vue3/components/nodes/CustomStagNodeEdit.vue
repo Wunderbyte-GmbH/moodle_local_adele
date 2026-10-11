@@ -265,12 +265,12 @@ const expandCourses = () => {
           </div>
         </div>
         <div v-if="store.state.view !=='student'">
-          <div v-if="data.manualrestriction">
+          <div v-if="store.state.canedit !== false && data.manualrestriction">
             <RestrictionOutPutItem
               :data="data"
             />
           </div>
-          <div v-if="data.manualcompletion">
+          <div v-if="store.state.canedit !== false && data.manualcompletion">
             <CompletionOutPutItem :data="data" />
           </div>
         </div>
@@ -281,7 +281,7 @@ const expandCourses = () => {
           />
         </div>
         <MasterConditions
-            v-if="store.state.view == 'teacher'"
+            v-if="store.state.view == 'teacher' && store.state.canedit !== false"
             class="col-12"
             :data="data"
           />

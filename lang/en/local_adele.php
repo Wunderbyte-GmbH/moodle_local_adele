@@ -46,6 +46,7 @@ $string['adele:canmanage'] = 'May manage learning path plugins';
 $string['adele:edit'] = 'Edit learning path';
 $string['adele:teacheredit'] = 'Teacher edit';
 $string['adele:view'] = 'View learning path';
+$string['adele:viewparticipants'] = 'See the learners of a learning path and their paths';
 $string['adeleassistantdescription'] = 'Learning path assistant';
 $string['adeleroledescription'] = 'Learning path manager';
 $string['all_quiz'] = 'In at least one of the attempts, every scale must be fulfilled.';

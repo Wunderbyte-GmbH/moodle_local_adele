@@ -489,5 +489,18 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100502, 'local', 'adele');
     }
 
+    // Seeing a learner's path and changing it are two rights now (mod_adele
+    // #39). local/adele:viewparticipants is new; Moodle assigns it by
+    // archetype (teacher, editingteacher, manager) when it registers the
+    // capability, after this step. local/adele:teacheredit lost the 'teacher'
+    // archetype - the teacher WITHOUT editing rights. Archetype defaults only
+    // apply to fresh installs, so the grant is taken from the existing roles
+    // of that archetype here; course-level overrides are left to the people
+    // who set them.
+    if ($oldversion < 2026100707) {
+        \local_adele\helper\capability_migration::remove_teacheredit_from_nonediting_teachers();
+        upgrade_plugin_savepoint(true, 2026100707, 'local', 'adele');
+    }
+
     return true;
 }

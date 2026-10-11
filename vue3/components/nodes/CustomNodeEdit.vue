@@ -300,13 +300,13 @@ const courseLinkTitle = computed(() =>
             <div class="col-12" style="display: flex; justify-content: end;">
               <ProgressBar :progress="data.progress" :status="statusMessage" />
             </div>
-            <div v-if="store.state.view == 'teacher' && data.manualrestriction">
+            <div v-if="store.state.view == 'teacher' && store.state.canedit !== false && data.manualrestriction">
               <RestrictionOutPutItem :data="data" />
             </div>
-            <div v-if="store.state.view == 'teacher' && data.manualcompletion">
+            <div v-if="store.state.view == 'teacher' && store.state.canedit !== false && data.manualcompletion">
               <CompletionOutPutItem :data="data" />
             </div>
-            <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
+            <MasterConditions v-if="store.state.view == 'teacher' && store.state.canedit !== false" class="col-12" :data="data" />
           </div>
         </div>
       </div>

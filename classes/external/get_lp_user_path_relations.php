@@ -97,7 +97,7 @@ class get_lp_user_path_relations extends external_api {
         // - managers and the editors of THIS path (has_path_authority()):
         // their authority is about the path, not about a course. Being
         // allowed to edit some other path (check_access()) is not enough;
-        // - teachers of a course (local/adele:teacheredit) and its enrolled
+        // - teachers of a course (local/adele:viewparticipants) and its enrolled
         // participants (StudentView.vue) - but only of a course that EMBEDS
         // this path. The check used to accept any course: a participant or
         // teacher of an unrelated course read the roster of every path by
@@ -107,7 +107,7 @@ class get_lp_user_path_relations extends external_api {
         $embedded = $coursecontext
             && learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid']);
         $isprivileged = learning_paths::has_path_authority((int) $params['learningpathid'])
-            || ($embedded && has_capability('local/adele:teacheredit', $coursecontext));
+            || ($embedded && learning_paths::can_view_participants($coursecontext));
         if (!$isprivileged && !($embedded && is_enrolled($coursecontext, $USER->id))) {
             throw new \required_capability_exception(
                 $coursecontext ?: $context,

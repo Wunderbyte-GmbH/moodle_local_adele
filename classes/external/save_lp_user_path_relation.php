@@ -109,9 +109,11 @@ class save_lp_user_path_relation extends external_api {
             ) {
                 throw new \required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');
             }
-            if (!has_capability('local/adele:canmanage', $context)) {
-                require_capability('local/adele:teacheredit', $context);
-            }
+            // Changing a learner's path is local/adele:teacheredit - and nothing
+            // else. The check used to accept local/adele:canmanage in the given
+            // context as well, which a teacher WITHOUT editing rights holds in
+            // the own course by archetype (mod_adele #39).
+            require_capability('local/adele:teacheredit', $context);
             // A course right covers the learners of that course - not the
             // ones another course brought to the same path (#588).
             if (!is_enrolled($coursecontext, (int) ($payload->route->userId ?? 0))) {

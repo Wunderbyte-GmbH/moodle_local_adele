@@ -194,6 +194,8 @@ export function createAppStore() {
         state() {
             return {
                 view: 'defaultView',
+                // False in a read-only teacher's view (mod_adele #39).
+                canedit: true,
                 user: null,
                 userlist: null,
                 learningPathID: 0,

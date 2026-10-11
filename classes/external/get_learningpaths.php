@@ -93,7 +93,7 @@ class get_learningpaths extends external_api {
         // drive the in-course teacher view; the filter below scopes the result to their
         // own (zero) editor paths, so no other path leaks. Editing the path structure
         // stays gated on check_access()/canmanage elsewhere (save_learningpath etc.).
-        if (empty($sessionvalue) && !has_capability('local/adele:teacheredit', $context)) {
+        if (empty($sessionvalue) && !learning_paths::can_view_participants($context)) {
             throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', '');
         }
 

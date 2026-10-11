@@ -98,7 +98,7 @@ class get_lp_user_path_relation extends external_api {
         // requested user's email plus their full progress snapshot, so reading a path
         // that is not your own must be restricted to a manager or an editor of THIS
         // path (has_path_authority() - being allowed to edit some other path is not
-        // enough) or a course teacher (:teacheredit, resolved up the module/course context);
+        // enough) or a course teacher (:viewparticipants, resolved up the module/course context);
         // otherwise any student could read any other student's progress + email by id
         // (IDOR). The teacher's right counts only in a course that EMBEDS this path:
         // it used to count in any course, so a teacher of an unrelated course read
@@ -113,7 +113,7 @@ class get_lp_user_path_relation extends external_api {
             // another course brought to the same path (#588).
             $teacherhere = $coursecontext
                 && learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid'])
-                && has_capability('local/adele:teacheredit', $context)
+                && learning_paths::can_view_participants($context)
                 && is_enrolled($coursecontext, (int) $params['userpathid']);
             if (!$teacherhere) {
                 throw new \required_capability_exception(

@@ -73,6 +73,7 @@ const onCancelConfirmation = () => {
 <template>
   <Panel class="save-restore-controls">
     <button
+      v-if="store.state.canedit !== false"
       class="btn btn-primary m-2"
       @click="onSave"
     >

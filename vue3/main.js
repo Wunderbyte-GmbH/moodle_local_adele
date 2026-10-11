@@ -72,6 +72,9 @@ function init() {
             app.use(appRouter);
             const viewAttributeValue = localAdeleAppElement.getAttribute('view');
             store.state.view = viewAttributeValue;
+            // The teacher's view may be read-only (mod_adele #39): the page
+            // then says canedit="0". Everything else may edit, as before.
+            store.state.canedit = localAdeleAppElement.getAttribute('canedit') !== '0';
             const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
             store.state.learningPathID = pathAttributeValue;
             const userAttributeValue = localAdeleAppElement.getAttribute('user');
