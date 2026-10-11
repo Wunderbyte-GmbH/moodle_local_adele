@@ -46,6 +46,9 @@ class enrol_state {
      */
     const ENTITLING_STATUSES = ['accessible', 'completed'];
 
+    /** The capability that makes somebody a participant of a course's learning paths (#587). */
+    const PARTICIPATE = 'local/adele:participate';
+
     /**
      * Course ids the user is entitled to right now on this learning path.
      *
@@ -286,6 +289,120 @@ class enrol_state {
             return null;
         }
         return \mod_adele\local\host_policy::get_entitlement($learningpathid, $hostcourseid, $userid);
+    }
+
+    /**
+     * Whether a user takes part in a course AS A PARTICIPANT, by their own
+     * right (#587).
+     *
+     * Being enrolled is not enough: a teacher is enrolled too. Taking part
+     * is holding local/adele:participate through a role in the course (or
+     * above it) - and not through a role ADELE assigned itself: the student
+     * role enrol_adele gives a learner in a node or host course must not
+     * make that learner a participant there by own right (the same reason
+     * ADELE's own enrolments do not count, mod_adele #37). A role that
+     * prohibits the capability settles it.
+     *
+     * The one definition for every place that asks - subscribing on
+     * enrolment (local_adele), the participant sources (mod_adele), whether
+     * a subscription is still carried (enrol_adele).
+     *
+     * @param int $courseid The course.
+     * @param int $userid The user.
+     * @return bool
+     */
+    public static function is_participant(int $courseid, int $userid): bool {
+        $context = \context_course::instance($courseid, IGNORE_MISSING);
+        if (!$context) {
+            return false;
+        }
+        [$needed, $forbidden] = get_roles_with_cap_in_context($context, self::PARTICIPATE);
+        if (!$needed) {
+            return false;
+        }
+        $participant = false;
+        foreach (get_user_roles($context, $userid, true) as $assignment) {
+            if ($assignment->component === 'enrol_adele') {
+                continue;
+            }
+            if (isset($forbidden[$assignment->roleid])) {
+                return false;
+            }
+            if (isset($needed[$assignment->roleid])) {
+                $participant = true;
+            }
+        }
+        return $participant;
+    }
+
+    /**
+     * Of the given users: those who are in the course by their own right and
+     * do NOT take part in it - its teachers, in short (#587).
+     *
+     * For the roster of an embedding. Somebody who is in the course only
+     * through ADELE (host modes) has no own-right enrolment and is not
+     * returned: such a learner is on the roster because of the path.
+     * Decides like {@see is_participant()}, for many users in two queries.
+     *
+     * @param int $courseid The course.
+     * @param int[] $userids The users to look at.
+     * @return int[] User ids.
+     */
+    public static function get_nonparticipant_userids(int $courseid, array $userids): array {
+        global $DB;
+        $context = \context_course::instance($courseid, IGNORE_MISSING);
+        $userids = array_values(array_unique(array_map('intval', $userids)));
+        if (!$context || !$userids) {
+            return [];
+        }
+        [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+        $now = \core\di::get(\core\clock::class)->time();
+        $ownright = $DB->get_fieldset_sql(
+            "SELECT DISTINCT ue.userid
+               FROM {user_enrolments} ue
+               JOIN {enrol} e ON e.id = ue.enrolid
+              WHERE e.courseid = :courseid
+                    AND e.enrol <> 'adele'
+                    AND e.status = :enabled
+                    AND (ue.timestart = 0 OR ue.timestart <= :now1)
+                    AND (ue.timeend = 0 OR ue.timeend > :now2)
+                    AND ue.userid {$usersql}",
+            ['courseid' => $courseid, 'enabled' => ENROL_INSTANCE_ENABLED, 'now1' => $now, 'now2' => $now] + $userparams
+        );
+        if (!$ownright) {
+            return [];
+        }
+        [$needed, $forbidden] = get_roles_with_cap_in_context($context, self::PARTICIPATE);
+        $participants = [];
+        $prohibited = [];
+        if ($needed) {
+            [$ctxsql, $ctxparams] = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'ctx');
+            [$ownsql, $ownparams] = $DB->get_in_or_equal($ownright, SQL_PARAMS_NAMED, 'own');
+            $assignments = $DB->get_recordset_sql(
+                "SELECT ra.id, ra.userid, ra.roleid
+                   FROM {role_assignments} ra
+                  WHERE ra.contextid {$ctxsql}
+                        AND ra.component <> 'enrol_adele'
+                        AND ra.userid {$ownsql}",
+                $ctxparams + $ownparams
+            );
+            foreach ($assignments as $assignment) {
+                if (isset($forbidden[$assignment->roleid])) {
+                    $prohibited[(int) $assignment->userid] = true;
+                } else if (isset($needed[$assignment->roleid])) {
+                    $participants[(int) $assignment->userid] = true;
+                }
+            }
+            $assignments->close();
+        }
+        $staff = [];
+        foreach ($ownright as $userid) {
+            $userid = (int) $userid;
+            if (empty($participants[$userid]) || !empty($prohibited[$userid])) {
+                $staff[] = $userid;
+            }
+        }
+        return $staff;
     }
 
     /**

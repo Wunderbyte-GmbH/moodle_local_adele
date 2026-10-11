@@ -1643,6 +1643,7 @@ if ($privacypath && $privacysecond) {
         'COLLABORATOR' => local_adele_fixture_person('fx_p_collab', 'Privacy Collaborator', $fixturepassword),
         'OUTSIDER' => local_adele_fixture_person('fx_p_out', 'Privacy Outsider', $fixturepassword),
         'FOREIGN' => local_adele_fixture_person('fx_p_foreign', 'Privacy Foreign', $fixturepassword),
+        'SWITCH' => local_adele_fixture_person('fx_p_switch', 'Privacy Switch', $fixturepassword),
     ];
     $privacymanual = enrol_get_plugin('manual');
     $privacyenrol = static function (stdClass $course, stdClass $person, string $role) use ($DB, $privacymanual): void {
@@ -1656,6 +1657,22 @@ if ($privacypath && $privacysecond) {
     $privacyenrol($privacyhost, $privacypeople['TEACHER'], 'editingteacher');
     $privacyenrol($privacyhost, $privacypeople['TUTOR'], 'teacher');
     $privacyenrol($privacyhost, $privacypeople['COLLABORATOR'], 'student');
+    // Somebody who starts as a teacher of the course (without editing
+    // rights) and changes sides in the chain (#587). Back to the start on
+    // every run: only the teaching role, no learner path.
+    $privacyenrol($privacyhost, $privacypeople['SWITCH'], 'teacher');
+    role_unassign(
+        (int) $DB->get_field('role', 'id', ['shortname' => 'student']),
+        (int) $privacypeople['SWITCH']->id,
+        context_course::instance($privacyhost->id)->id
+    );
+    $DB->delete_records('local_adele_path_user', [
+        'learning_path_id' => $privacyid,
+        'user_id' => $privacypeople['SWITCH']->id,
+    ]);
+    if (class_exists('\\enrol_adele\\local\\reconciler')) {
+        \enrol_adele\local\reconciler::purge_user($privacyid, (int) $privacypeople['SWITCH']->id);
+    }
     $privacyenrol($privacyother, $privacypeople['OUTSIDER'], 'student');
     // A teacher - of the OTHER course only. Without editing rights: an
     // editing teacher would become an ADELE assistant (enrollassistant).

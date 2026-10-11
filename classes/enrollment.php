@@ -53,12 +53,47 @@ class enrollment {
             return;
         }
         $params = $event;
+        // Being enrolled is not taking part: a teacher is enrolled too (#587).
+        // At the moment of user_enrolment_created the role is not assigned
+        // yet (core assigns it after the event) - the participant is picked
+        // up by role_assigned_in_course() a moment later.
+        if (!enrol_state::is_participant((int) $params->courseid, (int) $params->relateduserid)) {
+            return;
+        }
         $learningpaths = self::buildsqlquerypath($params->courseid);
         if ($learningpaths) {
             foreach ($learningpaths as $learningpath) {
                 self::subscribe_user_to_learning_path($learningpath, $params, $params->courseid);
             }
         }
+    }
+
+    /**
+     * Somebody was given a role in a course: if that makes them a participant
+     * of a course they are enrolled in, they become a learner of the paths it
+     * embeds (#587). This is what subscribes on an ordinary enrolment - the
+     * role comes after the enrolment event - and what picks up a teacher who
+     * becomes a participant.
+     *
+     * @param \core\event\role_assigned $event The event.
+     */
+    public static function role_assigned_in_course($event) {
+        $context = $event->get_context();
+        if (!$context || $context->contextlevel != CONTEXT_COURSE) {
+            return;
+        }
+        // ADELE's own role bookkeeping is not taking part (mod_adele #37).
+        if ((($event->other ?? [])['component'] ?? '') === 'enrol_adele') {
+            return;
+        }
+        if (!is_enrolled($context, (int) $event->relateduserid)) {
+            return;
+        }
+        self::enrolled((object) [
+            'courseid' => (int) $context->instanceid,
+            'relateduserid' => (int) $event->relateduserid,
+            'userid' => (int) $event->userid,
+        ]);
     }
 
     /**

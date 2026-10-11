@@ -502,5 +502,17 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100707, 'local', 'adele');
     }
 
+    // Who takes part in a course - and so becomes a learner of the paths it
+    // embeds - is decided by local/adele:participate now (#587). The
+    // capability is registered here, ahead of Moodle's own pass, because the
+    // step needs it: besides the 'student' archetype, which Moodle serves
+    // itself, the site's gradebook roles get it, so that learners under a
+    // role without archetype do not lose their subscriptions to the sweep.
+    if ($oldversion < 2026100708) {
+        update_capabilities('local_adele');
+        \local_adele\helper\capability_migration::grant_participate_to_gradebook_roles();
+        upgrade_plugin_savepoint(true, 2026100708, 'local', 'adele');
+    }
+
     return true;
 }

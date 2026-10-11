@@ -505,6 +505,18 @@ class learning_paths {
 
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
+        // The course's teachers are not its learners (#587): whoever is in
+        // the course by own right without taking part does not belong on its
+        // roster, even while a snapshot from before still exists.
+        if (!empty($data['scopecourseid']) && $records) {
+            $staff = array_flip(enrol_state::get_nonparticipant_userids(
+                (int) $data['scopecourseid'],
+                array_map('intval', array_column($records, 'user_id'))
+            ));
+            $records = array_filter($records, static function ($record) use ($staff) {
+                return !isset($staff[(int) $record->user_id]);
+            });
+        }
         try {
             foreach ($records as $record) {
                 $record->json = json_decode($record->json);

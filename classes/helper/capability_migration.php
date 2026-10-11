@@ -57,4 +57,43 @@ class capability_migration {
         }
         return $changed;
     }
+
+    /**
+     * local/adele:participate decides who is a learner of the paths a course
+     * embeds (#587). Moodle gives a new capability to the roles of its
+     * archetype - 'student' - and to no other. A site that runs its learners
+     * under a role WITHOUT that archetype would lose them all: no role of
+     * theirs would count as taking part, and enrol_adele's sweep removes
+     * subscriptions nothing carries.
+     *
+     * So the roles the site itself calls its learners get the capability as
+     * well: the gradebook roles ($CFG->gradebookroles), Moodle's own list of
+     * "the people who are graded". Roles that prohibit or already define the
+     * capability are left alone.
+     *
+     * Needs the capability to be registered (update_capabilities()).
+     *
+     * @return int[] The ids of the roles that were given the capability.
+     */
+    public static function grant_participate_to_gradebook_roles(): array {
+        global $CFG, $DB;
+        $systemcontext = \context_system::instance();
+        $granted = [];
+        foreach (array_filter(array_map('intval', explode(',', (string) ($CFG->gradebookroles ?? '')))) as $roleid) {
+            if (!$DB->record_exists('role', ['id' => $roleid])) {
+                continue;
+            }
+            $defined = $DB->record_exists('role_capabilities', [
+                'roleid' => $roleid,
+                'contextid' => $systemcontext->id,
+                'capability' => 'local/adele:participate',
+            ]);
+            if ($defined) {
+                continue;
+            }
+            assign_capability('local/adele:participate', CAP_ALLOW, $roleid, $systemcontext->id);
+            $granted[] = $roleid;
+        }
+        return $granted;
+    }
 }

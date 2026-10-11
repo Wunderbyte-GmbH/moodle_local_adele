@@ -539,3 +539,56 @@ export async function completionReport(page: Page, courseid: string, activitynam
   }
   return state;
 }
+
+/**
+ * As somebody who may assign roles: set a person's roles in a course on the
+ * participants page - Moodle's own inline editor, the way a teacher or
+ * manager changes somebody's role without touching the enrolment.
+ *
+ * The editor is an autocomplete; what gets saved is its hidden <select>, so
+ * that is what is checked before saving (a click that did not arrive must
+ * not pass as a role change).
+ *
+ * @param page The page, logged in.
+ * @param courseid The course.
+ * @param person A text that identifies the person's row.
+ * @param roles The complete set of role names the person is to have, e.g. ["Non-editing teacher", "Student"].
+ */
+export async function setCourseRoles(page: Page, courseid: string, person: string, roles: string[]): Promise<void> {
+  await page.goto(`/user/index.php?id=${courseid}&perpage=5000`);
+  const row = page.locator('table#participants tbody tr').filter({ hasText: person }).first();
+  await expect(row, `${person} must be listed in course ${courseid}`).toBeVisible({ timeout: 30_000 });
+  const cell = row.locator('[data-itemtype="user_roles"]');
+  await page.waitForLoadState('networkidle');
+  await cell.locator('a[data-inplaceeditablelink]').click();
+  const select = cell.locator('select.form-autocomplete-original-select');
+  await expect(select).toBeAttached({ timeout: 15_000 });
+  const chosen = () => select.locator('option:checked').allInnerTexts().then((texts) => texts.map((text) => text.trim()).sort());
+  // Take away what is not wanted ...
+  for (const current of await chosen()) {
+    if (!roles.includes(current)) {
+      await cell.locator('.form-autocomplete-selection [role="option"]').filter({ hasText: current }).first().click();
+    }
+  }
+  // ... and add what is missing.
+  const input = cell.locator('input[id^="form_autocomplete_input"]');
+  for (const role of roles) {
+    for (let attempt = 0; attempt < 3 && !(await chosen()).includes(role); attempt++) {
+      await input.click();
+      await input.fill('');
+      await input.pressSequentially(role, { delay: 20 });
+      const suggestion = cell.locator('.form-autocomplete-suggestions [role="option"]')
+        .filter({ hasText: new RegExp(`^\\s*${role}\\s*$`) }).first();
+      await suggestion.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => undefined);
+      if (await suggestion.isVisible()) {
+        await suggestion.click();
+      }
+    }
+  }
+  expect(await chosen(), `the roles selected for ${person}`).toEqual([...roles].sort());
+  await cell.getByRole('link', { name: 'Save changes' }).click();
+  await expect(cell.locator('select'), 'the role editor must close after saving').toHaveCount(0, { timeout: 15_000 });
+  for (const role of roles) {
+    await expect(cell, `${person} must now be shown as ${role}`).toContainText(role);
+  }
+}
