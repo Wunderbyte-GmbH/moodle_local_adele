@@ -224,9 +224,29 @@ class catquiz implements course_completion {
                             $bestresult['scaleid'] = $scales['parent']['id'];
                             $bestresult['attemptid'] = $record->attemptid;
                         }
-                        // Ist Prozentwert.
-                        $rightanswerspercentage =
-                          Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
+                        // Share of right answers per scale - only for scales that set
+                        // a percentage threshold ($scaleids). Without such a scale
+                        // there is nothing to compute, and local_catquiz would still
+                        // load the attempt's progress first: for an attempt without a
+                        // complete progress record (imported, or the settings gone)
+                        // that throws, and the whole re-evaluation of the path fails.
+                        $rightanswerspercentage = [];
+                        if (!empty($scaleids)) {
+                            try {
+                                $rightanswerspercentage =
+                                  Local_catquizCatquiz::get_percentage_of_right_answers_by_scale($scaleids, $record);
+                            } catch (\Throwable $e) {
+                                // One attempt local_catquiz cannot read (no progress
+                                // record - a reader cannot create one) must not abort
+                                // the re-evaluation of the whole path. That attempt
+                                // simply meets no percentage threshold.
+                                debugging(
+                                    'local_adele: share of right answers unavailable for catquiz attempt ' .
+                                    $record->attemptid . ': ' . $e->getMessage(),
+                                    DEBUG_DEVELOPER
+                                );
+                            }
+                        }
                         $this->percentageattempts[$record->attemptid] = $rightanswerspercentage;
                         $invalidattempt = false;
                         $parentscalerecord = 0;
@@ -436,11 +456,17 @@ class catquiz implements course_completion {
             ];
         }
 
+        // Best attempt per scale. Initialised: when no attempt qualifies (e.g.
+        // every ability below the threshold) the loop below must still find
+        // an array. And compared against the stored SCALE VALUE - comparing a
+        // number with the stored array is always false in PHP, so a better
+        // later attempt was never taken over.
+        $bestattemptpescale = [];
         foreach ($subscaleids as $subscaleid) {
             foreach ($percentageofrightanswersbyscalekeyid as $attempt => $scalevalues) {
                 if (
                     (!isset($bestattemptpescale[$subscaleid]) ||
-                    $scalevalues[$subscaleid] > $bestattemptpescale[$subscaleid]) &&
+                    $scalevalues[$subscaleid] > $bestattemptpescale[$subscaleid]['scale']) &&
                     isset($this->percentageattempts[$attempt]) &&
                     isset($this->percentageattempts[$attempt][$subscaleid]) &&
                     isset($this->percentageattempts[$attempt][$subscaleid]['percentage'])

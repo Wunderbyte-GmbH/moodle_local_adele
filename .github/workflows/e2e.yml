@@ -167,6 +167,35 @@ jobs:
             cp -a "$src" "$dest"; rm -rf "$dest/.git"
           done
 
+          # The catquiz family for the diagnosis chain (plan section 13), Moodle
+          # 4.5 line: branch ALiSe-v-1.2.0-legacy of the ralferlebach forks -
+          # for now the only source of that line (decision 2026-10-06).
+          # local_catquiz brings two subplugins as git SUBMODULES
+          # (catquizcentralhub/host, /client); without them Moodle's component
+          # scan fails with "Invalid subtype directory".
+          CATQUIZ_REF=ALiSe-v-1.2.0-legacy
+          declare -A EXTRA=(
+            [local/wunderbyte_table]="Wunderbyte-GmbH/moodle-local_wunderbyte_table|MOODLE_405_DEV"
+            [mod/adaptivequiz]="ralferlebach/moodle-mod_adaptivequiz|$CATQUIZ_REF"
+            [mod/adaptivequiz/catmodel/catquiz]="ralferlebach/moodle-adaptivequizcatmodel_catquiz|$CATQUIZ_REF"
+            [local/catquiz]="ralferlebach/moodle-local_catquiz|$CATQUIZ_REF"
+          )
+          # Order matters: the adapter lives INSIDE mod/adaptivequiz.
+          for path in local/wunderbyte_table mod/adaptivequiz mod/adaptivequiz/catmodel/catquiz local/catquiz; do
+            repo="${EXTRA[$path]%%|*}"
+            ref="${EXTRA[$path]##*|}"
+            src="$RUNNER_TEMP/src_$(basename "$repo")"
+            rm -rf "$src"
+            git clone --quiet --depth 1 --branch "$ref" --recurse-submodules --shallow-submodules \
+              "https://github.com/$repo.git" "$src"
+            echo "| $(basename "$repo") | $repo | $ref | $(git -C "$src" rev-parse HEAD) |" \
+              >> "$RUNNER_TEMP/plugins.md"
+            dest="$MOODLE_WEBROOT/$path"
+            rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+            cp -a "$src" "$dest"
+            find "$dest" -name .git -prune -exec rm -rf {} +
+          done
+
       - name: Install Moodle site
         run: |
           cd moodle

@@ -382,4 +382,58 @@ final class uc09_catquiz_completion_test extends adele_learningpath_testcase {
 
         $this->sink->close();
     }
+
+    /**
+     * Ability exactly at, just below and just above the threshold (plan
+     * section 13, chain D): the rule is "ability >= threshold", so the
+     * boundary itself passes.
+     *
+     * @return array [ability, expected status]
+     */
+    public static function boundary_provider(): array {
+        $x = self::SCALE_THRESHOLD;
+        return [
+            'x - epsilon' => [$x - 0.01, 'not completed'],
+            'x' => [$x, 'completed'],
+            'x + epsilon' => [$x + 0.01, 'completed'],
+        ];
+    }
+
+    /**
+     * The ability threshold decides at its boundary as the rule says.
+     *
+     * @dataProvider boundary_provider
+     * @param float $ability The person ability stored in the attempt.
+     * @param string $expected "completed" or "not completed".
+     */
+    public function test_ability_threshold_boundary(float $ability, string $expected): void {
+        global $DB;
+        $this->subscribe_users_to_lp();
+        foreach ($this->get_update_events() as $event) {
+            relation_update::updated_single($event);
+        }
+        set_config('quizsettings', 'single_quiz', 'local_adele');
+        foreach ($DB->get_records('local_adele_path_user') as $record) {
+            $this->insert_catquiz_attempt_in_db((int) $record->user_id, $ability);
+        }
+        foreach ($DB->get_records('local_adele_path_user') as $fresh) {
+            $fresh->json = json_decode($fresh->json, true);
+            relation_update::updated_single(user_path_updated::create([
+                'objectid' => $fresh->id,
+                'context' => context_system::instance(),
+                'other' => ['userpath' => $fresh],
+            ]));
+        }
+        $records = $DB->get_records('local_adele_path_user');
+        $this->assertNotEmpty($records);
+        foreach ($records as $record) {
+            $status = json_decode($record->json, true)['user_path_relation']['dndnode_1']['feedback']['status'] ?? '';
+            if ($expected === 'completed') {
+                $this->assertEquals('completed', $status, "ability {$ability} meets the threshold " . self::SCALE_THRESHOLD);
+            } else {
+                $this->assertNotEquals('completed', $status, "ability {$ability} is below the threshold " . self::SCALE_THRESHOLD);
+            }
+        }
+        $this->sink->close();
+    }
 }
