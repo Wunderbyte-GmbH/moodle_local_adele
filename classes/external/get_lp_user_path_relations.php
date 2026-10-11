@@ -117,6 +117,12 @@ class get_lp_user_path_relations extends external_api {
             );
         }
 
+        // Asked for through a course that embeds the path, the roster is that
+        // course's: its enrolled learners of the path, ranked among themselves
+        // (#588). Path authority outside such a course gets the path's roster.
+        if ($embedded) {
+            $params['scopecourseid'] = (int) $params['courseid'];
+        }
         $relations = learning_paths::get_learning_user_relations($params);
 
         // The mod_adele setting 'Participant results' = 'Only own results' must

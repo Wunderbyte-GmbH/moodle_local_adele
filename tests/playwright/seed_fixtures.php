@@ -785,6 +785,7 @@ $masteraccesstimepath = null;
 $masterbothpath = null;
 $privacypath = null;
 $privacysecond = null;
+$privacythird = null;
 $finalpaths = [];
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
@@ -1100,6 +1101,16 @@ if (!empty($imported['Linear A1'])) {
             $masteraccess,
             'fx_p_b',
             'Privacy Beta',
+            $fixturepassword
+        );
+        // ... and a third learner of the SAME path who belongs to another
+        // course that embeds it as well (#588): the roster of one course must
+        // not show the learners of the other.
+        $privacythird = local_adele_fixture_store_path(
+            'E2E Lernerdaten',
+            $masteraccess,
+            'fx_p_c',
+            'Privacy Gamma',
             $fixturepassword
         );
         // Z: overall completion. Four paths, each with a learner of its own,
@@ -1650,6 +1661,23 @@ if ($privacypath && $privacysecond) {
     // editing teacher would become an ADELE assistant (enrollassistant).
     $privacyenrol($privacyother, $privacypeople['FOREIGN'], 'teacher');
     \local_adele\learning_path_editors::create_editors($privacyid, (int) $privacypeople['COLLABORATOR']->id);
+    // The same path in a second course, with a learner of its own.
+    if ($privacythird) {
+        $privacysecondhost = local_adele_fixture_host_course(
+            'E2EP2',
+            'E2E P second course',
+            $privacyid,
+            $privacythird[1],
+            (int) $options['category'],
+            1
+        );
+        $privacypeople['C'] = $privacythird[1];
+        $privacycms['SECOND'] = (int) get_coursemodule_from_instance(
+            'adele',
+            $DB->get_field('adele', 'id', ['course' => $privacysecondhost->id, 'name' => 'E2E P second course']),
+            $privacysecondhost->id
+        )->id;
+    }
     $privacy = [
         'path' => $privacyid,
         'host' => $privacyhost,

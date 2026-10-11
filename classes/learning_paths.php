@@ -474,10 +474,32 @@ class learning_paths {
             'learning_path_id' => (int)$data['learningpathid'],
         ];
 
+        // The roster of an embedding belongs to its course (#588): learners
+        // of the path AND enrolled in that course - not the learners another
+        // course brought to the same path. Enrolled means enrolled, active or
+        // suspended: host mode "hidden" keeps its learners suspended in the
+        // host course, and their teacher must still see them. This is NOT the
+        // course_id column discussed above (that one only records where the
+        // snapshot was first triggered); it is the course's real enrolments.
+        // Without a scope - path authority outside any course - the roster is
+        // the path's. Ranks are given below, within whatever set this yields.
+        $scopejoin = '';
+        if (!empty($data['scopecourseid'])) {
+            [$enrolledsql, $enrolledparams] = get_enrolled_sql(
+                \context_course::instance((int) $data['scopecourseid']),
+                '',
+                0,
+                false
+            );
+            $scopejoin = "JOIN ({$enrolledsql}) scope ON scope.id = lpu.user_id";
+            $params = array_merge($params, $enrolledparams);
+        }
+
         $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
             usr.firstname, usr.lastname, usr.email
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
+            {$scopejoin}
             WHERE lpu.learning_path_id = :learning_path_id
             AND lpu.status = 'active'";
 

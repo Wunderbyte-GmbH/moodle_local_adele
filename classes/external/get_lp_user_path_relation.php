@@ -109,9 +109,12 @@ class get_lp_user_path_relation extends external_api {
             (int)$params['userpathid'] !== (int)$USER->id
             && !learning_paths::has_path_authority((int) $params['learningpathid'])
         ) {
+            // ... and it covers the learners of that course, not the ones
+            // another course brought to the same path (#588).
             $teacherhere = $coursecontext
                 && learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid'])
-                && has_capability('local/adele:teacheredit', $context);
+                && has_capability('local/adele:teacheredit', $context)
+                && is_enrolled($coursecontext, (int) $params['userpathid']);
             if (!$teacherhere) {
                 throw new \required_capability_exception(
                     $context,
