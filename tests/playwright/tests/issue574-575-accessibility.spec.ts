@@ -32,6 +32,7 @@
  */
 
 import AxeBuilder from '@axe-core/playwright';
+import * as fs from 'node:fs';
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
 
@@ -166,7 +167,7 @@ test.describe('ADELE-PW-575 — usable without the graph', () => {
     await expect(insert).toBeFocused();
   });
 
-  test('the overview has no serious accessibility violations', async ({ page }) => {
+  test('the overview has no serious accessibility violations', async ({ page }, testInfo) => {
     await page.goto('/local/adele/index.php');
     await expect(app(page).locator(`[data-testid="learningpath-row-${PATH_ID()}"]`))
       .toBeVisible({ timeout: 30_000 });
@@ -194,6 +195,67 @@ test.describe('ADELE-PW-575 — usable without the graph', () => {
         : '';
       return `${violation.id} at ${JSON.stringify(node.target)}${colours} :: ${String(node.html).slice(0, 160)}`;
     }));
+
+    // Evidence attached to the run, green or red: the full axe result, and
+    // for every serious finding the element itself - outlined, photographed
+    // on its own and in the page, with the styles the browser computed for
+    // it at that moment. A screenshot of the page alone says nothing about
+    // contrast (anti-aliasing mixes the colours, the state may have changed
+    // since the check); this ties the picture to the element and the values
+    // axe measured.
+    // Written as files next to the test's other results (test-results/…, part
+    // of the uploaded artifact) and attached to the report.
+    const evidence = async (name: string, body: string | Buffer, contentType: string): Promise<void> => {
+      const file = testInfo.outputPath(name);
+      fs.writeFileSync(file, body);
+      await testInfo.attach(name, { path: file, contentType });
+    };
+    // Without the passes (megabytes): the findings, and what axe could not
+    // decide ("incomplete" - for contrast, e.g. a background it could not
+    // determine), with the browser and viewport it ran in.
+    await evidence('axe-results.json', JSON.stringify({
+      url: results.url,
+      timestamp: results.timestamp,
+      testEnvironment: results.testEnvironment,
+      violations: results.violations,
+      incomplete: results.incomplete,
+    }, null, 2), 'application/json');
+    let finding = 0;
+    for (const violation of serious) {
+      for (const node of violation.nodes) {
+        finding++;
+        const selector = typeof node.target[0] === 'string' ? node.target[0] : null;
+        if (!selector) {
+          continue;
+        }
+        const element = page.locator(selector).first();
+        const styles = await element.evaluate((el) => {
+          const css = getComputedStyle(el);
+          (el as HTMLElement).style.outline = '3px solid magenta';
+          (el as HTMLElement).style.outlineOffset = '2px';
+          return {
+            color: css.color,
+            backgroundColor: css.backgroundColor,
+            opacity: css.opacity,
+            fontFamily: css.fontFamily,
+            fontSize: css.fontSize,
+            fontWeight: css.fontWeight,
+            text: (el.textContent || '').trim().slice(0, 120),
+          };
+        }).catch((error) => ({ error: String(error) }));
+        await evidence(`finding-${finding}-${violation.id}.json`, JSON.stringify({
+          rule: violation.id, target: node.target, html: node.html,
+          measured: node.any?.[0]?.data ?? null, computed: styles,
+        }, null, 2), 'application/json');
+        const picture = await element.screenshot({ timeout: 5_000 }).catch(() => null);
+        if (picture) {
+          await evidence(`finding-${finding}-${violation.id}-element.png`, picture, 'image/png');
+        }
+      }
+    }
+    if (finding) {
+      await evidence('findings-in-page.png', await page.screenshot({ fullPage: true }), 'image/png');
+    }
     expect(details, details.join('\n')).toEqual([]);
   });
 });
