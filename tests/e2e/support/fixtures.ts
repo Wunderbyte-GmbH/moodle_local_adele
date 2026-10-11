@@ -216,3 +216,70 @@ export async function expectCourseOpen(page: Page, courseid: string, because: st
 export async function expectCourseClosed(page: Page, courseid: string, because: string): Promise<void> {
   expect(await courseAccess(page, courseid), because).not.toBe('open');
 }
+
+/**
+ * Complete a course the way a learner does: open it and mark its completion
+ * activity as done.
+ *
+ * Every fixture course (T01-T12) completes on ONE activity - its
+ * "Announcements" forum, set to manual completion. The click records the
+ * activity completion; the course completion itself is aggregated by
+ * Moodle's completion task (runCompletion()).
+ *
+ * @param page The page, logged in as the learner.
+ * @param courseid The course.
+ */
+export async function completeCourse(page: Page, courseid: string): Promise<void> {
+  await page.goto(`/course/view.php?id=${courseid}`);
+  // Moodle names the button after the activity for assistive technology:
+  // "Mark Ankündigungen as done", afterwards "Ankündigungen is marked as
+  // done. Press to undo." (core_course completion_manual:aria:*).
+  const mark = page.getByRole('button', { name: /^Mark .+ as done$/ }).first();
+  const done = page.getByRole('button', { name: /is marked as done/ }).first();
+  await expect(mark, `course ${courseid} must offer its completion activity to the learner`).toBeVisible({ timeout: 30_000 });
+  // The button is server-rendered; its click handler arrives with Moodle's
+  // JavaScript a moment later, and a click before that does nothing at all.
+  // So: let the page settle, click, and click again ONLY while the button
+  // still offers "Mark ... as done" - a second click on a toggled button
+  // would undo the completion.
+  await page.waitForLoadState('networkidle');
+  for (let attempt = 0; attempt < 3 && !(await done.isVisible()); attempt++) {
+    if (await mark.isVisible()) {
+      await mark.click();
+    }
+    await done.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => undefined);
+  }
+  await expect(done, `the completion of course ${courseid} must be recorded`).toBeVisible({ timeout: 10_000 });
+}
+
+/**
+ * Let the system act on completions: Moodle's completion task aggregates
+ * course completion, then the queue of local_adele and enrol_adele runs.
+ * Both under the same (possibly shifted) clock as the web server.
+ */
+export function runCompletion(): void {
+  execFileSync(
+    'php',
+    ['-d', 'max_input_vars=5000', 'admin/cli/scheduled_task.php', '--execute=\\core\\task\\completion_regular_task'],
+    { cwd: fixture('ADELE_MOODLE_ROOT'), encoding: 'utf8', env: { ...process.env, ...serverTimeEnv() } }
+  );
+  drainTaskQueue();
+}
+
+/**
+ * The state of one node as the learner's own path view shows it
+ * (data-status: accessible, completed, not_accessible, closed).
+ *
+ * @param page The page, logged in as the learner.
+ * @param hostcourse The course embedding the path.
+ * @param activityname The embedding activity's name.
+ * @param nodeid The node, e.g. "dndnode_2".
+ */
+export async function nodeStatus(page: Page, hostcourse: string, activityname: string, nodeid: string): Promise<string> {
+  await page.goto(`/course/view.php?id=${hostcourse}`);
+  // In the page content: the course index beside it lists the same link.
+  await page.getByRole('main').getByRole('link', { name: activityname }).click();
+  const node = page.locator(`[data-testid="learningpath-node-${nodeid}"]`);
+  await expect(node).toBeVisible({ timeout: 60_000 });
+  return (await node.getAttribute('data-status')) || '';
+}

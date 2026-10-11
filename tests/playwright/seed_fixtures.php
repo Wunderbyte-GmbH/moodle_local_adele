@@ -419,6 +419,65 @@ function local_adele_fixture_single_condition(array $first, array $feedback, arr
 }
 
 /**
+ * A host course of its own for one fixture path: one mod_adele activity
+ * (source "this course"), the learner as its only member. Activities from an
+ * earlier run are removed first.
+ *
+ * @param string $shortname Short name of the host course.
+ * @param string $activityname Name of the activity.
+ * @param int $pathid The learning path.
+ * @param stdClass $learner The learner.
+ * @param int $category Course category.
+ * @return stdClass The host course.
+ */
+function local_adele_fixture_host_course(
+    string $shortname,
+    string $activityname,
+    int $pathid,
+    stdClass $learner,
+    int $category
+): stdClass {
+    global $DB;
+    $course = $DB->get_record('course', ['shortname' => $shortname]);
+    if (!$course) {
+        $course = create_course((object) [
+            'shortname' => $shortname,
+            'fullname' => 'E2E host course ' . $shortname,
+            'category' => $category,
+            'summary' => 'Shows one fixture learning path to its learner. Created by seed_fixtures.php.',
+            'summaryformat' => FORMAT_HTML,
+        ]);
+    }
+    foreach ($DB->get_records('adele', ['course' => $course->id]) as $activity) {
+        $cm = get_coursemodule_from_instance('adele', $activity->id, $course->id);
+        if ($cm) {
+            course_delete_module($cm->id);
+        }
+    }
+    $manual = enrol_get_plugin('manual');
+    $instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', IGNORE_MULTIPLE);
+    $roleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
+    if ($manual && $instance && $roleid) {
+        $manual->enrol_user($instance, $learner->id, $roleid);
+    }
+    create_module((object) [
+        'modulename' => 'adele',
+        'course' => $course->id,
+        'section' => 0,
+        'visible' => 1,
+        'name' => $activityname,
+        // Modules with a description want it the way the form sends it.
+        'introeditor' => ['text' => '', 'format' => FORMAT_HTML, 'itemid' => file_get_unused_draft_itemid()],
+        'learningpathid' => $pathid,
+        'participantslist' => '1',
+        'hostenrolmentmode' => 'visible',
+        'userlist' => 1,
+        'view' => 1,
+    ]);
+    return $course;
+}
+
+/**
  * Create or refresh a fixture path derived from another one, with a new
  * access criterion on its entry node, and subscribe one dedicated learner.
  *
@@ -438,12 +497,37 @@ function local_adele_fixture_derived_path(
     string $lastname,
     string $password
 ): array {
-    global $DB, $CFG;
     foreach ($base['tree']['nodes'] as $n => $node) {
         if ($node['id'] === 'dndnode_1') {
             $base['tree']['nodes'][$n]['restriction'] = $restriction;
         }
     }
+    return local_adele_fixture_store_path($name, $base, $username, $lastname, $password);
+}
+
+/**
+ * Create or refresh a fixture path from a complete JSON structure and
+ * subscribe one dedicated learner, with a clean slate: no previous
+ * subscription, no ADELE enrolments, no course completions in the path's
+ * courses (a completion is permanent in Moodle and would leak from one run
+ * into the next).
+ *
+ * @param string $name Name of the path.
+ * @param array $json The decoded path JSON.
+ * @param string $username The learner's account (created if missing).
+ * @param string $lastname The learner's last name.
+ * @param string $password The fixture password.
+ * @return array [path id, learner record, relation timecreated]
+ */
+function local_adele_fixture_store_path(
+    string $name,
+    array $json,
+    string $username,
+    string $lastname,
+    string $password
+): array {
+    global $DB, $CFG;
+    $base = $json;
     $record = (object) [
         'name' => $name,
         'description' => 'E2E fixture derived from Linear A1: ' . $name . '.',
@@ -476,6 +560,28 @@ function local_adele_fixture_derived_path(
         $learner = $DB->get_record('user', ['id' => $learner->id]);
     }
     $DB->set_field('user', 'password', hash_internal_user_password($password), ['id' => $learner->id]);
+    // Forget every completion in the path's courses: activity, criteria, course.
+    $courseids = [];
+    foreach ($base['tree']['nodes'] as $node) {
+        foreach ((array) ($node['data']['course_node_id'] ?? []) as $courseid) {
+            $courseids[] = (int) $courseid;
+        }
+    }
+    foreach (array_unique($courseids) as $courseid) {
+        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'course = ?', [$courseid]);
+        if ($cmids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($cmids);
+            $DB->delete_records_select(
+                'course_modules_completion',
+                "userid = ? AND coursemoduleid {$insql}",
+                array_merge([$learner->id], $inparams)
+            );
+        }
+        $DB->delete_records('course_completion_crit_compl', ['userid' => $learner->id, 'course' => $courseid]);
+        $DB->delete_records('course_completions', ['userid' => $learner->id, 'course' => $courseid]);
+    }
+    \cache::make('core', 'completion')->purge();
+    \cache::make('core', 'coursecompletion')->purge();
     $DB->delete_records('local_adele_path_user', ['learning_path_id' => $pathid, 'user_id' => $learner->id]);
     if (class_exists('\\enrol_adele\\local\\reconciler')) {
         \enrol_adele\local\reconciler::purge_user($pathid, $learner->id);
@@ -508,6 +614,8 @@ $timelearner = null;
 $durationpath = null;
 $durationlearner = null;
 $durationcreated = 0;
+$c1paths = [];
+$c3path = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -555,6 +663,92 @@ if (!empty($imported['Linear A1'])) {
             local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $data),
             'fx_duration_learner',
             'Duration',
+            $fixturepassword
+        );
+
+        // C1: access by predecessors. Every course's completion is the
+        // forum "Announcements" with manual completion - a learner can
+        // really complete a course with "Mark as done".
+        $parentcriterion = function (array $ids, int $min) use ($firsttemplate, $feedbacktemplate): array {
+            $data = $firsttemplate['data'];
+            $data['value'] = ['courses_id' => $ids, 'min_courses' => $min];
+            return local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $data);
+        };
+        $edgetemplate = $base['tree']['edges'][0];
+        unset($edgetemplate['sourceNode'], $edgetemplate['targetNode']);
+        $edge = function (string $from, string $to) use ($edgetemplate): array {
+            return array_merge($edgetemplate, ['id' => $to . $from, 'source' => $from, 'target' => $to]);
+        };
+
+        // 1 of 1: the linear path, each node after its single predecessor,
+        // without the reference path's extra (expired) time condition.
+        $single = $base;
+        foreach ($single['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_2') {
+                $single['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            } else if ($node['id'] === 'dndnode_3') {
+                $single['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $c1paths['single'] = local_adele_fixture_store_path(
+            'E2E Vorgänger 1 von 1',
+            $single,
+            'fx_c1_single',
+            'Predecessor single',
+            $fixturepassword
+        );
+
+        // 1 of 2 and 2 of 2: T01 and T02 both start the path, T03 follows
+        // BOTH. Only the number of predecessors to complete differs.
+        foreach (['any' => 1, 'all' => 2] as $variant => $min) {
+            $fan = $base;
+            foreach ($fan['tree']['nodes'] as $n => $node) {
+                if ($node['id'] === 'dndnode_1') {
+                    $fan['tree']['nodes'][$n]['childCourse'] = ['dndnode_3'];
+                } else if ($node['id'] === 'dndnode_2') {
+                    $fan['tree']['nodes'][$n]['parentCourse'] = ['starting_node'];
+                    $fan['tree']['nodes'][$n]['childCourse'] = ['dndnode_3'];
+                    $fan['tree']['nodes'][$n]['restriction'] = ['nodes' => [], 'edges' => []];
+                    $fan['tree']['nodes'][$n]['position'] = ['x' => 600, 'y' => 0];
+                } else if ($node['id'] === 'dndnode_3') {
+                    $fan['tree']['nodes'][$n]['parentCourse'] = ['dndnode_1', 'dndnode_2'];
+                    $fan['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1', 'dndnode_2'], $min);
+                    $fan['tree']['nodes'][$n]['position'] = ['x' => 300, 'y' => 600];
+                }
+            }
+            $fan['tree']['edges'] = [$edge('dndnode_1', 'dndnode_3'), $edge('dndnode_2', 'dndnode_3')];
+            $c1paths[$variant] = local_adele_fixture_store_path(
+                $min === 1 ? 'E2E Vorgänger 1 von 2' : 'E2E Vorgänger 2 von 2',
+                $fan,
+                'fx_c1_' . $variant,
+                'Predecessor ' . $variant,
+                $fixturepassword
+            );
+        }
+
+        // C3: manual release. Node 2's only access condition is "manual":
+        // a teacher unlocks it for this learner in the learner's path view.
+        $data = $firsttemplate['data'];
+        $data['label'] = 'manual';
+        $data['name'] = get_string('course_name_condition_restriction_manual', 'local_adele');
+        $data['description'] = get_string('course_description_condition_restriction_manual', 'local_adele');
+        $data['description_before'] = get_string('course_restricition_before_condition_manual', 'local_adele');
+        $data['information'] = get_string('course_information_condition_manual', 'local_adele');
+        $data['value'] = null;
+        $manualpath = $base;
+        foreach ($manualpath['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_2') {
+                $manualpath['tree']['nodes'][$n]['restriction'] =
+                    local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $data);
+            } else if ($node['id'] === 'dndnode_3') {
+                $manualpath['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $c3path = local_adele_fixture_store_path(
+            'E2E Manuelle Freigabe',
+            $manualpath,
+            'fx_c3_manual',
+            'Manual release',
             $fixturepassword
         );
     }
@@ -778,6 +972,40 @@ printf("export ADELE_MOODLE_ROOT='%s'\n", $CFG->dirroot);
 if ($entrylearner) {
     printf("export ADELE_FIXTURE_ENTRY_LEARNER='%s'\n", $entrylearner->username);
     printf("export ADELE_FIXTURE_ENTRY_LEARNER_NAME='%s'\n", fullname($entrylearner));
+}
+// Each C path embedded into a host course of its own, with its learner as
+// the only member: the learner needs the path view to show node states, and
+// one shared host course would subscribe every member to every path.
+\core\session\manager::set_user(get_admin());
+$c1hosts = [];
+foreach ($c1paths as $variant => [$pathid, $learner]) {
+    $c1hosts[$variant] = local_adele_fixture_host_course(
+        'E2EC1' . strtoupper($variant),
+        'E2E C1 ' . $variant,
+        $pathid,
+        $learner,
+        (int) $options['category']
+    );
+}
+$c3host = $c3path ? local_adele_fixture_host_course(
+    'E2EC3',
+    'E2E C3 manual',
+    $c3path[0],
+    $c3path[1],
+    (int) $options['category']
+) : null;
+
+foreach ($c1paths as $variant => [$pathid, $learner]) {
+    $key = strtoupper($variant);
+    printf("export ADELE_FIXTURE_PATH_C1_%s='%d'\n", $key, $pathid);
+    printf("export ADELE_FIXTURE_C1_%s_LEARNER='%s'\n", $key, $learner->username);
+    printf("export ADELE_FIXTURE_C1_%s_HOST='%d'\n", $key, $c1hosts[$variant]->id);
+}
+if ($c3path && $c3host) {
+    printf("export ADELE_FIXTURE_PATH_C3='%d'\n", $c3path[0]);
+    printf("export ADELE_FIXTURE_C3_LEARNER='%s'\n", $c3path[1]->username);
+    printf("export ADELE_FIXTURE_C3_LEARNER_NAME='%s'\n", fullname($c3path[1]));
+    printf("export ADELE_FIXTURE_C3_HOST='%d'\n", $c3host->id);
 }
 if ($durationpath && $durationlearner) {
     printf("export ADELE_FIXTURE_PATH_DURATION='%d'\n", $durationpath);
