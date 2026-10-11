@@ -509,6 +509,95 @@ function local_adele_fixture_two_conditions(array $first, array $feedback, array
 }
 
 /**
+ * Give the conditions of a fixture path the texts the EDITOR would give them.
+ *
+ * The fixture paths are derived from one authored path by swapping
+ * conditions. The texts of a condition and of its feedback node are stored in
+ * the path, written when the author placed the condition - so a derived path
+ * kept texts about conditions it no longer had ("... und {start_date} bis
+ * {end_date}" on a node without a time condition), and a chain about feedback
+ * texts would have judged the fixture instead of the product.
+ *
+ * What the editor does, done here:
+ *  - a condition gets the defaults of its class (get_description() - the very
+ *    data the editor loads its palette from), in the language of the author
+ *    (this script's: English);
+ *  - a feedback node with "use default" ticked gets the texts of its
+ *    condition chain, joined by " and " (feedbackNode.vue and
+ *    feedbackNodeRestriction.vue, renderFeedback()).
+ *
+ * @param array $json The path definition.
+ * @return array The path definition with editor-default texts.
+ */
+function local_adele_fixture_editor_texts(array $json): array {
+    $and = get_string('course_condition_concatination_and', 'local_adele');
+    foreach ($json['tree']['nodes'] as $n => $treenode) {
+        foreach (['restriction' => ['before'], 'completion' => ['before', 'after', 'inbetween']] as $type => $actions) {
+            $graph = $treenode[$type]['nodes'] ?? null;
+            if (!is_array($graph) || !$graph) {
+                continue;
+            }
+            $byid = [];
+            foreach ($graph as $g => $node) {
+                if (($node['type'] ?? '') !== 'feedback' && !empty($node['data']['label'])) {
+                    $class = '\\local_adele\\course_' . $type . '\\conditions\\' . $node['data']['label'];
+                    if (class_exists($class)) {
+                        $defaults = (new $class())->get_description();
+                        unset($defaults['id'], $defaults['label']);
+                        $graph[$g]['data'] = array_merge($node['data'], $defaults);
+                    }
+                }
+                $byid[$node['id']] = $g;
+            }
+            foreach ($graph as $g => $node) {
+                if (($node['type'] ?? '') !== 'feedback') {
+                    continue;
+                }
+                // The chain this feedback node speaks for.
+                $chain = [];
+                $next = $node['data']['childCondition'] ?? null;
+                while ($next !== null && isset($byid[$next]) && !in_array($next, $chain, true)) {
+                    $chain[] = $next;
+                    $following = null;
+                    foreach ((array) ($graph[$byid[$next]]['childCondition'] ?? []) as $child) {
+                        if (strpos((string) $child, 'feedback') === false) {
+                            $following = $child;
+                        }
+                    }
+                    $next = $following;
+                }
+                $information = [];
+                $texts = array_fill_keys($actions, []);
+                foreach ($chain as $position => $conditionid) {
+                    $data = $graph[$byid[$conditionid]]['data'];
+                    $visible = !empty($data['visibility']);
+                    // The first condition's information is always part of
+                    // it; the following ones only while visible - as the
+                    // completion editor has it. (The restriction editor adds
+                    // them regardless; every fixture condition is visible.)
+                    if ($position === 0 || $visible) {
+                        $information[] = (string) ($data['information'] ?? '');
+                    }
+                    if ($visible) {
+                        foreach ($actions as $action) {
+                            $texts[$action][] = (string) ($data['description_' . $action] ?? '');
+                        }
+                    }
+                }
+                $graph[$g]['data']['information'] = implode($and, $information);
+                foreach ($actions as $action) {
+                    if (!empty($node['data']['feedback_' . $action . '_checkmark'])) {
+                        $graph[$g]['data']['feedback_' . $action] = implode($and, $texts[$action]);
+                    }
+                }
+            }
+            $json['tree']['nodes'][$n][$type]['nodes'] = $graph;
+        }
+    }
+    return $json;
+}
+
+/**
  * A host course of its own for one fixture path: one mod_adele activity
  * (source "this course"), the learner as its only member. Activities from an
  * earlier run are removed first.
@@ -681,7 +770,10 @@ function local_adele_fixture_store_path(
     string $password
 ): array {
     global $DB, $CFG;
-    $base = $json;
+    // Remembered by name, so that a later chain can put a learner of its own
+    // on the same definition (chain F does).
+    $GLOBALS['local_adele_fixture_definitions'][$name] = $json;
+    $base = local_adele_fixture_editor_texts($json);
     $record = (object) [
         'name' => $name,
         'description' => 'E2E fixture derived from Linear A1: ' . $name . '.',
@@ -1719,6 +1811,117 @@ foreach ($finalpaths as $key => [$pathid, $learner]) {
     printf("export ADELE_FIXTURE_%s_LEARNER='%s'\n", $key, $learner->username);
     printf("export ADELE_FIXTURE_%s_HOST='%d'\n", $key, $finalhost->id);
 }
+
+// F: feedback texts. The conditions other chains test for their EFFECT, each
+// with a learner and a host course of its own, so that this chain can walk
+// the states and read the texts without disturbing anybody: predecessor
+// (1 of 1, 2 of 2), manual release, manual completion, a fixed time window,
+// window AND / OR predecessor - and one learner whose language is German.
+// The time fixtures get paths and windows of their own (2032, 2033), later
+// than every window of chain T: moving the clock runs every task due by then,
+// for every learner on a path - shared windows would consume each other's
+// re-evaluations. A window may be open at one end (null).
+// CUSTOM: node 2 carries a text the author wrote instead of the default.
+// [source definition, name of the own path or null, window or null].
+/** @var int Start of chain F's first window: 2032-01-15 10:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_F_WINDOW3_START = 1957773600;
+/** @var int End of chain F's first window: 2032-01-15 12:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_F_WINDOW3_END = 1957780800;
+/** @var int Start of chain F's second window: 2033-01-15 10:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_F_WINDOW4_START = 1989396000;
+/** @var int End of chain F's second window: 2033-01-15 12:00:00 UTC. */
+const LOCAL_ADELE_FIXTURE_F_WINDOW4_END = 1989403200;
+/** @var string The author's own text on node 2 of the CUSTOM fixtures. */
+const LOCAL_ADELE_FIXTURE_F_CUSTOM_TEXT = 'E2E author text: finish Testkurs 01 first';
+$feedbackwindow3 = [LOCAL_ADELE_FIXTURE_F_WINDOW3_START, LOCAL_ADELE_FIXTURE_F_WINDOW3_END];
+$feedbackwindow4 = [LOCAL_ADELE_FIXTURE_F_WINDOW4_START, LOCAL_ADELE_FIXTURE_F_WINDOW4_END];
+$feedbackfixtures = [
+    'LINEAR' => ['E2E Vorgänger 1 von 1', null, null],
+    'ALL' => ['E2E Vorgänger 2 von 2', null, null],
+    'ACCESS' => ['E2E Manuelle Freigabe', null, null],
+    'MANUAL' => ['E2E Abschluss manuell', null, null],
+    'TIME' => ['E2E Master-Zugang Zeit', 'E2E F Zeitfenster', $feedbackwindow3],
+    // Same window, a learner on the other side of the world: UTC+9.
+    'TIME_TOKYO' => ['E2E Master-Zugang Zeit', 'E2E F Zeitfenster', $feedbackwindow3],
+    'TIME_START' => ['E2E Master-Zugang Zeit', 'E2E F Nur Beginn', [LOCAL_ADELE_FIXTURE_F_WINDOW3_START, null]],
+    'TIME_END' => ['E2E Master-Zugang Zeit', 'E2E F Nur Ende', [null, LOCAL_ADELE_FIXTURE_F_WINDOW3_END]],
+    'AND' => ['E2E Zeit UND Vorgänger', 'E2E F Zeit UND Vorgänger', $feedbackwindow4],
+    'AND_LATE' => ['E2E Zeit UND Vorgänger', 'E2E F Zeit UND Vorgänger', $feedbackwindow4],
+    'OR' => ['E2E Zeit ODER Vorgänger', 'E2E F Zeit ODER Vorgänger', $feedbackwindow4],
+    'CUSTOM' => ['E2E Vorgänger 1 von 1', 'E2E F Eigener Text', null],
+    'CUSTOM_DE' => ['E2E Vorgänger 1 von 1', 'E2E F Eigener Text', null],
+    'DE' => ['E2E Vorgänger 1 von 1', null, null],
+];
+// The list of installed languages is cached; a pack installed a moment ago
+// by another process is not on it yet.
+get_string_manager()->reset_caches();
+$german = get_string_manager()->translation_exists('de', false);
+if (!$german) {
+    // The language pack, the way an administrator installs it. Without
+    // network access the German part of the chain is skipped, not faked.
+    try {
+        (new \tool_langimport\controller())->install_languagepacks('de');
+        get_string_manager()->reset_caches();
+        $german = get_string_manager()->translation_exists('de', false);
+    } catch (\Throwable $e) {
+        $german = false;
+    }
+}
+foreach ($feedbackfixtures as $key => [$sourcename, $ownname, $window]) {
+    $definition = $GLOBALS['local_adele_fixture_definitions'][$sourcename] ?? null;
+    $isgerman = substr($key, -2) === 'DE';
+    if (!$definition || ($isgerman && !$german)) {
+        continue;
+    }
+    foreach ($definition['tree']['nodes'] as $n => $treenode) {
+        foreach ($treenode['restriction']['nodes'] ?? [] as $c => $condition) {
+            if ($window && ($condition['data']['label'] ?? '') === 'timed') {
+                $definition['tree']['nodes'][$n]['restriction']['nodes'][$c]['data']['value'] =
+                    ['start' => $window[0], 'end' => $window[1]];
+            }
+            if (
+                strpos($key, 'CUSTOM') === 0 && $treenode['id'] === 'dndnode_2' &&
+                ($condition['type'] ?? '') === 'feedback'
+            ) {
+                // What the editor stores when the author unticks "use
+                // default" and writes a text of their own.
+                $definition['tree']['nodes'][$n]['restriction']['nodes'][$c]['data']['feedback_before_checkmark'] = false;
+                $definition['tree']['nodes'][$n]['restriction']['nodes'][$c]['data']['feedback_before'] =
+                    LOCAL_ADELE_FIXTURE_F_CUSTOM_TEXT;
+            }
+        }
+    }
+    $feedbacklabel = strtolower(str_replace('_', ' ', $key));
+    // Language and time zone BEFORE the subscription: the first texts are
+    // rendered there. An explicit zone, so that the dates the chain reads do
+    // not depend on the site's default.
+    $feedbackperson = local_adele_fixture_person('fx_f_' . strtolower($key), 'Feedback ' . $feedbacklabel, $fixturepassword);
+    $DB->set_field('user', 'lang', $isgerman ? 'de' : 'en', ['id' => $feedbackperson->id]);
+    $DB->set_field('user', 'timezone', $key === 'TIME_TOKYO' ? 'Asia/Tokyo' : 'UTC', ['id' => $feedbackperson->id]);
+    [$feedbackpathid, $feedbacklearner] = local_adele_fixture_store_path(
+        $ownname ?? $sourcename,
+        $definition,
+        'fx_f_' . strtolower($key),
+        'Feedback ' . $feedbacklabel,
+        $fixturepassword
+    );
+    // Named after the key, not numbered: a numbered course would pass to
+    // another fixture - with its members - whenever the list changes.
+    $feedbackhost = local_adele_fixture_host_course(
+        'E2EF_' . $key,
+        'E2E F ' . $feedbacklabel,
+        $feedbackpathid,
+        $feedbacklearner,
+        (int) $options['category']
+    );
+    printf("export ADELE_FIXTURE_F_%s_LEARNER='%s'\n", $key, $feedbacklearner->username);
+    printf("export ADELE_FIXTURE_F_%s_HOST='%d'\n", $key, $feedbackhost->id);
+}
+printf("export ADELE_FIXTURE_F_WINDOW3_START='%d'\n", LOCAL_ADELE_FIXTURE_F_WINDOW3_START);
+printf("export ADELE_FIXTURE_F_WINDOW3_END='%d'\n", LOCAL_ADELE_FIXTURE_F_WINDOW3_END);
+printf("export ADELE_FIXTURE_F_WINDOW4_START='%d'\n", LOCAL_ADELE_FIXTURE_F_WINDOW4_START);
+printf("export ADELE_FIXTURE_F_WINDOW4_END='%d'\n", LOCAL_ADELE_FIXTURE_F_WINDOW4_END);
+printf("export ADELE_FIXTURE_F_CUSTOM_TEXT='%s'\n", LOCAL_ADELE_FIXTURE_F_CUSTOM_TEXT);
 
 if ($privacy) {
     printf("export ADELE_FIXTURE_PATH_P='%d'\n", $privacy['path']);

@@ -420,6 +420,7 @@ class relation_update {
             $restrictioncriteria,
             $node,
             $restrictionnodepathsall,
+            isset($userpath->user_id) ? (int) $userpath->user_id : null
         );
         $feedback['status_completion'] = self::getnodestatusforcompletion(
             $feedback,
@@ -527,8 +528,16 @@ class relation_update {
      * @param array $restrictioncriteria
      * @param array $node
      * @param string $wheretoput
+     * @param int|null $userid The path's learner: the end is shown in their time zone.
      */
-    public static function inbetweenfeedback(&$feedback, $restrictionnodepaths, $restrictioncriteria, $node, $wheretoput) {
+    public static function inbetweenfeedback(
+        &$feedback,
+        $restrictionnodepaths,
+        $restrictioncriteria,
+        $node,
+        $wheretoput,
+        $userid = null
+    ) {
         $latestdate = 0;
         foreach ($restrictionnodepaths as $signlerestrictionpatharray) {
             $smallestenddate = 0;
@@ -567,7 +576,7 @@ class relation_update {
             get_string(
                 'node_restriction_' . $wheretoput . '_timed',
                 'local_adele',
-                \local_adele\helper\time_value::display($latestdate)
+                \local_adele\helper\time_value::display($latestdate, $userid)
             );
         }
     }
@@ -580,19 +589,21 @@ class relation_update {
      * @param array $restrictioncriteria
      * @param array $node
      * @param array $restrictionnodepathsall
+     * @param int|null $userid The path's learner, for dates in their time zone.
      */
     public static function getnodestatusforrestriciton(
         &$feedback,
         $restrictionnodepaths,
         $restrictioncriteria,
         $node,
-        $restrictionnodepathsall
+        $restrictionnodepathsall,
+        $userid = null
     ) {
         // Treat a present-but-empty restriction (no condition nodes) the same as
         // no restriction at all, so removing all access criteria opens the node
         // (issue #449).
         if (count($restrictionnodepaths) > 0 || empty($node['restriction']['nodes'])) {
-            self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween');
+            self::inbetweenfeedback($feedback, $restrictionnodepaths, $restrictioncriteria, $node, 'inbetween', $userid);
             return 'inbetween';
         }
 
@@ -642,7 +653,7 @@ class relation_update {
         if (empty($feedback['restriction']['before_valid'])) {
             return 'after';
         }
-            self::inbetweenfeedback($feedback, $restrictionnodepathsall, $restrictioncriteria, $node, 'before');
+            self::inbetweenfeedback($feedback, $restrictionnodepathsall, $restrictioncriteria, $node, 'before', $userid);
             return 'before';
     }
 

@@ -231,16 +231,18 @@ export async function expectCourseClosed(page: Page, courseid: string, because: 
  */
 export async function completeCourse(page: Page, courseid: string): Promise<void> {
   await page.goto(`/course/view.php?id=${courseid}`);
-  // Moodle names the button after the activity for assistive technology:
-  // "Mark Ankündigungen as done", afterwards "Ankündigungen is marked as
-  // done. Press to undo." (core_course completion_manual:aria:*).
-  const mark = page.getByRole('button', { name: /^Mark .+ as done$/ }).first();
-  const done = page.getByRole('button', { name: /is marked as done/ }).first();
+  // Moodle's manual completion button, by what it does - not by its label:
+  // the label is "Mark Announcements as done" for one learner and
+  // "Ankündigungen als erledigt kennzeichnen" for the next (chain F has a
+  // learner whose language is German).
+  const toggle = 'button[data-action="toggle-manual-completion"]';
+  const mark = page.locator(`${toggle}[data-toggletype="manual:mark-done"]`).first();
+  const done = page.locator(`${toggle}[data-toggletype="manual:undo"]`).first();
   await expect(mark, `course ${courseid} must offer its completion activity to the learner`).toBeVisible({ timeout: 30_000 });
   // The button is server-rendered; its click handler arrives with Moodle's
   // JavaScript a moment later, and a click before that does nothing at all.
   // So: let the page settle, click, and click again ONLY while the button
-  // still offers "Mark ... as done" - a second click on a toggled button
+  // still offers "mark as done" - a second click on a toggled button
   // would undo the completion.
   await page.waitForLoadState('networkidle');
   for (let attempt = 0; attempt < 3 && !(await done.isVisible()); attempt++) {
@@ -282,6 +284,49 @@ export async function nodeStatus(page: Page, hostcourse: string, activityname: s
   const node = page.locator(`[data-testid="learningpath-node-${nodeid}"]`);
   await expect(node).toBeVisible({ timeout: 60_000 });
   return (await node.getAttribute('data-status')) || '';
+}
+
+/** What a learner can read on one node of their path. */
+export interface NodeTexts {
+  /** data-status of the node: accessible, completed, not_accessible, closed. */
+  status: string;
+  /** The information card behind the i symbol. */
+  info: string;
+  /** The feedback area behind the speech bubble. */
+  feedback: string;
+  /** Colour of the speech bubble - the node's state as the button shows it. */
+  colour: string;
+}
+
+/**
+ * Everything one node tells the learner: its state, the information card
+ * (i symbol) and the feedback area (speech bubble), with white space
+ * normalised.
+ *
+ * Both open only on a click on their icon, and the canvas may clip the icon -
+ * so the click event is dispatched to it directly: same Vue handler, no
+ * visible spot needed.
+ *
+ * @param page The page, logged in as the learner.
+ * @param hostcourse The course embedding the path.
+ * @param activityname The embedding activity's name.
+ * @param nodeid The node, e.g. "dndnode_2".
+ */
+export async function nodeTexts(page: Page, hostcourse: string, activityname: string, nodeid: string): Promise<NodeTexts> {
+  const status = await nodeStatus(page, hostcourse, activityname, nodeid);
+  const wrapper = page.locator(`.vue-flow__node[data-id="${nodeid}"]`);
+  const squeeze = (text: string): string => text.replace(/\s+/g, ' ').trim();
+  await wrapper.locator('.information').first().dispatchEvent('click');
+  const card = wrapper.locator('.additional-card');
+  await expect(card, `${nodeid} must offer its information card`).toBeVisible({ timeout: 10_000 });
+  const info = squeeze(await card.innerText());
+  const bubble = wrapper.locator('.toggle-button').first();
+  await bubble.dispatchEvent('click');
+  const area = wrapper.locator('.selectable');
+  await expect(area, `${nodeid} must offer its feedback area`).toBeVisible({ timeout: 10_000 });
+  const feedback = squeeze(await area.innerText());
+  const colour = await bubble.locator('i').first().evaluate((icon) => getComputedStyle(icon).color);
+  return { status, info, feedback, colour };
 }
 
 /**

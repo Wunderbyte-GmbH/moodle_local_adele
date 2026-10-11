@@ -109,7 +109,16 @@ class time_value {
      * @return string
      */
     public static function display(int $timestamp, ?int $userid = null): string {
-        $timezone = $userid ? \core_date::get_user_timezone($userid) : 99;
+        // The record, not the id: core_date::get_user_timezone() reads a bare
+        // number as a forced time zone - and an id is no valid zone, so the
+        // server's zone came out for everybody.
+        $timezone = 99;
+        if ($userid) {
+            $user = \core_user::get_user($userid, 'id, timezone');
+            if ($user) {
+                $timezone = \core_date::get_user_timezone($user);
+            }
+        }
         return userdate($timestamp, get_string('strftimedatetimeshort', 'langconfig'), $timezone);
     }
 

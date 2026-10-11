@@ -243,4 +243,51 @@ final class timed_timestamps_test extends \advanced_testcase {
             );
         }
     }
+
+    /**
+     * Dates are shown in the time zone of the learner the path belongs to -
+     * whoever happens to run the evaluation (cron, a teacher, an admin).
+     *
+     * Regression: display() handed the user id to core_date, which reads a
+     * bare number as a forced time zone; the server's zone came out for
+     * everybody, and the end of the window in the zone of the current user.
+     */
+    public function test_dates_are_shown_in_the_learners_time_zone(): void {
+        $this->resetAfterTest();
+        // The site, and the person running the evaluation: UTC.
+        set_config('timezone', 'UTC');
+        $this->setAdminUser();
+        global $USER;
+        $USER->timezone = 'UTC';
+        $learner = $this->getDataGenerator()->create_user(['timezone' => 'Asia/Tokyo']);
+        $format = get_string('strftimedatetimeshort', 'langconfig');
+        $startintokyo = userdate(self::START, $format, 'Asia/Tokyo');
+        $endintokyo = userdate(self::END, $format, 'Asia/Tokyo');
+        $this->assertNotSame(userdate(self::START, $format, 'UTC'), $startintokyo, 'the two zones must differ for this test');
+
+        $this->assertSame($startintokyo, time_value::display(self::START, (int) $learner->id));
+
+        $this->mock_clock_with_frozen(self::START + 60);
+        $status = (new timed())->get_restriction_status(
+            self::node(self::START, self::END),
+            (object) ['user_id' => $learner->id]
+        );
+        $this->assertSame($startintokyo, $status['condition_1']['placeholders']['start_date']);
+        $this->assertSame($endintokyo, $status['condition_1']['placeholders']['end_date']);
+
+        $feedback = [];
+        relation_update::inbetweenfeedback(
+            $feedback,
+            [['timed_condition_1']],
+            ['timed' => ['condition_1' => $status['condition_1']]],
+            [],
+            'inbetween',
+            (int) $learner->id
+        );
+        $this->assertSame(
+            get_string('node_restriction_inbetween_timed', 'local_adele', $endintokyo),
+            $feedback['restriction']['inbetween_timed'] ?? null,
+            'the end of the window, in the learner\'s zone'
+        );
+    }
 }
