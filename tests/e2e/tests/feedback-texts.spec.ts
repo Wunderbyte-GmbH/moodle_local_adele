@@ -32,7 +32,8 @@
  * instead, fails, and is skipped in a normal run (support/feedback.ts:
  * knownDefect) - until the defect is fixed and the test moves up. So far:
  * mixed languages and the lost author's text (local_adele #589), the wording
- * of manual completion (#590) - all fixed and asserted above.
+ * of manual completion (#590), no keyboard access to i symbol and speech
+ * bubble (#591) - all fixed and asserted here. No known defect is left.
  *
  * Not covered: nested combinations (they need the editor's brackets, E2).
  *
@@ -49,7 +50,6 @@ import {
   DE,
   EN,
   expectNoRawPlaceholders,
-  knownDefect,
   learnerCompletes,
   learnerReads,
   seeded,
@@ -252,18 +252,31 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
   });
 });
 
-test.describe('ADELE-E2E-F — known defects (skipped; ADELE_RUN_KNOWN_DEFECTS=1 runs them)', () => {
-  knownDefect('keyboard: the information card and the feedback area open without a mouse', async ({ page }) => {
-    // Measured: both containers take the focus (tabindex="0"), but only a
-    // mouse click on the icon opens them - no key does (#575 territory).
+test.describe('ADELE-E2E-F — the texts are reachable without a mouse (local_adele #591)', () => {
+  test('F2 keyboard: i symbol and speech bubble are named buttons - Enter opens, Escape closes', async ({ page }) => {
+    // Was a defect: both took the focus, but only a mouse click opened them.
     await loginAs(page, fixture('ADELE_FIXTURE_F_LINEAR_LEARNER'), fixturePassword());
     await nodeStatus(page, fixture('ADELE_FIXTURE_F_LINEAR_HOST'), 'E2E F linear', 'dndnode_1');
     const wrapper = page.locator('.vue-flow__node[data-id="dndnode_1"]');
-    await wrapper.locator('.dndnode_1_node_info_listener').focus();
-    await page.keyboard.press('Enter');
-    await expect(wrapper.locator('.additional-card'), 'Enter on the focused i symbol').toBeVisible({ timeout: 5_000 });
-    await wrapper.locator('.dndnode_1_user_info_listener').focus();
-    await page.keyboard.press('Enter');
-    await expect(wrapper.locator('.selectable'), 'Enter on the focused speech bubble').toBeVisible({ timeout: 5_000 });
+    for (const [name, panel] of [
+      ['Access and completion criteria: Testkurs 01', '.additional-card'],
+      ['Feedback on your progress: Testkurs 01', '.selectable'],
+    ]) {
+      // Found by role and name - what a screen reader announces.
+      const button = wrapper.getByRole('button', { name, exact: true });
+      await expect(button, name).toHaveAttribute('aria-expanded', 'false');
+      await button.focus();
+      await page.keyboard.press('Enter');
+      await expect(wrapper.locator(panel), `${name}: Enter opens`).toBeVisible({ timeout: 5_000 });
+      await expect(button).toHaveAttribute('aria-expanded', 'true');
+      await expect(button, 'the focus stays on the button').toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(wrapper.locator(panel), `${name}: Escape closes`).toBeHidden({ timeout: 5_000 });
+      await expect(button).toHaveAttribute('aria-expanded', 'false');
+      await page.keyboard.press('Space');
+      await expect(wrapper.locator(panel), `${name}: Space opens`).toBeVisible({ timeout: 5_000 });
+      await page.keyboard.press('Space');
+      await expect(wrapper.locator(panel), `${name}: Space closes`).toBeHidden({ timeout: 5_000 });
+    }
   });
 });
