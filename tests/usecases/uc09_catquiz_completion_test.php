@@ -392,11 +392,17 @@ final class uc09_catquiz_completion_test extends adele_learningpath_testcase {
      */
     public static function boundary_provider(): array {
         $x = self::SCALE_THRESHOLD;
-        return [
-            'x - epsilon' => [$x - 0.01, 'not completed'],
-            'x' => [$x, 'completed'],
-            'x + epsilon' => [$x + 0.01, 'completed'],
-        ];
+        // Both validation modes of the site setting "quizsettings": the default
+        // all_quiz_global once required a share-of-right-answers result even
+        // when no percentage threshold was set, so an ability-only threshold
+        // could never be met there.
+        $cases = [];
+        foreach (['single_quiz', 'all_quiz_global'] as $mode) {
+            $cases["{$mode}: x - epsilon"] = [$x - 0.01, 'not completed', $mode];
+            $cases["{$mode}: x"] = [$x, 'completed', $mode];
+            $cases["{$mode}: x + epsilon"] = [$x + 0.01, 'completed', $mode];
+        }
+        return $cases;
     }
 
     /**
@@ -405,14 +411,15 @@ final class uc09_catquiz_completion_test extends adele_learningpath_testcase {
      * @dataProvider boundary_provider
      * @param float $ability The person ability stored in the attempt.
      * @param string $expected "completed" or "not completed".
+     * @param string $mode The site's quiz validation mode.
      */
-    public function test_ability_threshold_boundary(float $ability, string $expected): void {
+    public function test_ability_threshold_boundary(float $ability, string $expected, string $mode): void {
         global $DB;
         $this->subscribe_users_to_lp();
         foreach ($this->get_update_events() as $event) {
             relation_update::updated_single($event);
         }
-        set_config('quizsettings', 'single_quiz', 'local_adele');
+        set_config('quizsettings', $mode, 'local_adele');
         foreach ($DB->get_records('local_adele_path_user') as $record) {
             $this->insert_catquiz_attempt_in_db((int) $record->user_id, $ability);
         }

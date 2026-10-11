@@ -344,10 +344,14 @@ class catquiz implements course_completion {
                     ) {
                         $catquizzes['completed'][$completionnode['id']] = $allpassedrecords;
                     } else if (
-                        isset($partialpassedrecords['scale']) &&
-                        isset($partialpassedrecords['percentage']) &&
-                        count($partialpassedrecords['scale']) == $scaleattemptset['scales'] &&
-                        count($partialpassedrecords['percentage']) == $scaleattemptset['attempts']
+                        // Every configured threshold met - and at least one configured.
+                        // A kind with no threshold counts as an empty set: before, a
+                        // scale-only condition (no percentage threshold) required a
+                        // percentage result that is never produced, so in this mode
+                        // it could never be met.
+                        ($scaleattemptset['scales'] + $scaleattemptset['attempts']) > 0 &&
+                        count($partialpassedrecords['scale'] ?? []) == $scaleattemptset['scales'] &&
+                        count($partialpassedrecords['percentage'] ?? []) == $scaleattemptset['attempts']
                     ) {
                         $catquizzes['completed'][$completionnode['id']] = $partialpassedrecords;
                         $filteredpercentageofrightanswers = array_intersect_key(
@@ -567,9 +571,12 @@ class catquiz implements course_completion {
                     return true;
                 }
             } else {
+                // The boundary itself passes, as two lines above ("ability >=
+                // threshold"); this check was strict, so in mode
+                // all_quiz_global an ability exactly at the threshold failed.
                 if (
                     $validationtype != 'all_quiz_global' ||
-                    $parentscaleglobal < $parentscalerecord
+                    $parentscaleglobal <= $parentscalerecord
                 ) {
                     $partialpassedrecords['scale'][$scale['id']][] = $record->attemptid;
                     if (!in_array($record->attemptid, $partialpassedattemptids)) {

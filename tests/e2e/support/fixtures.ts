@@ -283,3 +283,31 @@ export async function nodeStatus(page: Page, hostcourse: string, activityname: s
   await expect(node).toBeVisible({ timeout: 60_000 });
   return (await node.getAttribute('data-status')) || '';
 }
+
+/**
+ * Whether this site has the catquiz ecosystem (seeded chain D).
+ */
+export const hasCatquiz = (): boolean => Boolean(process.env.ADELE_FIXTURE_D_CMID);
+
+/**
+ * Signal one finished CAT attempt with the given person ability - what a
+ * real adaptive test leaves behind (attempt, catquiz result, completion
+ * event), without playing one through. See support/catquiz_signal.php.
+ *
+ * @param username The learner.
+ * @param ability The person ability on the fixture scale.
+ */
+export function catquizSignal(username: string, ability: number): void {
+  execFileSync(
+    'php',
+    [
+      '-d', 'max_input_vars=5000',
+      'local/adele/tests/e2e/support/catquiz_signal.php',
+      `--user=${username}`,
+      `--cmid=${fixture('ADELE_FIXTURE_D_CMID')}`,
+      `--scale=${fixture('ADELE_FIXTURE_D_SCALE')}`,
+      `--ability=${ability}`,
+    ],
+    { cwd: fixture('ADELE_MOODLE_ROOT'), encoding: 'utf8', env: { ...process.env, ...serverTimeEnv(), ADELE_SEED_I_KNOW: '1' } }
+  );
+}

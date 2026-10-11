@@ -680,6 +680,7 @@ $c1paths = [];
 $c3path = null;
 $timecombined = [];
 $routepaths = [];
+$runningpath = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -863,6 +864,25 @@ if (!empty($imported['Linear A1'])) {
                 );
             }
         }
+
+        // M: changing a running path. Node 2 starts WITHOUT an access
+        // condition - its learner is in T02 from the start; the chain adds a
+        // condition through the editor (M1) and removes it again (M2).
+        $running = $base;
+        foreach ($running['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_2') {
+                $running['tree']['nodes'][$n]['restriction'] = ['nodes' => [], 'edges' => []];
+            } else if ($node['id'] === 'dndnode_3') {
+                $running['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $runningpath = local_adele_fixture_store_path(
+            'E2E Laufende Änderung',
+            $running,
+            'fx_m_running',
+            'Running change',
+            $fixturepassword
+        );
 
         // T4/T5: predecessor AND / OR the fixed window. Node 2 of the linear
         // path; two learners per path, so both middle rows of the plan's
@@ -1122,6 +1142,86 @@ if ($entrylearner) {
     printf("export ADELE_FIXTURE_ENTRY_LEARNER='%s'\n", $entrylearner->username);
     printf("export ADELE_FIXTURE_ENTRY_LEARNER_NAME='%s'\n", fullname($entrylearner));
 }
+// D: diagnosis through a CAT result (plan section 13), only where the catquiz
+// ecosystem is installed. A real adaptive test in T01 and a real catquiz
+// scale; node 1 of the reference path completes when the person ability on
+// that scale reaches the threshold ("ability >= threshold"). Three learners
+// for x - epsilon, x and x + epsilon; the signals themselves are created by
+// tests/e2e/support/catquiz_signal.php at test time.
+$diagnosis = null;
+if (
+    class_exists('\local_catquiz\catquiz')
+    && $DB->get_manager()->table_exists('adaptivequiz')
+    && !empty($imported['Linear A1'])
+) {
+    require_once($CFG->libdir . '/testing/generator/lib.php');
+    \core\session\manager::set_user(get_admin());
+    $t01 = $DB->get_record('course', ['shortname' => 'T01'], '*', MUST_EXIST);
+    $quizname = 'E2E Diagnose CAT';
+    $quiz = $DB->get_record('adaptivequiz', ['course' => $t01->id, 'name' => $quizname]);
+    if (!$quiz) {
+        $quiz = (new testing_data_generator())->get_plugin_generator('mod_adaptivequiz')
+            ->create_instance(['course' => $t01->id, 'name' => $quizname]);
+    }
+    $quizcm = get_coursemodule_from_instance('adaptivequiz', $quiz->id, $t01->id, false, MUST_EXIST);
+    $scale = $DB->get_record('local_catquiz_catscales', ['name' => 'E2E Diagnose-Skala', 'parentid' => 0]);
+    $scaleid = $scale ? (int) $scale->id : (int) $DB->insert_record('local_catquiz_catscales', (object) [
+        'name' => 'E2E Diagnose-Skala',
+        'description' => 'Scale for the E2E diagnosis chain. Created by seed_fixtures.php.',
+        'parentid' => 0,
+        'timecreated' => time(),
+        'timemodified' => time(),
+    ]);
+    $threshold = 2.5;
+    $diagbase = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
+    foreach ($diagbase['tree']['nodes'] as $n => $node) {
+        if ($node['id'] === 'dndnode_1') {
+            foreach ($diagbase['tree']['nodes'][$n]['completion']['nodes'] as $c => $condition) {
+                if (($condition['data']['label'] ?? '') === 'course_completed') {
+                    $diagbase['tree']['nodes'][$n]['completion']['nodes'][$c]['data']['label'] = 'catquiz';
+                    $diagbase['tree']['nodes'][$n]['completion']['nodes'][$c]['data']['value'] = [
+                        'testid' => (int) $quiz->id,
+                        'testid_courseid' => (int) $t01->id,
+                        'componentid' => (int) $quiz->id,
+                        'scales' => [
+                            'parent' => [
+                                'id' => (string) $scaleid,
+                                'scale' => $threshold,
+                                'name' => 'E2E Diagnose-Skala',
+                                'attempts' => '',
+                            ],
+                            'sub' => [],
+                        ],
+                    ];
+                }
+            }
+        } else if ($node['id'] === 'dndnode_2') {
+            $diagbase['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1'], 1);
+        }
+    }
+    $diagnosis = ['cmid' => (int) $quizcm->id, 'scale' => $scaleid, 'threshold' => $threshold, 'learners' => []];
+    foreach (['below', 'at', 'above'] as $variant) {
+        [$pathid, $learner] = local_adele_fixture_store_path(
+            'E2E Diagnose',
+            $diagbase,
+            'fx_d_' . $variant,
+            'Diagnosis ' . $variant,
+            $fixturepassword
+        );
+        // A clean slate for the signals of earlier runs.
+        $DB->delete_records('local_catquiz_attempts', ['userid' => $learner->id, 'instanceid' => $quiz->id]);
+        $DB->delete_records('adaptivequiz_attempt', ['userid' => $learner->id, 'instance' => $quiz->id]);
+        $host = local_adele_fixture_host_course(
+            'E2ED' . strtoupper($variant),
+            'E2E D ' . $variant,
+            $pathid,
+            $learner,
+            (int) $options['category']
+        );
+        $diagnosis['learners'][$variant] = [$learner, $host];
+    }
+}
+
 // Each C path embedded into a host course of its own, with its learner as
 // the only member: the learner needs the path view to show node states, and
 // one shared host course would subscribe every member to every path.
@@ -1146,6 +1246,13 @@ foreach ($routepaths as $variant => [$pathid, $learner]) {
         (int) $options['category']
     );
 }
+$runninghost = $runningpath ? local_adele_fixture_host_course(
+    'E2EM',
+    'E2E M running',
+    $runningpath[0],
+    $runningpath[1],
+    (int) $options['category']
+) : null;
 $c3host = $c3path ? local_adele_fixture_host_course(
     'E2EC3',
     'E2E C3 manual',
@@ -1165,6 +1272,22 @@ foreach ($routepaths as $variant => [$pathid, $learner]) {
     printf("export ADELE_FIXTURE_A_%s_LEARNER='%s'\n", $key, $learner->username);
     printf("export ADELE_FIXTURE_A_%s_LEARNER_NAME='%s'\n", $key, fullname($learner));
     printf("export ADELE_FIXTURE_A_%s_HOST='%d'\n", $key, $routehosts[$variant]->id);
+}
+if ($diagnosis) {
+    printf("export ADELE_FIXTURE_D_CMID='%d'\n", $diagnosis['cmid']);
+    printf("export ADELE_FIXTURE_D_SCALE='%d'\n", $diagnosis['scale']);
+    printf("export ADELE_FIXTURE_D_THRESHOLD='%s'\n", $diagnosis['threshold']);
+    foreach ($diagnosis['learners'] as $variant => [$learner, $host]) {
+        $key = strtoupper($variant);
+        printf("export ADELE_FIXTURE_D_%s_LEARNER='%s'\n", $key, $learner->username);
+        printf("export ADELE_FIXTURE_D_%s_LEARNER_NAME='%s'\n", $key, fullname($learner));
+        printf("export ADELE_FIXTURE_D_%s_HOST='%d'\n", $key, $host->id);
+    }
+}
+if ($runningpath && $runninghost) {
+    printf("export ADELE_FIXTURE_PATH_M='%d'\n", $runningpath[0]);
+    printf("export ADELE_FIXTURE_M_LEARNER='%s'\n", $runningpath[1]->username);
+    printf("export ADELE_FIXTURE_M_HOST='%d'\n", $runninghost->id);
 }
 if ($c3path && $c3host) {
     printf("export ADELE_FIXTURE_PATH_C3='%d'\n", $c3path[0]);
