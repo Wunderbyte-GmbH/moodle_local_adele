@@ -27,9 +27,8 @@
  *   - the follow-up node: node 2's state and real access to T02 (L3, O1),
  *   - the enrolment in T02 on its participants page (O1).
  *
- * NOT asserted, deliberately: the wording of node 1's information card. It
- * reads "manual completion recorded" in every state, also while nothing is
- * recorded - a finding for chain F, not a behaviour to pin down here.
+ * Not asserted here: the wording of node 1's information card and feedback -
+ * that is chain F (feedback-texts.spec.ts).
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach

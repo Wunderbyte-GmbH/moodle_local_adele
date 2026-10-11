@@ -50,6 +50,44 @@ class relation_update {
      * @param object $event
      */
     public static function updated_single($event) {
+        $userpath = $event->other['userpath'] ?? null;
+        if (!$userpath) {
+            return;
+        }
+        // Everything the recompute writes down is read by the learner the path
+        // belongs to - so it is rendered in THEIR language, whoever triggered
+        // it: the learner, a teacher, cron (#589).
+        $previous = force_current_language(self::learner_language((int) ($userpath->user_id ?? 0)));
+        try {
+            self::recompute_user_path($event);
+        } finally {
+            force_current_language($previous);
+        }
+    }
+
+    /**
+     * The language a learner's path is rendered in: the language of their
+     * profile, the site's default if they have none (or one that is not
+     * installed any more).
+     *
+     * @param int $userid The learner.
+     * @return string A language code.
+     */
+    public static function learner_language(int $userid): string {
+        global $CFG, $DB;
+        $lang = $userid ? (string) $DB->get_field('user', 'lang', ['id' => $userid]) : '';
+        if ($lang === '' || !get_string_manager()->translation_exists($lang, false)) {
+            $lang = !empty($CFG->lang) ? $CFG->lang : 'en';
+        }
+        return $lang;
+    }
+
+    /**
+     * Recompute a learner's path - see updated_single(), which sets the language.
+     *
+     * @param object $event
+     */
+    protected static function recompute_user_path($event) {
         $userpath = $event->other['userpath'];
         $completionclass = new course_completion_status();
         $restrictionclass = new  course_restriction_status();
@@ -63,160 +101,14 @@ class relation_update {
             self::reschedule_timed_restrictions_for_all_nodes($userpath);
             if (!empty($userpath->json['tree']['nodes'])) {
                 foreach ($userpath->json['tree']['nodes'] as &$node) {
-                    $completioncriteria = $completionclass->get_condition_status($node, $userpath->user_id);
-                    $restrictioncriteria = $restrictionclass->get_restriction_status($node, $userpath);
-                    $restrictionnodepaths = [];
-                    $restrictionnodepathsall = [];
-                    $singlerestrictionnode = [];
-                    if (isset($node['data']['completion']['master'])) {
-                        $userpath->json['user_path_relation'][$node['id']]['master'] =
-                              $node['data']['completion']['master'];
-                    }
-                    if (
-                        isset($restrictioncriteria['master']) &&
-                        $restrictioncriteria['master']
-                    ) {
-                        $restrictionnodepaths[] = 'master';
-                    } else if (isset($node['restriction'])) {
-                        foreach (($node['restriction']['nodes'] ?? []) as $restrictionnodepath) {
-                            $failedrestriction = false;
-                            $validationconditionstring = [];
-                            if (
-                                isset($restrictionnodepath['parentCondition']) &&
-                                $restrictionnodepath['parentCondition'][0] == 'starting_condition'
-                            ) {
-                                $currentcondition = $restrictionnodepath;
-                                $feedback = self::searchnestedarray(
-                                    $node['restriction']['nodes'],
-                                    $currentcondition['childCondition'],
-                                    'id',
-                                    true
-                                );
-                                $activecolumnfeedback = [];
-                                $activefeedbackfornode = [];
-                                $validationcondition = false;
-                                $allconditions = [];
-                                while ($currentcondition) {
-                                    $currlabel = $currentcondition['data']['label'];
-                                    $allconditions[] = $currentcondition['data']['label']
-                                    . '_' . $currentcondition['id'];
-                                    if (
-                                        $currentcondition['data']['label'] == 'timed' ||
-                                        $currentcondition['data']['label'] == 'timed_duration' ||
-                                        $currentcondition['data']['label'] == 'specific_course' ||
-                                        $currentcondition['data']['label'] == 'parent_courses'
-                                    ) {
-                                        $currcondi = $currentcondition['id'];
-                                        $validationcondition =
-                                            $restrictioncriteria[$currlabel][$currcondi]['completed'] ?? false;
-                                        $singlerestrictionnode[$currentcondition['data']['label']
-                                            . '_' . $currentcondition['id']] = $validationcondition;
-                                        $validationconditionstring[] = $currentcondition['data']['label']
-                                            . '_' . $currentcondition['id'];
-                                    } else if (
-                                        $currentcondition['data']['label'] == 'parent_node_completed' &&
-                                        isset($restrictioncriteria[$currlabel][$currentcondition['id']]['completed'])
-                                    ) {
-                                        $validationcondition =
-                                          $restrictioncriteria[$currlabel][$currentcondition['id']]['completed'];
-                                        $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
-                                        $validationconditionstring[] = $currentcondition['data']['label'];
-                                    } else {
-                                        $validationcondition =
-                                          $restrictioncriteria[$currentcondition['data']['label']]['completed'] ?? false;
-                                        $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
-                                        $validationconditionstring[] = $currentcondition['data']['label'];
-                                    }
-                                    // Check if the conditon is true and break if one condition is not met.
-                                    if (!$validationcondition) {
-                                        $failedrestriction = true;
-                                        $activecolumnfeedback[] = self::render_placeholders_single_restriction(
-                                            $currentcondition['data']['description_before'],
-                                            $currentcondition['id'],
-                                            $node['restriction']['nodes'],
-                                            $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']]
-                                            ?? null
-                                        );
-                                    }
-                                    // Get next Condition and return null if no child node exsists.
-                                    $currentcondition = self::searchnestedarray(
-                                        $node['restriction']['nodes'],
-                                        $currentcondition['childCondition'],
-                                        'id'
-                                    );
-                                }
-                                if ($validationcondition && !$failedrestriction) {
-                                    $restrictionnodepaths[] = $validationconditionstring;
-                                }
-                                $activefeedbackfornode =
-                                    implode(
-                                        get_string('course_condition_concatination_and', 'local_adele'),
-                                        $activecolumnfeedback
-                                    );
-                                $restrictionnodepathsall[] = $allconditions;
-                                // The $feedback value is null when the condition's feedback node is not
-                                // wired up (empty childCondition); there is then nothing to key
-                                // the per-feedback-node hint by, so skip it instead of fataling.
-                                if (isset($feedback['id'])) {
-                                    $fbdata = $feedback['data'] ?? [];
-                                    if (empty($fbdata['visibility'])) {
-                                        // Hidden ("Verbergen"): a hidden feedback node contributes no student-facing
-                                        // text - neither the custom message nor the default description -
-                                        // so the speech bubble stays empty, consistent with
-                                        // restriction.before/information in getfeedback(). Display-only:
-                                        // the lock verdict (status_restriction) is unaffected. See #474.
-                                        continue;
-                                    }
-                                    if (
-                                        empty($fbdata['feedback_before_checkmark'])
-                                        && !empty($fbdata['feedback_before'])
-                                    ) {
-                                        $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
-                                            self::render_placeholders_single_restriction(
-                                                $fbdata['feedback_before'],
-                                                $feedback['id'],
-                                                $node['restriction']['nodes']
-                                            );
-                                    } else {
-                                        $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
-                                            $activefeedbackfornode;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (
-                        isset($completioncriteria['master']) &&
-                        $completioncriteria['master']
-                    ) {
-                        $validatenodecompletion = [
-                            'completionnodepaths' => ['master'],
-                            'singlecompletionnode' => 'master',
-                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
-                        ];
-                    } else if (isset($node['completion'])) {
-                        $validatenodecompletion = self::validatenodecompletion(
-                            $restrictionnodepathsall ?? [],
-                            $node,
-                            $completioncriteria,
-                            $userpath,
-                            $restrictionnodepaths,
-                            1,
-                            $restrictioncriteria,
-                            $nodecompletedname
-                        );
-                    } else {
-                        // A node with neither a master completion nor a `completion` structure
-                        // yields the same empty envelope validatenodecompletion() returns for an
-                        // empty completion set, so downstream getconditionnode() sees an empty
-                        // (valid=false) path instead of an undefined variable.
-                        $validatenodecompletion = [
-                            'completionnodepaths' => [],
-                            'singlecompletionnode' => [],
-                            'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
-                        ];
-                    }
+                    [
+                        $completioncriteria,
+                        $restrictioncriteria,
+                        $restrictionnodepaths,
+                        $restrictionnodepathsall,
+                        $singlerestrictionnode,
+                        $validatenodecompletion,
+                    ] = self::evaluate_node($node, $userpath, $completionclass, $restrictionclass, $nodecompletedname);
                     $completionnode = self::getconditionnode($validatenodecompletion['completionnodepaths'], 'completion');
                     $restrictionnode = self::getconditionnode($restrictionnodepaths, 'restriction');
 
@@ -282,6 +174,198 @@ class relation_update {
                 }
             }
         }
+    }
+
+    /**
+     * Evaluate one node of a learner's path: which access and completion
+     * criteria are met, the node's states, and every text the learner reads on
+     * it - in the current language.
+     *
+     * The recompute calls this for every node and stores the result; the
+     * fetch-time re-render (rerender_feedback_language()) calls the same code
+     * on a copy to get the texts in the viewer's language. One code path, so
+     * the two cannot drift apart (#589).
+     *
+     * No side effects beyond its arguments: nothing is stored, nobody is
+     * enrolled.
+     *
+     * @param array $node The node (by reference: carries before_active, firstcompleted, animations).
+     * @param object $userpath The learner's path (user_id, json).
+     * @param course_completion_status $completionclass
+     * @param course_restriction_status $restrictionclass
+     * @param array $nodecompletedname Collects nodes completed for the first time.
+     * @return array [completioncriteria, restrictioncriteria, restrictionnodepaths,
+     *     restrictionnodepathsall, singlerestrictionnode, validatenodecompletion]
+     */
+    protected static function evaluate_node(
+        array &$node,
+        $userpath,
+        $completionclass,
+        $restrictionclass,
+        array &$nodecompletedname
+    ): array {
+        $completioncriteria = $completionclass->get_condition_status($node, $userpath->user_id);
+        $restrictioncriteria = $restrictionclass->get_restriction_status($node, $userpath);
+        $restrictionnodepaths = [];
+        $restrictionnodepathsall = [];
+        $singlerestrictionnode = [];
+        if (isset($node['data']['completion']['master'])) {
+            $userpath->json['user_path_relation'][$node['id']]['master'] =
+                  $node['data']['completion']['master'];
+        }
+        if (
+            isset($restrictioncriteria['master']) &&
+            $restrictioncriteria['master']
+        ) {
+            $restrictionnodepaths[] = 'master';
+        } else if (isset($node['restriction'])) {
+            foreach (($node['restriction']['nodes'] ?? []) as $restrictionnodepath) {
+                $failedrestriction = false;
+                $validationconditionstring = [];
+                if (
+                    isset($restrictionnodepath['parentCondition']) &&
+                    $restrictionnodepath['parentCondition'][0] == 'starting_condition'
+                ) {
+                    $currentcondition = $restrictionnodepath;
+                    $feedback = self::searchnestedarray(
+                        $node['restriction']['nodes'],
+                        $currentcondition['childCondition'],
+                        'id',
+                        true
+                    );
+                    $activecolumnfeedback = [];
+                    $activefeedbackfornode = [];
+                    $validationcondition = false;
+                    $allconditions = [];
+                    while ($currentcondition) {
+                        $currlabel = $currentcondition['data']['label'];
+                        $allconditions[] = $currentcondition['data']['label']
+                        . '_' . $currentcondition['id'];
+                        if (
+                            $currentcondition['data']['label'] == 'timed' ||
+                            $currentcondition['data']['label'] == 'timed_duration' ||
+                            $currentcondition['data']['label'] == 'specific_course' ||
+                            $currentcondition['data']['label'] == 'parent_courses'
+                        ) {
+                            $currcondi = $currentcondition['id'];
+                            $validationcondition =
+                                $restrictioncriteria[$currlabel][$currcondi]['completed'] ?? false;
+                            $singlerestrictionnode[$currentcondition['data']['label']
+                                . '_' . $currentcondition['id']] = $validationcondition;
+                            $validationconditionstring[] = $currentcondition['data']['label']
+                                . '_' . $currentcondition['id'];
+                        } else if (
+                            $currentcondition['data']['label'] == 'parent_node_completed' &&
+                            isset($restrictioncriteria[$currlabel][$currentcondition['id']]['completed'])
+                        ) {
+                            $validationcondition =
+                              $restrictioncriteria[$currlabel][$currentcondition['id']]['completed'];
+                            $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                            $validationconditionstring[] = $currentcondition['data']['label'];
+                        } else {
+                            $validationcondition =
+                              $restrictioncriteria[$currentcondition['data']['label']]['completed'] ?? false;
+                            $singlerestrictionnode[$currentcondition['data']['label']] = $validationcondition;
+                            $validationconditionstring[] = $currentcondition['data']['label'];
+                        }
+                        // Check if the conditon is true and break if one condition is not met.
+                        if (!$validationcondition) {
+                            $failedrestriction = true;
+                            $activecolumnfeedback[] = self::render_placeholders_single_restriction(
+                                self::condition_default('restriction', $currentcondition, 'description_before'),
+                                $currentcondition['id'],
+                                $node['restriction']['nodes'],
+                                $restrictioncriteria[$currentcondition['data']['label']][$currentcondition['id']]
+                                ?? null
+                            );
+                        }
+                        // Get next Condition and return null if no child node exsists.
+                        $currentcondition = self::searchnestedarray(
+                            $node['restriction']['nodes'],
+                            $currentcondition['childCondition'],
+                            'id'
+                        );
+                    }
+                    if ($validationcondition && !$failedrestriction) {
+                        $restrictionnodepaths[] = $validationconditionstring;
+                    }
+                    $activefeedbackfornode =
+                        implode(
+                            get_string('course_condition_concatination_and', 'local_adele'),
+                            $activecolumnfeedback
+                        );
+                    $restrictionnodepathsall[] = $allconditions;
+                    // The $feedback value is null when the condition's feedback node is not
+                    // wired up (empty childCondition); there is then nothing to key
+                    // the per-feedback-node hint by, so skip it instead of fataling.
+                    if (isset($feedback['id'])) {
+                        $fbdata = $feedback['data'] ?? [];
+                        if (empty($fbdata['visibility'])) {
+                            // Hidden ("Verbergen"): a hidden feedback node contributes no student-facing
+                            // text - neither the custom message nor the default description -
+                            // so the speech bubble stays empty, consistent with
+                            // restriction.before/information in getfeedback(). Display-only:
+                            // the lock verdict (status_restriction) is unaffected. See #474.
+                            continue;
+                        }
+                        if (
+                            empty($fbdata['feedback_before_checkmark'])
+                            && !empty($fbdata['feedback_before'])
+                        ) {
+                            $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
+                                self::render_placeholders_single_restriction(
+                                    $fbdata['feedback_before'],
+                                    $feedback['id'],
+                                    $node['restriction']['nodes']
+                                );
+                        } else {
+                            $node['data']['completion']['feedback']['restriction']['before_active'][$feedback['id']] =
+                                $activefeedbackfornode;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (
+            isset($completioncriteria['master']) &&
+            $completioncriteria['master']
+        ) {
+            $validatenodecompletion = [
+                'completionnodepaths' => ['master'],
+                'singlecompletionnode' => 'master',
+                'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
+            ];
+        } else if (isset($node['completion'])) {
+            $validatenodecompletion = self::validatenodecompletion(
+                $restrictionnodepathsall ?? [],
+                $node,
+                $completioncriteria,
+                $userpath,
+                $restrictionnodepaths,
+                1,
+                $restrictioncriteria,
+                $nodecompletedname
+            );
+        } else {
+            // A node with neither a master completion nor a `completion` structure
+            // yields the same empty envelope validatenodecompletion() returns for an
+            // empty completion set, so downstream getconditionnode() sees an empty
+            // (valid=false) path instead of an undefined variable.
+            $validatenodecompletion = [
+                'completionnodepaths' => [],
+                'singlecompletionnode' => [],
+                'feedback' => self::getfeedback($node, $completioncriteria, $restrictioncriteria),
+            ];
+        }
+        return [
+            $completioncriteria,
+            $restrictioncriteria,
+            $restrictionnodepaths,
+            $restrictionnodepathsall,
+            $singlerestrictionnode,
+            $validatenodecompletion,
+        ];
     }
 
     /**
@@ -553,6 +637,13 @@ class relation_update {
             foreach ($signlerestrictionpatharray as $restrictionlabelid) {
                 if (strpos($restrictionlabelid, 'time') === 0) {
                     $nodelabelid = explode('_condition_', $restrictionlabelid);
+                    if ($wheretoput === 'before' && $nodelabelid[0] !== 'timed_duration') {
+                        // A locked node behind a FIXED window: the sentence of
+                        // this state is "From subscription you have access until
+                        // ..." - true for a period counted from the subscription,
+                        // false for a window that has its own start (#590).
+                        continue;
+                    }
                     $restnode = $restrictioncriteria[$nodelabelid[0]]['condition_' . $nodelabelid[1]] ?? [];
                     // Timestamps since #581; to_timestamp() still reads a value
                     // computed before the upgrade.
@@ -814,55 +905,118 @@ class relation_update {
     }
 
     /**
-     * Resolve a condition's DEFAULT template string for a feedback node, from the condition
-     * class ({label}::get_description()[$field]), via the sibling condition node
-     * ({condition}_feedback -> {condition}). Used both to fill an unseeded info field (#483)
-     * and, under $forcelangdefaults, to render the info-symbol AND speech-bubble text from the
-     * current-language lang defaults so they follow a language switch (#493). Returns '' when
-     * it cannot be resolved so the caller can fall back.
+     * The text of ONE condition, in the current language: what its class says
+     * today ({label}::get_description()[$field]). The copy stored in the path
+     * is in the language of whoever built the path; it is used only for an
+     * information text the author wrote themselves (informationedited) and as
+     * the fallback for a condition whose class is gone.
      *
-     * @param string $feedbackid The feedback node id (e.g. condition_1_feedback).
-     * @param array $nodes The completion or restriction nodes array.
      * @param string $conditiontype 'completion' or 'restriction'.
-     * @param string $field The get_description() key to read (e.g. 'information',
-     *   'description_before', 'description_inbetween', 'description_after').
+     * @param array $conditionnode The condition node.
+     * @param string $field 'information', 'description_before', 'description_inbetween' or 'description_after'.
      * @return string
      */
-    public static function get_default_condition_string($feedbackid, $nodes, $conditiontype, $field = 'information') {
-        $conditionid = str_replace('_feedback', '', $feedbackid);
-        $label = '';
-        foreach ($nodes as $conditionnode) {
-            if (($conditionnode['id'] ?? '') === $conditionid) {
-                $label = $conditionnode['data']['label'] ?? '';
-                break;
+    public static function condition_default(string $conditiontype, array $conditionnode, string $field): string {
+        $stored = (string) ($conditionnode['data'][$field] ?? '');
+        if ($field === 'information' && !empty($conditionnode['data']['informationedited']) && $stored !== '') {
+            // The one text of a condition an author can write themselves
+            // (manual completion, "custom information"): theirs, in every language.
+            return $stored;
+        }
+        $label = (string) ($conditionnode['data']['label'] ?? '');
+        $class = '\\local_adele\\course_' . $conditiontype . '\\conditions\\' . $label;
+        if ($label !== '' && class_exists($class)) {
+            $description = (new $class())->get_description();
+            if (isset($description[$field]) && $description[$field] !== '') {
+                return (string) $description[$field];
             }
         }
-        if ($label === '') {
-            return '';
-        }
-        $class = '\\local_adele\\course_' . $conditiontype . '\\conditions\\' . $label;
-        if (!class_exists($class)) {
-            return '';
-        }
-        $description = (new $class())->get_description();
-        return $description[$field] ?? '';
+        return $stored;
     }
 
     /**
-     * Pick the template to render for a feedback field.
-     *  - $forcelangdefaults (fetch-time re-render, #493): the condition's current-language lang
-     *    default wins, so the text follows a language switch.
-     *  - otherwise (recompute): the per-node stored template wins; when it is empty the lang
-     *    default is used only if $fallbackwhenempty is set (the info-symbol #483 behaviour) -
-     *    the speech-bubble fields keep their original "stored or blank" behaviour.
+     * The DEFAULT text of a feedback node, in the current language - composed
+     * the way the editor composes it when "use default" is ticked
+     * (feedbackNode.vue / feedbackNodeRestriction.vue, renderFeedback()): the
+     * texts of the condition the feedback node hangs on and of the conditions
+     * chained behind it (AND), joined by " and ".
      *
-     * @param bool $forcelangdefaults
-     * @param string|null $stored The per-node stored template (feedback_before / information / ...).
+     * Visibility as in the editor: a hidden condition contributes no feedback
+     * text. For the info symbol the first condition always counts; the ones
+     * behind it always for access criteria, only while visible for completion
+     * criteria.
+     *
+     * @param string $feedbackid The feedback node id (e.g. condition_1_feedback).
+     * @param array $nodes The completion or restriction nodes.
+     * @param string $conditiontype 'completion' or 'restriction'.
+     * @param string $field 'information', 'description_before', 'description_inbetween' or 'description_after'.
+     * @return string '' when the chain cannot be resolved.
+     */
+    public static function get_default_condition_string($feedbackid, $nodes, $conditiontype, $field = 'information') {
+        $byid = [];
+        foreach ($nodes as $conditionnode) {
+            if (isset($conditionnode['id'])) {
+                $byid[$conditionnode['id']] = $conditionnode;
+            }
+        }
+        // The feedback node names its condition; an unwired one is found by its name.
+        $next = $byid[$feedbackid]['data']['childCondition'] ?? str_replace('_feedback', '', (string) $feedbackid);
+        $information = $field === 'information';
+        $texts = [];
+        $seen = [];
+        $position = 0;
+        while (is_string($next) && isset($byid[$next]) && !isset($seen[$next])) {
+            $seen[$next] = true;
+            $condition = $byid[$next];
+            // Every condition the editor creates carries the flag; one without
+            // it (older data) is visible.
+            $visible = !array_key_exists('visibility', $condition['data'] ?? []) || !empty($condition['data']['visibility']);
+            if ($information) {
+                $counts = $position === 0 || $conditiontype === 'restriction' || $visible;
+            } else {
+                $counts = $visible;
+            }
+            if ($counts) {
+                $text = self::condition_default($conditiontype, $condition, $field);
+                // The editor appends unconditionally; an empty first text
+                // must not leave a dangling " and ".
+                if ($text !== '' || $texts) {
+                    $texts[] = $text;
+                }
+            }
+            $following = null;
+            foreach ((array) ($condition['childCondition'] ?? []) as $child) {
+                if (is_string($child) && strpos($child, 'feedback') === false) {
+                    $following = $child;
+                }
+            }
+            $next = $following;
+            $position++;
+        }
+        return implode(get_string('course_condition_concatination_and', 'local_adele'), $texts);
+    }
+
+    /**
+     * Pick the template to render for a field of a feedback node.
+     *
+     *  - The info symbol ('information') is never the author's: always the
+     *    default, in the current language.
+     *  - A speech-bubble text with "use default" ticked: the default, in the
+     *    current language - NOT the copy stored in the path, which is in the
+     *    language of whoever built it.
+     *  - A speech-bubble text the author wrote ("use default" unticked): the
+     *    stored text, in every language. Unticked and left empty means no text.
+     *
+     * The same for the recompute and for the fetch-time re-render (#589);
+     * $forcelangdefaults is kept for callers and no longer makes a difference.
+     *
+     * @param bool $forcelangdefaults Unused.
+     * @param string|null $stored The stored text (feedback_before / information / ...).
      * @param string $feedbackid
      * @param array $nodes
      * @param string $conditiontype 'completion' or 'restriction'.
-     * @param string $field The get_description() key for the lang default.
-     * @param bool $fallbackwhenempty Fall back to the lang default when the stored template is empty.
+     * @param string $field The get_description() key of the default.
+     * @param bool $fallbackwhenempty Unused.
      * @return string
      */
     public static function pick_feedback_template(
@@ -874,17 +1028,22 @@ class relation_update {
         $field,
         $fallbackwhenempty = false
     ) {
-        $stored = ($stored === null) ? '' : $stored;
-        if (!$forcelangdefaults && $stored !== '') {
-            return $stored;
-        }
-        if ($forcelangdefaults || $fallbackwhenempty) {
-            $default = self::get_default_condition_string($feedbackid, $nodes, $conditiontype, $field);
-            if ($default !== '') {
-                return $default;
+        $stored = ($stored === null) ? '' : (string) $stored;
+        if ($field !== 'information') {
+            $data = [];
+            foreach ($nodes as $conditionnode) {
+                if (($conditionnode['id'] ?? null) === $feedbackid) {
+                    $data = $conditionnode['data'] ?? [];
+                    break;
+                }
+            }
+            $checkmark = 'feedback_' . str_replace('description_', '', $field) . '_checkmark';
+            if (empty($data[$checkmark])) {
+                return $stored;
             }
         }
-        return $stored;
+        $default = self::get_default_condition_string($feedbackid, $nodes, $conditiontype, $field);
+        return $default !== '' ? $default : $stored;
     }
 
     /**
@@ -1073,9 +1232,11 @@ class relation_update {
      *
      * @param string $json The stored user-path json (string).
      * @param int $userid The path owner's id.
+     * @param int $timecreated When the learner was assigned to the path - a
+     *     period "from subscription" is counted from there.
      * @return string The json with feedback display strings re-rendered in the current language.
      */
-    public static function rerender_feedback_language($json, $userid) {
+    public static function rerender_feedback_language($json, $userid, $timecreated = 0) {
         $data = json_decode($json, true);
         if (empty($data['tree']['nodes']) || empty($data['user_path_relation'])) {
             return $json;
@@ -1087,50 +1248,66 @@ class relation_update {
         }
         $completionclass = new course_completion_status();
         $restrictionclass = new course_restriction_status();
-        $userpath = (object) ['user_id' => $userid, 'json' => $data];
+        // A copy: evaluate_node() writes into the node and the path it is given.
+        $userpath = (object) ['user_id' => $userid, 'json' => $data, 'timecreated' => (int) $timecreated];
+        $ignored = [];
         foreach ($data['tree']['nodes'] as $node) {
             $nodeid = $node['id'] ?? null;
             if ($nodeid === null || !isset($data['user_path_relation'][$nodeid]['feedback'])) {
                 continue;
             }
-            $completioncriteria = $completionclass->get_condition_status($node, $userid);
-            $restrictioncriteria = $restrictionclass->get_restriction_status($node, $userpath);
-            $fresh = self::getfeedback($node, $completioncriteria, $restrictioncriteria, true);
+            // The very code the recompute runs, in the viewer's language - so
+            // the texts cannot differ from what a recompute in this language
+            // would have stored (#589). Only texts are taken over below; the
+            // stored verdicts stay.
+            $evaluated = self::evaluate_node($node, $userpath, $completionclass, $restrictionclass, $ignored);
+            $fresh = $evaluated[5]['feedback'] ?? [];
+            // The completed conditions' messages, wherever the evaluation put them.
+            $freshafter = array_merge(
+                array_values((array) ($fresh['completion']['after'] ?? [])),
+                array_values((array) ($fresh['completion']['after_all'] ?? []))
+            );
             $feedback = &$data['user_path_relation'][$nodeid]['feedback'];
-            // Info-symbol + completion speech-bubble text (before/inbetween shown in the before/
-            // inbetween states).
+            // Info symbol and the completion texts of the before / inbetween states.
             foreach (['information', 'before', 'inbetween'] as $field) {
                 if (isset($fresh['completion'][$field])) {
                     $feedback['completion'][$field] = $fresh['completion'][$field];
                 }
             }
-            // The after_all map (all conditions' completed message) comes from getfeedback(); the
-            // recompute splits the completed ones into `after`. Re-derive both from the fresh
-            // (translated) after_all using the stored completion verdict, so the "completed" bubble
-            // follows the language too.
-            $freshafterall = array_values((array) ($fresh['completion']['after_all'] ?? []));
-            if (($feedback['status_completion'] ?? '') === 'after') {
-                $feedback['completion']['after'] = $freshafterall;
-                $feedback['completion']['after_all'] = [];
-            } else {
+            // The "completed" messages. Where the stored verdict is what the
+            // evaluation finds now - the rule - they are taken as evaluated.
+            // Where the path has not been recomputed since something changed,
+            // the STORED verdict decides what is shown.
+            $storedcompletion = $feedback['status_completion'] ?? '';
+            if ($storedcompletion === ($fresh['status_completion'] ?? '')) {
+                $feedback['completion']['after'] = $fresh['completion']['after'] ?? null;
                 $feedback['completion']['after_all'] = $fresh['completion']['after_all'] ?? [];
+            } else if ($storedcompletion === 'after') {
+                $feedback['completion']['after'] = $freshafter;
+                $feedback['completion']['after_all'] = [];
             }
-            // Restriction info-symbol + requirement text.
+            // Access: info symbol and the full requirement per feedback node.
             foreach (['information', 'before'] as $field) {
                 if (isset($fresh['restriction'][$field])) {
                     $feedback['restriction'][$field] = $fresh['restriction'][$field];
                 }
             }
-            // The before_valid / before_active maps are keyed per blocking column; refresh their
-            // VALUES from the freshly-rendered `before` (same keys) so the locked-requirement list
-            // follows the language too, keeping the stored keys (which columns block).
-            foreach (['before_valid', 'before_active'] as $field) {
+            // The maps before_valid (blocking columns) and before_active (what
+            // is still missing): the stored keys stay, their texts are the
+            // fresh ones.
+            foreach (['before_valid' => 'before', 'before_active' => 'before_active'] as $field => $source) {
                 if (isset($feedback['restriction'][$field]) && is_array($feedback['restriction'][$field])) {
                     foreach (array_keys($feedback['restriction'][$field]) as $key) {
-                        if (isset($fresh['restriction']['before'][$key])) {
-                            $feedback['restriction'][$field][$key] = $fresh['restriction']['before'][$key];
+                        if (isset($fresh['restriction'][$source][$key])) {
+                            $feedback['restriction'][$field][$key] = $fresh['restriction'][$source][$key];
                         }
                     }
+                }
+            }
+            // The sentences about the end of a time window.
+            foreach (['before_timed', 'inbetween_timed'] as $field) {
+                if (isset($feedback['restriction'][$field]) && isset($fresh['restriction'][$field])) {
+                    $feedback['restriction'][$field] = $fresh['restriction'][$field];
                 }
             }
             unset($feedback);

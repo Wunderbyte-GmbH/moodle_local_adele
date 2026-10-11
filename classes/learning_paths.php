@@ -717,7 +717,7 @@ class learning_paths {
             'userpathid' => (int)$data['userpathid'],
         ];
 
-        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, usr.username,
+        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, lpu.timecreated, usr.username,
             usr.firstname, usr.lastname, usr.email, lpu.json, lap.image
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
@@ -762,7 +762,11 @@ class learning_paths {
             }
             // Re-render the feedback/info strings in the CURRENT (viewer's) language so they follow
             // a language switch instead of the language the recompute happened to run in (#493).
-            $record->json = relation_update::rerender_feedback_language($record->json, $record->user_id);
+            $record->json = relation_update::rerender_feedback_language(
+                $record->json,
+                $record->user_id,
+                (int) ($record->timecreated ?? 0)
+            );
             $record->json = self::addnodemanualcondition($record->json, $record->user_id);
             return (array)$record;
         }

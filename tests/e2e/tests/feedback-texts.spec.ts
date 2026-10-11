@@ -26,11 +26,13 @@
  * a learner whose language is German. The conditions on time, and with them
  * F3 (AND / OR), are in zz-time-feedback: they move the server clock.
  *
- * Every text asserted here was measured first (session 006, part 39). Texts
- * that were measured and are WRONG are not written down as expectations: they
- * are the "known defect" tests at the end, which state what the learner
- * should read instead, fail today, and are skipped in a normal run
- * (support/feedback.ts: knownDefect).
+ * Every text asserted here was measured first (session 006, part 39). What
+ * was measured and is WRONG is not written down as an expectation: it becomes
+ * a "known defect" test at the end, which states what the learner should get
+ * instead, fails, and is skipped in a normal run (support/feedback.ts:
+ * knownDefect) - until the defect is fixed and the test moves up. So far:
+ * mixed languages and the lost author's text (local_adele #589), the wording
+ * of manual completion (#590) - all fixed and asserted above.
  *
  * Not covered: nested combinations (they need the editor's brackets, E2).
  *
@@ -171,6 +173,9 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
       const node = await learnerReads(page, 'MANUAL', 'dndnode_1');
       expect(node.status).toBe('accessible');
       expect(node.feedback).toBe(waiting);
+      expect(node.info, 'a criterion, not a fact nobody recorded (#590)').toBe(
+        'Access criteria: Freely accessible Completion criteria: • Manual completion by the teacher'
+      );
       expectNoRawPlaceholders(node, 'before');
     });
 
@@ -203,53 +208,51 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     );
   });
 
-  test('F language: a German learner reads German', async ({ page }) => {
+  test('F language: the author\'s own text reaches a learner with another language', async ({ page }) => {
+    test.skip(!seeded('CUSTOM_DE'), 'needs the German language pack');
+    // Was a defect (local_adele #589): the German learner read the default
+    // text instead of what the author wrote.
+    const node = await learnerReads(page, 'CUSTOM_DE', 'dndnode_2');
+    expect(node.feedback).toBe(
+      `${DE.locked} ${fixture('ADELE_FIXTURE_F_CUSTOM_TEXT')}. ${DE.todo} ${DE.completeCourse}`
+    );
+    // The neighbouring node keeps the default - in German.
+    expect((await learnerReads(page, 'CUSTOM_DE', 'dndnode_3')).feedback).toBe(
+      `${DE.locked} Abschluss des Vorgängers „Testkurs 02“. ${DE.todo} ${DE.completeCourse}`
+    );
+  });
+
+  test('F language: a German learner reads German - before and after their own action', async ({ page }) => {
     test.skip(!seeded('DE'), 'needs the German language pack (seed_fixtures.php installs it where the network allows)');
-    const second = await learnerReads(page, 'DE', 'dndnode_2');
-    expect(second.status).toBe('not_accessible');
-    expect(second.info).toBe(
-      'Zugangskriterien: - Abschluss des Vorgängers „Testkurs 01“ Abschlusskriterien: • diesen Kurs bearbeiten.'
-    );
-    expect(second.feedback).toBe(
-      `${DE.locked} Abschluss des Vorgängers „Testkurs 01“. ` +
-      'Um diesen Kurs/Stapel abzuschließen, müssen Sie: diesen Kurs erfolgreich bearbeiten.'
-    );
-    expectNoRawPlaceholders(second, 'German, node 2');
+    const info = 'Zugangskriterien: - Abschluss des Vorgängers „Testkurs 01“ Abschlusskriterien: • diesen Kurs bearbeiten.';
+
+    await test.step('before: German', async () => {
+      const second = await learnerReads(page, 'DE', 'dndnode_2');
+      expect(second.status).toBe('not_accessible');
+      expect(second.info).toBe(info);
+      expect(second.feedback).toBe(`${DE.locked} Abschluss des Vorgängers „Testkurs 01“. ${DE.todo} ${DE.completeCourse}`);
+      expectNoRawPlaceholders(second, 'German, node 2');
+    });
+
+    await test.step('after the learner completed Testkurs 01 themselves: still German, everywhere', async () => {
+      // Was a defect (local_adele #589): their own click recomputed the path
+      // from the author's English texts - "Complete diesen Kurs".
+      await learnerCompletes(page, 'DE', 'T01');
+      const second = await learnerReads(page, 'DE', 'dndnode_2', 'accessible');
+      expect(second.info).toBe(info);
+      expect(second.feedback).toBe(`${DE.unlocked} ${DE.todo} ${DE.completeCourse}`);
+      const first = await learnerReads(page, 'DE', 'dndnode_1');
+      expect(first.status).toBe('completed');
+      for (const texts of [first, second, await learnerReads(page, 'DE', 'dndnode_3')]) {
+        expect(`${texts.info} ${texts.feedback}`, 'no English in a German path').not.toMatch(
+          /Complete|complete|successfully|predecessor|unlocked/
+        );
+      }
+    });
   });
 });
 
 test.describe('ADELE-E2E-F — known defects (skipped; ADELE_RUN_KNOWN_DEFECTS=1 runs them)', () => {
-  knownDefect('language: German stays German after the learner\'s own action', async ({ page }) => {
-    test.skip(!seeded('DE'), 'needs the German language pack');
-    // Measured: the learner's own click recomputes the path in THEIR language
-    // from the AUTHOR's stored texts, and marks the result as German - so the
-    // re-rendering for another language (#493) no longer steps in. Result:
-    // "Complete diesen Kurs", "successfully complete diesen Kurs".
-    await learnerCompletes(page, 'DE', 'T01');
-    const second = await learnerReads(page, 'DE', 'dndnode_2', 'accessible');
-    expect(second.info).not.toMatch(/Complete|successfully/);
-    expect(second.feedback).not.toMatch(/Complete|successfully/);
-    expect(second.feedback).toContain(DE.unlocked);
-    const first = await learnerReads(page, 'DE', 'dndnode_1');
-    expect(first.feedback).not.toMatch(/Complete|successfully/);
-  });
-
-  knownDefect('language: the author\'s own text reaches a learner with another language', async ({ page }) => {
-    test.skip(!seeded('CUSTOM_DE'), 'needs the German language pack');
-    // Measured: the German learner reads the DEFAULT text ("Abschluss des
-    // Vorgängers ...") - the author's text is replaced, not shown.
-    const node = await learnerReads(page, 'CUSTOM_DE', 'dndnode_2');
-    expect(node.feedback).toContain(fixture('ADELE_FIXTURE_F_CUSTOM_TEXT'));
-  });
-
-  knownDefect('manual completion: the information card does not claim a completion nobody recorded', async ({ page }) => {
-    // Measured: "Completion criteria: • manual completion recorded" in every
-    // state - before, recorded, withdrawn.
-    const node = await learnerReads(page, 'MANUAL', 'dndnode_1');
-    expect(node.status).toBe('accessible');
-    expect(node.info).not.toContain('manual completion recorded');
-  });
-
   knownDefect('keyboard: the information card and the feedback area open without a mouse', async ({ page }) => {
     // Measured: both containers take the focus (tabindex="0"), but only a
     // mouse click on the icon opens them - no key does (#575 territory).

@@ -55,6 +55,8 @@ export const EN = {
 export const DE = {
   unlocked: 'Dieser Kurs/Stapel ist freigeschaltet.',
   locked: 'Sie haben keinen Zugang zu diesem Kurs/Stapel. Eine Freischaltung erfolgt, wenn:',
+  todo: 'Um diesen Kurs/Stapel abzuschließen, müssen Sie:',
+  completeCourse: 'diesen Kurs erfolgreich bearbeiten.',
 };
 
 /** The speech bubble's colour for a completed node and for one that can no longer be unlocked. */

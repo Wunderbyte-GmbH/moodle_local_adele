@@ -138,14 +138,17 @@ class timed implements course_restriction {
                     $end = time_value::to_timestamp($restrictionnode['data']['value']['end'] ?? null);
                     $state = time_value::window_state($start, $end, $now);
 
-                    $nodate = get_string('course_restricition_timed_no_date', 'local_adele');
-                    $timed[$restrictionnode['id']]['placeholders']['start_date'] =
-                        $start === null ? $nodate : time_value::display($start, $userid);
-                    if ($end !== null) {
-                        $timed[$restrictionnode['id']]['placeholders']['end_date'] = time_value::display($end, $userid);
-                    } else {
-                        $timed[$restrictionnode['id']]['placeholders']['end_date'] = $nodate;
-                    }
+                    // A window may be open at one end (the editor asks for at
+                    // least one boundary). The templates read "{start_date} to
+                    // {end_date}", also where an author wrote their own - so the
+                    // open end gets words that fit there: "now to ...",
+                    // "... to open end" (#590).
+                    $timed[$restrictionnode['id']]['placeholders']['start_date'] = $start === null
+                        ? get_string('course_restricition_timed_no_start', 'local_adele')
+                        : time_value::display($start, $userid);
+                    $timed[$restrictionnode['id']]['placeholders']['end_date'] = $end === null
+                        ? get_string('course_restricition_timed_no_end', 'local_adele')
+                        : time_value::display($end, $userid);
                     $timed[$restrictionnode['id']]['completed'] = $state['inside'];
                     $timed[$restrictionnode['id']]['inbetween'] = $state['inside'];
                     $timed[$restrictionnode['id']]['isbefore'] = $state['isbefore'];

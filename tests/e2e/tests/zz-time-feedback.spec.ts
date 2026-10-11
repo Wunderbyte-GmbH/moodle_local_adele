@@ -37,7 +37,10 @@
  *
  * Requires the test clock (ADELE_FAKETIME_LIB, ADELE_FAKETIME_FILE); without
  * it the chain is skipped, loudly. Texts measured first (session 006,
- * part 39); known defects at the end, see support/feedback.ts.
+ * part 39). Two of them were wrong then and are asserted in their corrected
+ * form since local_adele #590: a locked node behind a fixed window is no
+ * longer told "From subscription you have access until ...", and a window
+ * open at one end no longer reads "Missing date".
  *
  * Not covered: nested combinations (they need the editor's brackets, E2).
  *
@@ -52,7 +55,6 @@ import {
   COLOUR,
   EN,
   expectNoRawPlaceholders,
-  knownDefect,
   learnerCompletes,
   learnerReads,
 } from '../support/feedback';
@@ -62,30 +64,6 @@ const AFTER_BUFFER = 120 + 10;
 const boundary = (window: number, edge: 'START' | 'END'): number => Number(fixture(`ADELE_FIXTURE_F_WINDOW${window}_${edge}`));
 const INFO_COMPLETION = 'Completion criteria: • Complete this course.';
 const PREDECESSOR = 'Completion of the predecessor „Testkurs 01“';
-
-// FIRST in this file: they read the fixtures on the real clock, in front of
-// their windows, and move nothing. After the chain below every learner is
-// behind the window, and these tests would pass without having seen anything.
-test.describe('ADELE-E2E-F — known defects, time (skipped; ADELE_RUN_KNOWN_DEFECTS=1 runs them)', () => {
-  knownDefect('fixed window, before it opens: nobody is told they "have access until" its end', async ({ page }) => {
-    // Measured: "... from 15/01/32, 10:00. From subscription you have access
-    // until 15/01/32, 12:00." - the sentence of the condition "period from
-    // subscription", on a fixed window, while the node is locked.
-    const node = await learnerReads(page, 'TIME', 'dndnode_1');
-    expect(node.status).toBe('not_accessible');
-    expect(node.feedback).not.toContain('From subscription');
-    expect(node.feedback).not.toContain('you have access');
-  });
-
-  knownDefect('a window open at one end does not read "Missing date"', async ({ page }) => {
-    // Measured: "15/01/32, 10:00 to Missing date" and "Missing date to
-    // 15/01/32, 12:00" on the information card.
-    for (const key of ['TIME_START', 'TIME_END']) {
-      const node = await learnerReads(page, key, 'dndnode_1');
-      expect(node.info, key).not.toContain('Missing date');
-    }
-  });
-});
 
 test.describe('ADELE-E2E-F — what a learner reads on a node with a condition on time', () => {
   test.skip(!hasServerClock(), 'needs the server test clock (libfaketime): ADELE_FAKETIME_LIB and ADELE_FAKETIME_FILE');
@@ -99,23 +77,31 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
       const node = await learnerReads(page, 'TIME', 'dndnode_1');
       expect(node.status).toBe('not_accessible');
       expect(node.info).toBe(`Access criteria: - 15/01/32, 10:00 to 15/01/32, 12:00 ${INFO_COMPLETION}`);
-      expect(node.feedback).toContain(`${EN.locked} from 15/01/32, 10:00.`);
+      expect(node.feedback, 'no promise of access while the node is locked (#590)').toBe(
+        `${EN.locked} from 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
+      );
       expectNoRawPlaceholders(node, 'before');
 
       const tokyo = await learnerReads(page, 'TIME_TOKYO', 'dndnode_1');
       expect(tokyo.info, 'UTC+9').toBe(`Access criteria: - 15/01/32, 19:00 to 15/01/32, 21:00 ${INFO_COMPLETION}`);
-      expect(tokyo.feedback).toContain(`${EN.locked} from 15/01/32, 19:00.`);
+      expect(tokyo.feedback).toBe(`${EN.locked} from 15/01/32, 19:00. ${EN.todo} ${EN.completeCourse}`);
 
       const openend = await learnerReads(page, 'TIME_START', 'dndnode_1');
       expect(openend.status).toBe('not_accessible');
       expect(openend.feedback, 'a window without an end').toBe(
         `${EN.locked} from 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
       );
+      expect(openend.info, 'the open end reads as words (#590)').toBe(
+        `Access criteria: - 15/01/32, 10:00 to open end ${INFO_COMPLETION}`
+      );
 
       const openstart = await learnerReads(page, 'TIME_END', 'dndnode_1');
       expect(openstart.status, 'a window without a start is open until its end').toBe('accessible');
       expect(openstart.feedback).toBe(
         `${EN.unlocked} You have access to this node until 15/01/32, 12:00. ${EN.todo} ${EN.completeCourse}`
+      );
+      expect(openstart.info, 'the open start reads as words (#590)').toBe(
+        `Access criteria: - now to 15/01/32, 12:00 ${INFO_COMPLETION}`
       );
     });
 
@@ -164,7 +150,9 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
         const node = await learnerReads(page, key, 'dndnode_2');
         expect(node.status).toBe('not_accessible');
         expect(node.info).toBe(`Access criteria: - ${PREDECESSOR} and ${window} ${INFO_COMPLETION}`);
-        expect(node.feedback).toContain(`${EN.locked} ${PREDECESSOR} and from 15/01/33, 10:00.`);
+        expect(node.feedback).toBe(
+          `${EN.locked} ${PREDECESSOR} and from 15/01/33, 10:00. ${EN.todo} ${EN.completeCourse}`
+        );
         expectNoRawPlaceholders(node, `${key}, both missing`);
       }
       const either = await learnerReads(page, 'OR', 'dndnode_2');
@@ -180,8 +168,9 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
       await learnerCompletes(page, 'AND', 'T01');
       const node = await learnerReads(page, 'AND', 'dndnode_2');
       expect(node.status).toBe('not_accessible');
-      expect(node.feedback).toContain(`${EN.locked} from 15/01/33, 10:00.`);
-      expect(node.feedback, 'what is met is no longer asked for').not.toContain('predecessor');
+      expect(node.feedback, 'what is met is no longer asked for').toBe(
+        `${EN.locked} from 15/01/33, 10:00. ${EN.todo} ${EN.completeCourse}`
+      );
 
       await learnerCompletes(page, 'OR', 'T01');
       const either = await learnerReads(page, 'OR', 'dndnode_2', 'accessible');
@@ -197,8 +186,9 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
 
       const late = await learnerReads(page, 'AND_LATE', 'dndnode_2');
       expect(late.status).toBe('not_accessible');
-      expect(late.feedback).toContain(`${EN.locked} ${PREDECESSOR}.`);
-      expect(late.feedback, 'the window is open and no longer asked for').not.toContain('from 15/01/33');
+      expect(late.feedback, 'the window is open and no longer asked for').toBe(
+        `${EN.locked} ${PREDECESSOR}. ${EN.todo} ${EN.completeCourse}`
+      );
 
       await learnerCompletes(page, 'AND_LATE', 'T01');
       const now = await learnerReads(page, 'AND_LATE', 'dndnode_2', 'accessible');

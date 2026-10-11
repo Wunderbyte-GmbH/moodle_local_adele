@@ -148,7 +148,11 @@ final class uc03_parent_courses_restriction_test extends adele_learningpath_test
         $records = $DB->get_records('local_adele_path_user');
         $this->assertNotEmpty($records, 'Expected user path records after enrollment.');
 
-        $expectedbefore = '[EN_233]Sie [EN_386]Collection abgeschlossen haben';
+        // The fixture stores templates of an earlier wording, in German, with
+        // "use default" ticked. A default is rendered from the CURRENT language
+        // string, not from the copy stored in the path (#589) - so this reads
+        // as today's English default.
+        $expectedbefore = get_string('course_restriction_parent_single', 'local_adele', '„[EN_386]Collection“');
 
         foreach ($records as $record) {
             $json = json_decode($record->json, true);
