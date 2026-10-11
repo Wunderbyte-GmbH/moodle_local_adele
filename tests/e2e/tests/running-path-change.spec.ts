@@ -51,6 +51,7 @@ import {
   fixturePassword,
   nodeStatus,
   runCompletion,
+  saveLearningPath,
 } from '../support/fixtures';
 
 const PATH = 'E2E Laufende Änderung';
@@ -82,7 +83,7 @@ async function openNode2Criteria(page: Page): Promise<void> {
 async function saveCriteriaAndPath(page: Page): Promise<void> {
   await page.getByRole('button', { name: /^(Save|Speichern)$/ }).click();
   await expect(app(page).locator('[data-testid="learningpath-node-dndnode_2"]')).toBeVisible({ timeout: 30_000 });
-  await app(page).locator('[data-testid="learningpath-save"]').click();
+  await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
   await expect(app(page).locator('[data-testid="learningpath-create"]')).toBeVisible({ timeout: 30_000 });
   drainTaskQueue();
 }

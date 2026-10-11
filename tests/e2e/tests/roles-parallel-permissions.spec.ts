@@ -37,7 +37,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath } from '../support/fixtures';
+import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -109,8 +109,9 @@ async function removeCollaborator(page: Page, name: string): Promise<void> {
  * @param name The new name.
  */
 async function renameAndReload(page: Page, id: string, name: string): Promise<void> {
+  await waitForEditorLoaded(page);
   await app(page).locator('[data-testid="learningpath-title"]').fill(name);
-  await app(page).locator('[data-testid="learningpath-save"]').click();
+  await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
   await openOverview(page);
   await expect(rowOf(page, id).locator('h5').first()).toHaveText(name, { timeout: 30_000 });
 }

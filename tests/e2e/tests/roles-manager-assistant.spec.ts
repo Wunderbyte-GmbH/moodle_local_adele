@@ -36,7 +36,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath } from '../support/fixtures';
+import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The path the assistant was made an editor of. */
 const editablePath = {
@@ -75,8 +75,9 @@ async function renameThroughEditor(page: Page, id: string, name: string): Promis
 
   const title = app(page).locator('[data-testid="learningpath-title"]');
   await expect(title).toBeVisible({ timeout: 30_000 });
+  await waitForEditorLoaded(page);
   await title.fill(name);
-  await app(page).locator('[data-testid="learningpath-save"]').click();
+  await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
   // Reload rather than trust the rendered list: the point is that the change
   // reached the server.

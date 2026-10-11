@@ -37,7 +37,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { controlUser, fixturePassword, referencePath } from '../support/fixtures';
+import { controlUser, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -77,9 +77,10 @@ test.describe('ADELE-E2E-R1 — the administrator manages every learning path', 
     await test.step('create a learning path', async () => {
       await openOverview(page);
       await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(title);
       await app(page).locator('[data-testid="learningpath-description"]').fill('Angelegt von der E2E-Kette R1.');
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       await expect(cards(page, title)).toHaveCount(1, { timeout: 30_000 });
       await openOverview(page);
@@ -92,7 +93,7 @@ test.describe('ADELE-E2E-R1 — the administrator manages every learning path', 
       const field = app(page).locator('[data-testid="learningpath-title"]');
       await expect(field).toHaveValue(title);
       await field.fill(renamed);
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       await expect(cards(page, renamed)).toHaveCount(1, { timeout: 30_000 });
       await openOverview(page);

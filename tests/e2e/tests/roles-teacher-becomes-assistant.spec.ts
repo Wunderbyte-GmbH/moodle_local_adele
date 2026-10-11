@@ -38,7 +38,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture, fixturePassword } from '../support/fixtures';
+import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -97,10 +97,11 @@ test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', ()
       await expect(create, 'the teaching role must open the editor').toBeVisible({ timeout: 30_000 });
 
       await create.click();
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(pathname);
       await app(page).locator('[data-testid="learningpath-description"]')
         .fill('Angelegt von der E2E-Kette R3.');
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       // Reloaded: the point is that the path reached the server, under this
       // person's own account.

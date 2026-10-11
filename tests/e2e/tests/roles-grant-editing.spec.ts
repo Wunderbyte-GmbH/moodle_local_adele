@@ -40,7 +40,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath } from '../support/fixtures';
+import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -119,8 +119,9 @@ test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back',
       await openEditor(page, referencePath.id);
 
       const title = app(page).locator('[data-testid="learningpath-title"]');
+      await waitForEditorLoaded(page);
       await title.fill(renamed);
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       // Reloaded, because the point is that the change reached the server.
       await openOverview(page);
@@ -130,8 +131,9 @@ test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back',
 
     await test.step('the assistant puts the fixture name back', async () => {
       await openEditor(page, referencePath.id);
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(referencePath.name);
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
       await openOverview(page);
       await expect(rowOf(page, referencePath.id).locator('h5').first())
         .toHaveText(referencePath.name, { timeout: 30_000 });

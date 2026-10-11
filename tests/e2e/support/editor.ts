@@ -149,6 +149,52 @@ export async function fitCanvas(page: Page): Promise<void> {
 }
 
 /**
+ * The sidebar entry of a course, once the sidebar has stopped moving.
+ *
+ * The drag helpers grab by position. While the course list is still being
+ * built (entries arriving, the list reflowing), the spot measured a moment
+ * ago can hold a neighbouring course by the time the mouse goes down - the
+ * wrong course then ends up in the path. Stable means: the number of
+ * entries and the entry's box are the same on two readings in a row.
+ *
+ * @param page The page.
+ * @param shortname The fixture course.
+ * @returns The entry and the course name it shows.
+ */
+async function settledSidebarCourse(page: Page, shortname: string): Promise<{ source: Locator; label: string }> {
+  const source = sidebarCourse(page, shortname);
+  await expect(source).toBeVisible({ timeout: 30_000 });
+  let previous = '';
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const count = await page.locator('[data-draggable]').count();
+    const box = await source.boundingBox();
+    const now = `${count}:${box ? [box.x, box.y, box.width, box.height].map(Math.round).join(',') : '-'}`;
+    if (now === previous) {
+      break;
+    }
+    previous = now;
+    await page.waitForTimeout(300);
+  }
+  const label = ((await source.innerText()) || '').split('\n')[0].trim();
+  return { source, label };
+}
+
+/**
+ * Expect the course to have landed in the path - in the given node, or in
+ * any node.
+ *
+ * @param page The page.
+ * @param label The course name as the sidebar shows it.
+ * @param nodeid The node it must be in, or null for any node.
+ */
+async function expectCourseInPath(page: Page, label: string, nodeid: string | null): Promise<void> {
+  const where = nodeid
+    ? app(page).locator(`[data-testid="learningpath-node-${nodeid}"]`)
+    : app(page).locator('[data-testid^="learningpath-node-"]').filter({ hasText: label });
+  await expect(where.first(), `the dragged course "${label}" must be the one that landed`).toContainText(label, { timeout: 30_000 });
+}
+
+/**
  * Drop the first course onto the empty canvas.
  *
  * The starting marker is a real element from the beginning, so the plain
@@ -159,8 +205,10 @@ export async function fitCanvas(page: Page): Promise<void> {
  */
 export async function dropFirstCourse(page: Page, shortname: string): Promise<void> {
   const before = await app(page).locator('[data-testid^="learningpath-node-"]').count();
-  await sidebarCourse(page, shortname).dragTo(flowNode(page, 'starting_node').first());
+  const { source, label } = await settledSidebarCourse(page, shortname);
+  await source.dragTo(flowNode(page, 'starting_node').first());
   await expect(app(page).locator('[data-testid^="learningpath-node-"]')).toHaveCount(before + 1, { timeout: 30_000 });
+  await expectCourseInPath(page, label, null);
 }
 
 /**
@@ -174,9 +222,8 @@ export async function dropFirstCourse(page: Page, shortname: string): Promise<vo
 export async function dropCourseAt(page: Page, shortname: string, target: string, zone: DropZone): Promise<void> {
   const nodes = app(page).locator('[data-testid^="learningpath-node-"]');
   const before = await nodes.count();
-  const source = sidebarCourse(page, shortname);
-  await expect(source).toBeVisible({ timeout: 30_000 });
   await fitCanvas(page);
+  const { source, label } = await settledSidebarCourse(page, shortname);
 
   await source.hover();
   await page.mouse.down();
@@ -245,6 +292,9 @@ export async function dropCourseAt(page: Page, shortname: string, target: string
   const expected = zone === 'or' ? before : before + 1;
   await expect(nodes, `dropping ${shortname} on the ${zone} zone must leave ${expected} node(s)`)
     .toHaveCount(expected, { timeout: 30_000 });
+  // The "or" zone adds the course INTO the target node; the others create
+  // a node of their own somewhere in the path.
+  await expectCourseInPath(page, label, zone === 'or' ? target : null);
 }
 
 /**

@@ -38,7 +38,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword } from '../support/fixtures';
+import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 
 /** The path the assistant may edit, and whose ownership is handed over here. */
 const path = {
@@ -115,8 +115,9 @@ test.describe('ADELE-E2E-R6 — a learning path is handed to a new owner', () =>
     await test.step('the new owner can still work on the path', async () => {
       await loginAs(page, assistant, fixturePassword());
       await openEditor(page, path.id);
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(renamed);
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       await page.goto('/local/adele/index.php');
       await expect(app(page).locator(`[data-testid="learningpath-row-${path.id}"]`).locator('h5').first())
@@ -128,8 +129,9 @@ test.describe('ADELE-E2E-R6 — a learning path is handed to a new owner', () =>
       // must not lock the manager out of it.
       await loginAs(page, manager, fixturePassword());
       await openEditor(page, path.id);
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(path.name);
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
 
       await page.goto('/local/adele/index.php');
       await expect(app(page).locator(`[data-testid="learningpath-row-${path.id}"]`).locator('h5').first())

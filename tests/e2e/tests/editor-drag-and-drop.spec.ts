@@ -33,7 +33,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture, fixturePassword } from '../support/fixtures';
+import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 import { VIEWPORT, dropCourseAt, dropFirstCourse } from '../support/editor';
 
 /** The Vue application's mount point. */
@@ -61,6 +61,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     await test.step('a manager starts a new path', async () => {
       await page.goto('/local/adele/index.php');
       await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(title);
       await app(page).locator('[data-testid="learningpath-description"]')
         .fill('Referenzpfad der E2E-Kette E1, ausschließlich per Drag&Drop.');
@@ -73,7 +74,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
 
     await test.step('saved, left and reopened, the path is unchanged', async () => {
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
       await expect(app(page).locator('[data-testid="learningpath-create"]')).toBeVisible({ timeout: 30_000 });
 
       await page.goto('/local/adele/index.php');
@@ -115,6 +116,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     await test.step('a manager starts a new path', async () => {
       await page.goto('/local/adele/index.php');
       await app(page).locator('[data-testid="learningpath-create"]').click();
+      await waitForEditorLoaded(page);
       await app(page).locator('[data-testid="learningpath-title"]').fill(title);
       await app(page).locator('[data-testid="learningpath-description"]')
         .fill('Angelegt von der E2E-Kette E1, ausschließlich über den Editor.');
@@ -136,7 +138,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
 
     await test.step('the path is saved and reopened', async () => {
-      await app(page).locator('[data-testid="learningpath-save"]').click();
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
       await expect(app(page).locator('[data-testid="learningpath-create"]'))
         .toBeVisible({ timeout: 30_000 });
 

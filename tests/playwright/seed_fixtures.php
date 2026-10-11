@@ -178,6 +178,9 @@ if (!is_readable($pathsfile)) {
 
 $imported = [];
 $pathmap = [];
+// Fixture id -> site path id, as this seed created them last time.
+$fixturemapfile = $CFG->dataroot . '/local_adele_e2e_fixturemap.json';
+$fixturemap = is_readable($fixturemapfile) ? (json_decode(file_get_contents($fixturemapfile), true) ?: []) : [];
 foreach (json_decode(file_get_contents($pathsfile), true) as $fixture) {
     $tree = json_decode($fixture['json'], true);
     $missing = [];
@@ -225,7 +228,32 @@ foreach (json_decode(file_get_contents($pathsfile), true) as $fixture) {
         'timemodified' => time(),
     ];
 
-    $existing = $DB->get_field('local_adele_learning_paths', 'id', ['name' => $fixture['name']]);
+    // Which site path IS this fixture? Chains rename fixture paths and rename
+    // them back at the end; a chain that dies in between leaves a path with a
+    // suffixed name behind. Matching by name alone then created a duplicate
+    // next to it, and the leftover - with whatever owner and editors the chain
+    // gave it - poisoned every later run. So, in this order: the id this seed
+    // gave the fixture last time; the exact name; a name the chains derive
+    // from it ("<name> <suffix>"). Whichever is found is reset, name included.
+    $existing = false;
+    if (isset($fixture['id'], $fixturemap[(int) $fixture['id']])) {
+        $existing = $DB->get_field('local_adele_learning_paths', 'id', ['id' => $fixturemap[(int) $fixture['id']]]);
+    }
+    if (!$existing) {
+        $existing = $DB->get_field('local_adele_learning_paths', 'id', ['name' => $fixture['name']]);
+    }
+    if (!$existing) {
+        $renamed = $DB->get_records_select(
+            'local_adele_learning_paths',
+            $DB->sql_like('name', '?'),
+            [$DB->sql_like_escape($fixture['name']) . ' %'],
+            'id ASC',
+            'id',
+            0,
+            1
+        );
+        $existing = $renamed ? (int) reset($renamed)->id : false;
+    }
     if ($existing) {
         $record->id = $existing;
         $DB->update_record('local_adele_learning_paths', $record);
@@ -236,8 +264,12 @@ foreach (json_decode(file_get_contents($pathsfile), true) as $fixture) {
     $imported[$fixture['name']] = $pathid;
     if (isset($fixture['id'])) {
         $pathmap[(int) $fixture['id']] = $pathid;
+        $fixturemap[(int) $fixture['id']] = $pathid;
     }
 }
+// Remembered for the next run, in the data directory: test bookkeeping, not
+// plugin configuration.
+file_put_contents($fixturemapfile, json_encode($fixturemap));
 
 // Some fixture courses (l01, l02) arrive with ADELE activities already in
 // them, pointing at the learning path ids of the SOURCE site. On a fresh site
@@ -683,6 +715,10 @@ $routepaths = [];
 $runningpath = null;
 $linear4path = null;
 $manualcompletionpath = null;
+$mastercompletionpath = null;
+$masteraccesspath = null;
+$masteraccesstimepath = null;
+$masterbothpath = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -933,6 +969,64 @@ if (!empty($imported['Linear A1'])) {
             $manualcompletion,
             'fx_l_manual',
             'Manual completion',
+            $fixturepassword
+        );
+
+        // L4/O3: master completion. A plain linear path (each node completes
+        // on its course, each follows its predecessor); the learner completes
+        // nothing - the teacher's "Master completion checkbox" is the only way
+        // a node can become completed.
+        $masterpath = $base;
+        foreach ($masterpath['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_2') {
+                $masterpath['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            } else if ($node['id'] === 'dndnode_3') {
+                $masterpath['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $mastercompletionpath = local_adele_fixture_store_path(
+            'E2E Master-Abschluss',
+            $masterpath,
+            'fx_l_master',
+            'Master completion',
+            $fixturepassword
+        );
+
+        // O2: master access. (a) Linear, node 2 requires node 1 - the master
+        // access checkbox opens node 2 without node 1 being completed. (b) Node
+        // 1 open only in the 2030 window - the master access opens it now.
+        $masteraccess = $base;
+        foreach ($masteraccess['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_2') {
+                $masteraccess['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            } else if ($node['id'] === 'dndnode_3') {
+                $masteraccess['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $masteraccesspath = local_adele_fixture_store_path(
+            'E2E Master-Zugang',
+            $masteraccess,
+            'fx_o2_access',
+            'Master access',
+            $fixturepassword
+        );
+        // O4: both master checkboxes on the same node, in all four
+        // combinations - the same structure as O2, a learner of its own.
+        $masterbothpath = local_adele_fixture_store_path(
+            'E2E Master beide',
+            $masteraccess,
+            'fx_o4_both',
+            'Master both',
+            $fixturepassword
+        );
+        $windowonly = $timedtemplate['data'];
+        $windowonly['value'] = ['start' => LOCAL_ADELE_FIXTURE_WINDOW_START, 'end' => LOCAL_ADELE_FIXTURE_WINDOW_END];
+        $masteraccesstimepath = local_adele_fixture_derived_path(
+            'E2E Master-Zugang Zeit',
+            $base,
+            local_adele_fixture_single_condition($firsttemplate, $feedbacktemplate, $windowonly),
+            'fx_o2_time',
+            'Master access time',
             $fixturepassword
         );
 
@@ -1331,6 +1425,25 @@ $manualcompletionhost = $manualcompletionpath ? local_adele_fixture_host_course(
     $manualcompletionpath[1],
     (int) $options['category']
 ) : null;
+$mastercompletionhost = $mastercompletionpath ? local_adele_fixture_host_course(
+    'E2EL4',
+    'E2E L master',
+    $mastercompletionpath[0],
+    $mastercompletionpath[1],
+    (int) $options['category']
+) : null;
+$masteraccesshosts = [];
+foreach (['O2' => $masteraccesspath, 'O2T' => $masteraccesstimepath, 'O4' => $masterbothpath] as $key => $entry) {
+    if ($entry) {
+        $masteraccesshosts[$key] = [local_adele_fixture_host_course(
+            'E2E' . $key,
+            'E2E ' . $key . ' master access',
+            $entry[0],
+            $entry[1],
+            (int) $options['category']
+        ), $entry[1]];
+    }
+}
 $runninghost = $runningpath ? local_adele_fixture_host_course(
     'E2EM',
     'E2E M running',
@@ -1377,6 +1490,14 @@ if ($manualcompletionpath && $manualcompletionhost) {
     printf("export ADELE_FIXTURE_L3_LEARNER='%s'\n", $manualcompletionpath[1]->username);
     printf("export ADELE_FIXTURE_L3_LEARNER_NAME='%s'\n", fullname($manualcompletionpath[1]));
     printf("export ADELE_FIXTURE_L3_HOST='%d'\n", $manualcompletionhost->id);
+}
+if ($mastercompletionpath && $mastercompletionhost) {
+    printf("export ADELE_FIXTURE_L4_LEARNER='%s'\n", $mastercompletionpath[1]->username);
+    printf("export ADELE_FIXTURE_L4_HOST='%d'\n", $mastercompletionhost->id);
+}
+foreach ($masteraccesshosts as $key => [$host, $learner]) {
+    printf("export ADELE_FIXTURE_%s_LEARNER='%s'\n", $key, $learner->username);
+    printf("export ADELE_FIXTURE_%s_HOST='%d'\n", $key, $host->id);
 }
 if ($runningpath && $runninghost) {
     printf("export ADELE_FIXTURE_PATH_M='%d'\n", $runningpath[0]);

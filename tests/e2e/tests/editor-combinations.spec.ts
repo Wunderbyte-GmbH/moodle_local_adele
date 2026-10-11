@@ -39,6 +39,7 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
+import { saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
 import { VIEWPORT, dropCourseAt, dropFirstCourse, storedPredecessorCriterion } from '../support/editor';
 
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -54,6 +55,7 @@ const cardTitled = (page: Page, title: string): Locator =>
 async function newPath(page: Page, title: string): Promise<void> {
   await page.goto('/local/adele/index.php');
   await app(page).locator('[data-testid="learningpath-create"]').click();
+  await waitForEditorLoaded(page);
   await app(page).locator('[data-testid="learningpath-title"]').fill(title);
   await app(page).locator('[data-testid="learningpath-description"]').fill('E2E-Kette E2, logische Kombination.');
 }
@@ -65,7 +67,7 @@ async function newPath(page: Page, title: string): Promise<void> {
  * @param title The title.
  */
 async function saveAndReopen(page: Page, title: string): Promise<void> {
-  await app(page).locator('[data-testid="learningpath-save"]').click();
+  await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
   await expect(app(page).locator('[data-testid="learningpath-create"]')).toBeVisible({ timeout: 30_000 });
   await page.goto('/local/adele/index.php');
   const card = cardTitled(page, title);
