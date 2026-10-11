@@ -682,6 +682,7 @@ $timecombined = [];
 $routepaths = [];
 $runningpath = null;
 $linear4path = null;
+$manualcompletionpath = null;
 if (!empty($imported['Linear A1'])) {
     $base = json_decode($DB->get_field('local_adele_learning_paths', 'json', ['id' => $imported['Linear A1']]), true);
     $timedtemplate = null;
@@ -904,6 +905,36 @@ if (!empty($imported['Linear A1'])) {
                 $fixturepassword
             );
         }
+
+        // L3/O1: manual completion. Node 1 completes ONLY when a teacher
+        // ticks it in the learner's path view; node 2 follows node 1.
+        $manualcompletion = $base;
+        foreach ($manualcompletion['tree']['nodes'] as $n => $node) {
+            if ($node['id'] === 'dndnode_1') {
+                foreach ($node['completion']['nodes'] ?? [] as $c => $condition) {
+                    if (($condition['data']['label'] ?? '') === 'course_completed') {
+                        $data = $condition['data'];
+                        $data['label'] = 'manual';
+                        $data['name'] = get_string('course_name_condition_completion_manual', 'local_adele');
+                        $data['description'] = get_string('course_description_condition_completion_manual', 'local_adele');
+                        $data['information'] = get_string('course_information_condition_completion_manual', 'local_adele');
+                        $data['value'] = null;
+                        $manualcompletion['tree']['nodes'][$n]['completion']['nodes'][$c]['data'] = $data;
+                    }
+                }
+            } else if ($node['id'] === 'dndnode_2') {
+                $manualcompletion['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_1'], 1);
+            } else if ($node['id'] === 'dndnode_3') {
+                $manualcompletion['tree']['nodes'][$n]['restriction'] = $parentcriterion(['dndnode_2'], 1);
+            }
+        }
+        $manualcompletionpath = local_adele_fixture_store_path(
+            'E2E Manueller Abschluss',
+            $manualcompletion,
+            'fx_l_manual',
+            'Manual completion',
+            $fixturepassword
+        );
 
         // M: changing a running path. Node 2 starts WITHOUT an access
         // condition - its learner is in T02 from the start; the chain adds a
@@ -1293,6 +1324,13 @@ $linear4host = $linear4path ? local_adele_fixture_host_course(
     $linear4path[1],
     (int) $options['category']
 ) : null;
+$manualcompletionhost = $manualcompletionpath ? local_adele_fixture_host_course(
+    'E2EL3',
+    'E2E L manual',
+    $manualcompletionpath[0],
+    $manualcompletionpath[1],
+    (int) $options['category']
+) : null;
 $runninghost = $runningpath ? local_adele_fixture_host_course(
     'E2EM',
     'E2E M running',
@@ -1334,6 +1372,11 @@ if ($diagnosis) {
 if ($linear4path && $linear4host) {
     printf("export ADELE_FIXTURE_L1_LEARNER='%s'\n", $linear4path[1]->username);
     printf("export ADELE_FIXTURE_L1_HOST='%d'\n", $linear4host->id);
+}
+if ($manualcompletionpath && $manualcompletionhost) {
+    printf("export ADELE_FIXTURE_L3_LEARNER='%s'\n", $manualcompletionpath[1]->username);
+    printf("export ADELE_FIXTURE_L3_LEARNER_NAME='%s'\n", fullname($manualcompletionpath[1]));
+    printf("export ADELE_FIXTURE_L3_HOST='%d'\n", $manualcompletionhost->id);
 }
 if ($runningpath && $runninghost) {
     printf("export ADELE_FIXTURE_PATH_M='%d'\n", $runningpath[0]);
