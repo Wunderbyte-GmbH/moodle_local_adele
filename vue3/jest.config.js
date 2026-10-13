@@ -58,22 +58,31 @@ module.exports = {
   // lower; they are identical from run to run.
   coverageProvider: "babel",
   // Coverage gate (Jest issue, "Coverage-Gate"): the GLOBAL floor is the
-  // baseline of 2026-10-13, rounded down - it may not sink. Jest measures it
-  // WITHOUT the files that have a gate of their own: statements 62.03 %,
-  // branches 45.7 %, functions 48.85 %, lines 74.37 % (all files together:
-  // 63.48 / 47.22 / 49.45 / 75.72). The
+  // measured coverage, rounded down - it may not sink, and it is raised with
+  // every step. Jest measures it WITHOUT the files that have a gate of their
+  // own. Baseline 2026-10-13 (part 1): statements 62.03 %, branches 45.7 %,
+  // functions 48.85 %, lines 74.37 % (all files 63.48 / 47.22 / 49.45 /
+  // 75.72). After part 2, with more files under gates of their own: 62.4 /
+  // 47.26 / 50.15 / 76.23 (all files 65.71 / 50.15 / 52.84 / 78.9). The
   // files the systematic matrices cover carry gates of their own, at their
   // measured values. useStatusMessage.js: one `break` after a switch case
   // whose branches all return is unreachable; 100 % is not attainable
   // without changing the code.
   coverageThreshold: {
-    global: { statements: 62, branches: 45, functions: 48, lines: 74 },
+    global: { statements: 62, branches: 47, functions: 50, lines: 76 },
     './composables/useStatusMessage.js': { statements: 95, branches: 97, functions: 100, lines: 95 },
     './components/nodes_items/MasterConditions.vue': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './components/nodes_items/ProgressBar.vue': { statements: 69, branches: 32, functions: 44, lines: 92 },
     './components/restriction/conditions/timed_dates.vue': { statements: 96, branches: 100, functions: 85, lines: 96 },
     './components/restriction/conditions/parent_node_completed.vue': { statements: 95, branches: 50, functions: 80, lines: 95 },
     './components/nodes/feedbackNode.vue': { statements: 84, branches: 79, functions: 50, lines: 86 },
+    './components/restriction/conditions/parent_courses.vue': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './components/restriction/conditions/timed_duration.vue': { statements: 97, branches: 100, functions: 91, lines: 97 },
+    './components/restriction/conditions_output/manual_output.vue': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './components/completion/conditions_output/manual_output.vue': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './components/nodes_items/UserFeedbackBlock.vue': { statements: 100, branches: 90, functions: 100, lines: 100 },
+    './components/charthelper/userSearch.vue': { statements: 87, branches: 74, functions: 81, lines: 91 },
+    './components/nodes/feedbackNodeRestriction.vue': { statements: 87, branches: 70, functions: 62, lines: 90 },
   },
   testEnvironment: 'jsdom',           // Use jsdom for DOM simulation
   moduleNameMapper: {
