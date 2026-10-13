@@ -19,6 +19,11 @@ namespace local_adele;
 use advanced_testcase;
 use local_adele\external\save_learningpath;
 
+// The attributes stand above the class comment: between comment and class
+// they would hide the class-level @covers tags from the coding-style check
+// (moodle.PHPUnit.TestCaseCovers), which only looks right above the class.
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 /**
  * Creating a learning path without any right is refused the way Moodle
  * refuses - with a required_capability_exception, not with a PHP error
@@ -33,8 +38,6 @@ use local_adele\external\save_learningpath;
  * @runTestsInSeparateProcesses
  * @covers \local_adele\external\save_learningpath
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 final class save_learningpath_refusal_test extends advanced_testcase {
     protected function setUp(): void {
         parent::setUp();

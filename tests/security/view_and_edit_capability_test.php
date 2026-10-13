@@ -24,6 +24,11 @@ use local_adele\external\get_lp_user_path_relations;
 use local_adele\external\save_lp_user_path_relation;
 use local_adele\helper\capability_migration;
 
+// The attributes stand above the class comment: between comment and class
+// they would hide the class-level @covers tags from the coding-style check
+// (moodle.PHPUnit.TestCaseCovers), which only looks right above the class.
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 /**
  * Seeing a learner's path and changing it are two rights (mod_adele #39).
  *
@@ -44,8 +49,6 @@ use local_adele\helper\capability_migration;
  * @covers \local_adele\helper\capability_migration
  * @runTestsInSeparateProcesses
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 final class view_and_edit_capability_test extends advanced_testcase {
     /** @var \stdClass The course embedding the path. */
     private $course;

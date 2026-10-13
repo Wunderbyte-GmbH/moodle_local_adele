@@ -92,7 +92,7 @@ final class feedback_language_test extends advanced_testcase {
      * @param string $label Condition class.
      * @param mixed $value The condition's value.
      * @param string|null $next A condition chained behind this one (AND).
-     * @param array $feedback Overrides of the feedback node's data; null for "no feedback node".
+     * @param array|null $feedback Overrides of the feedback node's data; null for "no feedback node".
      * @return array The nodes.
      */
     private function condition(string $type, string $id, string $label, $value, ?string $next, ?array $feedback = []): array {

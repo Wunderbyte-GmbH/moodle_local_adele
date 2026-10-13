@@ -24,6 +24,11 @@ use local_adele\external\get_lp_user_path_relation;
 use local_adele\external\get_lp_user_path_relations;
 use local_adele\external\save_lp_user_path_relation;
 
+// The attributes stand above the class comment: between comment and class
+// they would hide the class-level @covers tags from the coding-style check
+// (moodle.PHPUnit.TestCaseCovers), which only looks right above the class.
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 /**
  * Learner data and the course the request claims to come from.
  *
@@ -60,8 +65,6 @@ use local_adele\external\save_lp_user_path_relation;
  * @covers \local_adele\learning_paths::has_learner_data_authority
  * @runTestsInSeparateProcesses
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 final class learner_data_embedding_test extends advanced_testcase {
     /** @var \stdClass The course that embeds the path, with 'Only own results'. */
     private $host;

@@ -24,6 +24,11 @@ use local_adele\external\get_lp_user_path_relation;
 use local_adele\external\get_lp_user_path_relations;
 use local_adele\external\save_lp_user_path_relation;
 
+// The attributes stand above the class comment: between comment and class
+// they would hide the class-level @covers tags from the coding-style check
+// (moodle.PHPUnit.TestCaseCovers), which only looks right above the class.
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 /**
  * The roster of an embedding belongs to its course (#588).
  *
@@ -44,8 +49,6 @@ use local_adele\external\save_lp_user_path_relation;
  * @covers \local_adele\learning_paths::get_learning_user_relations
  * @runTestsInSeparateProcesses
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 final class roster_course_scope_test extends advanced_testcase {
     /** @var \stdClass Course X. */
     private $coursex;

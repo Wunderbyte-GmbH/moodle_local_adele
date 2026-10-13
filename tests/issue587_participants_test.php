@@ -21,6 +21,11 @@ use context_course;
 use context_module;
 use local_adele\external\get_lp_user_path_relations;
 
+// The attributes stand above the class comment: between comment and class
+// they would hide the class-level @covers tags from the coding-style check
+// (moodle.PHPUnit.TestCaseCovers), which only looks right above the class.
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 /**
  * The teachers of a course are not the learners of its learning paths (#587).
  *
@@ -40,8 +45,6 @@ use local_adele\external\get_lp_user_path_relations;
  * @covers \local_adele\enrollment::role_assigned_in_course
  * @runTestsInSeparateProcesses
  */
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 final class issue587_participants_test extends advanced_testcase {
     /** @var \stdClass The course embedding the path. */
     private $course;
