@@ -38,7 +38,14 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  fixture,
+  fixturePassword,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 
 /** The path the assistant may edit, and whose ownership is handed over here. */
 const path = {
@@ -71,12 +78,16 @@ const cardOf = (page: Page, name: string): Locator =>
 /** The line naming the current owner. */
 const ownerLine = (page: Page): Locator => app(page).locator('.owner-label');
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R6 — a learning path is handed to a new owner', () => {
   test('the manager transfers ownership, and it sticks', { tag: ['@story:R6'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
-    const renamed = `${path.name} nach Eigentumswechsel ${Date.now()}`;
+    const renamed = runLabel(`${path.name} nach Eigentumswechsel`);
 
     await test.step('precondition: the assistant is an editor but not the owner', async () => {
       await loginAs(page, manager, fixturePassword());

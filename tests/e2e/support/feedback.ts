@@ -15,7 +15,7 @@
 
 /**
  * Shared by the two files of chain F (plan section 10): feedback-texts and
- * zz-time-feedback.
+ * time-feedback.
  *
  * Every fixture of the chain is one learner in a host course of their own:
  * key LINEAR -> login ADELE_FIXTURE_F_LINEAR_LEARNER, course

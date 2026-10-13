@@ -37,7 +37,15 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { controlUser, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  controlUser,
+  fixturePassword,
+  referencePath,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -66,11 +74,14 @@ async function openOverview(page: Page): Promise<void> {
     .toBeVisible({ timeout: 30_000 });
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R1 — the administrator manages every learning path', () => {
   test('create, rename, duplicate and delete a path', { tag: ['@story:R1'] }, async ({ page }) => {
-    const stamp = Date.now();
-    const title = `E2E R1 ${stamp}`;
-    const renamed = `E2E R1 umbenannt ${stamp}`;
+    const title = runLabel('E2E R1');
+    const renamed = runLabel('E2E R1 umbenannt');
 
     await loginAs(page, env.adminUser, env.adminPassword);
 

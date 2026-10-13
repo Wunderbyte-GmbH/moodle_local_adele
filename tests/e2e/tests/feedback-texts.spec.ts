@@ -24,7 +24,7 @@
  * 2 of 2), manual release, manual completion - each before it is met, met,
  * and, where it can be taken back, withdrawn. Plus the author's own text and
  * a learner whose language is German. The conditions on time, and with them
- * F3 (AND / OR), are in zz-time-feedback: they move the server clock.
+ * F3 (AND / OR), are in time-feedback: they move the server clock.
  *
  * Every text asserted here was measured first (session 006, part 39). What
  * was measured and is WRONG is not written down as an expectation: it becomes
@@ -44,7 +44,7 @@
 
 import { test, expect } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, nodeStatus } from '../support/fixtures';
+import { fixture, fixturePassword, nodeStatus, reseedFixtures } from '../support/fixtures';
 import {
   COLOUR,
   DE,
@@ -59,6 +59,10 @@ import {
 const PREDECESSOR_1 = 'Completion of the predecessor „Testkurs 01“';
 const PREDECESSOR_2 = 'Completion of the predecessor „Testkurs 02“';
 const INFO_COMPLETION = 'Completion criteria: • Complete this course.';
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', () => {
   test('F1/F2 predecessor, 1 of 1: before and after the predecessor is completed', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {

@@ -35,7 +35,8 @@
 
 import { test, expect, Page } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture } from '../support/fixtures';
+import { fixture, reseedFixtures } from '../support/fixtures';
+import { ABSENCE_WINDOW_MS } from '../support/timing';
 
 const LOAD = /info=local_adele_get_learningpath(&|$)/;
 
@@ -53,6 +54,10 @@ async function editButton(page: Page) {
   await expect(button).toBeVisible({ timeout: 30_000 });
   return { app, button };
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-E — the editor keeps what was typed (#585)', () => {
   test('opening a path for editing loads it exactly once', { tag: ['@story:E1'] }, async ({ page }) => {
@@ -85,7 +90,8 @@ test.describe('ADELE-E2E-E — the editor keeps what was typed (#585)', () => {
 
     await test.step('while the path is on its way there is no field to type into', async () => {
       await expect.poll(() => loads, { timeout: 30_000 }).toBe(1);
-      await page.waitForTimeout(1_500);
+      // Absence has no event: the field must stay away for a while.
+      await page.waitForTimeout(ABSENCE_WINDOW_MS);
       await expect(title).toHaveCount(0);
     });
 
@@ -93,7 +99,9 @@ test.describe('ADELE-E2E-E — the editor keeps what was typed (#585)', () => {
       release();
       await expect(title).toHaveValue('Linear A2', { timeout: 30_000 });
       await title.fill('Neuer Name');
-      await page.waitForTimeout(4_000);
+      // Whatever could still overwrite the field comes over the network:
+      // wait until nothing has been in flight for half a second.
+      await page.waitForLoadState('networkidle');
       await expect(title, 'nothing may overwrite what the person typed').toHaveValue('Neuer Name');
       expect(loads, 'and no second load was sent after it').toBe(1);
     });

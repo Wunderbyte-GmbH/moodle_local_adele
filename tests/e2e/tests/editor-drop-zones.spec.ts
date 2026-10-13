@@ -35,11 +35,12 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { waitForEditorLoaded } from '../support/fixtures';
+import { reseedFixtures, waitForEditorLoaded } from '../support/fixtures';
 import {
   VIEWPORT, DropZone, abandonDrag, dragOverNode, dropCourseAt, dropFirstCourse, leadOntoZone, offeredZones,
   startDrag, zonesAround,
 } from '../support/editor';
+import { editorPause, POINTER_STEP_MS } from '../support/timing';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -82,6 +83,10 @@ async function expectZones(page: Page, expected: Record<string, DropZone[]>): Pr
   }
   await abandonDrag(page, 'T05');
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
   test.use({ viewport: VIEWPORT });
@@ -138,11 +143,11 @@ test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
         position: { x: from.x + ((target.x - from.x) * step) / 6 - area!.x, y: target.y - area!.y },
         force: true,
       });
-      await page.waitForTimeout(200);
+      await editorPause(page, POINTER_STEP_MS);
     }
     for (let rest = 0; rest < 4; rest++) {
       await pane.hover({ position: { x: target.x - area!.x - (rest % 2), y: target.y - area!.y }, force: true });
-      await page.waitForTimeout(200);
+      await editorPause(page, POINTER_STEP_MS);
     }
     await expect(zone, 'the zone must still be there').toHaveCount(1);
     await expect(zone, 'and still show the hit').toContainText(/drop to connect|ablegen zum verbinden/i);

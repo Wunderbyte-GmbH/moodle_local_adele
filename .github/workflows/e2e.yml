@@ -322,6 +322,9 @@ jobs:
           fi
 
           cd "$MOODLE_WEBROOT/$PLUGIN/adele/tests/e2e"
+          # Names of things a chain creates carry the run (support/fixtures:
+          # runLabel), so two runs on one site never meet.
+          ADELE_E2E_RUN_ID="run${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
           ADELE_E2E_EXPORT_DIR="$EXPORT_DIR" npx playwright test \
             ${TEST_GREP:+--grep "$TEST_GREP"} 2>&1 \
             | tee "$EXPORT_DIR/run.log"

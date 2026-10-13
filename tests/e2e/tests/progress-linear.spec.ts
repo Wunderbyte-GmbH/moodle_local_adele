@@ -39,10 +39,13 @@ import { loginAs } from '../support/env';
 import {
   completeCourse,
   drainTaskQueue,
+  expectCourseClosed,
+  expectCourseOpenAfterTasks,
   fixture,
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   runCompletion,
 } from '../support/fixtures';
 
@@ -85,12 +88,18 @@ async function expectProgress(page: Page, k: number): Promise<void> {
     .toBe(`${k}/4 | ${percent} | ${percent} | ${label}`);
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-L1 — progress on a linear path, step by step', () => {
-  test('0/4 -> 1/4 -> 2/4 -> 3/4 -> 4/4: message, percentage, label and bar', { tag: ['@story:L1'] }, async ({ page }) => {
+  test('0/4 -> 1/4 -> 2/4 -> 3/4 -> 4/4: message, percentage, label, bar and real access', { tag: ['@story:L1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_L1_LEARNER'), fixturePassword());
 
-    await test.step('0/4: nothing completed yet', async () => {
+    await test.step('0/4: nothing completed yet; T01 open, T02 closed', async () => {
       await expectProgress(page, 0);
+      await expectCourseOpenAfterTasks(page, fixtureCourse('T01'), 'the first step is open from the start');
+      await expectCourseClosed(page, fixtureCourse('T02'), 'the second step waits for the first');
     });
 
     const courses = ['T01', 'T02', 'T03', 'T04'];
@@ -103,6 +112,11 @@ test.describe('ADELE-E2E-L1 — progress on a linear path, step by step', () => 
         if (k < 4) {
           expect(await nodeStatus(page, fixture('ADELE_FIXTURE_L1_HOST'), ACTIVITY, `dndnode_${k + 1}`),
             `the next step opens after ${courses[k - 1]}`).toBe('accessible');
+          // And really: the next course opens, the one after it does not yet.
+          await expectCourseOpenAfterTasks(page, fixtureCourse(courses[k]), `${courses[k]} opens after ${courses[k - 1]}`);
+          if (k < 3) {
+            await expectCourseClosed(page, fixtureCourse(courses[k + 1]), `${courses[k + 1]} still waits for ${courses[k]}`);
+          }
         }
       });
     }

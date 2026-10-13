@@ -46,7 +46,15 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
 import {
-  callService, fixture, fixturePassword, referencePath, saveLearningPath, setSystemRole, waitForEditorLoaded,
+  callService,
+  fixture,
+  fixturePassword,
+  referencePath,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  setSystemRole,
+  waitForEditorLoaded,
 } from '../support/fixtures';
 
 /** The Vue application's mount point. */
@@ -126,12 +134,16 @@ async function renameAndReload(page: Page, id: string, name: string): Promise<vo
   await expect(rowOf(page, id).locator('h5').first()).toHaveText(name, { timeout: 30_000 });
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', () => {
   test('revoking the collaboration leaves manager access untouched', { tag: ['@story:R5'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
-    const renamed = `Linear A1 Manager nach Entzug ${Date.now()}`;
+    const renamed = runLabel('Linear A1 Manager nach Entzug');
 
     await loginAs(page, manager, fixturePassword());
     await openEditor(page, referencePath.id);
@@ -204,7 +216,7 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
     const own = fixture('ADELE_FIXTURE_PATH_LINEAR_A2');
-    const renamed = `Linear A2 ohne Assistentenrolle ${Date.now()}`;
+    const renamed = runLabel('Linear A2 ohne Assistentenrolle');
     /** What the server answers when the person asks for the editors of their path. */
     const editorsOfOwn = (): Promise<{ data?: unknown; error?: string }> =>
       callService(page, 'local_adele_get_lp_edit_users', { contextid: 1, lpid: Number(own) });
@@ -280,7 +292,7 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
-    const title = `R5 Eigentum ${Date.now()}`;
+    const title = runLabel('R5 Eigentum');
     const renamed = `${title} umbenannt`;
     const card = (name: string): Locator => app(page).locator('[data-testid^="learningpath-row-"]')
       .filter({ has: page.locator('h5', { hasText: name }) });

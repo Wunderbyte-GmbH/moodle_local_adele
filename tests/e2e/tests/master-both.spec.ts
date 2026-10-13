@@ -33,8 +33,9 @@
  * that is intended - a master completion always works, whatever the
  * prerequisites say.
  *
- * Checked in every combination: node states and route progress as the
- * learner sees them, and real access to T02 and T03.
+ * Checked in every combination: node states, route progress and the
+ * percentage the progress bar reports (aria-valuenow) as the learner sees
+ * them, and real access to T02 and T03.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -51,6 +52,7 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   setMasterCheckbox,
 } from '../support/fixtures';
 
@@ -83,14 +85,15 @@ async function learnerView(page: Page): Promise<string> {
   }
   const row = page.locator('tr').filter({ hasText: LASTNAME }).first();
   const route = ((await row.locator('td').nth(3).innerText()) || '').trim();
-  return `${states.join(' ')} | ${route}`;
+  const percent = (await row.getByRole('progressbar').getAttribute('aria-valuenow')) || '';
+  return `${states.join(' ')} | ${route} | ${percent}`;
 }
 
 /**
  * Expect a combination: the learner's view, then real access to T02 and T03.
  *
  * @param page The page.
- * @param expected "<node1> <node2> <node3> | <route>".
+ * @param expected "<node1> <node2> <node3> | <route> | <percent the bar reports>".
  * @param t02open Whether T02 must be open.
  * @param t03open Whether T03 must be open.
  * @param why What the combination means.
@@ -107,34 +110,38 @@ async function expectCombination(page: Page, expected: string, t02open: boolean,
   }
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-O4 — both master checkboxes, all four combinations', () => {
   test('0/0 -> 0/1 -> 1/1 -> 1/0 -> 0/0', { tag: ['@story:O4'] }, async ({ page }) => {
     await test.step('access 0, completion 0: normal logic', async () => {
-      await expectCombination(page, 'accessible not_accessible not_accessible | 0/3', false, false,
+      await expectCombination(page, 'accessible not_accessible not_accessible | 0/3 | 0', false, false,
         'nothing set');
     });
 
     await test.step('access 0, completion 1: node 2 completed, node 3 released - master completion needs no access', async () => {
       await setOnNode2(page, 'Master completion checkbox', true);
-      await expectCombination(page, 'accessible completed accessible | 1/3', true, true,
+      await expectCombination(page, 'accessible completed accessible | 1/3 | 33.33', true, true,
         'master completion alone');
     });
 
     await test.step('access 1, completion 1: both effects, consistent', async () => {
       await setOnNode2(page, 'Master access checkbox', true);
-      await expectCombination(page, 'accessible completed accessible | 1/3', true, true,
+      await expectCombination(page, 'accessible completed accessible | 1/3 | 33.33', true, true,
         'both checkboxes');
     });
 
     await test.step('access 1, completion 0: access only - no completion, node 3 locked again', async () => {
       await setOnNode2(page, 'Master completion checkbox', false);
-      await expectCombination(page, 'accessible accessible not_accessible | 0/3', true, false,
+      await expectCombination(page, 'accessible accessible not_accessible | 0/3 | 0', true, false,
         'master access alone must not complete');
     });
 
     await test.step('access 0, completion 0: back to normal logic', async () => {
       await setOnNode2(page, 'Master access checkbox', false);
-      await expectCombination(page, 'accessible not_accessible not_accessible | 0/3', false, false,
+      await expectCombination(page, 'accessible not_accessible not_accessible | 0/3 | 0', false, false,
         'nothing set any more');
     });
   });

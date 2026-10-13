@@ -46,7 +46,13 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  fixture,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 import { VIEWPORT, dropCourseAt, dropFirstCourse, storedPredecessorCriterion } from '../support/editor';
 import {
   chooseNode, closeCriteriaDiscarding, conditions, deleteCondition, dropCondition, insertWithKeyboard,
@@ -106,6 +112,10 @@ async function removePath(page: Page, title: string): Promise<void> {
   await expect(card).toHaveCount(0, { timeout: 30_000 });
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   test.use({ viewport: VIEWPORT });
   test.beforeEach(async ({ page }) => {
@@ -114,7 +124,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   });
 
   test('condition level: (A AND B) OR C', { tag: ['@story:E2'] }, async ({ page }) => {
-    const title = `E2 Bedingung (A und B) oder C ${Date.now()}`;
+    const title = runLabel('E2 Bedingung (A und B) oder C');
     await chainOfTwo(page, title);
     try {
       await openAccessCriteria(page, 'dndnode_2');
@@ -131,7 +141,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   });
 
   test('condition level: A AND (B OR C), multiplied out', { tag: ['@story:E2'] }, async ({ page }) => {
-    const title = `E2 Bedingung A und (B oder C) ${Date.now()}`;
+    const title = runLabel('E2 Bedingung A und (B oder C)');
     await chainOfTwo(page, title);
     try {
       await openAccessCriteria(page, 'dndnode_2');
@@ -148,7 +158,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   });
 
   test('condition level: add, remove, and throw changes away', { tag: ['@story:E2'] }, async ({ page }) => {
-    const title = `E2 Bedingung ändern ${Date.now()}`;
+    const title = runLabel('E2 Bedingung ändern');
     await chainOfTwo(page, title);
     try {
       await test.step('added and removed again before saving', async () => {
@@ -182,7 +192,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
 
   test('node level: A AND (B OR C)', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
-    const title = `E2 Knoten A und (B oder C) ${Date.now()}`;
+    const title = runLabel('E2 Knoten A und (B oder C)');
     await page.goto('/local/adele/index.php');
     await app(page).locator('[data-testid="learningpath-create"]').click();
     await waitForEditorLoaded(page);
@@ -218,7 +228,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
 
   test('node level: (A AND B) OR C', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
-    const title = `E2 Knoten (A und B) oder C ${Date.now()}`;
+    const title = runLabel('E2 Knoten (A und B) oder C');
     await page.goto('/local/adele/index.php');
     await app(page).locator('[data-testid="learningpath-create"]').click();
     await waitForEditorLoaded(page);
@@ -256,7 +266,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // zone). Fixed with the E2E issue, addAutoRestrictions 'parent'.
   test('a predecessor placed before a node counts in its criterion without opening the criteria', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
-    const title = `E2 Vorgänger davor ${Date.now()}`;
+    const title = runLabel('E2 Vorgänger davor');
     await chainOfTwo(page, title);
     try {
       await insertWithKeyboard(page, fixture('ADELE_FIXTURE_COURSE_T03'), 'Testkurs 02', 'dropzone_parent');
@@ -275,7 +285,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // Fixed with the E2E issue: parent_courses.vue reads the path being edited.
   test('the predecessor condition counts the predecessors drawn, saved or not', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
-    const title = `E2 Vorgänger zählen ${Date.now()}`;
+    const title = runLabel('E2 Vorgänger zählen');
     await chainOfTwo(page, title);
     try {
       await dropCourseAt(page, 'T03', 'dndnode_1', 'and');
@@ -291,7 +301,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // E2E issue: it goes next to the existing predecessors, in their row.
   test('a node placed before another with the keyboard does not cover it', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
-    const title = `E2 Vorgänger verdeckt ${Date.now()}`;
+    const title = runLabel('E2 Vorgänger verdeckt');
     await chainOfTwo(page, title);
     await insertWithKeyboard(page, fixture('ADELE_FIXTURE_COURSE_T03'), 'Testkurs 02', 'dropzone_parent');
     const target = await page.locator('.vue-flow__node[data-id="dndnode_2"]').boundingBox();

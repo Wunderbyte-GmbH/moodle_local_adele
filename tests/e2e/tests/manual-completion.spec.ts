@@ -41,10 +41,12 @@ import {
   drainTaskQueue,
   expectCourseClosedAfterTasks,
   expectCourseOpenAfterTasks,
+  fitPathView,
   fixture,
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
 } from '../support/fixtures';
 
 const ACTIVITY = 'E2E L manual';
@@ -87,11 +89,11 @@ async function learnerView(page: Page): Promise<string> {
   const node2 = await nodeStatus(page, host, ACTIVITY, 'dndnode_2');
   const node1 = await nodeStatus(page, host, ACTIVITY, 'dndnode_1');
   const wrapper = page.locator('.vue-flow__node[data-id="dndnode_1"]');
-  // The card opens only on a click on the icon (NodeInformation.toggleCard;
-  // focus merely raises its z-index - not reachable by keyboard, reported
-  // separately). The canvas may clip the icon, so the click event is
-  // dispatched to it directly: same Vue handler, no visible spot needed.
-  await wrapper.locator('.information').first().dispatchEvent('click');
+  // The card opens on a click on the icon (NodeInformation.toggleCard). A
+  // real click: a clipped or covered icon makes the test red - so the whole
+  // path is brought into view first, as a person would.
+  await fitPathView(page);
+  await wrapper.locator('.information').first().click({ timeout: 15_000 });
   await expect(wrapper.locator('.additional-card'), 'node 1 must offer its information card').toBeVisible({ timeout: 10_000 });
   const row = page.locator('tr').filter({ hasText: LASTNAME }).first();
   const route = ((await row.locator('td').nth(3).innerText()) || '').trim();
@@ -114,6 +116,10 @@ async function enrolmentInT02(page: Page): Promise<string> {
   const text = (await row.first().innerText()).replace(/\s+/g, ' ');
   return /Suspended/.test(text) ? 'Suspended' : /Active/.test(text) ? 'Active' : text;
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-L3/O1 — manual completion, set and withdrawn', () => {
 

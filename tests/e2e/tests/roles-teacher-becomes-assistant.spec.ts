@@ -50,7 +50,15 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
 import {
-  callService, fixture, fixturePassword, saveLearningPath, setSystemRole, unenrolFromCourse, waitForEditorLoaded,
+  callService,
+  fixture,
+  fixturePassword,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  setSystemRole,
+  unenrolFromCourse,
+  waitForEditorLoaded,
 } from '../support/fixtures';
 
 /** What saving a new, empty path through the web service is answered with. */
@@ -77,12 +85,16 @@ async function openOverview(page: Page): Promise<void> {
   await expect(app(page)).toBeVisible({ timeout: 30_000 });
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', () => {
   test('the teaching role opens the editor, and the person can create a path', { tag: ['@story:R3', '@story:R5'] }, async ({ page }) => {
     const teacher = fixture('ADELE_FIXTURE_TEACHER');
     const teachername = fixture('ADELE_FIXTURE_TEACHER_NAME');
     const course = fixture('ADELE_FIXTURE_HOST_COURSE');
-    const pathname = `Pfad der Lehrkraft ${Date.now()}`;
+    const pathname = runLabel('Pfad der Lehrkraft');
 
     await test.step('precondition: without a teaching role there is no editor', async () => {
       await loginAs(page, teacher, fixturePassword());
@@ -163,7 +175,7 @@ test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', ()
         'without the role, and with no other reason, there is no editor').toHaveCount(0);
       await expect(page.locator('[data-draggable]'), 'and no courses to build with').toHaveCount(0);
       // Not merely hidden: the server refuses to create a path for them.
-      const answer = await createThroughService(page, `Unerlaubter Pfad ${Date.now()}`);
+      const answer = await createThroughService(page, runLabel('Unerlaubter Pfad'));
       expect(answer.data, 'no path may be created').toBeUndefined();
       expect(answer.error, 'the server must refuse for lack of permission').toBe('nopermissions');
     });
@@ -174,7 +186,7 @@ test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', ()
     // exception the service means to throw was not imported in
     // save_learningpath.php (local_adele #594).
     await loginAs(page, fixture('ADELE_FIXTURE_CONTROL_USER'), fixturePassword());
-    const answer = await createThroughService(page, `Unerlaubter Pfad ${Date.now()}`);
+    const answer = await createThroughService(page, runLabel('Unerlaubter Pfad'));
     expect(answer.data, 'no path may be created').toBeUndefined();
     expect(answer.error, 'the server must refuse for lack of permission').toBe('nopermissions');
   });

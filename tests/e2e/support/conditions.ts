@@ -38,8 +38,9 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { expect, Locator, Page } from '@playwright/test';
+import { expect, Locator, Page, test } from '@playwright/test';
 import { fixture } from './fixtures';
+import { editorPause, POINTER_REST_MS, viewportAtRest, viewportMoved, viewportTransform, ZOOM_LOCK_MS } from './timing';
 
 /** The text a zone of the criteria editor shows once it registers the pointer. */
 const HIT = /new starting node|neue start-node/i;
@@ -66,15 +67,28 @@ export async function openAccessCriteria(page: Page, nodeid: string): Promise<vo
   await page.locator(`[data-testid="learningpath-node-${nodeid}"] button:has(i.fa-lock)`).first().click({ timeout: 15_000 });
   const pane = flow(page).locator('.vue-flow__pane').first();
   await expect(pane).toBeVisible({ timeout: 30_000 });
-  // The editor fits its view on opening (one second of animation) and only
-  // then allows zooming.
-  await page.waitForTimeout(2_000);
+  // The editor fits its view 300 ms after opening, in one second of
+  // animation, and only then accepts the wheel: wait for that movement to
+  // start (it may be over already) and to end.
+  const opened = await viewportTransform(flow(page));
+  await viewportMoved(flow(page), opened, 3_000);
+  await viewportAtRest(flow(page));
   const area = await pane.boundingBox();
   expect(area, 'the criteria canvas must be on screen').toBeTruthy();
   await page.mouse.move(area!.x + area!.width / 2, area!.y + area!.height / 2);
-  for (let step = 0; step < 3; step++) {
+  // Three steps out. The editor takes the wheel only once its opening fit
+  // has finished and again some time after each step (zoomLock) - neither
+  // shows in the page - so a wheel that moves nothing is simply repeated,
+  // within a bound. At the smallest zoom (0.2) nothing moves any more.
+  const until = Date.now() + 8_000;
+  for (let steps = 0; steps < 3 && Date.now() < until;) {
+    const before = await viewportTransform(flow(page));
     await page.mouse.wheel(0, 300);
-    await page.waitForTimeout(700);
+    if (await viewportMoved(flow(page), before, 700)) {
+      steps++;
+      await viewportAtRest(flow(page));
+      await editorPause(page, ZOOM_LOCK_MS);
+    }
   }
 }
 
@@ -105,7 +119,7 @@ export async function dropCondition(page: Page, name: string, target: string, zo
       },
       force: true,
     });
-    await page.waitForTimeout(150);
+    await editorPause(page);
   }
   let hit = false;
   for (let attempt = 0; attempt < 12 && !hit; attempt++) {
@@ -123,8 +137,14 @@ export async function dropCondition(page: Page, name: string, target: string, zo
         });
       }
     }
-    await page.waitForTimeout(200);
+    await editorPause(page, POINTER_REST_MS);
     hit = HIT.test(await conditionNode(page, zone).innerText({ timeout: 500 }).catch(() => ''));
+  }
+  if (!hit) {
+    // Evidence for the report: where the zones were when the drop failed.
+    const shot = test.info().outputPath(`drop-miss-${zone}-${target}.png`);
+    await page.screenshot({ path: shot });
+    await test.info().attach(`drop-miss-${zone}-${target}`, { path: shot, contentType: 'image/png' });
   }
   expect(hit, `the editor never registered the pointer on ${zone} of ${target}`).toBe(true);
   await page.mouse.up();

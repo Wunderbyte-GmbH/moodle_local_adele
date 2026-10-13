@@ -40,6 +40,7 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
 } from '../support/fixtures';
 
 const ACTIVITY = 'E2E C3 manual';
@@ -87,6 +88,10 @@ async function expectLearnerSees(page: Page, state: string, why: string): Promis
     }, { message: why, timeout: 90_000, intervals: [2_000, 5_000] })
     .toBe(state);
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-C3 — a teacher releases a node manually, and withdraws it', () => {
   test('not released -> released -> release withdrawn', { tag: ['@story:C3'] }, async ({ page }) => {

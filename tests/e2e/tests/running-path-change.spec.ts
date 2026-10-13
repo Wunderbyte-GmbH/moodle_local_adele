@@ -32,7 +32,9 @@
  *     access, not completion,
  *   - the enrolment in T02 as the participants page shows it: suspended
  *     after M1, active again after M2 (suspend, not delete),
- *   - real access to T02.
+ *   - real access to T02,
+ *   - and a person the change does not concern: on another path that opens
+ *     T02 as well; their access stays as it was throughout.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -50,6 +52,7 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   runCompletion,
   saveLearningPath,
 } from '../support/fixtures';
@@ -139,6 +142,24 @@ async function enrolmentInT02(page: Page): Promise<string> {
   return /Suspended/.test(text) ? 'Suspended' : /Active/.test(text) ? 'Active' : text;
 }
 
+/**
+ * A person the change does not concern: on ANOTHER path that opens T02 from
+ * the start (C1 "1 of 2", its negative control, who completes nothing).
+ * Changing this path must not touch their access to the same course - the
+ * enrolments of two paths in one course are separate.
+ *
+ * @param page The page.
+ * @param why What it means.
+ */
+async function uninvolvedKeepsT02(page: Page, why: string): Promise<void> {
+  await loginAs(page, fixture('ADELE_FIXTURE_C1_ANY_NEGATIVE'), fixturePassword());
+  await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), why);
+}
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-M — changing a path learners are already on', () => {
   test.use({ viewport: { width: 1920, height: 1400 } });
 
@@ -154,6 +175,7 @@ test.describe('ADELE-E2E-M — changing a path learners are already on', () => {
         .toMatch(/^accessible \| 1\/3 \| .*Freely accessible/);
       await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), 'node 2 has no access condition yet');
       expect(await enrolmentInT02(page)).toBe('Active');
+      await uninvolvedKeepsT02(page, 'precondition: the uninvolved person is in T02 through another path');
     });
 
     await test.step('M1: the author adds "Manual access" to node 2 and saves', async () => {
@@ -174,6 +196,7 @@ test.describe('ADELE-E2E-M — changing a path learners are already on', () => {
       expect(view, 'the message must no longer claim free access').not.toMatch(/Freely accessible/);
       await expectCourseClosedAfterTasks(page, fixtureCourse('T02'), 'the added condition must take access away');
       expect(await enrolmentInT02(page), 'suspend, not delete').toBe('Suspended');
+      await uninvolvedKeepsT02(page, 'a change to THIS path must not take T02 from somebody on another path');
     });
 
     await test.step('M2: the author removes the condition again and saves', async () => {
@@ -191,6 +214,7 @@ test.describe('ADELE-E2E-M — changing a path learners are already on', () => {
         .toMatch(/^accessible \| 1\/3 \| .*Freely accessible/);
       await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), 'without the condition the course must open again');
       expect(await enrolmentInT02(page), 'the suspended enrolment must be reactivated').toBe('Active');
+      await uninvolvedKeepsT02(page, 'and the uninvolved person was never touched');
     });
   });
 });

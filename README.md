@@ -219,3 +219,24 @@ without a time zone.
   its end (`start <= now < end`). This is the behaviour the old code showed
   in practice; it is now explicit.
 - **Display:** times are shown in the time zone of the person viewing them.
+
+## Tests: which layer proves what
+
+| Layer | Where | Proves |
+|---|---|---|
+| PHPUnit | `tests/` | the domain logic on the server: evaluation of conditions, time boundaries to the second, truth tables of combined criteria (`tests/usecases/uc21`–`uc23`), permissions, enrolments |
+| Jest | `vue3/tests/unit/` | how the Vue frontend reacts to every state the server can deliver: status codes, progress display, master and manual checkboxes, feedback texts and their joining, editor inputs - as data-driven matrices (`it.each`) |
+| Playwright smoke | `tests/playwright/` | a quick check on every push |
+| Playwright E2E | `tests/e2e/` | whole user stories across all three ADELE plugins on a real Moodle: roles, editor, real enrolment and course access, recompute, time on a test clock - started by hand (`e2e.yml`) |
+
+Jest renders what it is given; it never re-implements Moodle capabilities or
+server-side evaluation. A red Jest test points at the frontend; Playwright
+red with Jest green points at integration, backend, roles, recompute or
+enrolment. Neither replaces the other.
+
+Jest: `cd vue3 && npm ci && npm test` (with coverage; the gate in
+`jest.config.js` fails the run when coverage sinks below the baseline).
+Shared shapes for tests live in `vue3/tests/unit/fixtures/` (factories with
+explicit defaults, no product logic). Defects the matrices found are tests
+in `knownDefect(...)` (fixtures/knownDefect.js): skipped and visible as such
+until the defect is fixed; `ADELE_RUN_KNOWN_DEFECTS=1` runs them.

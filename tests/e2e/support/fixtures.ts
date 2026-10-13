@@ -35,6 +35,30 @@ export function fixture(name: string): string {
   return value;
 }
 
+/**
+ * The run this process belongs to: the GitHub run and attempt in CI
+ * (ADELE_E2E_RUN_ID, set by e2e.yml), otherwise the local start time.
+ */
+const RUN_ID = process.env.ADELE_E2E_RUN_ID || `local-${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '')}`;
+const labelsUsed = new Map<string, number>();
+
+/**
+ * A name for something a test creates: what it is, fixed, plus the run.
+ *
+ * Replaces Date.now() in titles (E2E issue, section 3B): the meaningful part
+ * stays the same from run to run and can be looked up in the report; the
+ * run id keeps two runs on one site apart, and a counter two uses of the
+ * same name within one run.
+ *
+ * @param name The fixed part, e.g. "E2 ODER".
+ * @returns E.g. "E2 ODER · run38168370644-1".
+ */
+export function runLabel(name: string): string {
+  const count = (labelsUsed.get(name) ?? 0) + 1;
+  labelsUsed.set(name, count);
+  return `${name} · ${RUN_ID}${count > 1 ? `-${count}` : ''}`;
+}
+
 /** The reference path of the plan (section 4): T01 -> T02 -> T03. */
 export const referencePath = {
   get id() { return fixture('ADELE_FIXTURE_PATH_LINEAR_A1'); },
@@ -243,6 +267,44 @@ export function setServerTime(epoch: number): void {
 }
 
 /**
+ * Seed the shipped fixtures again, on the real clock, and take over the
+ * variables the seed prints.
+ *
+ * The isolation the plan asks for (section 2; E2E issue, section 3B): every
+ * spec file starts from the seeded state, whatever ran before it - a chain
+ * that deleted the reference path (V2), renamed a path, released a node or
+ * moved the server clock to 2030 leaves nothing behind for the next file.
+ * That is what makes a file runnable alone, in any order, or with the rest.
+ *
+ * The seed re-imports what is missing and resets what exists; ids of things
+ * it re-creates change, so the new values replace the old ones in this
+ * process (every helper reads them through fixture()).
+ */
+export function reseedFixtures(): void {
+  resetServerTime();
+  const out = execFileSync('php', ['-d', 'max_input_vars=5000', 'local/adele/tests/playwright/seed_fixtures.php'], {
+    cwd: fixture('ADELE_MOODLE_ROOT'),
+    encoding: 'utf8',
+    // Without the test clock: the seed is the real starting point.
+    env: { ...process.env, ADELE_SEED_I_KNOW: '1' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  let seen = 0;
+  for (const line of out.split('\n')) {
+    const match = /^export ([A-Z_][A-Z0-9_]*)='(.*)'$/.exec(line.trim());
+    if (match) {
+      process.env[match[1]] = match[2];
+      seen++;
+    }
+  }
+  if (!seen) {
+    throw new Error('The fixture seed printed no variables - it did not run through.');
+  }
+  drainTaskQueue();
+}
+
+/**
  * Put the server back on the real time.
  */
 export function resetServerTime(): void {
@@ -434,13 +496,44 @@ export interface NodeTexts {
 }
 
 /**
+ * Bring the whole path into the visible part of its canvas, with the view's
+ * own "fit view" button - what a person does when a node lies outside.
+ *
+ * The canvas is a fixed frame on the page; scrolling the page does not move
+ * its content. A control on a node outside that frame can therefore not be
+ * clicked at all (measured: the information icon of node 1 sat under the
+ * page's navigation bar), and a real click is what the chains require.
+ *
+ * @param page The page showing a path in a vue-flow canvas.
+ */
+export async function fitPathView(page: Page): Promise<void> {
+  const fit = page.locator('.adele-fit-btn').first();
+  if (!(await fit.count())) {
+    return;
+  }
+  const pane = page.locator('.vue-flow__transformationpane').first();
+  const transform = async (): Promise<string> => (await pane.getAttribute('style')) || '';
+  const before = await transform();
+  await fit.click({ timeout: 15_000 });
+  // The fit animates; it may also find nothing to change.
+  await expect.poll(transform, { timeout: 2_000, intervals: [50] }).not.toBe(before).catch(() => undefined);
+  let last = '';
+  let same = 0;
+  await expect.poll(async () => {
+    const now = await transform();
+    same = now === last ? same + 1 : 0;
+    last = now;
+    return same;
+  }, { message: 'the canvas must come to rest after fitting', timeout: 10_000, intervals: [100] }).toBeGreaterThanOrEqual(2);
+}
+
+/**
  * Everything one node tells the learner: its state, the information card
  * (i symbol) and the feedback area (speech bubble), with white space
  * normalised.
  *
- * Both open only on a click on their icon, and the canvas may clip the icon -
- * so the click event is dispatched to it directly: same Vue handler, no
- * visible spot needed.
+ * Both open only on a click on their icon. A real click: an icon the canvas
+ * clips or covers makes the test red (E2E issue, section 3B).
  *
  * @param page The page, logged in as the learner.
  * @param hostcourse The course embedding the path.
@@ -451,12 +544,13 @@ export async function nodeTexts(page: Page, hostcourse: string, activityname: st
   const status = await nodeStatus(page, hostcourse, activityname, nodeid);
   const wrapper = page.locator(`.vue-flow__node[data-id="${nodeid}"]`);
   const squeeze = (text: string): string => text.replace(/\s+/g, ' ').trim();
-  await wrapper.locator('.information').first().dispatchEvent('click');
+  await fitPathView(page);
+  await wrapper.locator('.information').first().click({ timeout: 15_000 });
   const card = wrapper.locator('.additional-card');
   await expect(card, `${nodeid} must offer its information card`).toBeVisible({ timeout: 10_000 });
   const info = squeeze(await card.innerText());
   const bubble = wrapper.locator('.toggle-button').first();
-  await bubble.dispatchEvent('click');
+  await bubble.click({ timeout: 15_000 });
   const area = wrapper.locator('.selectable');
   await expect(area, `${nodeid} must offer its feedback area`).toBeVisible({ timeout: 10_000 });
   const feedback = squeeze(await area.innerText());
@@ -556,16 +650,18 @@ export async function setMasterCheckbox(
   await page.goto(`/course/view.php?id=${host}`);
   await page.getByRole('main').getByRole('link', { name: activity }).click();
   await page.locator('tr').filter({ hasText: learner }).first().getByRole('link').first().click();
+  await expect(page.locator(`[data-testid="learningpath-node-${nodes[0]}"]`)).toBeVisible({ timeout: 60_000 });
+  await fitPathView(page);
   for (const nodeid of nodes) {
     const node = page.locator(`[data-testid="learningpath-node-${nodeid}"]`);
     await expect(node).toBeVisible({ timeout: 60_000 });
     const checkbox = node.getByLabel(box);
     if (!(await checkbox.isVisible())) {
-      await node.getByRole('button', { name: 'Master checkboxes' }).dispatchEvent('click');
+      await node.getByRole('button', { name: 'Master checkboxes' }).click({ timeout: 15_000 });
     }
     await expect(checkbox, `the teacher must be offered the ${box} on ${nodeid}`).toBeVisible();
     if ((await checkbox.isChecked()) !== checked) {
-      await checkbox.dispatchEvent('click');
+      await checkbox.click({ timeout: 15_000 });
     }
     await expect(checkbox).toBeChecked({ checked });
   }

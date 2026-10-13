@@ -344,6 +344,24 @@ foreach ($imported as $name => $pathid) {
         'learning_path_id' => $pathid,
         'user_id' => $student->id,
     ]);
+    // Nobody else among the fixture learners may still be on this path from
+    // an earlier run. Found on the test site: the reference learner of
+    // Linear A1 was also on Linear A2 and on "Verzweigt gestapelt B1", with
+    // an active ADELE enrolment in T01 through Linear A2 - so access to T01
+    // could not end when T01 left Linear A1, and the withdrawal chain V2 was
+    // red for a reason outside the chain (session 006, part 56). Paths
+    // derived later in this script subscribe their own learners again.
+    foreach ($learners as $other) {
+        if ((int) $other->id === (int) $student->id) {
+            continue;
+        }
+        if ($DB->record_exists('local_adele_path_user', ['learning_path_id' => $pathid, 'user_id' => $other->id])) {
+            $DB->delete_records('local_adele_path_user', ['learning_path_id' => $pathid, 'user_id' => $other->id]);
+            if (class_exists('\\enrol_adele\\local\\reconciler')) {
+                \enrol_adele\local\reconciler::purge_user($pathid, $other->id);
+            }
+        }
+    }
     // So are the enrolments an earlier run produced: left in place, they
     // would let a chain see "access" that this run's reconciliation never
     // granted - the seed would anticipate the very effect under test
@@ -606,6 +624,48 @@ function local_adele_fixture_editor_texts(array $json): array {
 }
 
 /**
+ * A second person for a fixture path - the negative control of the plan
+ * (section 2 G): on the same path, through the same host course, but
+ * completing nothing. Starts clean like the path's own learner: no relation
+ * to the path, no ADELE enrolments from it, no completions in its courses.
+ *
+ * @param string $username The account (created if missing).
+ * @param string $lastname Its last name.
+ * @param string $password The fixture password.
+ * @param int $pathid The learning path.
+ * @return stdClass The person.
+ */
+function local_adele_fixture_negative_person(string $username, string $lastname, string $password, int $pathid): stdClass {
+    global $DB;
+    $person = local_adele_fixture_person($username, $lastname, $password);
+    $json = json_decode((string) $DB->get_field('local_adele_learning_paths', 'json', ['id' => $pathid]), true);
+    $courseids = [];
+    foreach ($json['tree']['nodes'] ?? [] as $node) {
+        foreach ((array) ($node['data']['course_node_id'] ?? []) as $courseid) {
+            $courseids[] = (int) $courseid;
+        }
+    }
+    foreach (array_unique($courseids) as $courseid) {
+        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'course = ?', [$courseid]);
+        if ($cmids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($cmids);
+            $DB->delete_records_select(
+                'course_modules_completion',
+                "userid = ? AND coursemoduleid {$insql}",
+                array_merge([$person->id], $inparams)
+            );
+        }
+        $DB->delete_records('course_completion_crit_compl', ['userid' => $person->id, 'course' => $courseid]);
+        $DB->delete_records('course_completions', ['userid' => $person->id, 'course' => $courseid]);
+    }
+    $DB->delete_records('local_adele_path_user', ['learning_path_id' => $pathid, 'user_id' => $person->id]);
+    if (class_exists('\\enrol_adele\\local\\reconciler')) {
+        \enrol_adele\local\reconciler::purge_user($pathid, $person->id);
+    }
+    return $person;
+}
+
+/**
  * A host course of its own for one fixture path: one mod_adele activity
  * (source "this course"), the learner as its only member. Activities from an
  * earlier run are removed first.
@@ -617,6 +677,8 @@ function local_adele_fixture_editor_texts(array $json): array {
  * @param int $category Course category.
  * @param int $userlist "Participant results": 1 all participants, 2 only own.
  * @param bool $completionrule Whether the activity completes when the learning path is finished.
+ * @param stdClass[] $others Further members, e.g. the negative control of a chain: on the
+ *                           same path through the same course, but doing nothing.
  * @return stdClass The host course.
  */
 function local_adele_fixture_host_course(
@@ -626,7 +688,8 @@ function local_adele_fixture_host_course(
     stdClass $learner,
     int $category,
     int $userlist = 1,
-    bool $completionrule = false
+    bool $completionrule = false,
+    array $others = []
 ): stdClass {
     global $DB;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
@@ -650,6 +713,9 @@ function local_adele_fixture_host_course(
     $roleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
     if ($manual && $instance && $roleid) {
         $manual->enrol_user($instance, $learner->id, $roleid);
+        foreach ($others as $other) {
+            $manual->enrol_user($instance, $other->id, $roleid);
+        }
     }
     local_adele_fixture_embed($course, $activityname, $pathid, $userlist, $completionrule);
     return $course;
@@ -815,7 +881,10 @@ function local_adele_fixture_store_path(
     }
     $DB->set_field('user', 'password', hash_internal_user_password($password), ['id' => $learner->id]);
     // Forget every completion in the path's courses: activity, criteria, course.
-    $courseids = [];
+    // And in every other fixture course (T01, T02, ...): a chain may extend
+    // the path by a course (Z1 adds T04), and that completion would otherwise
+    // be waiting for the next run, completed before anybody did anything.
+    $courseids = $DB->get_fieldset_select('course', 'id', $DB->sql_like('shortname', ':t'), ['t' => 'T__']);
     foreach ($base['tree']['nodes'] as $node) {
         foreach ((array) ($node['data']['course_node_id'] ?? []) as $courseid) {
             $courseids[] = (int) $courseid;
@@ -1435,8 +1504,13 @@ foreach ($imported as $pathid) {
 // E2EHOST4: source "starting node", mode hidden  (H3)
 // E2EHOST5: source "starting node", mode none    (H3)
 // E2EHOST6: sources "this course" + "starting node" combined (H2).
+// E2EHOST7: source "any course of the path", mode hidden (H3).
+// E2EHOST8: source "any course of the path", mode none   (H3).
+// E2EHOST9: two embeddings - another path for "this course", Linear A1 for
+// "starting node": the host enrolment ADELE creates for the second must not
+// subscribe anybody to the first (H2, #37).
 $extrahosts = [];
-foreach ([2, 3, 4, 5, 6] as $number) {
+foreach ([2, 3, 4, 5, 6, 7, 8, 9] as $number) {
     $shortname = 'E2EHOST' . $number;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
     if (!$course) {
@@ -1638,13 +1712,23 @@ if (
 // one shared host course would subscribe every member to every path.
 \core\session\manager::set_user(get_admin());
 $c1hosts = [];
+$c1negatives = [];
 foreach ($c1paths as $variant => [$pathid, $learner]) {
+    $c1negatives[$variant] = local_adele_fixture_negative_person(
+        'fx_c1_' . $variant . '_neg',
+        'Negative ' . $variant,
+        $fixturepassword,
+        $pathid
+    );
     $c1hosts[$variant] = local_adele_fixture_host_course(
         'E2EC1' . strtoupper($variant),
         'E2E C1 ' . $variant,
         $pathid,
         $learner,
-        (int) $options['category']
+        (int) $options['category'],
+        1,
+        false,
+        [$c1negatives[$variant]]
     );
 }
 $routehosts = [];
@@ -1961,6 +2045,7 @@ foreach ($c1paths as $variant => [$pathid, $learner]) {
     printf("export ADELE_FIXTURE_PATH_C1_%s='%d'\n", $key, $pathid);
     printf("export ADELE_FIXTURE_C1_%s_LEARNER='%s'\n", $key, $learner->username);
     printf("export ADELE_FIXTURE_C1_%s_HOST='%d'\n", $key, $c1hosts[$variant]->id);
+    printf("export ADELE_FIXTURE_C1_%s_NEGATIVE='%s'\n", $key, $c1negatives[$variant]->username);
 }
 foreach ($routepaths as $variant => [$pathid, $learner]) {
     $key = strtoupper($variant);

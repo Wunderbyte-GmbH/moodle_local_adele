@@ -40,7 +40,12 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 import { VIEWPORT, dropCourseAt, dropFirstCourse, storedPredecessorCriterion } from '../support/editor';
 
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -101,6 +106,10 @@ async function removePath(page: Page, title: string): Promise<void> {
 const edgeIds = (page: Page): Promise<string[]> =>
   page.locator('.vue-flow__edge').evaluateAll((els) => els.map((e) => e.getAttribute('data-id') || '').sort());
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-E2 — logical combinations by drag and drop', () => {
   test.use({ viewport: VIEWPORT });
 
@@ -110,7 +119,7 @@ test.describe('ADELE-E2E-E2 — logical combinations by drag and drop', () => {
   });
 
   test('A ODER B: the second course joins the node as an alternative', { tag: ['@story:E2'] }, async ({ page }) => {
-    const title = `E2 ODER ${Date.now()}`;
+    const title = runLabel('E2 ODER');
     await newPath(page, title);
     try {
       await dropFirstCourse(page, 'T01');
@@ -128,7 +137,7 @@ test.describe('ADELE-E2E-E2 — logical combinations by drag and drop', () => {
   });
 
   test('A UND B: a parallel node shares the successor', { tag: ['@story:E2'] }, async ({ page }) => {
-    const title = `E2 UND ${Date.now()}`;
+    const title = runLabel('E2 UND');
     await newPath(page, title);
     try {
       // T01 -> T03 first, so the successor exists when T02 joins in parallel.

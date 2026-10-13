@@ -36,7 +36,15 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  fixture,
+  fixturePassword,
+  referencePath,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 
 /** The path the assistant was made an editor of. */
 const editablePath = {
@@ -88,10 +96,14 @@ async function renameThroughEditor(page: Page, id: string, name: string): Promis
   await expect(rowOf(page, id).locator('h5').first()).toHaveText(name, { timeout: 30_000 });
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R2 — the manager administers paths they did not create', () => {
   test('the manager renames a path created by somebody else', { tag: ['@story:R2'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
-    const renamed = `Linear A1 vom Manager ${Date.now()}`;
+    const renamed = runLabel('Linear A1 vom Manager');
 
     await loginAs(page, manager, fixturePassword());
     await openOverview(page);
@@ -124,7 +136,7 @@ test.describe('ADELE-E2E-R2 — the manager administers paths they did not creat
 test.describe('ADELE-E2E-R4a — the collaborator edits only what they were given', () => {
   test('the assistant renames the path they are an editor of', { tag: ['@story:R4'] }, async ({ page }) => {
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
-    const renamed = `Linear A2 vom Assistenten ${Date.now()}`;
+    const renamed = runLabel('Linear A2 vom Assistenten');
 
     await loginAs(page, assistant, fixturePassword());
     await openOverview(page);

@@ -28,7 +28,11 @@
  * real access to the course.
  *
  * Each variant has a path, a learner and a host course of its own (seed),
- * so completing a course in one variant cannot open anything in another.
+ * so completing a course in one variant cannot open anything in another -
+ * and a second person on the same path who completes nothing, the negative
+ * control (plan section 2 G): what the learner unlocked must not reach them.
+ * The feedback names the predecessor that is still missing, and stops once
+ * nothing is.
  *
  * The fourth variant of the plan, "predecessor + time", is T4 and lives
  * with the time chain.
@@ -48,8 +52,11 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  nodeTexts,
+  reseedFixtures,
   runCompletion,
 } from '../support/fixtures';
+import { EN } from '../support/feedback';
 
 /**
  * Wait until the learner's path view shows the node in the given state,
@@ -71,12 +78,44 @@ async function expectNodeState(page: Page, variant: string, nodeid: string, stat
     .toBe(state);
 }
 
+/**
+ * What the learner reads on a node: the feedback text.
+ *
+ * @param page The page, logged in.
+ * @param variant SINGLE, ANY or ALL.
+ * @param nodeid The node.
+ */
+async function feedbackOf(page: Page, variant: string, nodeid: string): Promise<string> {
+  return (await nodeTexts(page, fixture(`ADELE_FIXTURE_C1_${variant}_HOST`), `E2E C1 ${variant.toLowerCase()}`, nodeid)).feedback;
+}
+
+/**
+ * The negative control of a variant: a second person on the same path,
+ * through the same host course, who completed nothing. Whatever the learner
+ * did must not have reached them.
+ *
+ * @param page The page.
+ * @param variant SINGLE, ANY or ALL.
+ * @param nodeid The node the learner unlocked.
+ * @param shortname Its course.
+ */
+async function negativeStaysLocked(page: Page, variant: string, nodeid: string, shortname: string): Promise<void> {
+  await loginAs(page, fixture(`ADELE_FIXTURE_C1_${variant}_NEGATIVE`), fixturePassword());
+  await expectNodeState(page, variant, nodeid, 'not_accessible', 'the other person on the path completed nothing');
+  await expectCourseClosed(page, fixtureCourse(shortname), 'the other person on the path completed nothing');
+}
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
   test('1 of 1: the successor opens once its predecessor is completed', { tag: ['@story:C1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_C1_SINGLE_LEARNER'), fixturePassword());
 
-    await test.step('before: T02 is shown locked and the course is closed', async () => {
+    await test.step('before: T02 is shown locked, its feedback names T01, the course is closed', async () => {
       await expectNodeState(page, 'SINGLE', 'dndnode_2', 'not_accessible', 'T02 must wait for T01');
+      expect(await feedbackOf(page, 'SINGLE', 'dndnode_2'), 'the missing predecessor is named').toContain('„Testkurs 01“');
       await expectCourseClosed(page, fixtureCourse('T02'), 'T01 is not completed yet');
     });
 
@@ -87,7 +126,12 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
     await test.step('after: T01 completed, T02 accessible and open', async () => {
       await expectNodeState(page, 'SINGLE', 'dndnode_1', 'completed', 'T01 has been completed');
       await expectNodeState(page, 'SINGLE', 'dndnode_2', 'accessible', 'its only predecessor is completed');
+      expect(await feedbackOf(page, 'SINGLE', 'dndnode_2'), 'nothing is missing any more').toContain(EN.unlocked);
       await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), 'T02 must open after T01');
+    });
+
+    await test.step('the other person on the path: still locked, still closed', async () => {
+      await negativeStaysLocked(page, 'SINGLE', 'dndnode_2', 'T02');
     });
   });
 
@@ -105,7 +149,12 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
 
     await test.step('after: T03 accessible and open', async () => {
       await expectNodeState(page, 'ANY', 'dndnode_3', 'accessible', 'one of two predecessors is enough');
+      expect(await feedbackOf(page, 'ANY', 'dndnode_3')).toContain(EN.unlocked);
       await expectCourseOpenAfterTasks(page, fixtureCourse('T03'), 'one of two predecessors is enough');
+    });
+
+    await test.step('the other person on the path: still locked, still closed', async () => {
+      await negativeStaysLocked(page, 'ANY', 'dndnode_3', 'T03');
     });
   });
 
@@ -119,6 +168,7 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
     await test.step('one of two: T03 stays locked', async () => {
       await expectNodeState(page, 'ALL', 'dndnode_1', 'completed', 'T01 has been completed');
       await expectNodeState(page, 'ALL', 'dndnode_3', 'not_accessible', 'both predecessors are required');
+      expect(await feedbackOf(page, 'ALL', 'dndnode_3'), 'the predecessor still missing is named').toContain('„Testkurs 02“');
       await expectCourseClosed(page, fixtureCourse('T03'), 'both predecessors are required');
     });
 
@@ -128,7 +178,12 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
 
     await test.step('two of two: T03 accessible and open', async () => {
       await expectNodeState(page, 'ALL', 'dndnode_3', 'accessible', 'both predecessors are completed');
+      expect(await feedbackOf(page, 'ALL', 'dndnode_3')).toContain(EN.unlocked);
       await expectCourseOpenAfterTasks(page, fixtureCourse('T03'), 'both predecessors are completed');
+    });
+
+    await test.step('the other person on the path: still locked, still closed', async () => {
+      await negativeStaysLocked(page, 'ALL', 'dndnode_3', 'T03');
     });
   });
 });

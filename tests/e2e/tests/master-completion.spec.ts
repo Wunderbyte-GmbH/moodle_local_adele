@@ -49,6 +49,7 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   setMasterCheckbox,
 } from '../support/fixtures';
 
@@ -108,6 +109,10 @@ async function enrolmentInT02(page: Page): Promise<string> {
   await loginAs(page, env.adminUser, env.adminPassword);
   return enrolmentStatus(page, fixtureCourse('T02'), LASTNAME);
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-L4/O3 — master completion, set and removed', () => {
   test('regular -> node 1 -> whole path -> removed', { tag: ['@story:L4', '@story:O3'] }, async ({ page }) => {

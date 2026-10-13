@@ -26,7 +26,17 @@
  * Checked per learner: node 1 in the path view, real access to T02, and the
  * progress on the route (0/3 or 1/3 = 33.33 %). Feedback texts: chain F.
  *
- * Needs the catquiz ecosystem (Moodle 4.5 line); skipped loudly without it.
+ * A CONTRACT test, labelled as such in its title (E2E issue, section 2, D):
+ * the CAT result is written as a signal - a real adaptivequiz attempt row,
+ * the catquiz result and the completion event - not produced by a learner
+ * answering questions in the browser. What it proves is ADELE's side: from
+ * the moment catquiz reports an ability, the route, the access and the
+ * progress follow the threshold. A browser journey through a real CAT test
+ * is not part of this file.
+ *
+ * Needs the catquiz ecosystem (Moodle 4.5 line); skipped loudly without it -
+ * and a skip makes the story coverage check fail, so a run without catquiz
+ * is never a complete run.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -45,6 +55,7 @@ import {
   fixturePassword,
   hasCatquiz,
   nodeStatus,
+  reseedFixtures,
 } from '../support/fixtures';
 
 /**
@@ -66,7 +77,11 @@ async function learnerView(page: Page, key: string): Promise<string> {
   return `${status} ${route} ${percent}`;
 }
 
-test.describe('ADELE-E2E-D — a CAT result decides the route at the threshold', () => {
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
+test.describe('ADELE-E2E-D — a CAT result decides the route at the threshold [contract test: injected CAT signal, no CAT journey]', () => {
   test.skip(!hasCatquiz(), 'needs the catquiz ecosystem (seed creates chain D only where it is installed)');
 
   const x = (): number => Number(fixture('ADELE_FIXTURE_D_THRESHOLD'));

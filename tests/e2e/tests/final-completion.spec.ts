@@ -49,13 +49,18 @@ import {
   completeCourse,
   completionReport,
   drainTaskQueue,
+  fitPathView,
   fixture,
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   runCompletion,
+  saveLearningPath,
   setMasterCheckbox,
 } from '../support/fixtures';
+import { dropCourseAt, VIEWPORT } from '../support/editor';
+import { app, openEditor, openOverview } from '../support/paths';
 
 const TODO = 'To do | To do: Finish the learning path';
 const DONE = 'Done | Done: Finish the learning path';
@@ -139,14 +144,16 @@ async function setManualCompletion(page: Page, story: Story, nodes: string[], co
   await page.goto(`/course/view.php?id=${hostOf(story)}`);
   await page.getByRole('main').getByRole('link', { name: activityOf(story) }).click();
   await page.locator('tr').filter({ hasText: story.lastname }).first().getByRole('link').first().click();
+  await expect(page.locator(`[data-testid="learningpath-node-${nodes[0]}"]`)).toBeVisible({ timeout: 60_000 });
+  await fitPathView(page);
   for (const nodeid of nodes) {
     const node = page.locator(`[data-testid="learningpath-node-${nodeid}"]`);
     await expect(node).toBeVisible({ timeout: 60_000 });
     const box = node.getByLabel('Finish node manually');
     await expect(box, `the teacher must be offered the manual completion on ${nodeid}`).toBeVisible();
     if ((await box.isChecked()) !== completed) {
-      // The canvas may clip a node's controls; same handler, no visible spot needed.
-      await box.dispatchEvent('click');
+      // A real click: a clipped or covered control makes the test red.
+      await box.click({ timeout: 15_000 });
     }
     await expect(box).toBeChecked({ checked: completed });
   }
@@ -155,7 +162,14 @@ async function setManualCompletion(page: Page, story: Story, nodes: string[], co
   drainTaskQueue();
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-Z — the path is finished, the activity is completed', () => {
+  // Tall enough for the editor's canvas (Z1 extends its path by drag and drop).
+  test.use({ viewport: VIEWPORT });
+
   test('Z1: regular completion', { tag: ['@story:Z1'] }, async ({ page }) => {
     const story: Story = { key: 'Z1', lastname: 'Final regular', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
 
@@ -172,6 +186,26 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
       await completeCourses(page, story, ['T03']);
       await expectState(page, story, 'completed completed completed | 3/3 | 100', true, 'three of three');
     });
+
+    const longer: Story = { ...story, nodes: [...story.nodes, 'dndnode_4'] };
+    await test.step('the author adds T04 behind T03: recomputed, the path is not finished any more', async () => {
+      await loginAs(page, env.adminUser, env.adminPassword);
+      await openOverview(page);
+      const row = app(page).locator('[data-testid^="learningpath-row-"]')
+        .filter({ has: page.locator('h5', { hasText: /^\s*E2E Abschluss regulär\s*$/ }) });
+      await expect(row).toHaveCount(1, { timeout: 30_000 });
+      const lpid = ((await row.getAttribute('data-testid')) || '').replace('learningpath-row-', '');
+      await openEditor(page, lpid);
+      await dropCourseAt(page, 'T04', 'dndnode_3', 'child');
+      await expect(app(page).locator('[data-testid="learningpath-node-dndnode_4"]')).toContainText('Testkurs 04');
+      await saveLearningPath(page, app(page).locator('[data-testid="learningpath-save"]'));
+      await expectState(page, longer, 'completed completed completed accessible | 3/4 | 75', false, 'a fourth step was added');
+    });
+
+    await test.step('T04 completed as well: 100 % and completed again', async () => {
+      await completeCourses(page, longer, ['T04']);
+      await expectState(page, longer, 'completed completed completed completed | 4/4 | 100', true, 'four of four');
+    });
   });
 
   test('Z2: alternative route - the branch not taken does not stand in the way', { tag: ['@story:Z2'] }, async ({ page }) => {
@@ -180,6 +214,10 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
       lastname: 'Final route',
       nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3', 'dndnode_4'],
     };
+
+    await test.step('at the start: nothing completed, the activity not either', async () => {
+      await expectState(page, story, 'accessible not_accessible not_accessible not_accessible | 0/3 | 0', false, 'start');
+    });
 
     await test.step('T01 and T02 completed, T03 never visited: T04 is open, the path is not finished', async () => {
       await completeCourses(page, story, ['T01', 'T02']);
@@ -194,6 +232,10 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
 
   test('Z3: manual completion', { tag: ['@story:Z3'] }, async ({ page }) => {
     const story: Story = { key: 'Z3', lastname: 'Final manual', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
+
+    await test.step('at the start: nothing completed', async () => {
+      await expectState(page, story, 'accessible not_accessible not_accessible | 0/3 | 0', false, 'start');
+    });
 
     await test.step('two nodes completed manually: not finished', async () => {
       await setManualCompletion(page, story, ['dndnode_1', 'dndnode_2'], true);
@@ -218,6 +260,10 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
       await setMasterCheckbox(page, hostOf(story), activityOf(story), story.lastname, nodes,
         'Master completion checkbox', on);
     };
+
+    await test.step('at the start: nothing completed', async () => {
+      await expectState(page, story, 'accessible not_accessible not_accessible | 0/3 | 0', false, 'start');
+    });
 
     await test.step('master completion on two nodes: not finished', async () => {
       await master(['dndnode_1', 'dndnode_2'], true);

@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStatusMessage } from '../../../composables/useStatusMessage';
 
 // Helper: wrap a plain completion.feedback object in the shape the composable
@@ -115,5 +115,86 @@ describe('useStatusMessage', () => {
     const { statusMessage } = useStatusMessage(data);
     // completion buckets are all undefined -> "Status 0" branch.
     expect(statusMessage.value).toBe('0');
+  });
+});
+
+// The documented table of status codes (Jest issue, area A1), row by row -
+// with the input, the restriction state and the expectation in the name, so
+// a red row says which one.
+describe('useStatusMessage - the status table', () => {
+  const rows = [
+    // restriction, before, inbetween, after, after_all, expected
+    ['before', null, null, null, null, '0'],
+    ['before', ['x'], [], [], null, 'a1'],
+    ['before', [], ['x'], [], null, 'a1'],
+    ['before', ['x'], [], null, null, 'a1'],
+    ['inbetween', ['x'], [], [], null, 'a2'],
+    ['inbetween', [], ['x'], [], null, 'a2'],
+    ['inbetween', null, null, ['done'], { dndnode_2: 'next' }, 'b'],
+    ['inbetween', null, null, ['done'], {}, 'c'],
+    ['inbetween', null, null, ['done'], [], 'c'],
+    ['after', null, null, ['done'], ['next'], 'd'],
+    ['after', null, null, ['done'], { dndnode_2: 'next' }, 'd'],
+    ['after', null, null, ['done'], [], 'e'],
+    ['after', [], null, [], null, 'f'],
+    ['after', ['x'], null, null, [], 'f'],
+  ];
+  it.each(rows)(
+    'restriction=%s before=%j inbetween=%j after=%j after_all=%j -> "%s"',
+    (restriction, before, inbetween, after, afterall, expected) => {
+      expect(resolve({
+        status_restriction: restriction,
+        completion: { before, inbetween, after, after_all: afterall },
+      })).toBe(expected);
+    }
+  );
+});
+
+describe('useStatusMessage - partial and missing data', () => {
+  it.each([
+    ['data itself is null', null],
+    ['data itself is undefined', undefined],
+    ['no completion', {}],
+    ['no feedback', { completion: {} }],
+    ['feedback without completion buckets', { completion: { feedback: { status_restriction: 'after' } } }],
+  ])('%s: "0", no exception', (_label, value) => {
+    const data = computed(() => value);
+    const { statusMessage } = useStatusMessage(data);
+    expect(() => statusMessage.value).not.toThrow();
+    expect(statusMessage.value).toBe('0');
+  });
+
+  it.each([
+    ['an unknown restriction state', 'somewhere'],
+    ['a missing restriction state', undefined],
+  ])('%s with buckets set: "" (no code is guessed)', (_label, restriction) => {
+    expect(resolve({ status_restriction: restriction, completion: { before: ['x'], after: [] } })).toBe('');
+  });
+
+  it('"inbetween" with buckets present but all empty: no code (undefined), no exception', () => {
+    expect(resolve({ status_restriction: 'inbetween', completion: { before: [], inbetween: [], after: [] } })).toBeUndefined();
+  });
+
+  it('"before" with buckets present but all empty: no code (undefined), no exception', () => {
+    // The composable finds no row for this case and returns nothing; pinned
+    // as it is, not invented.
+    expect(resolve({ status_restriction: 'before', completion: { before: [], inbetween: [], after: [] } })).toBeUndefined();
+  });
+});
+
+describe('useStatusMessage - reactive', () => {
+  it('follows the data through a whole life cycle: 0 -> a1 -> a2 -> c -> d', () => {
+    const data = ref({ completion: { feedback: { status_restriction: 'before', completion: { before: null, inbetween: null, after: null, after_all: null } } } });
+    const { statusMessage } = useStatusMessage(data);
+    expect(statusMessage.value).toBe('0');
+    data.value = { completion: { feedback: { status_restriction: 'before', completion: { before: ['x'], after: [] } } } };
+    expect(statusMessage.value).toBe('a1');
+    data.value.completion.feedback.status_restriction = 'inbetween';
+    expect(statusMessage.value).toBe('a2');
+    data.value.completion.feedback.completion = { after: ['done'], after_all: {} };
+    expect(statusMessage.value).toBe('c');
+    data.value.completion.feedback.status_restriction = 'after';
+    data.value.completion.feedback.completion.after_all = ['next'];
+    expect(statusMessage.value).toBe('d');
   });
 });

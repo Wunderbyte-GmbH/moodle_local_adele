@@ -1,0 +1,53 @@
+# Jest: the Vue frontend's unit tests, with their report and coverage as an
+# artefact (Jest issue, "CI": "Testreport und lcov sollen als CI-Artefakte
+# verfügbar sein").
+#
+# The same suite also runs inside "Moodle Plugin CI" (custom_steps), where it
+# fails the job - that gate stays. Its reusable workflow cannot upload files,
+# which is why this job exists: a red test or a coverage below the gate in
+# vue3/jest.config.js fails here too, and either way the report is kept.
+name: Jest
+
+"on": [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  jest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the plugin
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install the dependencies
+        working-directory: vue3
+        run: |
+          # Same flags as in Moodle Plugin CI, so both runs test the same tree.
+          npm install --force
+          npm install --save-dev @babel/plugin-syntax-dynamic-import --force
+
+      - name: Run the tests with coverage
+        working-directory: vue3
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: npm test -- --ci 2>&1 | tee jest-run.log; exit "${PIPESTATUS[0]}"
+
+      - name: Keep the report and the coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            vue3/test-report.html
+            vue3/jest-run.log
+            vue3/coverage/lcov.info
+            vue3/coverage/lcov-report
+          if-no-files-found: warn
+          retention-days: 30

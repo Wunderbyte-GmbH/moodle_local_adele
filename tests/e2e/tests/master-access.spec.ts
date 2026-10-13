@@ -46,6 +46,7 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  reseedFixtures,
   runCompletion,
   setMasterCheckbox,
 } from '../support/fixtures';
@@ -100,6 +101,10 @@ async function expectLearnerSees(page: Page, key: string, lastname: string, expe
   await expect.poll(() => learnerView(page, key, lastname), { message: why, timeout: 90_000, intervals: [2_000, 5_000] })
     .toBe(expected);
 }
+
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-O2 — master access opens a node, it never completes it', () => {
   test('variants 1-4: condition false/true, master off/on', { tag: ['@story:O2'] }, async ({ page }) => {

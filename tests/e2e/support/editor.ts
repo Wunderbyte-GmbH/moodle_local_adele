@@ -46,6 +46,7 @@
 import { execFileSync } from 'node:child_process';
 import { expect, Locator, Page } from '@playwright/test';
 import { fixture } from './fixtures';
+import { editorPause, POINTER_REST_MS, POINTER_STEP_MS, viewportAtRest, viewportMoved, viewportTransform } from './timing';
 
 /** A viewport in which the whole editor canvas fits without scrolling. */
 export const VIEWPORT = { width: 1920, height: 1800 };
@@ -176,7 +177,7 @@ export async function dragOverNode(page: Page, target: string, nudge = 0): Promi
     position: { x: dst!.x + dst!.width / 2 - area!.x + nudge, y: dst!.y + dst!.height / 2 - area!.y },
     force: true,
   });
-  await page.waitForTimeout(300);
+  await editorPause(page, POINTER_REST_MS);
 }
 
 /**
@@ -208,7 +209,7 @@ export async function dragOntoZone(page: Page, zone: DropZone): Promise<boolean>
         });
       }
     }
-    await page.waitForTimeout(250);
+    await editorPause(page, POINTER_REST_MS);
     // With a timeout of its own: a zone that has gone would otherwise be
     // waited for until the test's time is up.
     hit = HIT.test(await zoneLocator.first().innerText({ timeout: 1_000 }).catch(() => ''));
@@ -261,10 +262,10 @@ export async function leadOntoZone(page: Page, node: string, zone: DropZone, ste
       force: true,
     });
     // Longer than the 100 ms in which the editor looks at the pointer once.
-    await page.waitForTimeout(140);
+    await editorPause(page, POINTER_STEP_MS);
   }
   await pane(page).hover({ position: { x: end.x - area.x + 1, y: end.y - area.y }, force: true });
-  await page.waitForTimeout(300);
+  await editorPause(page, POINTER_REST_MS);
   return HIT.test(await zoneLocator.first().innerText({ timeout: 1_000 }).catch(() => ''));
 }
 
@@ -296,17 +297,24 @@ export async function abandonDrag(page: Page, shortname: string): Promise<void> 
 export async function fitCanvas(page: Page): Promise<void> {
   const fit = app(page).locator('.adele-fit-btn');
   if (await fit.count()) {
+    const before = await viewportTransform(app(page));
     await fit.first().click();
-    await page.waitForTimeout(600);
+    // The fit animates (400 ms); it may also find nothing to change.
+    await viewportMoved(app(page), before, 1_000);
+    await viewportAtRest(app(page));
   }
-  const slider = app(page).locator('input.adele-zoom-slider');
+  const slider = app(page).locator('input.adele-zoom-slider').first();
   if (await slider.count()) {
-    await slider.first().evaluate((el: HTMLInputElement) => {
-      const next = Math.max(0.05, parseFloat(el.value) * 0.6);
-      el.value = String(next);
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-    await page.waitForTimeout(300);
+    // By keyboard, as a person would operate the slider: one arrow press is
+    // one step (0.01). The label beside it shows the zoom the editor applied.
+    const value = parseFloat(await slider.inputValue());
+    const target = Math.max(0.05, Math.round(value * 0.6 * 100) / 100);
+    await slider.focus();
+    for (let step = Math.round((value - target) * 100); step > 0; step--) {
+      await slider.press('ArrowLeft');
+    }
+    await expect(app(page).locator('.adele-zoom-label').first()).toHaveText(`${Math.round(target * 100)}%`);
+    await viewportAtRest(app(page));
   }
 }
 
@@ -327,16 +335,14 @@ async function settledSidebarCourse(page: Page, shortname: string): Promise<{ so
   const source = sidebarCourse(page, shortname);
   await expect(source).toBeVisible({ timeout: 30_000 });
   let previous = '';
-  for (let attempt = 0; attempt < 20; attempt++) {
+  await expect.poll(async () => {
     const count = await page.locator('[data-draggable]').count();
     const box = await source.boundingBox();
     const now = `${count}:${box ? [box.x, box.y, box.width, box.height].map(Math.round).join(',') : '-'}`;
-    if (now === previous) {
-      break;
-    }
+    const settled = now === previous;
     previous = now;
-    await page.waitForTimeout(300);
-  }
+    return settled;
+  }, { message: `the sidebar entry ${shortname} must stop moving`, timeout: 10_000, intervals: [300] }).toBe(true);
   const label = ((await source.innerText()) || '').split('\n')[0].trim();
   return { source, label };
 }

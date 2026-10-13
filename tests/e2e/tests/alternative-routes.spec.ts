@@ -31,7 +31,9 @@
  * both routes here have three nodes, so 1/3, 2/3 and 3/3 are 33.33, 66.67
  * and 100 %.
  *
- * Feedback texts belong to chain F.
+ * Feedback texts belong to chain F; here only that T04 names the
+ * alternatives while it is locked. Every state is read once more in a new
+ * session: the route counted must not depend on the session.
  *
  * @copyright   2026 Wunderbyte GmbH
  * @copyright   2026 Ralf Erlebach
@@ -48,6 +50,8 @@ import {
   fixtureCourse,
   fixturePassword,
   nodeStatus,
+  nodeTexts,
+  reseedFixtures,
   runCompletion,
 } from '../support/fixtures';
 
@@ -105,6 +109,10 @@ async function expectT04(page: Page, variant: string, state: string, why: string
     .toBe(state);
 }
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-A — alternative routes', () => {
   for (const [variant, alternatives] of [['T02', ['T02']], ['T03', ['T03']], ['BOTH', ['T02', 'T03']]] as const) {
     test(`${variant.toLowerCase()}: T04 opens, and the route completes without the other alternative`, { tag: ['@story:A', '@story:L2'] }, async ({ page }) => {
@@ -132,6 +140,20 @@ test.describe('ADELE-E2E-A — alternative routes', () => {
           'the alternative not taken must not count as required'
         );
       });
+
+      if (alternatives.length === 1) {
+        await test.step('the alternative not taken stays what it was: not completed', async () => {
+          const other = alternatives[0] === 'T02' ? 'dndnode_3' : 'dndnode_2';
+          expect(await nodeStatus(page, fixture(`ADELE_FIXTURE_A_${variant}_HOST`), `E2E A ${variant.toLowerCase()}`, other),
+            'nothing was done there, and the route does not pretend otherwise').not.toBe('completed');
+        });
+      }
+
+      await test.step('a new session: the route chosen is still the one counted', async () => {
+        await loginAs(page, fixture(`ADELE_FIXTURE_A_${variant}_LEARNER`), fixturePassword());
+        await expectProgress(page, variant, '3/3', '100', 'recomputed for a new session, the same route');
+        await expectCourseOpenAfterTasks(page, fixtureCourse('T04'), 'T04 stays open');
+      });
     });
   }
 
@@ -141,5 +163,13 @@ test.describe('ADELE-E2E-A — alternative routes', () => {
     await expectT04(page, 'NONE', 'not_accessible', 'neither alternative is completed');
     await expectCourseClosed(page, fixtureCourse('T04'), 'neither alternative is completed');
     await expectProgress(page, 'NONE', '1/3', '33.33', 'one of three nodes on the best route');
+    const feedback = (await nodeTexts(page, fixture('ADELE_FIXTURE_A_NONE_HOST'), 'E2E A none', 'dndnode_4')).feedback;
+    expect(feedback, 'T04 names the alternatives that would open it').toContain('Testkurs 02');
+    expect(feedback).toContain('Testkurs 03');
+
+    // And in a new session nothing has changed by itself.
+    await loginAs(page, fixture('ADELE_FIXTURE_A_NONE_LEARNER'), fixturePassword());
+    await expectT04(page, 'NONE', 'not_accessible', 'still neither alternative');
+    await expectCourseClosed(page, fixtureCourse('T04'), 'still neither alternative');
   });
 });

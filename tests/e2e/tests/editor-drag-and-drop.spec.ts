@@ -34,7 +34,14 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
-import { fixture, fixturePassword, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  fixture,
+  fixturePassword,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 import {
   VIEWPORT, abandonDrag, dragOntoZone, dragOverNode, dropCourseAt, dropFirstCourse, startDrag, zonesAround,
 } from '../support/editor';
@@ -51,13 +58,17 @@ const cardTitled = (page: Page, title: string): Locator =>
   app(page).locator('[data-testid^="learningpath-row-"]')
     .filter({ has: page.locator('h5', { hasText: title }) });
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => {
   // Tall enough for the whole canvas: a scroll in the middle of a drag moves
   // every target the pointer is aiming at.
   test.use({ viewport: VIEWPORT });
 
   test('the reference path T01 -> T02 -> T03 is built by drag and drop alone', { tag: ['@story:E1'] }, async ({ page }) => {
-    const title = `E1 Referenzpfad ${Date.now()}`;
+    const title = runLabel('E1 Referenzpfad');
     page.on('dialog', (dialog) => dialog.accept());
     await loginAs(page, env.adminUser, env.adminPassword);
 
@@ -194,7 +205,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
   });
 
   test('a course dropped into the editor is still there after reopening', { tag: ['@story:E1'] }, async ({ page }) => {
-    const title = `E1 Drag und Drop ${Date.now()}`;
+    const title = runLabel('E1 Drag und Drop');
 
     // Deleting a node asks through the browser's own confirm(); accepted
     // here so the cleanup at the end cannot hang on it.

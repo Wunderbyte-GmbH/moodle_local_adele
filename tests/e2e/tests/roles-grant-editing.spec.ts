@@ -40,7 +40,15 @@
 
 import { test, expect, Page, Locator } from '@playwright/test';
 import { loginAs } from '../support/env';
-import { fixture, fixturePassword, referencePath, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
+import {
+  fixture,
+  fixturePassword,
+  referencePath,
+  reseedFixtures,
+  runLabel,
+  saveLearningPath,
+  waitForEditorLoaded,
+} from '../support/fixtures';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -79,12 +87,16 @@ const editorSearch = (page: Page): Locator => app(page).locator('input.user-sear
 /** The cards of the people who may edit this path. */
 const editorCards = (page: Page): Locator => app(page).locator('.card-user');
 
+// Every file starts from the seeded state, whatever ran before it
+// (support/fixtures: reseedFixtures; E2E issue, section 3B).
+test.beforeAll(() => reseedFixtures());
+
 test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back', () => {
   test('granting lets the assistant edit, revoking stops them again', { tag: ['@story:R4'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
-    const renamed = `Linear A1 vom Assistenten ${Date.now()}`;
+    const renamed = runLabel('Linear A1 vom Assistenten');
 
     await test.step('precondition: the assistant may not edit this path', async () => {
       await loginAs(page, assistant, fixturePassword());
