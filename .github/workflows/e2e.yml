@@ -286,6 +286,15 @@ jobs:
           echo "ADELE_FAKETIME_LIB=$lib" >> "$GITHUB_ENV"
           echo "ADELE_FAKETIME_FILE=$RUNNER_TEMP/adele-faketime.rc" >> "$GITHUB_ENV"
 
+      - name: Check that no test exists twice
+        run: |
+          # A renamed spec whose old copy stayed in the repository runs an
+          # outdated second version of the same tests (support/unique-tests.mjs).
+          # Reported here, before the suite, with the files to delete.
+          cd "$MOODLE_WEBROOT/$PLUGIN/adele/tests/e2e"
+          npx playwright test --list --reporter=json > "$RUNNER_TEMP/test-list.json"
+          node support/unique-tests.mjs "$RUNNER_TEMP/test-list.json"
+
       - name: Run the E2E suite
         run: |
           # GitHub runs this block with "bash -e"; a red suite must not end
