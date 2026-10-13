@@ -51,6 +51,18 @@
   const toggleCard = () => {
     showCard.value = !showCard.value
   }
+  // The i symbol is a button with a name and a state, so that the card opens
+  // without a mouse (#591); Escape closes. Its click bubbles to the container,
+  // which toggles - the card itself stays clickable as before.
+  const closeCard = () => {
+    showCard.value = false
+  }
+  const cardId = computed(() => 'adele-course-information-' + props.courses.id)
+  const toggleLabel = computed(() => {
+    const what = store.state.strings.a11y_node_information || ''
+    const course = props.courses[0] && (props.courses[0].givenname || props.courses[0].fullname)
+    return course ? what + ': ' + course : what
+  })
   // Keep original card background
   const backgroundColor = computed(() => store.state.strings.LIGHT_GRAY)
 
@@ -91,17 +103,28 @@
     class="icon-container "
     :class="{ 'card-hover': showCard, [courses.id + '_node_info_listener']: true}"
     @click="toggleCard()"
+    @keydown.esc="closeCard"
   >
     <div>
-      <div
+      <button
+        type="button"
         class="information"
         :style="{ backgroundColor: iconBackgroundColor }"
+        :aria-label="toggleLabel"
+        :aria-expanded="showCard ? 'true' : 'false'"
+        :aria-controls="cardId"
+        @keydown.enter.stop
+        @keydown.space.stop
       >
-        <i :class="['fas', iconClass]" />
-      </div>
+        <i
+          :class="['fas', iconClass]"
+          aria-hidden="true"
+        />
+      </button>
       <transition name="unfold">
         <div
           v-if="showCard"
+          :id="cardId"
           class="additional-card"
           :style="{ backgroundColor: backgroundColor}"
         >
@@ -172,6 +195,8 @@
 }
 
 .information {
+  cursor: pointer;
+  padding: 0;
   display: inline-flex;
   justify-content: center;
   align-items: center;

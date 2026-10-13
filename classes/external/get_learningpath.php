@@ -109,7 +109,7 @@ class get_learningpath extends external_api {
         if (
             !$issubscribed
             && !isset($learningpaths[$params['learningpathid']])
-            && !has_capability('local/adele:teacheredit', $context)
+            && !learning_paths::can_view_participants($context)
             && !learning_paths::check_access()
         ) {
             throw new required_capability_exception($context, 'local/adele:canmanage', 'nopermissions', 'error');

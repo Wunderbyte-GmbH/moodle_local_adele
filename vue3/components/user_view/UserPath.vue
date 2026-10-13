@@ -63,7 +63,30 @@
             </ul>
           </div>
         </div>
+        <!--
+          The learner's graph is the one that most needs a linear equivalent:
+          it carries the order of the courses and the conditions between them,
+          and neither survives being read out node by node (#575 B3, way B).
+        -->
+        <div class="d-flex justify-content-end mt-2">
+          <button
+            type="button"
+            class="btn btn-link"
+            :aria-pressed="showOutline ? 'true' : 'false'"
+            data-testid="learningpath-outline-toggle"
+            @click="toggleOutline"
+          >
+            {{ showOutline ? store.state.strings.outline_hide : store.state.strings.outline_show }}
+          </button>
+        </div>
+
+        <LearningPathOutline
+          v-if="showOutline"
+          :learningpath="user_learningpath"
+        />
+
         <div
+          v-show="!showOutline"
           ref="flowContainer"
           class="adele-flow-container"
           @wheel="onWheel($event, zoomLockVaraible, viewport, zoomTo)"
@@ -168,6 +191,7 @@ import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import Controls from '../user_view/UserControls.vue'
 import drawModules from '../../composables/nodesHelper/drawModules'
+import LearningPathOutline from '../flowchart/LearningPathOutline.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick';
 import onWheel from '../../composables/flowHelper/onWheel';
 import ExpandedCourses from '../nodes_items/ExpandedCourses.vue';
@@ -342,6 +366,20 @@ const edges = ref([]);
 const zoomstep = ref(0)
 const zoomLockVaraible = ref(false)
 const user_learningpath = ref({})
+
+// Graph or list. The graph stays the default; the list is the equivalent
+// alternative, reachable by one button (#575 B3).
+const showOutline = ref(false)
+
+/**
+ * Switch the presentation and say which one is now shown (#575 B4).
+ */
+const toggleOutline = () => {
+  showOutline.value = !showOutline.value
+  store.commit('announce', showOutline.value
+    ? store.state.strings.outline_title
+    : store.state.strings.outline_graph_shown)
+}
 
 onMounted( async () => {
   if (!store.state.availablecourses) {

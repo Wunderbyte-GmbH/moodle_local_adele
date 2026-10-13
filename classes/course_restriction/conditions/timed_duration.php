@@ -27,7 +27,7 @@
 
  namespace local_adele\course_restriction\conditions;
 
-use DateTime;
+use local_adele\helper\time_value;
 use local_adele\course_restriction\course_restriction;
 
 defined('MOODLE_INTERNAL') || die();
@@ -136,67 +136,65 @@ class timed_duration implements course_restriction {
      */
     public function get_restriction_status($node, $userpath) {
         $timed = [];
-        $currenttime = new DateTime();
-        $currenttime->setTimestamp(time());
         if (isset($node['restriction']) && isset($node['restriction']['nodes'])) {
+            // One reading of the clock for every condition of this node.
+            $now = \core\di::get(\core\clock::class)->time();
+            $userid = isset($userpath->user_id) ? (int) $userpath->user_id : null;
             foreach ($node['restriction']['nodes'] as $restrictionnode) {
                 if (isset($restrictionnode['data']['label']) && $restrictionnode['data']['label'] == 'timed_duration') {
-                    $iscurrenttimeinrange = false;
-                    $starttime = new DateTime();
-                    $endtime = null;
-                    $durationvalue = '';
-                    $selectedduration = '';
-                    if (isset($restrictionnode['data']['value']['selectedOption'])) {
-                        if ($restrictionnode['data']['value']['selectedOption'] == '1') {
+                    $value = $restrictionnode['data']['value'] ?? [];
+                    $durationvalue = $value['durationValue'] ?? '';
+                    $selectedduration = $value['selectedDuration'] ?? '';
+
+                    // Where the window starts: at the first enrolment into the
+                    // node, or when the user path was created. A missing first
+                    // enrolment leaves a message instead of a time.
+                    $start = null;
+                    $startmessage = null;
+                    if (isset($value['selectedOption'])) {
+                        if ($value['selectedOption'] == '1') {
                             if (isset($node['data']['first_enrolled'])) {
-                                $starttime->setTimestamp($node['data']['first_enrolled']);
+                                $start = (int) $node['data']['first_enrolled'];
                             } else {
-                                $starttime = get_string('course_condition_timed_duration_start', 'local_adele');
+                                $startmessage = get_string('course_condition_timed_duration_start', 'local_adele');
                             }
                         } else {
-                            $starttime->setTimestamp($userpath->timecreated);
-                        }
-                        $durationvalue = $restrictionnode['data']['value']['durationValue'];
-                        $selectedduration = $restrictionnode['data']['value']['selectedDuration'];
-                        // Check if the duration type is valid and calculate the end time.
-                        if (
-                            isset(self::DURATION_SECONDS[$durationvalue]) &&
-                            !is_string($starttime)
-                        ) {
-                            $totalseconds = self::DURATION_SECONDS[$durationvalue] * $selectedduration;
-                            $endtime = clone $starttime;
-                            $endtime->modify("+{$totalseconds} seconds");
-                            // Check if the current timestamp is between the start and end timestamps.
-                            $iscurrenttimeinrange = $currenttime >= $starttime && $currenttime <= $endtime;
-                            $isafterrange = $currenttime > $endtime;
-                            $isbeforerange = $currenttime < $starttime;
+                            $start = (int) ($userpath->timecreated ?? 0);
                         }
                     }
-                    if ($endtime) {
-                        $endtime = $endtime->format('d.m.Y H:i');
+
+                    // Half-open like the fixed window of `timed`: open from its
+                    // first second up to, but not including, its end (#581).
+                    $end = null;
+                    $state = ['isbefore' => false, 'inside' => false, 'isafter' => false];
+                    if ($start !== null && isset(self::DURATION_SECONDS[$durationvalue]) && is_numeric($selectedduration)) {
+                        $end = $start + (int) (self::DURATION_SECONDS[$durationvalue] * $selectedduration);
+                        $state = time_value::window_state($start, $end, $now);
                     }
-                    if (is_string($starttime)) {
-                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
-                          $starttime;
+
+                    if ($startmessage !== null) {
+                        $timed[$restrictionnode['id']]['placeholders']['timed_condition'] = $startmessage;
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
-                          'starttime' => $starttime,
-                          'endtime' => $endtime,
+                          'starttime' => $startmessage,
+                          'endtime' => null,
                         ];
                     } else {
                         $timed[$restrictionnode['id']]['placeholders']['timed_condition'] =
                           get_string('course_condition_timed_duration_since', 'local_adele') .
-                          $starttime->format('d.m.Y H:i');
+                          ($start !== null ? time_value::display($start, $userid) : '');
+                        // Timestamps, like `timed` (#581): relation_update compares
+                        // them, the frontend formats them for the viewer.
                         $timed[$restrictionnode['id']]['inbetween_info'] = [
-                          'starttime' => $starttime->format('d.m.Y H:i') ?? null,
-                          'endtime' => $endtime,
+                          'starttime' => $start,
+                          'endtime' => $end,
                         ];
                     }
                     $timed[$restrictionnode['id']]['placeholders']['duration_period'] =
                     $selectedduration . ' ' . ($this->durationplaceholder[$durationvalue] ?? '');
-                    $timed[$restrictionnode['id']]['completed'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['inbetween'] = $iscurrenttimeinrange;
-                    $timed[$restrictionnode['id']]['isbefore'] = $isbeforerange ?? '';
-                    $timed[$restrictionnode['id']]['isafter'] = $isafterrange ?? '';
+                    $timed[$restrictionnode['id']]['completed'] = $state['inside'];
+                    $timed[$restrictionnode['id']]['inbetween'] = $state['inside'];
+                    $timed[$restrictionnode['id']]['isbefore'] = $state['isbefore'];
+                    $timed[$restrictionnode['id']]['isafter'] = $state['isafter'];
                 } else {
                     $timed[$restrictionnode['id']] = [
                       'completed' => false,

@@ -24,7 +24,31 @@
 
 <template>
   <div>
+    <!--
+      The graph is not readable non-visually, so the same path is offered as a
+      keyboard-operable list (#575 B3, way B). The switch is a real button and
+      the first thing in the tab order, so the alternative is findable rather
+      than buried.
+    -->
+    <div class="d-flex justify-content-end mt-2">
+      <button
+        type="button"
+        class="btn btn-link"
+        :aria-pressed="showOutline ? 'true' : 'false'"
+        data-testid="learningpath-outline-toggle"
+        @click="toggleOutline"
+      >
+        {{ showOutline ? store.state.strings.outline_hide : store.state.strings.outline_show }}
+      </button>
+    </div>
+
+    <LearningPathOutline
+      v-if="showOutline"
+      :learningpath="learningpath"
+    />
+
     <div
+      v-show="!showOutline"
       class="dndflow mt-4"
     >
       <VueFlow
@@ -94,6 +118,7 @@ import { Background } from '@vue-flow/background'
 import ModuleNode from '../nodes/ModuleNode.vue'
 import OrCourses from '../nodes/OrCourses.vue'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
+import LearningPathOutline from './LearningPathOutline.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
 import setZoomLevel from '../../composables/flowHelper/setZoomLevel';
 
@@ -108,6 +133,20 @@ const props = defineProps({
 });
 
 // Define constants that will be referenced
+// Which of the two equivalent presentations is shown. The graph stays the
+// default: the list is the alternative, not a replacement (#575 B3).
+const showOutline = ref(false)
+
+/**
+ * Switch between graph and list, and say which one is now shown (#575 B4).
+ */
+const toggleOutline = () => {
+  showOutline.value = !showOutline.value
+  store.commit('announce', showOutline.value
+    ? store.state.strings.outline_title
+    : store.state.strings.outline_graph_shown)
+}
+
 const dark = ref(false)
 const editor_view = ref(false)
 // check the page width

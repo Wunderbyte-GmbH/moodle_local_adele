@@ -24,6 +24,22 @@
 import ExpandNodeInformation from '../../../../components/nodes_items/ExpandNodeInformation.vue';
 import { mount } from '@vue/test-utils';
 import { useStore } from 'vuex';
+import * as nodeColors from '../../../../config/nodeColors';
+
+/**
+ * The style attribute reports colours as rgb(); compare against the palette
+ * rather than against a hex literal, so a contrast correction (#575 B6) does
+ * not break a test that is about WHICH colour is chosen, not which value it
+ * has.
+ *
+ * @param {string} hex A colour from config/nodeColors.
+ * @returns {string} The same colour as the style attribute reports it.
+ */
+const asRgb = (hex) => {
+  const value = hex.replace('#', '');
+  const part = (at) => parseInt(value.slice(at, at + 2), 16);
+  return `rgb(${part(0)}, ${part(2)}, ${part(4)})`;
+};
 
 // Mock the store
 jest.mock('vuex', () => ({
@@ -48,19 +64,21 @@ describe('ExpandNodeInformation.vue', () => {
   it('colours the info badge by course completion status', async () => {
     const courses = [{ id: 1, description: 'This is a test course description.' }];
 
-    // Not completed -> the "not finished" status colour (courseNodeNotFinishedColor, #db8d31).
+    // Not completed -> the "not finished" status colour.
     const notDone = mount(ExpandNodeInformation, { props: { courses } });
     expect(notDone.find('.icon-container').exists()).toBe(true);
-    expect(notDone.find('.information').element.style.backgroundColor).toBe('rgb(219, 141, 49)');
+    expect(notDone.find('.information').element.style.backgroundColor)
+      .toBe(asRgb(nodeColors.courseNodeNotFinishedColor));
 
-    // Completed -> the "finished" status colour (courseNodeFinishedColor, #63aa43).
+    // Completed -> the "finished" status colour.
     const done = mount(ExpandNodeInformation, {
       props: {
         courses,
         data: { course_id: 1, completion: { completioncriteria: { course_completed: { completed: { 1: true } } } } },
       },
     });
-    expect(done.find('.information').element.style.backgroundColor).toBe('rgb(99, 170, 67)');
+    expect(done.find('.information').element.style.backgroundColor)
+      .toBe(asRgb(nodeColors.courseNodeFinishedColor));
   });
 
   it('toggles the additional card visibility on click', async () => {

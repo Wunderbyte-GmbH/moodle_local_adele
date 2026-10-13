@@ -72,62 +72,33 @@ final class timed_test extends advanced_testcase {
     }
 
     /**
-     * Test the get_restriction_status function.
+     * A window around "now" is open, a window in the future is not.
+     *
+     * Everything is relative to one frozen instant, so the test means the same
+     * on any date it runs. Exact boundaries, time zones and legacy values are
+     * covered in timed_timestamps_test.php.
+     *
      * @covers \local_adele\course_restriction\conditions\timed::get_restriction_status
      */
     public function test_get_restriction_status(): void {
+        $this->resetAfterTest();
+        $now = 1893456000;
+        $this->mock_clock_with_frozen($now);
         $timed = new timed();
+        $userpath = (object) ['timecreated' => 0];
 
-        // Test with valid start and end date.
-        $node = [
-            'restriction' => [
-                'nodes' => [
-                    [
-                        'id' => 1,
-                        'data' => [
-                            'label' => 'timed',
-                            'value' => [
-                                'start' => '2024-01-01T00:00',
-                                'end' => '2026-12-31T23:59',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $window = static fn(int $id, int $start, int $end): array => ['restriction' => ['nodes' => [[
+            'id' => $id,
+            'data' => ['label' => 'timed', 'value' => ['start' => $start, 'end' => $end]],
+        ]]]];
 
-        $userpath = (object) ['userid' => 1];
-        $status = $timed->get_restriction_status($node, $userpath);
+        $current = $timed->get_restriction_status($window(1, $now - DAYSECS, $now + DAYSECS), $userpath);
+        $this->assertTrue($current[1]['completed'], 'a window around now must be open');
+        $this->assertSame($now - DAYSECS, $current[1]['inbetween_info']['starttime']);
+        $this->assertSame($now + DAYSECS, $current[1]['inbetween_info']['endtime']);
 
-        $this->assertArrayHasKey(1, $status);
-        $this->assertTrue($status[1]['completed']);
-        $this->assertNotEmpty($status[1]['inbetween_info']);
-        $this->assertEquals("01.01.2024 00:00", $status[1]['inbetween_info']['starttime']);
-        $this->assertEquals("31.12.2026 23:59", $status[1]['inbetween_info']['endtime']);
-
-        // Test with future start date (restriction should be incomplete).
-        $futurenode = [
-            'restriction' => [
-                'nodes' => [
-                    [
-                        'id' => 2,
-                        'data' => [
-                            'label' => 'timed',
-                            'value' => [
-                                'start' => '2099-01-01T00:00',
-                                'end' => '2099-12-31T23:59',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $futurestatus = $timed->get_restriction_status($futurenode, $userpath);
-
-        $this->assertArrayHasKey(2, $futurestatus);
-        $this->assertFalse($futurestatus[2]['completed']);
-        $this->assertEquals("01.01.2099 00:00", $futurestatus[2]['inbetween_info']['starttime']);
-        $this->assertEquals("31.12.2099 23:59", $futurestatus[2]['inbetween_info']['endtime']);
+        $future = $timed->get_restriction_status($window(2, $now + YEARSECS, $now + 2 * YEARSECS), $userpath);
+        $this->assertFalse($future[2]['completed'], 'a window in the future must be closed');
+        $this->assertTrue($future[2]['isbefore']);
     }
 }

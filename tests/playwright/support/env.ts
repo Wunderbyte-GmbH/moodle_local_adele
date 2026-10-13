@@ -74,6 +74,10 @@ export async function loginAsAdmin(page: Page): Promise<void> {
  * @param password The password.
  */
 export async function loginAs(page: Page, username: string, password: string): Promise<void> {
+  // Leave the current page first: requests it still has in flight can set
+  // the previous session's cookie after this login and silently undo it
+  // (page and API share one cookie jar). See tests/e2e/support/env.ts.
+  await page.goto('about:blank');
   const api = page.context().request;
   await page.context().clearCookies();
 

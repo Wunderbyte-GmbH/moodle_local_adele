@@ -79,6 +79,12 @@
       'callback' => 'local_adele_observer::assign_assistant_to_role',
     ],
     [
+      // Taking part in a course is a matter of the role, and the role is
+      // assigned after the enrolment event (#587).
+      'eventname' => '\core\event\role_assigned',
+      'callback' => 'local_adele_observer::role_assigned_in_course',
+    ],
+    [
       'eventname' => '\core\event\user_deleted',
       'callback' => 'local_adele_observer::user_deleted',
     ],

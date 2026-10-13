@@ -36,3 +36,6 @@ CHANGELOG.md      export-ignore
 .gitignore        export-ignore
 .phpcsignore      export-ignore
 .phpcs.xml        export-ignore
+
+# Test fixtures: Moodle course backups are archives, never text.
+*.mbz binary

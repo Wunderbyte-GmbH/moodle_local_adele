@@ -73,6 +73,13 @@ if (strpos($CFG->wwwroot, 'https://') !== 0) {
     set_config('cookiesecure', 0);
 }
 
+// No user tours on a test site. Core's tours ("Find your way around") open
+// for any account that has not dismissed them yet and lay a backdrop over
+// the page - whether a click lands first or the tour does is a race the
+// browser suite cannot win reliably. They belong to Moodle, not to ADELE.
+$DB->set_field('tool_usertours_tours', 'enabled', 0);
+\cache::make('tool_usertours', 'tourdata')->purge();
+
 // A known admin credential for the browser suite.
 $admin = get_admin();
 $admin->password = hash_internal_user_password($adminpassword);

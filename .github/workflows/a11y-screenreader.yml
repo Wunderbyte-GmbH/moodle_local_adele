@@ -1,0 +1,154 @@
+name: Accessibility Screenreader
+
+# Screen reader tests with NVDA (Guidepup), as a suite of their own.
+#
+# MANUAL ONLY: Actions tab -> "Accessibility Screenreader" -> "Run workflow".
+# No push trigger and no schedule.
+#
+# Why this is separate from e2e.yml:
+# - NVDA exists on Windows only, so this runs on a windows runner. Service
+#   containers (the PostgreSQL the other workflows use) are Linux-only, which
+#   is why this workflow does NOT build a Moodle site; it runs against one
+#   that already exists and whose address is given below.
+# - A screen reader is a single instance on a visible desktop: one worker, no
+#   parallelism, no headless browser.
+# - Guidepup needs Playwright 1.57 or newer, while the other suites are
+#   pinned to 1.49.1. Separate directory, separate lockfile.
+#
+# EVERY run uploads ONE artefact, whatever the outcome - passed, failed or
+# cancelled: HTML report, video of every test, the spoken phrase log NVDA
+# produced, results.json, junit.xml and the console output. For this suite
+# the recording of a PASSING run is the point: it is what lets a sighted
+# reviewer follow what a blind user would have heard.
+#
+# NOTE: workflow_dispatch only appears in the Actions UI once this file is on
+# the repository's DEFAULT branch.
+"on":
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: >-
+          Address of the Moodle site to test, e.g. https://adele.example.org.
+          It must already carry the three ADELE plugins and the fixtures
+          (tests/playwright/seed_fixtures.php).
+        type: string
+        required: true
+      grep:
+        description: >-
+          Only run tests whose title matches this regular expression, e.g.
+          ADELE-SR-01. Empty: the whole suite.
+        type: string
+        default: ''
+      retention_days:
+        description: Days the result artefact is kept.
+        type: number
+        default: 30
+
+permissions:
+  contents: read
+
+jobs:
+  screenreader:
+    name: NVDA (${{ inputs.base_url }})
+    # Windows, because NVDA is a Windows application. This is not a
+    # preference; the suite cannot run anywhere else.
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    env:
+      # Inputs reach the scripts through the environment only, never by
+      # interpolating ${{ }} into a run block.
+      ADELE_BASE_URL: ${{ inputs.base_url }}
+      TEST_GREP: ${{ inputs.grep || '' }}
+      # The account the suite logs in with. Stored as repository secrets:
+      # the site under test is a real installation, not a throwaway built
+      # inside the job.
+      ADELE_ADMIN_USER: ${{ secrets.ADELE_A11Y_USER }}
+      ADELE_ADMIN_PASSWORD: ${{ secrets.ADELE_A11Y_PASSWORD }}
+
+    steps:
+      - name: Check the inputs
+        shell: bash
+        run: |
+          if [ -z "${ADELE_ADMIN_USER:-}" ] || [ -z "${ADELE_ADMIN_PASSWORD:-}" ]; then
+            echo "::error::The secrets ADELE_A11Y_USER and ADELE_A11Y_PASSWORD are not set."
+            echo "This workflow runs against an existing site and needs an account on it."
+            exit 1
+          fi
+          case "$ADELE_BASE_URL" in
+            http://*|https://*) ;;
+            *) echo "::error::base_url must start with http:// or https://"; exit 1 ;;
+          esac
+          echo "EXPORT_DIR=$RUNNER_TEMP/a11y-export" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/a11y-export"
+
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install the suite
+        shell: bash
+        run: |
+          cd plugin/tests/a11y-screenreader
+          # npm ci, not npm install: it fails loudly when the lockfile is
+          # missing rather than resolving whatever is current that day.
+          npm ci
+          # A real browser, not the headless shell: a screen reader attaches
+          # to the browser window a person would see.
+          npx playwright install --with-deps chrome
+
+      - name: Install and configure NVDA
+        shell: bash
+        run: |
+          cd plugin/tests/a11y-screenreader
+          # Guidepup's own installer: it fetches NVDA and writes the settings
+          # the automation needs (speech viewer, no welcome dialog). Without
+          # it the run would stop at a screen reader that is not there.
+          npx guidepup setup --no-interactive
+
+      - name: Run the screen reader suite
+        shell: bash
+        run: |
+          cd plugin/tests/a11y-screenreader
+          ADELE_A11Y_EXPORT_DIR="$EXPORT_DIR" npx playwright test \
+            ${TEST_GREP:+--grep "$TEST_GREP" --pass-with-no-tests} 2>&1 \
+            | tee "$EXPORT_DIR/run.log"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Summarise the results
+        if: always()
+        shell: bash
+        run: |
+          [ -n "${EXPORT_DIR:-}" ] || exit 0
+          summary="$EXPORT_DIR/summary.md"
+          {
+            echo "# Screen reader results (NVDA)"
+            echo
+            echo "| Item | Value |"
+            echo "|---|---|"
+            echo "| Site | $ADELE_BASE_URL |"
+            echo "| Started by | $GITHUB_ACTOR |"
+            echo "| Title filter | ${TEST_GREP:-none} |"
+            echo
+            node "support/summarize-results.mjs" "NVDA" "$EXPORT_DIR/results.json"
+            echo "The spoken phrase log of every test is attached to the HTML report" \
+              "(\`nvda-spoken-phrases.txt\`) and is what a review should read first;" \
+              "the videos show the same run from the outside."
+          } > "$summary"
+          cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+
+      # One artefact, always: passed, failed or cancelled.
+      - name: Upload report, videos and spoken phrase logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-screenreader-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/a11y-export
+          retention-days: ${{ inputs.retention_days || 30 }}
+          if-no-files-found: warn

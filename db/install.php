@@ -120,7 +120,7 @@ function create_role_for_adele($name, $shortname, $descriptionstr, $capabilities
                 'roleid' => $roleid,
                 'capability' => $cap,
                 'permission' => CAP_ALLOW,
-                'timemodified' => time(),
+                'timemodified' => \core\di::get(\core\clock::class)->time(),
                 'modifierid' => 0,
             ]);
         }

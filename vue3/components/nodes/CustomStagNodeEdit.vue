@@ -38,9 +38,20 @@ import NodeInformation from '../nodes_items/NodeInformation.vue'
 import truncatedText from '../../composables/nodesHelper/truncatedText'
 import MasterConditions from '../nodes_items/MasterConditions.vue';
 import { expandedStacks } from '../../composables/flowHelper/expandedStacks';
+import { useNodeStatus } from '../../composables/useNodeStatus';
 
 // Load Store
 const store = useStore();
+// Machine-readable identity and state of this node (#574) and its accessible
+// name (#575 B1). All three come from useNodeStatus, the single derivation
+// shared with the icon the sighted user sees; role="group" is what makes the
+// name reachable for an assistive technology - aria-label on a bare div is
+// not exposed.
+const { status: nodeStatus, accessibleName: nodeAccessibleName } = useNodeStatus(
+  computed(() => props.data),
+  computed(() => store.state.strings)
+);
+
 const date = ref({})
 const progress = ref(0);
 
@@ -175,6 +186,10 @@ const expandCourses = () => {
 
 <template>
   <div
+    role="group"
+    :aria-label="nodeAccessibleName"
+    :data-testid="'learningpath-node-' + data.node_id"
+    :data-status="nodeStatus"
     @click="emit('node-clicked', props.data)"
   >
     <div
@@ -233,6 +248,7 @@ const expandCourses = () => {
               v-else
               class="icon-link"
               :title="store.state.strings.locked"
+              :aria-label="store.state.strings.locked + ': ' + (data.fullname || store.state.strings.nodes_collection)"
             >
               <i :class="'fas fa-lock'" />
             </button>
@@ -249,12 +265,12 @@ const expandCourses = () => {
           </div>
         </div>
         <div v-if="store.state.view !=='student'">
-          <div v-if="data.manualrestriction">
+          <div v-if="store.state.canedit !== false && data.manualrestriction">
             <RestrictionOutPutItem
               :data="data"
             />
           </div>
-          <div v-if="data.manualcompletion">
+          <div v-if="store.state.canedit !== false && data.manualcompletion">
             <CompletionOutPutItem :data="data" />
           </div>
         </div>
@@ -265,7 +281,7 @@ const expandCourses = () => {
           />
         </div>
         <MasterConditions
-            v-if="store.state.view == 'teacher'"
+            v-if="store.state.view == 'teacher' && store.state.canedit !== false"
             class="col-12"
             :data="data"
           />

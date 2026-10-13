@@ -76,7 +76,7 @@ class node_completion {
                     // membership are independent of which plugin performs the
                     // enrolment.
                     if (!isset($node->data->first_enrolled)) {
-                        $node->data->first_enrolled = time();
+                        $node->data->first_enrolled = \core\di::get(\core\clock::class)->time();
                         $firstenrollededit = true;
                     }
                     adhoc_task_helper::set_scheduled_adhoc_tasks(

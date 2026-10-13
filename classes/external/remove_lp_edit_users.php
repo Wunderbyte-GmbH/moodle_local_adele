@@ -96,6 +96,15 @@ class remove_lp_edit_users extends external_api {
             }
         }
 
+        // The owner always stands on the list of editors (decision
+        // 2026-10-08): taken off it, they would lose their own path, because
+        // editing is decided by the list alone. Whoever wants to hand a path
+        // over transfers the ownership first.
+        $ownerid = (int) $DB->get_field('local_adele_learning_paths', 'createdby', ['id' => $params['lpid']]);
+        if ($ownerid === (int) $params['userid']) {
+            throw new \moodle_exception('editorremoveowner', 'local_adele');
+        }
+
         return learning_path_editors::remove_editors($params['lpid'], $params['userid']);
     }
 

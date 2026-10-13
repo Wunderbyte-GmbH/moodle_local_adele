@@ -32,10 +32,21 @@ import NodeInformation from '../nodes_items/NodeInformation.vue';
 import ProgressBar from '../nodes_items/ProgressBar.vue';
 import UserInformation from '../nodes_items/UserInformation.vue';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
+import { useNodeStatus } from '../../composables/useNodeStatus';
 
 
 // Load Store
 const store = useStore();
+// Machine-readable identity and state of this node (#574) and its accessible
+// name (#575 B1). All three come from useNodeStatus, the single derivation
+// shared with the icon the sighted user sees; role="group" is what makes the
+// name reachable for an assistive technology - aria-label on a bare div is
+// not exposed.
+const { status: nodeStatus, accessibleName: nodeAccessibleName } = useNodeStatus(
+  computed(() => props.data),
+  computed(() => store.state.strings)
+);
+
 const parentnode = ref({})
 const props = defineProps({
   data: {
@@ -179,7 +190,12 @@ const zoomOnParent = () => {
 </script>
 
 <template>
-  <div>
+  <div
+    role="group"
+    :aria-label="nodeAccessibleName"
+    :data-testid="'learningpath-node-' + data.node_id"
+    :data-status="nodeStatus"
+  >
     <div
       class="card"
       :style="[{ minHeight: '200px', width: '400px' }, childStyle]"
@@ -200,6 +216,8 @@ const zoomOnParent = () => {
               v-if="store.state.view!='teacher' && editorview"
               class="btn btn-danger btn-sm"
               style="position: absolute; top: 5px; right: 5px;"
+              :title="store.state.strings.flowchart_delete_button"
+              :aria-label="store.state.strings.flowchart_delete_button + ': ' + (data.fullname || store.state.strings.nodes_collection)"
               @click.stop="deleteCondition"
             >
               <i
@@ -233,6 +251,7 @@ const zoomOnParent = () => {
               <button
                 class="icon-link"
                 :title="store.state.strings.nodes_edit_restriction"
+                :aria-label="store.state.strings.nodes_edit_restriction + ': ' + (data.fullname || store.state.strings.nodes_collection)"
                 @click="setRestrictionView"
               >
                 <i class="fas fa-lock" />
@@ -244,6 +263,7 @@ const zoomOnParent = () => {
               <button
                 class="icon-link"
                 :title="store.state.strings.edit_node_pretest"
+                :aria-label="store.state.strings.edit_node_pretest + ': ' + (data.fullname || store.state.strings.nodes_collection)"
                 @click="setPretestView"
               >
                 <i
@@ -257,6 +277,7 @@ const zoomOnParent = () => {
               <button
                 class="icon-link"
                 :title="store.state.strings.edit_course_node"
+                :aria-label="store.state.strings.edit_course_node + ': ' + (data.fullname || store.state.strings.nodes_collection)"
                 data-toggle="modal"
                 data-target="#nodeModal"
                 data-placement="right"
@@ -276,6 +297,7 @@ const zoomOnParent = () => {
               <button
                 class="icon-link"
                 :title="store.state.strings.locked"
+                :aria-label="store.state.strings.locked + ': ' + (data.fullname || store.state.strings.nodes_collection)"
               >
                 <i class="fas fa-lock" />
               </button>

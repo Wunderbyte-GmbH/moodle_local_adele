@@ -1,7 +1,7 @@
 Adaptive e-Learning Paths (moodle-local_adele)
 ==============================================
 
-[![Moodle Plugin CI](https://github.com/Wunderbyte-GmbH/moodle_local_adele/actions/workflows/moodle-plugin-ci.yml/badge.svg?branch=main)](https://github.com/Wunderbyte-GmbH/moodle_local_adele/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amain)
+[![Moodle Plugin CI](https://github.com/Wunderbyte-GmbH/moodle-local_adele/actions/workflows/moodle-plugin-ci.yml/badge.svg?branch=main)](https://github.com/Wunderbyte-GmbH/moodle-local_adele/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amain)
 
 AdeLe - Adaptive e-Learning Paths - lets you build learning paths from independent Moodle courses: a graph of nodes, each with its own completion and access rules, edited graphically and evaluated per learner.
 
@@ -108,7 +108,7 @@ Plugin repositories
 This plugin is not published in the Moodle plugins repository.
 
 The latest development version can be found on Github:
-https://github.com/Wunderbyte-GmbH/moodle_local_adele
+https://github.com/Wunderbyte-GmbH/moodle-local_adele
 
 
 Bug and problem reports / Support requests
@@ -117,7 +117,7 @@ Bug and problem reports / Support requests
 This plugin is carefully developed and thoroughly tested, but bugs and problems can always appear.
 
 Please report bugs and problems on Github:
-https://github.com/Wunderbyte-GmbH/moodle_local_adele/issues
+https://github.com/Wunderbyte-GmbH/moodle-local_adele/issues
 
 We will do our best to solve your problems, but please note that due to limited resources we can't always provide per-case support.
 
@@ -128,10 +128,10 @@ Feature proposals
 Due to limited resources, the functionality of this plugin is primarily implemented for our own local needs and published as-is to the community. We are aware that members of the community will have other needs and would love to see them solved by this plugin.
 
 Please issue feature proposals on Github:
-https://github.com/Wunderbyte-GmbH/moodle_local_adele/issues
+https://github.com/Wunderbyte-GmbH/moodle-local_adele/issues
 
 Please create pull requests on Github:
-https://github.com/Wunderbyte-GmbH/moodle_local_adele/pulls
+https://github.com/Wunderbyte-GmbH/moodle-local_adele/pulls
 
 We are always interested to read about your feature proposals or even get a pull request from you, but please accept that we can handle your issues only as feature _proposals_ and not as feature _requests_.
 
@@ -179,3 +179,64 @@ The copyright of this plugin is held by\
 Wunderbyte GmbH
 
 Individual copyrights of individual developers are tracked in PHPDoc comments and Git commits.
+
+## Upgrade notes
+
+### 2026100713 — who takes part follows the graded roles (#593)
+
+A learner of an embedded learning path is who holds, in the embedding course,
+one of the site's **graded roles** (*Site administration → Grades → General
+settings → Graded roles*) — the same list Moodle uses for grades and
+completion reports. Teachers are not learners (#587).
+
+- **Before installing, check that setting.** Every role your learners are
+  enrolled with must be on it. A role that is not on it does not take part:
+  its holders disappear from the learning path's lists at once, and the
+  nightly reconcile of `enrol_adele` removes their subscription and progress
+  after its period of grace.
+- The capability `local/adele:participate` (introduced with 2026100708) is
+  removed. The upgrade names, in its output and in the upgrade log, every role
+  that took part through it and is not a graded role.
+- **Changing the setting later** takes effect immediately. When a role is
+  added, the people who already hold it become learners in the background
+  (`mod_adele`, ad-hoc task); when a role is removed, see above.
+- With no graded role at all, nobody takes part.
+
+### 2026100502 — timed access conditions store timestamps (#581)
+
+Fixed start and end times of the "timed" access condition are now stored as
+Unix timestamps and compared as whole seconds. Previously the editor stored
+the wall-clock text of the date field (for example `2026-12-01T10:00`)
+without a time zone.
+
+- **Migration:** the upgrade converts every existing value once, in both the
+  learning paths and the per-user copies. A stored text has no time zone, so
+  it is read in the **site's time zone** — the zone the evaluation used for
+  it until now. Windows therefore keep their meaning. If authors entered
+  times in a different zone than the site's, those windows were already
+  shifted before the upgrade and stay shifted; correct them in the editor.
+- **Boundaries:** a window is open from its start up to, but not including,
+  its end (`start <= now < end`). This is the behaviour the old code showed
+  in practice; it is now explicit.
+- **Display:** times are shown in the time zone of the person viewing them.
+
+## Tests: which layer proves what
+
+| Layer | Where | Proves |
+|---|---|---|
+| PHPUnit | `tests/` | the domain logic on the server: evaluation of conditions, time boundaries to the second, truth tables of combined criteria (`tests/usecases/uc21`–`uc23`), permissions, enrolments |
+| Jest | `vue3/tests/unit/` | how the Vue frontend reacts to every state the server can deliver: status codes, progress display, master and manual checkboxes, feedback texts and their joining, editor inputs - as data-driven matrices (`it.each`) |
+| Playwright smoke | `tests/playwright/` | a quick check on every push |
+| Playwright E2E | `tests/e2e/` | whole user stories across all three ADELE plugins on a real Moodle: roles, editor, real enrolment and course access, recompute, time on a test clock - started by hand (`e2e.yml`) |
+
+Jest renders what it is given; it never re-implements Moodle capabilities or
+server-side evaluation. A red Jest test points at the frontend; Playwright
+red with Jest green points at integration, backend, roles, recompute or
+enrolment. Neither replaces the other.
+
+Jest: `cd vue3 && npm ci && npm test` (with coverage; the gate in
+`jest.config.js` fails the run when coverage sinks below the baseline).
+Shared shapes for tests live in `vue3/tests/unit/fixtures/` (factories with
+explicit defaults, no product logic). Defects the matrices found are tests
+in `knownDefect(...)` (fixtures/knownDefect.js): skipped and visible as such
+until the defect is fixed; `ADELE_RUN_KNOWN_DEFECTS=1` runs them.

@@ -21,13 +21,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-export const progressBarColorCase0 = '#90b6ca';  
-export const progressBarColorCaseA1 = '#db8d31';
-export const progressBarColorCaseA2 = '#db8d31';  
+/*
+ * Contrast (#575 B6, WCAG 1.4.11 Non-text Contrast, AA).
+ *
+ * Measured against the card background #efefef, the three state colours were
+ * below the required 3:1 and have been darkened by the smallest step that
+ * clears it, hue and saturation unchanged:
+ *
+ *   progress / "not finished"  #db8d31 -> #c37922   2.32 -> 3.00
+ *   progress / "finished"      #63aa43 -> #59993c   2.48 -> 3.02
+ *   progress / case 0          #90b6ca -> #5891af   1.88 -> 3.00
+ *
+ * The pastel header backgrounds are NOT touched: they carry black text and
+ * already reach 7.2:1 to 17.3:1 (1.4.3), and they no longer carry the state
+ * on their own since every node also names its state (B1).
+ */
+export const progressBarColorCase0 = '#5891af';  
+export const progressBarColorCaseA1 = '#c37922';
+export const progressBarColorCaseA2 = '#c37922';  
 export const progressBarColorCaseB = '#265471';  
-export const progressBarColorCaseC = '#63aa43'; 
-export const progressBarColorCaseD = '#63aa43';   
-export const progressBarColorCaseE = '#63aa43';   
+export const progressBarColorCaseC = '#59993c'; 
+export const progressBarColorCaseD = '#59993c';   
+export const progressBarColorCaseE = '#59993c';   
 export const progressBarColorCaseF = '#cc0000';
 export const progressBarColorCaseDefault = '#808080';
 
@@ -45,8 +60,8 @@ export const headerBackgroundColorCaseDefault = '#808080';
 export const nodeBackgroundColorDefault = '#cccccc';
 export const cardBackgroundColor = '#efefef';
 
-export const courseNodeFinishedColor = '#63aa43';
-export const courseNodeNotFinishedColor = '#db8d31';
+export const courseNodeFinishedColor = '#59993c';
+export const courseNodeNotFinishedColor = '#c37922';
 
 export const courseNodeFinishedColorLight = '#e0edd9';
 export const courseNodeNotFinishedColorLight = '#eaddce';

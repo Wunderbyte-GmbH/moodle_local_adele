@@ -340,9 +340,20 @@ final class save_learningpath_test extends adele_learningpath_testcase {
             . get_string('course_description_before_condition_course_completed_kursen', 'local_adele');
         // Result: "1 from 2 Kursen".
 
-        $expectedbefore    = '[EN_215]' . $expecteditem . ' erfolgreich bearbeiten ';
-        $expectedinbetween = '[EN_216]' . $expecteditem . ' erfolgreich bearbeiten';
-        $expectedafter     = '[EN_217]' . $expecteditem . ' erfolgreich bearbeitet haben';
+        // The fixture stores templates of an earlier wording, in German, with
+        // "use default" ticked. A default is rendered from the CURRENT language
+        // string, not from the copy stored in the path (#589) - so this reads
+        // as today's English default.
+        $template = function (string $state) use ($expecteditem): string {
+            return str_replace(
+                '{item}',
+                $expecteditem,
+                get_string('course_description_' . $state . '_condition_course_completed', 'local_adele')
+            );
+        };
+        $expectedbefore    = $template('before');
+        $expectedinbetween = $template('inbetween');
+        $expectedafter     = $template('after');
 
         $updatedrecords = $DB->get_records('local_adele_path_user');
         foreach ($updatedrecords as $record) {
@@ -432,8 +443,12 @@ final class save_learningpath_test extends adele_learningpath_testcase {
         relation_update::updated_single($updateevents[1]);
 
         // Step 3: Assert dndnode_2 is locked with 'before' restriction state.
-        $expectedparent = '[EN_233]Sie [EN_386]Collection abgeschlossen haben';
-        $expectedmanual = '[EN_232]eine manuelle Freigabe durch den Lehrenden stattgefunden hat';
+        // The fixture stores templates of an earlier wording, in German, with
+        // "use default" ticked. A default is rendered from the CURRENT language
+        // string, not from the copy stored in the path (#589) - so this reads
+        // as today's English default.
+        $expectedparent = get_string('course_restriction_parent_single', 'local_adele', '„[EN_386]Collection“');
+        $expectedmanual = get_string('course_restricition_before_condition_manual', 'local_adele');
 
         $userpathrecords = $DB->get_records('local_adele_path_user');
         foreach ($userpathrecords as $record) {

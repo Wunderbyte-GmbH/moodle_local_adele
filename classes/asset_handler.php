@@ -143,7 +143,7 @@ class asset_handler {
                 'filearea'  => 'lp_images',
                 'itemid'    => $learningpathid,
                 'filepath'  => '/',
-                'filename'  => $filename . (string) time(),
+                'filename'  => $filename . (string) \core\di::get(\core\clock::class)->time(),
                 'userid'    => $USER->id,
                 'license'   => 'allrightsreserved',
                 'author'    => $USER->firstname . ' ' . $USER->lastname,

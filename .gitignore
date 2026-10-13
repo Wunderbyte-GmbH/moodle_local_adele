@@ -21,6 +21,11 @@ package-lock.json
 # under it is exactly how a green suite becomes an intermittent one. The
 # file never reaches a release archive: tests/playwright/ is export-ignore.
 !tests/playwright/package-lock.json
+# The E2E suite is installed with npm ci as well, which refuses to run
+# without a lockfile.
+!tests/e2e/package-lock.json
+# The screen reader suite is installed with npm ci as well.
+!tests/a11y-screenreader/package-lock.json
 yarn.lock
 
 # vue

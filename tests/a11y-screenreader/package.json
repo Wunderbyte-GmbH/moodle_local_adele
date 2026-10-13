@@ -1,0 +1,14 @@
+{
+  "name": "local-adele-a11y-screenreader",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Screen reader tests for local_adele, driven with Guidepup and NVDA on Windows.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@guidepup/playwright": "^0.19.1",
+    "@guidepup/setup": "^0.29.1",
+    "@playwright/test": "1.57.0"
+  }
+}

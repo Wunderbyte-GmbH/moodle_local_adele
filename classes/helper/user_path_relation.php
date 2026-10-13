@@ -177,7 +177,7 @@ class user_path_relation {
                 'local_adele_path_user',
                 [
                     'id' => $userpath->id,
-                    'timemodified' => time(),
+                    'timemodified' => \core\di::get(\core\clock::class)->time(),
                     'json' => $userpath->json,
                 ]
             );
@@ -189,7 +189,7 @@ class user_path_relation {
                 'learning_path_id' => $userpath->learning_path_id,
                 'status' => 'active',
                 'timecreated' => $userpath->timecreated,
-                'timemodified' => time(),
+                'timemodified' => \core\di::get(\core\clock::class)->time(),
                 'createdby' => $userpath->createdby,
                 'json' => $userpath->json,
             ]);

@@ -118,7 +118,21 @@
 
   const toggleCard = () => {
     showCard.value = !showCard.value
+    // An open card lies above its neighbours, however it was opened.
+    cardStyle.value.zIndex = showCard.value ? 4 : 3
   }
+  // The trigger is a button with a name and a state, so that the criteria
+  // are reachable without a mouse (#591): Enter and Space open and close,
+  // Escape closes.
+  const closeCard = () => {
+    showCard.value = false
+    cardStyle.value.zIndex = 3
+  }
+  const cardId = computed(() => 'adele-node-information-' + props.data.node_id)
+  const toggleLabel = computed(() => {
+    const what = store.state.strings.a11y_node_information || ''
+    return props.data.fullname ? what + ': ' + props.data.fullname : what
+  })
   const backgroundColor = computed(() => store.state.strings.DARK_RED)
   const backgroundColorInfo = computed(() => store.state.strings.LIGHT_GRAY)
 
@@ -206,6 +220,12 @@
   };
 
   Object.entries(return_date).forEach(([type, dateString]) => {
+    // Unix seconds since #581: formatted in the viewer's own time zone.
+    if (typeof dateString === "number") {
+      return_date[type] = new Date(dateString * 1000).toLocaleString('en-US', options);
+      return;
+    }
+    // Legacy "d.m.Y H:i" from before the upgrade.
     if (typeof dateString === "string") {
       // Extract day, month, year, hours, and minutes from the string
       const [datePart, timePart] = dateString.split(' ');
@@ -287,15 +307,21 @@
       'icon-container': !mobile,
       'card-container': mobile
     }"
-    @focus="handleFocus"
-    @blur="handleBlur"
-    tabindex="0"
+    @focusin="handleFocus"
+    @focusout="handleBlur"
+    @keydown.esc="closeCard"
     :style="cardStyle"
   >
-    <div
+    <button
+      type="button"
       class="information"
       :style="{ backgroundColor: iconColor, '--icon-bg-color': iconColor }"
+      :aria-label="toggleLabel"
+      :aria-expanded="showCard ? 'true' : 'false'"
+      :aria-controls="cardId"
       @click.stop="toggleCard"
+      @keydown.enter.stop
+      @keydown.space.stop
       :class="{ 'information-rotating': iconState === 'rotating' }"
     >
       <i
@@ -305,12 +331,14 @@
           'icon-fadingOut': iconState === 'fadingOut'
         }]"
         :style="{ color: '#fff' }"
+        aria-hidden="true"
       />
-    </div>
+    </button>
     <transition :name="mobile ? 'fade' : 'unfold'">
-   
+
       <div
         v-if="showCard"
+        :id="cardId"
         :class="{
           'additional-card': !mobile
         }"
@@ -458,6 +486,7 @@
 
 .information {
   cursor: pointer;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;

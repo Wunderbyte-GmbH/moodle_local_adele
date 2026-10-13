@@ -1,0 +1,13 @@
+{
+  "name": "local-adele-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "description": "End-to-end suite for the ADELE ecosystem, driven from local_adele.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "1.49.1"
+  }
+}

@@ -143,7 +143,10 @@ const editLearningpath = async (singlelearningpathid) => {
   <div>
     <div v-if="store.state.view!='teacher'">
       <div class="col-12">
-        <h4 class="font-weight-bold">
+        <label
+          class="font-weight-bold h4"
+          for="goalnameplaceholder"
+        >
           {{ store.state.strings.fromlearningtitel }}
           <span
             class="required-sign"
@@ -152,12 +155,15 @@ const editLearningpath = async (singlelearningpathid) => {
             <i
               v-tooltip="store.state.strings.required"
               class="fas fa-exclamation-circle text-danger ml-2"
+              :aria-label="store.state.strings.required"
+              role="img"
             />
           </span>
-        </h4>
+        </label>
         <div class="mb-2">
           <input
             id="goalnameplaceholder"
+            data-testid="learningpath-title"
             v-model="goalname"
             v-autowidth="{ maxWidth: '960px', minWidth: '20px', comfortZone: 0 }"
             class="form-control fancy-input"
@@ -168,7 +174,10 @@ const editLearningpath = async (singlelearningpathid) => {
         </div>
       </div>
       <div class="col-12">
-        <h4 class="font-weight-bold">
+        <label
+          class="font-weight-bold h4"
+          for="goalsubjectplaceholder"
+        >
           {{ store.state.strings.fromlearningdescription }}
           <span
             class="required-sign"
@@ -177,12 +186,15 @@ const editLearningpath = async (singlelearningpathid) => {
             <i
               v-tooltip="store.state.strings.required"
               class="fas fa-exclamation-circle text-danger ml-2"
+              :aria-label="store.state.strings.required"
+              role="img"
             />
           </span>
-        </h4>
+        </label>
         <div class="mb-2">
           <textarea
             id="goalsubjectplaceholder"
+            data-testid="learningpath-description"
             v-model="goaldescription"
             :name="store.state.strings.goalsubjectplaceholder"
             v-autowidth="{ maxWidth: '960px', minWidth: '40%', comfortZone: 0 }"

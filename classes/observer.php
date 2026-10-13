@@ -52,6 +52,16 @@ class local_adele_observer {
     }
 
     /**
+     * Observer for role_assigned: a new participant of a course becomes a
+     * learner of the paths it embeds (#587).
+     *
+     * @param \core\event\role_assigned $event
+     */
+    public static function role_assigned_in_course(\core\event\role_assigned $event) {
+        enrollment::role_assigned_in_course($event);
+    }
+
+    /**
      * Observer for the assign_assistant_to_role event
      *
      * @param \core\event\role_assigned $event

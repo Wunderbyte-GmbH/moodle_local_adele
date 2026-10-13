@@ -71,11 +71,11 @@ class learning_paths {
         $data->name = $params['name'];
         $data->description = $params['description'];
         $data->image = $params['image'];
-        $data->timemodified = time();
+        $data->timemodified = \core\di::get(\core\clock::class)->time();
         $data->json = $params['json'];
         $id = 0;
         if ($params['learningpathid'] == 0) {
-            $data->timecreated = time();
+            $data->timecreated = \core\di::get(\core\clock::class)->time();
             $data->createdby = $params['userid'] ?? 0;
             $id = $DB->insert_record('local_adele_learning_paths', (object)$data);
             // Trigger catscale created event.
@@ -200,7 +200,7 @@ class learning_paths {
         $data->id = $params['id'];
         $data->json = $params['json'];
         $data->createdby = '100';
-        $data->timemodified = time();
+        $data->timemodified = \core\di::get(\core\clock::class)->time();
         return $DB->update_record('local_adele_learning_paths', $data);
     }
 
@@ -383,8 +383,8 @@ class learning_paths {
             if ($copyindex > 1) {
                 $learningpath->name .= ' ' . $copyindex;
             }
-            $learningpath->timecreated = time();
-            $learningpath->timemodified = time();
+            $learningpath->timecreated = \core\di::get(\core\clock::class)->time();
+            $learningpath->timemodified = \core\di::get(\core\clock::class)->time();
             $id = $DB->insert_record('local_adele_learning_paths', $learningpath);
             // Trigger catscale created event.
             $event = learnpath_created::create([
@@ -474,15 +474,44 @@ class learning_paths {
             'learning_path_id' => (int)$data['learningpathid'],
         ];
 
+        // The roster of an embedding belongs to its course (#588): learners
+        // of the path AND enrolled in that course - not the learners another
+        // course brought to the same path. Enrolled means enrolled, active or
+        // suspended: host mode "hidden" keeps its learners suspended in the
+        // host course, and their teacher must still see them. This is NOT the
+        // course_id column discussed above (that one only records where the
+        // snapshot was first triggered); it is the course's real enrolments.
+        // Without a scope - path authority outside any course - the roster is
+        // the path's. Ranks are given below, within whatever set this yields.
+        $scopejoin = '';
+        if (!empty($data['scopecourseid'])) {
+            [$enrolledsql, $enrolledparams] = self::roster_members_sql((int) $data['scopecourseid']);
+            $scopejoin = "JOIN ({$enrolledsql}) scope ON scope.id = lpu.user_id";
+            $params = array_merge($params, $enrolledparams);
+        }
+
         $sql = "SELECT lpu.user_id, lpu.status, lpu.json, usr.username,
             usr.firstname, usr.lastname, usr.email
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
+            {$scopejoin}
             WHERE lpu.learning_path_id = :learning_path_id
             AND lpu.status = 'active'";
 
         $userpathlist = [];
         $records = $DB->get_records_sql($sql, $params);
+        // The course's teachers are not its learners (#587): whoever is in
+        // the course by own right without taking part does not belong on its
+        // roster, even while a snapshot from before still exists.
+        if (!empty($data['scopecourseid']) && $records) {
+            $staff = array_flip(enrol_state::get_nonparticipant_userids(
+                (int) $data['scopecourseid'],
+                array_map('intval', array_column($records, 'user_id'))
+            ));
+            $records = array_filter($records, static function ($record) use ($staff) {
+                return !isset($staff[(int) $record->user_id]);
+            });
+        }
         try {
             foreach ($records as $record) {
                 $record->json = json_decode($record->json);
@@ -683,7 +712,7 @@ class learning_paths {
             'userpathid' => (int)$data['userpathid'],
         ];
 
-        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, usr.username,
+        $sql = "SELECT lpu.id, lpu.user_id, lpu.json, lpu.last_seen_by_owner, lpu.timecreated, usr.username,
             usr.firstname, usr.lastname, usr.email, lpu.json, lap.image
             FROM {local_adele_path_user} lpu
             LEFT JOIN {user} usr ON lpu.user_id = usr.id
@@ -728,7 +757,11 @@ class learning_paths {
             }
             // Re-render the feedback/info strings in the CURRENT (viewer's) language so they follow
             // a language switch instead of the language the recompute happened to run in (#493).
-            $record->json = relation_update::rerender_feedback_language($record->json, $record->user_id);
+            $record->json = relation_update::rerender_feedback_language(
+                $record->json,
+                $record->user_id,
+                (int) ($record->timecreated ?? 0)
+            );
             $record->json = self::addnodemanualcondition($record->json, $record->user_id);
             return (array)$record;
         }
@@ -1023,7 +1056,7 @@ class learning_paths {
         global $DB;
         $record = new stdClass();
         $record->id = $params['lpuserpathid'];
-        $record->last_seen_by_owner = time();
+        $record->last_seen_by_owner = \core\di::get(\core\clock::class)->time();
         $DB->update_record('local_adele_path_user', $record);
 
         return ['last_seen' => $record->last_seen_by_owner];
@@ -1102,6 +1135,113 @@ class learning_paths {
         }
 
         return $iseditor;
+    }
+
+    /**
+     * Whether a learning path is embedded in a course: whether a mod_adele
+     * activity of that course shows it.
+     *
+     * This is what ties a path to a course. The web services that hand out
+     * learner data take the context from the client; rights that come from a
+     * course (teaching it, being enrolled in it) may only count where the
+     * path is actually shown - otherwise any course somebody belongs to would
+     * open the learner data of every path.
+     *
+     * @param int $learningpathid The learning path.
+     * @param int $courseid The course.
+     * @return bool
+     */
+    public static function is_embedded_in_course(int $learningpathid, int $courseid): bool {
+        global $DB;
+        if ($learningpathid <= 0 || $courseid <= 0) {
+            return false;
+        }
+        // The embedding lives in mod_adele; without it nothing is embedded.
+        if (!$DB->get_manager()->table_exists('adele')) {
+            return false;
+        }
+        return $DB->record_exists('adele', ['course' => $courseid, 'learningpathid' => $learningpathid]);
+    }
+
+    /**
+     * Whether the current user may SEE the learners of a learning path in a
+     * course: local/adele:viewparticipants - or local/adele:teacheredit,
+     * since who may change a learner's path may look at it.
+     *
+     * Seeing and changing are two rights (mod_adele #39): a teacher without
+     * editing rights sees everything and changes nothing. Changing is
+     * local/adele:teacheredit alone.
+     *
+     * @param \context $context A course or module context.
+     * @return bool
+     */
+    public static function can_view_participants(\context $context): bool {
+        return has_capability('local/adele:viewparticipants', $context)
+            || has_capability('local/adele:teacheredit', $context);
+    }
+
+    /**
+     * Whether the current user may read and change the data of learners
+     * WITHOUT being a teacher of a course that embeds the path: site
+     * administrators, and nobody else.
+     *
+     * Building a path and using it in a course are two different things
+     * (#586, addendum of 2026-10-07): whoever creates or edits a path - its
+     * owner, the people added to it, an ADELE assistant, an ADELE manager
+     * (local/adele:canmanage) - gets no view of the learners by that. The
+     * learners of a course are for the teachers of that course
+     * (can_view_participants(), local/adele:teacheredit).
+     *
+     * @return bool
+     */
+    public static function has_learner_data_authority(): bool {
+        return is_siteadmin();
+    }
+
+    /**
+     * Who is on the roster of a course: everybody with an ACTIVE enrolment
+     * there, by whatever method - and everybody ADELE itself has enrolled
+     * there, active or suspended.
+     *
+     * A suspension is one flag with two meanings. ADELE's own: "enrolled,
+     * without access" - the host mode "hidden" keeps its learners that way on
+     * purpose, they belong on their teacher's list. Everybody else's: a
+     * person or another system took this participant out - they keep their
+     * path (a suspension in the host course is without consequence for it),
+     * but they are not shown among the course's learners (#588, addendum of
+     * 2026-10-07).
+     *
+     * @param int $courseid The course.
+     * @return array [sql selecting the column "id", params]
+     */
+    public static function roster_members_sql(int $courseid): array {
+        [$activesql, $params] = get_enrolled_sql(\context_course::instance($courseid), '', 0, true);
+        $sql = "SELECT active.id
+                  FROM ({$activesql}) active
+                 UNION
+                SELECT rosterue.userid
+                  FROM {user_enrolments} rosterue
+                  JOIN {enrol} rostere ON rostere.id = rosterue.enrolid
+                 WHERE rostere.courseid = :rostercourseid AND rostere.enrol = 'adele'";
+        $params['rostercourseid'] = $courseid;
+        return [$sql, $params];
+    }
+
+    /**
+     * Whether a person is on the roster of a course - see roster_members_sql().
+     *
+     * @param int $courseid The course.
+     * @param int $userid The person.
+     * @return bool
+     */
+    public static function is_roster_member(int $courseid, int $userid): bool {
+        global $DB;
+        if ($userid <= 0) {
+            return false;
+        }
+        [$sql, $params] = self::roster_members_sql($courseid);
+        $params['rosteruserid'] = $userid;
+        return $DB->record_exists_sql("SELECT 1 FROM ({$sql}) roster WHERE roster.id = :rosteruserid", $params);
     }
 
     /**

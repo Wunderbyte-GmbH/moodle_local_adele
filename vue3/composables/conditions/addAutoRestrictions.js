@@ -29,18 +29,55 @@ const  addAutoRestrictions = (newNode, oldNode, relation, store) => {
     newNode.restriction = createRestriction(newNode.id, oldNode.id, store)
     return newNode
   } else if (relation == 'parent') {
-    // Add restriction to already exsisting node.
-    if (oldNode.restriction != undefined) {
-      return oldNode
-    } else {
-      oldNode.restriction = createRestriction(oldNode.id, newNode.id, store)
-    }
-    return oldNode
+    // The new node becomes a further predecessor of the node it was placed
+    // before. Like the parallel zone (#584), its predecessor criterion must
+    // name it - otherwise the edge is drawn but the new node does not count
+    // for the access (found with chain E2).
+    return includePredecessor(oldNode, newNode, store)
   } else if (relation == 'and') {
-    // Add restriction to already exsisting node.
-    return oldNode
+    // The new node runs in parallel to the node it was dropped next to and
+    // shares that node's successors (#584). Each shared successor gets the
+    // new node into its predecessor criterion - exactly what the criterion
+    // editor does when an author opens it (parent_courses.vue): every
+    // predecessor in courses_id, min_courses left as it is. Its default, here
+    // as everywhere in the editor, is 1: any one of the predecessors suffices.
+    return includePredecessor(oldNode, newNode, store)
   }
   return null
+}
+
+/**
+ * Make a node's predecessor criterion name a new predecessor.
+ *
+ * - A criterion "according to predecessor nodes" is there: the new node is
+ *   added to its courses_id, min_courses stays.
+ * - No criterion at all: one is created naming every predecessor (the
+ *   starting marker aside) and the new node, min_courses 1.
+ * - Other conditions but no predecessor criterion: the author has written
+ *   the criteria by hand; they are left alone.
+ *
+ * @param {object} oldNode The node that gets a further predecessor.
+ * @param {object} newNode The new predecessor.
+ * @param {object} store The store (strings).
+ * @returns {object} oldNode.
+ */
+function includePredecessor (oldNode, newNode, store) {
+  const criterion = (oldNode.restriction?.nodes || [])
+    .find((node) => node?.data?.label === 'parent_courses');
+  if (criterion) {
+    const ids = criterion.data.value?.courses_id || [];
+    if (!ids.includes(newNode.id)) {
+      criterion.data.value = { ...criterion.data.value, courses_id: [...ids, newNode.id] };
+    }
+  } else if (!oldNode.restriction?.nodes?.length) {
+    oldNode.restriction = createRestriction(oldNode.id, newNode.id, store);
+    const created = oldNode.restriction.nodes
+      .find((node) => node?.data?.label === 'parent_courses');
+    const parents = (oldNode.parentCourse || [])
+      .filter((id) => id !== 'starting_node' && id !== newNode.id);
+    created.data.value.courses_id = [...parents, newNode.id];
+  }
+  return oldNode
 }
 
 function createRestriction (node_id, parent_node_id, store) {

@@ -193,8 +193,10 @@ onBeforeUnmount(() => {
           >
             <i class="fa fa-crown crown-grey" aria-hidden="true" />
           </button>
+          <!-- The owner always stays on the list (decision 2026-10-08):
+               ownership is handed over with the crown, not by removal. -->
           <button
-            v-if="selectedUsers.length > 1"
+            v-if="selectedUsers.length > 1 && !isOwnerCard(user)"
             class="btn btn-link text-danger p-0"
             @click="removeUser(user.id)"
             :title="store.state.strings.removeuser"

@@ -36,6 +36,7 @@
         v-if="store.state.view != null && (store.state.view == 'manager' || store.state.view == 'assistant')"
         type="button"
         class="btn btn-primary mt-4 mb-4 btn-block"
+        data-testid="learningpath-create"
         @click.prevent="addNewLearningpath()"
       >
         {{ store.state.strings.learningpath_form_title_add }}
@@ -71,6 +72,7 @@
         :key="singlelearningpath.id"
         class="learningcard"
         :title="singlelearningpath.name"
+        :data-testid="'learningpath-row-' + singlelearningpath.id"
       >
         <div
           v-if="
@@ -92,22 +94,31 @@
               <h5 class="text-center mb-0">
                 {{ singlelearningpath.name }}
               </h5>
-              <a
+              <button
                 v-if="
                   store.state.editablepaths[singlelearningpath.id] != undefined ||
                   store.state.view == 'manager' ||
                   singlelearningpath.isowner == 'true'
                 "
+                type="button"
                 class="icon-link position-absolute"
-                href=""
-                v-tooltip="singlelearningpath.visibility == 1 ? 'Make Invisible' : 'Make Visible'"
+                :aria-label="store.state.strings.learningpath_visibility + ': ' + singlelearningpath.name"
+                :aria-pressed="singlelearningpath.visibility == 1 ? 'true' : 'false'"
+                :title="singlelearningpath.visibility == 1
+                  ? store.state.strings.make_invisible
+                  : store.state.strings.make_visible"
+                v-tooltip="singlelearningpath.visibility == 1
+                  ? store.state.strings.make_invisible
+                  : store.state.strings.make_visible"
+                :data-testid="'learningpath-visibility-toggle-' + singlelearningpath.id"
                 @click.prevent="toggleVisibility(singlelearningpath)"
               >
                 <i
                   class="icon fa-fw iconsmall"
                   :class="singlelearningpath.visibility== '1' ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                  aria-hidden="true"
                 />
-              </a>
+              </button>
             </div>
           </div>
             <div
@@ -125,43 +136,48 @@
                 }"
               >
                 <div class="overlay">
-                  <a
+                  <button
                     v-if="
                       store.state.view == 'manager' ||
                       (store.state.view == 'assistant' && singlelearningpath.isowner == 'true')
                     "
+                    type="button"
                     class="icon-link"
-                    href=""
+                    :aria-label="store.state.strings.duplicate + ': ' + singlelearningpath.name"
                     :title="store.state.strings.duplicate"
                     v-tooltip="store.state.strings.duplicate"
                     @click.prevent="duplicateLearningpath(singlelearningpath.id)"
                   >
                     <i
                       class="icon m-r-0 fas fa-copy fa-fw iconsmall"
+                      aria-hidden="true"
                     />
-                  </a>
-                  <a
+                  </button>
+                  <button
                     v-if="
                       store.state.editablepaths[singlelearningpath.id] != undefined ||
                       store.state.view == 'manager' ||
                       singlelearningpath.isowner == 'true'
                     "
+                    type="button"
                     class="icon-link"
-                    href=""
+                    :aria-label="store.state.strings.edit + ': ' + singlelearningpath.name"
                     :title="store.state.strings.edit"
                     v-tooltip="store.state.strings.edit"
                     @click.prevent="editLearningpath(singlelearningpath.id)"
                   >
                     <i
                       class="icon m-r-0 fas fa-pencil fa-fw iconsmall"
+                      aria-hidden="true"
                     />
-                  </a>
-                  <a
+                  </button>
+                  <button
                     v-if="
                        (store.state.view == 'manager') || (store.state.view == 'assistant' && singlelearningpath.isowner == 'true')
                     "
+                    type="button"
                     class="icon-link"
-                    href=""
+                    :aria-label="store.state.strings.delete + ': ' + singlelearningpath.name"
                     :title="store.state.strings.delete"
                     v-tooltip="store.state.strings.delete"
                     @click.prevent="showDeleteConfirm(singlelearningpath.id)"
@@ -169,8 +185,9 @@
                     <i
                       class="icon fa-fw iconsmall fa"
                       :class="store.state.version ? 'fa-trash' : 'fa-trash-o'"
+                      aria-hidden="true"
                     />
-                  </a>
+                  </button>
                 </div>
               </div>
               <div>
@@ -229,6 +246,7 @@
           v-for="viewablelearningpath in viewLearningPaths"
           :key="viewablelearningpath.id"
           class="learningcard"
+          :data-testid="'learningpath-row-' + viewablelearningpath.id"
         >
           <div
             v-if="viewablelearningpath.visibility == 1"
@@ -255,17 +273,19 @@
                 }"
               >
                 <div class="overlay">
-                  <a
+                  <button
+                    type="button"
                     class="icon-link"
-                    href=""
+                    :aria-label="store.state.strings.view + ': ' + viewablelearningpath.name"
                     :title="store.state.strings.view"
                     v-tooltip="store.state.strings.view"
                     @click.prevent="viewLearningpath(viewablelearningpath.id)"
                   >
                     <i
                       class="icon m-r-0 fas fa-solid fa-play fa-fw iconsmall"
+                      aria-hidden="true"
                     />
-                  </a>
+                  </button>
                 </div>
               </div>
               <div>
@@ -380,20 +400,20 @@ const showDeleteConfirm = (index) => {
   clicked.value[index] = true;
 };
 
-// Edit learning path deletion
+// The path itself is loaded by the view the route leads to
+// (LearningpathsEdit.showForm) - once. Loading it here as well meant two
+// requests, and the later answer overwrote what had been typed meanwhile (#585).
 const viewLearningpath = async (singlelearningpathid) => {
   store.state.learningPathID = singlelearningpathid
-  await store.dispatch('fetchLearningpath')
   router.push({
     name: 'learningpath-view',
     params: { learningpathId: singlelearningpathid  }
   })
 };
 
-// Edit learning path deletion
+// Open a learning path for editing (it is loaded by the target, see above).
 const editLearningpath = async (singlelearningpathid) => {
   store.state.learningPathID = singlelearningpathid
-  await store.dispatch('fetchLearningpath')
   router.push({
     name: 'learningpath-edit',
     params: { learningpathId: singlelearningpathid  }
@@ -514,6 +534,32 @@ const duplicateLearningpath = (learningpathid) => {
     padding: 10px;
     margin: 0 15px;
     display: inline-flex;
+  }
+
+  /*
+   * The icon controls are <button> elements since #575 B2 (they were links
+   * with href="", which navigate rather than toggle and are unusable from the
+   * keyboard). These four declarations only undo the browser's button
+   * defaults, so the controls look exactly as before.
+   */
+  button.icon-link {
+    background: none;
+    border: 0;
+    font: inherit;
+    line-height: 1;
+  }
+
+  /*
+   * Focus indicator (#575 B6, WCAG 2.4.7 / 1.4.11). The controls sit on a
+   * coloured card header and on top of the cover image, where the browser
+   * default outline can disappear; the white outline plus a dark shadow keeps
+   * it visible on either background.
+   */
+  .icon-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
+    border-radius: 2px;
   }
 
   .fa-copy,

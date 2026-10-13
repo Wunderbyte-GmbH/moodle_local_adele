@@ -28,6 +28,7 @@ import { createAppStore } from './store';
 import Notifications from '@kyvg/vue3-notification'
 import { createAppRouter } from './router/router'
 import tooltipDirective from './directives/tooltip';
+import A11yLiveRegion from './components/A11yLiveRegion.vue';
 
 
 // Enables the Composition API
@@ -71,6 +72,9 @@ function init() {
             app.use(appRouter);
             const viewAttributeValue = localAdeleAppElement.getAttribute('view');
             store.state.view = viewAttributeValue;
+            // The teacher's view may be read-only (mod_adele #39): the page
+            // then says canedit="0". Everything else may edit, as before.
+            store.state.canedit = localAdeleAppElement.getAttribute('canedit') !== '0';
             const pathAttributeValue = localAdeleAppElement.getAttribute('learningpath');
             store.state.learningPathID = pathAttributeValue;
             const userAttributeValue = localAdeleAppElement.getAttribute('user');
@@ -86,6 +90,10 @@ function init() {
             store.state.editablepaths = JSON.parse(editablepathsValue);
             store.state.version = canUseNewFaIconsnewVersion(localAdeleAppElement.getAttribute('version'));
             app.directive('tooltip', tooltipDirective);
+            // The accessibility live region sits in the root template
+            // (templates/initview.mustache) next to <router-view>, so it is
+            // present in every view and survives navigation (#575 B4).
+            app.component('A11yLiveRegion', A11yLiveRegion);
             app.mount(localAdeleAppElement);
         }
     });

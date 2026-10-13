@@ -37,9 +37,20 @@ import truncatedText from '../../composables/nodesHelper/truncatedText';
 import MasterConditions from '../nodes_items/MasterConditions.vue';
 import { useStatusMessage } from '../../composables/useStatusMessage';
 import * as nodeColors from '../../config/nodeColors';
+import { useNodeStatus } from '../../composables/useNodeStatus';
 
 // Load Store
 const store = useStore();
+// Machine-readable identity and state of this node (#574) and its accessible
+// name (#575 B1). All three come from useNodeStatus, the single derivation
+// shared with the icon the sighted user sees; role="group" is what makes the
+// name reachable for an assistive technology - aria-label on a bare div is
+// not exposed.
+const { status: nodeStatus, accessibleName: nodeAccessibleName } = useNodeStatus(
+  computed(() => props.data),
+  computed(() => store.state.strings)
+);
+
 const date = ref({})
 const includedCourses = ref([])
 const parentnode = ref({})
@@ -246,7 +257,14 @@ const courseLinkTitle = computed(() =>
 </script>
 
 <template>
-  <div @click="handleNodeClick" ref="customNodeEdit">
+  <div
+    ref="customNodeEdit"
+    role="group"
+    :aria-label="nodeAccessibleName"
+    :data-testid="'learningpath-node-' + data.node_id"
+    :data-status="nodeStatus"
+    @click="handleNodeClick"
+  >
     <div v-if="zoomstep != '0.2'" class="card" :style="[{ minHeight: '200px', width: '400px' }, parentStyle, cardBackgroundColor]">
       <div class="card-header text-center" :style="headerBackgroundColor">
         <NodeInformation v-if="store.state.feedbacksettings.show_info" :data :parentnode :startanimation :status="statusMessage" />
@@ -282,13 +300,13 @@ const courseLinkTitle = computed(() =>
             <div class="col-12" style="display: flex; justify-content: end;">
               <ProgressBar :progress="data.progress" :status="statusMessage" />
             </div>
-            <div v-if="store.state.view == 'teacher' && data.manualrestriction">
+            <div v-if="store.state.view == 'teacher' && store.state.canedit !== false && data.manualrestriction">
               <RestrictionOutPutItem :data="data" />
             </div>
-            <div v-if="store.state.view == 'teacher' && data.manualcompletion">
+            <div v-if="store.state.view == 'teacher' && store.state.canedit !== false && data.manualcompletion">
               <CompletionOutPutItem :data="data" />
             </div>
-            <MasterConditions v-if="store.state.view == 'teacher'" class="col-12" :data="data" />
+            <MasterConditions v-if="store.state.view == 'teacher' && store.state.canedit !== false" class="col-12" :data="data" />
           </div>
         </div>
       </div>

@@ -139,12 +139,63 @@ function readFeedbackSettings(json) {
     };
 }
 
+/**
+ * Compare the node states of two user path relations (#575 B4).
+ *
+ * Returns the nodes that became accessible or completed since the previous
+ * fetch. Only the gains are reported: a recompute that changes nothing must
+ * stay silent, and a node that went backwards is not news a learner needs
+ * read out mid-task.
+ *
+ * @param {object} previous The relation held before the fetch, or null.
+ * @param {object} current The relation just fetched.
+ * @returns {{accessible: string[], completed: string[]}} Course names by gain.
+ */
+export function newlyReachedNodes(previous, current) {
+    const statuses = (relation) => {
+        const map = {};
+        const nodes = relation && relation.json && relation.json.tree
+            ? relation.json.tree.nodes || [] : [];
+        nodes.forEach((node) => {
+            const data = node.data || {};
+            map[node.id] = {
+                status: data.completion && data.completion.feedback
+                    ? data.completion.feedback.status : null,
+                name: data.fullname || '',
+            };
+        });
+        return map;
+    };
+    const before = statuses(previous);
+    const after = statuses(current);
+    const gained = { accessible: [], completed: [] };
+    Object.keys(after).forEach((id) => {
+        // A node seen for the first time is not a change: on the first load
+        // every node would be "new", and the learner would be read the whole
+        // graph before they had done anything.
+        if (!(id in before)) {
+            return;
+        }
+        const was = before[id].status;
+        const is = after[id].status;
+        if (was === is) {
+            return;
+        }
+        if (is === 'accessible' || is === 'completed') {
+            gained[is].push(after[id].name);
+        }
+    });
+    return gained;
+}
+
 // Defining store for application
 export function createAppStore() {
     return createStore({
         state() {
             return {
                 view: 'defaultView',
+                // False in a read-only teacher's view (mod_adele #39).
+                canedit: true,
                 user: null,
                 userlist: null,
                 learningPathID: 0,
@@ -181,6 +232,9 @@ export function createAppStore() {
                 undoNodes: [],
                 undoEdges: [],
                 wwwroot: '',
+                // Text of the accessibility live region (#575 B4). Written by
+                // announce(), read by A11yLiveRegion.vue, never rendered visibly.
+                announcement: '',
             };
         },
         getters: {
@@ -288,6 +342,24 @@ export function createAppStore() {
             },
             setLpUserPathRelation(state, data){
                 state.lpuserpathrelation = data;
+            },
+            /**
+             * Put one short sentence into the live region.
+             *
+             * A screen reader announces a live region when its text CHANGES.
+             * Writing the same sentence twice would therefore stay silent -
+             * and blanking it first does not help, because Vue batches both
+             * writes into one render and the empty string never reaches the
+             * DOM. So a repeated message alternates a trailing no-break
+             * space: a different string, an identical announcement.
+             */
+            announce(state, message) {
+                if (!message) {
+                    state.announcement = '';
+                    return;
+                }
+                const repeat = state.announcement.replace(/\u00a0$/, '') === message;
+                state.announcement = repeat ? message + '\u00a0' : message;
             },
             setLpImages(state, data){
               state.lpimages = data;
@@ -397,11 +469,26 @@ export function createAppStore() {
                       userpathid: route.userId,
                       contextid: context.state.contextid,
                     });
+                const previousrelation = context.state.lpuserpathrelation;
                 context.commit('setLpUserPathRelation', lpUserPathRelation);
                 context.commit('setLastSeen', lpUserPathRelation.last_seen_by_owner);
                 if (lpUserPathRelation.json != '') {
                   lpUserPathRelation.json = await JSON.parse(lpUserPathRelation.json);
                   context.commit('setFeedbackSettings', lpUserPathRelation.json);
+                  // What changed for the learner, in one sentence (#575 B4).
+                  const gained = newlyReachedNodes(previousrelation, lpUserPathRelation);
+                  const sentences = [];
+                  if (gained.accessible.length) {
+                    sentences.push(context.state.strings.a11y_now_accessible + ' ' +
+                      gained.accessible.join(', '));
+                  }
+                  if (gained.completed.length) {
+                    sentences.push(context.state.strings.a11y_now_completed + ' ' +
+                      gained.completed.join(', '));
+                  }
+                  if (sentences.length) {
+                    context.commit('announce', sentences.join('. '));
+                  }
                 }
                 return lpUserPathRelation
             },
@@ -492,8 +579,12 @@ export function createAppStore() {
                     // bypassed frontend, or a duplicate name #492), show its message in
                     // the same clean modal - never the raw exception dialog with a stack.
                     Notification.alert(context.state.strings.error_save_title, error.message);
+                    // The modal takes the focus, but its text is not a status
+                    // message; announce the reason as well (#575 B4).
+                    context.commit('announce', error.message);
                     throw error;
                 }
+                context.commit('announce', context.state.strings.title_save);
                 context.dispatch('fetchLearningpaths');
                 return result.learningpath.id;
             },

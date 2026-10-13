@@ -1,0 +1,384 @@
+name: E2E
+
+# End-to-end suite for the ADELE ecosystem (docs: E2E test plan, section 22).
+#
+# MANUAL ONLY: Actions tab -> "E2E" -> "Run workflow". No push trigger and no
+# schedule. A run builds a full site, restores the fixture courses and drives
+# whole chains through the browser; that costs minutes, and it is started when
+# somebody wants the answer, not on every commit. The smoke suite
+# (playwright.yml) is what runs automatically.
+#
+# EVERY run uploads ONE artefact with the complete evidence, whether the suite
+# passed, failed or was cancelled:
+#   playwright-report/  HTML report, every test with screenshot and video
+#   test-results/       the same videos by test name, traces for failures
+#   results.json        complete machine-readable result tree
+#   junit.xml           the same in JUnit format
+#   run.log             console output
+#   environment.md      Moodle, PHP and the exact commit of every plugin
+#   summary.md          one row per test, also shown in the job summary
+#   coverage.md/.json   story -> test -> status -> evidence -> commit; the
+#                       job is red unless every required story passed and
+#                       nothing was skipped, fixme or flaky
+# The video of a PASSING run is part of the point: the plan uses these
+# recordings as evidence that the intended journey works, and they are reused
+# as documentation.
+#
+# NOTE: workflow_dispatch only appears in the Actions UI once this file is on
+# the repository's DEFAULT branch.
+"on":
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: >-
+          Only run tests whose title matches this regular expression
+          (Playwright --grep), e.g. ADELE-E2E-C1. Empty: the whole suite.
+        type: string
+        default: ''
+      php_version:
+        description: PHP version (Moodle 4.5 supports 8.1 to 8.3).
+        type: choice
+        options:
+          - '8.3'
+          - '8.2'
+          - '8.1'
+        default: '8.3'
+      sibling_ref:
+        description: >-
+          Branch, tag or commit for the two companion plugins. Empty: a branch
+          of the same name as this run's if the companion has one, otherwise
+          its default branch.
+        type: string
+        default: ''
+      retention_days:
+        description: Days the result artefact is kept.
+        type: number
+        default: 30
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E (Moodle 4.5, PHP ${{ inputs.php_version || '8.3' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moodle
+          POSTGRES_PASSWORD: moodle
+          POSTGRES_DB: moodle
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+
+    env:
+      # The plugin this repository holds: enrol, local or mod.
+      PLUGIN: local
+      # Inputs reach the scripts through the environment only, never by
+      # interpolating ${{ }} into a run block: a free-text input pasted into
+      # shell code is a script injection.
+      PHP_VERSION: ${{ inputs.php_version || '8.3' }}
+      SIBLING_REF: ${{ inputs.sibling_ref || '' }}
+      TEST_GREP: ${{ inputs.grep || '' }}
+      MOODLE_BRANCH: MOODLE_405_STABLE
+      MOODLE_WWWROOT: http://127.0.0.1:8000
+
+    steps:
+      - name: Prepare
+        run: |
+          # runner.temp is not available at job level, so it is handed on here.
+          echo "EXPORT_DIR=$RUNNER_TEMP/e2e-export" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/e2e-export"
+
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pgsql, gd, intl, zip, soap, mbstring, curl, xml, exif
+          ini-values: max_input_vars=5000
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check out Moodle
+        run: |
+          git clone --depth 1 --branch "$MOODLE_BRANCH" https://github.com/moodle/moodle.git moodle
+          echo "MOODLE_WEBROOT=$GITHUB_WORKSPACE/moodle" >> "$GITHUB_ENV"
+
+      - name: Install the plugin ecosystem into Moodle
+        run: |
+          # All three plugins are needed whichever repository started the run:
+          # the chains cross plugin boundaries by definition (path state in
+          # local_adele, enrolment in enrol_adele, embedding in mod_adele),
+          # and the dependency graph is circular, so Moodle cannot install
+          # one of them alone.
+          #
+          # Companions come from the SAME owner as the repository under test
+          # (Wunderbyte upstream or a fork); all three are named
+          # moodle-<type>_adele and default to "main".
+          declare -A REPO=(
+            [local]="${GITHUB_REPOSITORY_OWNER}/moodle-local_adele"
+            [enrol]="${GITHUB_REPOSITORY_OWNER}/moodle-enrol_adele"
+            [mod]="${GITHUB_REPOSITORY_OWNER}/moodle-mod_adele"
+          )
+          {
+            echo "| Plugin | Repository | Ref | Commit |"
+            echo "|---|---|---|---|"
+            echo "| ${PLUGIN}_adele (under test) | $GITHUB_REPOSITORY | $GITHUB_REF_NAME | $GITHUB_SHA |"
+          } > "$RUNNER_TEMP/plugins.md"
+
+          dest="$MOODLE_WEBROOT/$PLUGIN/adele"
+          rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+          cp -a plugin "$dest"; rm -rf "$dest/.git"
+
+          for sib in local enrol mod; do
+            [ "$sib" = "$PLUGIN" ] && continue
+            url="https://github.com/${REPO[$sib]}.git"
+            src="$RUNNER_TEMP/src_$sib"
+            ref="$SIBLING_REF"
+            if [ -z "$ref" ] && git ls-remote --exit-code --heads "$url" "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+              ref="$GITHUB_REF_NAME"
+            fi
+            rm -rf "$src"
+            git clone --quiet "$url" "$src"
+            if [ -n "$ref" ]; then
+              # checkout, not clone --branch: it also accepts tags and SHAs.
+              git -C "$src" checkout --quiet "$ref" || {
+                echo "::error::${sib}_adele: ref '$ref' does not exist in ${REPO[$sib]}."
+                exit 1
+              }
+            else
+              ref="$(git -C "$src" rev-parse --abbrev-ref HEAD) (default)"
+            fi
+            echo "| ${sib}_adele | ${REPO[$sib]} | $ref | $(git -C "$src" rev-parse HEAD) |" \
+              >> "$RUNNER_TEMP/plugins.md"
+            dest="$MOODLE_WEBROOT/$sib/adele"
+            rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+            cp -a "$src" "$dest"; rm -rf "$dest/.git"
+          done
+
+          # The catquiz family for the diagnosis chain (plan section 13), Moodle
+          # 4.5 line: branch ALiSe-v-1.2.0-legacy of the ralferlebach forks -
+          # for now the only source of that line (decision 2026-10-06).
+          # local_catquiz brings two subplugins as git SUBMODULES
+          # (catquizcentralhub/host, /client); without them Moodle's component
+          # scan fails with "Invalid subtype directory".
+          CATQUIZ_REF=ALiSe-v-1.2.0-legacy
+          declare -A EXTRA=(
+            [local/wunderbyte_table]="Wunderbyte-GmbH/moodle-local_wunderbyte_table|MOODLE_405_DEV"
+            [mod/adaptivequiz]="ralferlebach/moodle-mod_adaptivequiz|$CATQUIZ_REF"
+            [mod/adaptivequiz/catmodel/catquiz]="ralferlebach/moodle-adaptivequizcatmodel_catquiz|$CATQUIZ_REF"
+            [local/catquiz]="ralferlebach/moodle-local_catquiz|$CATQUIZ_REF"
+          )
+          # Order matters: the adapter lives INSIDE mod/adaptivequiz.
+          for path in local/wunderbyte_table mod/adaptivequiz mod/adaptivequiz/catmodel/catquiz local/catquiz; do
+            repo="${EXTRA[$path]%%|*}"
+            ref="${EXTRA[$path]##*|}"
+            src="$RUNNER_TEMP/src_$(basename "$repo")"
+            rm -rf "$src"
+            git clone --quiet --depth 1 --branch "$ref" --recurse-submodules --shallow-submodules \
+              "https://github.com/$repo.git" "$src"
+            echo "| $(basename "$repo") | $repo | $ref | $(git -C "$src" rev-parse HEAD) |" \
+              >> "$RUNNER_TEMP/plugins.md"
+            dest="$MOODLE_WEBROOT/$path"
+            rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+            cp -a "$src" "$dest"
+            find "$dest" -name .git -prune -exec rm -rf {} +
+          done
+
+      - name: Install Moodle site
+        run: |
+          cd moodle
+          mkdir -p "$RUNNER_TEMP/moodledata"
+          php admin/cli/install.php \
+            --non-interactive --agree-license \
+            --dbtype=pgsql --dbhost=127.0.0.1 --dbport=5432 --dbname=moodle \
+            --dbuser=moodle --dbpass=moodle \
+            --wwwroot="$MOODLE_WWWROOT" --dataroot="$RUNNER_TEMP/moodledata" \
+            --fullname="ADELE E2E" --shortname="adelee2e" \
+            --adminpass="Admin!23" --adminemail=ci@example.invalid
+
+      - name: Seed the shipped fixtures
+        run: |
+          cd moodle
+          # Courses, accounts and learning paths ship with local_adele
+          # (tests/playwright/fixtures), so nothing is fetched at run time:
+          # a suite that clones its own data is green or red depending on a
+          # repository nobody in this run is watching.
+          ADELE_SEED_I_KNOW=1 php local/adele/tests/playwright/seed_fixtures.php \
+            > "$RUNNER_TEMP/fixtures.env"
+          echo "Fixture variables:"
+          sed -n "s/^export \([A-Z_][A-Z0-9_]*\)=.*/  \1/p" "$RUNNER_TEMP/fixtures.env"
+          sed -n "s/^export \([A-Z_][A-Z0-9_]*\)='\(.*\)'$/\1=\2/p" \
+            "$RUNNER_TEMP/fixtures.env" >> "$GITHUB_ENV"
+
+          if ! grep -q "^export ADELE_FIXTURE_PATH_" "$RUNNER_TEMP/fixtures.env"; then
+            echo "::error::The fixture seed imported no learning path."
+            cat "$RUNNER_TEMP/fixtures.env"
+            exit 1
+          fi
+
+          # The entitlements the chains assert are produced by ad-hoc tasks,
+          # not by the subscription itself. Draining the queue here is what
+          # the plan means by "no real waiting": the state is complete before
+          # the first browser starts.
+          php admin/cli/adhoc_task.php --execute
+
+      - name: Record the tested environment
+        run: |
+          # Read, not executed: version.php uses constants that only exist
+          # inside Moodle.
+          versions () {
+            local release version
+            release=$(sed -n "s/^\$plugin->release *= *'\(.*\)';.*/\1/p" "$1")
+            version=$(sed -n "s/^\$plugin->version *= *\([0-9]*\);.*/\1/p" "$1")
+            echo "$release ($version)"
+          }
+          {
+            echo "# Tested environment"
+            echo
+            echo "| Item | Value |"
+            echo "|---|---|"
+            echo "| Workflow run | $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (attempt $GITHUB_RUN_ATTEMPT) |"
+            echo "| Started by | $GITHUB_ACTOR |"
+            echo "| Title filter | ${TEST_GREP:-none} |"
+            echo "| Moodle | $MOODLE_BRANCH, $(sed -n "s/^\$release *= *'\(.*\)';.*/\1/p" "$MOODLE_WEBROOT/version.php") |"
+            echo "| PHP | $(php -r 'echo PHP_VERSION;') |"
+            echo "| Database | PostgreSQL 16 (service container) |"
+            echo "| enrol_adele | $(versions "$MOODLE_WEBROOT/enrol/adele/version.php") |"
+            echo "| local_adele | $(versions "$MOODLE_WEBROOT/local/adele/version.php") |"
+            echo "| mod_adele | $(versions "$MOODLE_WEBROOT/mod/adele/version.php") |"
+            echo
+            echo "## Plugin sources"
+            echo
+            cat "$RUNNER_TEMP/plugins.md"
+          } > "$EXPORT_DIR/environment.md"
+          cat "$EXPORT_DIR/environment.md"
+
+      - name: Install Playwright and browsers
+        run: |
+          cd "$MOODLE_WEBROOT/$PLUGIN/adele/tests/e2e"
+          # npm ci, not npm install: it fails loudly when the lockfile is
+          # missing rather than resolving whatever is current that day.
+          npm ci
+          npx playwright install --with-deps chromium
+          # The server test clock for the time chains (plan section 9):
+          # libfaketime, preloaded into the PHP processes only.
+          sudo apt-get install -y -qq faketime >/dev/null
+          lib="$(dpkg -L libfaketime | grep -m1 '/libfaketime.so.1$')"
+          if [ -z "$lib" ]; then
+            echo "::error::libfaketime.so.1 not found after installing faketime."
+            exit 1
+          fi
+          echo "ADELE_FAKETIME_LIB=$lib" >> "$GITHUB_ENV"
+          echo "ADELE_FAKETIME_FILE=$RUNNER_TEMP/adele-faketime.rc" >> "$GITHUB_ENV"
+
+      - name: Run the E2E suite
+        run: |
+          # GitHub runs this block with "bash -e"; a red suite must not end
+          # the step before the evidence is collected.
+          set +e
+          set -uo pipefail
+          # The web server runs inside THIS step. One started in an earlier
+          # step does not reliably survive into the next, which surfaces as a
+          # browser run against a target that has gone away.
+          # Under the test clock: the chains move it through
+          # ADELE_FAKETIME_FILE; it starts on the real time.
+          echo "+0s" > "$ADELE_FAKETIME_FILE"
+          LD_PRELOAD="$ADELE_FAKETIME_LIB" FAKETIME_TIMESTAMP_FILE="$ADELE_FAKETIME_FILE" FAKETIME_NO_CACHE=1 \
+            PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$MOODLE_WEBROOT" \
+            >"$RUNNER_TEMP/moodle-server.log" 2>&1 &
+          server_pid=$!
+          sleep 2
+          if ! kill -0 "$server_pid" 2>/dev/null; then
+            echo "::error::The Moodle web server did not start:"
+            cat "$RUNNER_TEMP/moodle-server.log"
+            exit 1
+          fi
+          ready=0; code=""
+          for _ in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+              http://127.0.0.1:8000/login/index.php || true)
+            if [ "$code" = "200" ]; then ready=1; break; fi
+            sleep 3
+          done
+          if [ "$ready" != "1" ]; then
+            echo "::error::Moodle never became reachable (last HTTP status: $code)."
+            tail -50 "$RUNNER_TEMP/moodle-server.log"
+            exit 1
+          fi
+
+          cd "$MOODLE_WEBROOT/$PLUGIN/adele/tests/e2e"
+          # Names of things a chain creates carry the run (support/fixtures:
+          # runLabel), so two runs on one site never meet.
+          ADELE_E2E_RUN_ID="run${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+          ADELE_E2E_EXPORT_DIR="$EXPORT_DIR" npx playwright test \
+            ${TEST_GREP:+--grep "$TEST_GREP"} 2>&1 \
+            | tee "$EXPORT_DIR/run.log"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Summarise the results
+        if: always()
+        run: |
+          [ -n "${EXPORT_DIR:-}" ] || exit 0
+          summary="$EXPORT_DIR/summary.md"
+          {
+            echo "# E2E results"
+            echo
+            if [ -f "$EXPORT_DIR/environment.md" ]; then
+              sed -n '/^| Item/,/^$/p' "$EXPORT_DIR/environment.md"
+            fi
+            node "plugin/tests/e2e/support/summarize-results.mjs" \
+              "${PLUGIN}_adele E2E" "$EXPORT_DIR/results.json"
+            echo "Videos of ALL tests - passed ones too - are in the artefact" \
+              "**e2e-results-${PLUGIN}_adele-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT**." \
+              "Open \`playwright-report/index.html\`, or run" \
+              "\`npx playwright show-report playwright-report\` to view traces too."
+          } > "$summary"
+          cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s "$RUNNER_TEMP/moodle-server.log" ]; then
+            gzip -c "$RUNNER_TEMP/moodle-server.log" > "$EXPORT_DIR/moodle-server.log.gz"
+          fi
+
+      # The acceptance: every required story of the test plan has a passed
+      # test, and nothing was skipped, marked fixme or flaky. A grep run is
+      # diagnostic (missing stories are listed, not counted against it); a
+      # grep that matches nothing fails already in the run step - there is
+      # no --pass-with-no-tests.
+      - name: Check the story coverage
+        if: always()
+        run: |
+          [ -n "${EXPORT_DIR:-}" ] || { echo "::error::No export directory - the suite did not run."; exit 1; }
+          node "plugin/tests/e2e/support/story-coverage.mjs" \
+            "$EXPORT_DIR/results.json" "plugin/tests/e2e/stories.json" "$EXPORT_DIR" \
+            ${TEST_GREP:+--filtered} | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Show the tail of the server log on failure
+        if: failure()
+        run: tail -100 "$RUNNER_TEMP/moodle-server.log" || true
+
+      # One artefact, always: passed, failed or cancelled. The name carries the
+      # run attempt because artefact names must be unique within a run, and
+      # "Re-run jobs" would otherwise fail at this step.
+      - name: Upload results with videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ env.PLUGIN }}_adele-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/e2e-export
+          retention-days: ${{ inputs.retention_days || 30 }}
+          if-no-files-found: warn
