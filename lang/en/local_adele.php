@@ -235,6 +235,7 @@ $string['edit_course_node'] = 'Edit node';
 $string['edit_feedback'] = 'Edit feedback...';
 $string['edit_node_pretest'] = 'Edit completion criteria';
 $string['editordeleteconfirmation'] = 'Do you really want to remove this editor from the learning path?';
+$string['editorremoveowner'] = 'The owner of a learning path cannot be removed from its editors. Transfer the ownership first.';
 $string['enabletextarea_manual_check'] = 'Edit text';
 $string['enroll_as_assistant'] = 'Automatic assistant role';
 $string['enroll_as_assistant_desc'] = 'Select a role whose assignment automatically grants the user the site-wide learning path assistant role (adeleassistant). Choose "Do not assign assistant role" to disable. Note: the assistant role is granted at system level and therefore applies site-wide.';

@@ -528,5 +528,16 @@ function xmldb_local_adele_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100713, 'local', 'adele');
     }
 
+    // The owner always stands on the list of editors of their path (decision
+    // 2026-10-08); owners taken off it before removing them was refused are
+    // put back.
+    if ($oldversion < 2026100721) {
+        $restored = \local_adele\ownership::ensure_owners_are_editors();
+        if ($restored) {
+            mtrace("local_adele: {$restored} learning path owner(s) put back on the list of editors.");
+        }
+        upgrade_plugin_savepoint(true, 2026100721, 'local', 'adele');
+    }
+
     return true;
 }

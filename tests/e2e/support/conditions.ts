@@ -60,18 +60,10 @@ export const conditions = (page: Page): Locator => flow(page).locator('.vue-flow
  *
  * @param page The page showing the path editor.
  * @param nodeid The node, e.g. "dndnode_2".
- * @param covered Whether another node lies on top of it.
  */
-export async function openAccessCriteria(page: Page, nodeid: string, covered = false): Promise<void> {
-  const button = page.locator(`[data-testid="learningpath-node-${nodeid}"] button:has(i.fa-lock)`).first();
-  if (covered) {
-    // The node lies under another one (known defect, see editor-brackets):
-    // a pointer cannot reach the button, the click event is sent to it
-    // directly.
-    await button.dispatchEvent('click');
-  } else {
-    await button.click({ timeout: 15_000 });
-  }
+export async function openAccessCriteria(page: Page, nodeid: string): Promise<void> {
+  // A real click: a node covered by another must make this fail.
+  await page.locator(`[data-testid="learningpath-node-${nodeid}"] button:has(i.fa-lock)`).first().click({ timeout: 15_000 });
   const pane = flow(page).locator('.vue-flow__pane').first();
   await expect(pane).toBeVisible({ timeout: 30_000 });
   // The editor fits its view on opening (one second of animation) and only

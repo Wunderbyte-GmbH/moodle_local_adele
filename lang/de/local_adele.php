@@ -235,6 +235,7 @@ $string['edit_course_node'] = 'Node bearbeiten';
 $string['edit_feedback'] = 'Feedback bearbeiten...';
 $string['edit_node_pretest'] = 'Abschlusskriterien bearbeiten';
 $string['editordeleteconfirmation'] = 'Soll der Bearbeiter für diesen Lernpfad wirklich entfernt werden?';
+$string['editorremoveowner'] = 'Der Owner eines Lernpfads kann nicht aus den Bearbeitern entfernt werden. Übertragen Sie zuerst die Eigentümerschaft.';
 $string['enabletextarea_manual_check'] = 'Text bearbeiten';
 $string['enroll_as_assistant'] = 'Automatische Assistentenrolle';
 $string['enroll_as_assistant_desc'] = 'Rolle auswählen, deren Zuweisung Nutzenden automatisch die systemweite Lernpfad-Assistentenrolle (adeleassistant) gewährt. Zum Deaktivieren „Assistentenrolle nicht zuweisen“ wählen. Hinweis: Die Assistentenrolle wird auf Systemebene vergeben und gilt daher site-weit.';

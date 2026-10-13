@@ -99,4 +99,30 @@ describe('parent_courses.vue (restriction)', () => {
     );
     expect(wrapper.vm.data.min_courses).toBe(2);
   });
+
+  // Found with chain E2: before the path was saved, the store still held the
+  // predecessors as last loaded - a node with a second, unsaved predecessor
+  // offered "1 / 1". The path the editor holds right now decides.
+  it.each([
+    ['store stale, editor current', ['c1'], ['c1', 'c2'], 2],
+    ['both the same', ['c1', 'c2'], ['c1', 'c2'], 2],
+  ])('counts the predecessors of the path being edited (%s)', async (_, stored, current, expected) => {
+    const wrapper = mount(parent_courses, {
+      global: { plugins: [buildStore([{ id: 'n1', parentCourse: stored }], 'n1')] },
+      props: {
+        restriction: { node_id: 'r1', description: 'Parent courses' },
+        learningpath: { json: { tree: { nodes: [{ id: 'n1', parentCourse: current }] } } },
+      },
+    });
+    await wrapper.vm.$nextTick();
+    const numbers = wrapper.findAll('option').filter((o) => o.attributes('disabled') === undefined);
+    expect(numbers).toHaveLength(expected);
+    expect(wrapper.text()).toContain(`/ ${expected}`);
+  });
+
+  it('falls back to the store when it is not given the path', async () => {
+    const wrapper = factory([{ id: 'n1', parentCourse: ['c1', 'c2'] }], 'n1');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.text()).toContain('/ 2');
+  });
 });

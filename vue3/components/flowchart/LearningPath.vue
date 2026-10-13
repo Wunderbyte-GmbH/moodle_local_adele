@@ -190,6 +190,7 @@ import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
 import addStagCompletions from '../../composables/conditions/addStagCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 import addAndConditions from '../../composables/conditions/addAndConditions'
+import linkParallelNode from '../../composables/conditions/linkParallelNode'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
@@ -516,6 +517,11 @@ function insertCourseNode(type, data) {
     else if (intersectedNode.value.dropzone.id == 'dropzone_parent'){
         childCourse.push(intersectedNode.value.closestnode.id)
         parentCourse.push('starting_node')
+        // The predecessors the node has already, before the new one joins.
+        const existing = intersectedNode.value.closestnode.parentCourse
+          .filter((id) => id !== 'starting_node')
+          .map((id) => findNode(id))
+          .filter((node) => node)
         intersectedNode.value.closestnode.parentCourse.push(data.node_id)
         // Check if the array contains the value
         const index = intersectedNode.value.closestnode.parentCourse.indexOf('starting_node');
@@ -523,6 +529,12 @@ function insertCourseNode(type, data) {
         if (index !== -1) {
           intersectedNode.value.closestnode.parentCourse.splice(index, 1)
           shiftNodesDown(data, nodes.value)
+        } else if (existing.length) {
+          // A further predecessor (keyboard dialog, #595): next to the ones
+          // there are, in their row - not on top of the node it precedes.
+          const rightmost = existing.reduce((a, b) => (a.position.x >= b.position.x ? a : b))
+          position.x = rightmost.position.x + (rightmost.dimensions?.width || 400) + 150
+          position.y = rightmost.position.y
         }
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
@@ -532,8 +544,10 @@ function insertCourseNode(type, data) {
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
       addConditions = addAndConditions(intersectedNode.value, getEdges, id)
       position.x += 200
-      parentCourse = addConditions.parentNodes
-      childCourse = addConditions.childNodes
+      // Copies: the lists of the node dropped next to must not be shared.
+      parentCourse = [...(addConditions.parentNodes || [])]
+      childCourse = [...(addConditions.childNodes || [])]
+      linkParallelNode(findNode, id, parentCourse, childCourse)
       newNode.restriction = addConditions.newRestrictions
       newNode.completion = addConditions.newCompletions
       newNode.data = data

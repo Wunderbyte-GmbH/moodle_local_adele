@@ -84,7 +84,6 @@ test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back',
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
-    const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
     const renamed = `Linear A1 vom Assistenten ${Date.now()}`;
 
     await test.step('precondition: the assistant may not edit this path', async () => {
@@ -139,27 +138,20 @@ test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back',
         .toHaveText(referencePath.name, { timeout: 30_000 });
     });
 
-    await test.step('the only editor cannot be removed', async () => {
+    await test.step('the manager takes the right back; the owner stays', async () => {
       await loginAs(page, manager, fixturePassword());
       await openOverview(page);
       await openEditor(page, referencePath.id);
 
       const card = editorCards(page).filter({ hasText: assistantName });
       await expect(card).toHaveCount(1, { timeout: 30_000 });
-      // By design: a path must not end up with nobody who may edit it, so
-      // the remove control only appears once a second person is listed.
-      await expect(card.locator('button.text-danger'),
-        'the last remaining editor must not be removable').toHaveCount(0);
-    });
+      // The owner (the administrator, who created the fixture path) always
+      // stays on the list (decision 2026-10-08): their card offers no
+      // removal - so a path never ends up with nobody who may edit it.
+      const owner = editorCards(page).filter({ has: page.locator('.owner-crown') });
+      await expect(owner, 'the owner is on the list').toHaveCount(1);
+      await expect(owner.locator('button.text-danger'), 'the owner cannot be removed').toHaveCount(0);
 
-    await test.step('the manager adds themselves and then takes the right back', async () => {
-      await editorSearch(page).fill(managerName.split(' ')[1] || managerName);
-      const hit = app(page).locator('.user-item').filter({ hasText: managerName });
-      await expect(hit).toHaveCount(1, { timeout: 30_000 });
-      await hit.click();
-      await expect(editorCards(page)).toHaveCount(2);
-
-      const card = editorCards(page).filter({ hasText: assistantName });
       // Removing asks through the browser's own confirm(), which Playwright
       // dismisses unless something accepts it - and a dismissed confirm
       // cancels the removal without a word.

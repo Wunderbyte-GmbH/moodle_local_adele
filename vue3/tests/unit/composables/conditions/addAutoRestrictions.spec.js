@@ -114,6 +114,44 @@ describe('addAutoRestrictions', () => {
     });
   });
 
+  // A course placed "before" a node that already has a predecessor (keyboard
+  // dialog, #595): the node's criterion must name the new predecessor too.
+  describe('relation "parent" with a predecessor already there', () => {
+    const nodeWith = (restriction) => ({
+      id: 'dndnode_2',
+      parentCourse: ['dndnode_1', 'dndnode_3'],
+      restriction,
+    });
+    const criterion = (ids, min = 1) => ({ nodes: [
+      { id: 'condition_1', data: { label: 'parent_courses', value: { courses_id: ids, min_courses: min } } },
+      { id: 'condition_1_feedback', type: 'feedback', data: { childCondition: 'condition_1' } },
+    ], edges: [] });
+    const before = { id: 'dndnode_3' };
+    const criterionOf = (node) => node.restriction.nodes.find((n) => n.data.label === 'parent_courses').data.value;
+
+    it.each([
+      ['1 of [T01]', ['dndnode_1'], 1, ['dndnode_1', 'dndnode_3'], 1],
+      ['2 of [T01, T05]', ['dndnode_1', 'dndnode_5'], 2, ['dndnode_1', 'dndnode_5', 'dndnode_3'], 2],
+      ['already named', ['dndnode_1', 'dndnode_3'], 1, ['dndnode_1', 'dndnode_3'], 1],
+    ])('criterion %s: names the new predecessor, keeps min_courses', (_, ids, min, expectedIds, expectedMin) => {
+      const result = addAutoRestrictions(before, nodeWith(criterion(ids, min)), 'parent', store);
+      expect(criterionOf(result).courses_id).toEqual(expectedIds);
+      expect(criterionOf(result).min_courses).toBe(expectedMin);
+    });
+
+    it('creates a criterion naming all predecessors when there is none', () => {
+      const result = addAutoRestrictions(before, nodeWith(undefined), 'parent', store);
+      expect(criterionOf(result).courses_id).toEqual(['dndnode_1', 'dndnode_3']);
+      expect(criterionOf(result).min_courses).toBe(1);
+    });
+
+    it('leaves criteria written by hand without a predecessor condition alone', () => {
+      const manual = { nodes: [{ id: 'condition_1', data: { label: 'manual' } }], edges: [] };
+      const result = addAutoRestrictions(before, nodeWith(manual), 'parent', store);
+      expect(result.restriction.nodes.map((n) => n.data.label)).toEqual(['manual']);
+    });
+  });
+
   it('should return null for a relation it does not handle', () => {
     expect(addAutoRestrictions(newNode, oldNode, 'or', store)).toBe(null);
   });

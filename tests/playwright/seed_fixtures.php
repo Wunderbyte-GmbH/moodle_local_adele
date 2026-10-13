@@ -1379,6 +1379,10 @@ if ($editorpath && !empty($roleusers['adeleassistant'])) {
         $editorpath,
         (int) $roleusers['adeleassistant']->id
     );
+    // The owner always stands on the list of editors (decision 2026-10-08):
+    // the fixture paths belong to the administrator, who is put back on each
+    // list - the same repair the upgrade step does.
+    \local_adele\ownership::ensure_owners_are_editors();
 }
 
 // Reset what a previous run of the embedding chains left behind. Deleting an

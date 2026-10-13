@@ -27,8 +27,9 @@
  *   assistant + collaborator, assistant revoked -> the collaboration still
  *                                                  opens its path
  *   collaborator only, collaboration revoked -> nothing is left
- *   owner + collaborator, collaboration revoked -> the owner keeps the path
- *                                                  (known defect, see below)
+ *   owner + collaborator, collaboration revoked -> cannot arise: the owner
+ *                                                  always stays on the list
+ *                                                  (decision 2026-10-08)
  *
  * "assistant only, assistant revoked" is decided at the end of
  * roles-teacher-becomes-assistant.
@@ -47,7 +48,6 @@ import { env, loginAs } from '../support/env';
 import {
   callService, fixture, fixturePassword, referencePath, saveLearningPath, setSystemRole, waitForEditorLoaded,
 } from '../support/fixtures';
-import { knownDefect } from '../support/feedback';
 
 /** The Vue application's mount point. */
 const app = (page: Page): Locator => page.locator('[id^="local-adele-app"]');
@@ -265,18 +265,18 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
         if ((await cards.filter({ hasText: managerName }).count()) > 0) {
           await removeCollaborator(page, managerName);
         }
-        await expect(cards).toHaveCount(1);
-        await expect(cards).toContainText(assistantName);
+        await expect(cards.filter({ hasText: assistantName })).toHaveCount(1);
+        await expect(cards.filter({ hasText: managerName })).toHaveCount(0);
       });
     }
   });
 
-  // Known defect: owning a path counts only together with a row on its list
-  // of editors (learning_paths::return_learningpaths_owned, and
-  // require_lp_editor_access asks the list alone). Taken off the list, the
-  // owner no longer even sees their own hidden path. Issue draft:
-  // local_adele-issue-owner-loses-path-with-editor-row.md.
-  knownDefect('an owner who is taken off the list of editors keeps their path', async ({ page }) => {
+  // Decision 2026-10-08 ("Regel B"): the owner always stands on the list of
+  // editors. Taking them off is refused - in the interface and on the server
+  // - so the row "owner + collaborator, collaboration revoked" cannot arise:
+  // the owner keeps the path. (Before, the owner could take themselves off
+  // and lost their own path - found with this chain.)
+  test('the owner cannot be taken off the list of editors and keeps the path', async ({ page }) => {
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
@@ -306,12 +306,24 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
         'whoever creates a path is put on its list of editors').toHaveCount(1, { timeout: 30_000 });
     });
 
-    await test.step('a second editor joins, the owner is taken off the list', async () => {
-      // A second person first: the interface protects the last editor.
+    await test.step('a second editor joins; the owner cannot be taken off', async () => {
       await addCollaborator(page, managerName);
       const own = app(page).locator('.card-user').filter({ hasText: assistantName });
-      await own.locator('button.text-danger').click();
-      await expect(own).toHaveCount(0);
+      const other = app(page).locator('.card-user').filter({ hasText: managerName });
+      await expect(other.locator('button.text-danger'), 'the other editor can be removed').toHaveCount(1);
+      await expect(own.locator('button.text-danger'), 'the owner card offers no removal').toHaveCount(0);
+    });
+
+    await test.step('the server refuses to take the owner off', async () => {
+      await openOverview(page);
+      const rowid = (await card(title).getAttribute('data-testid'))!.replace('learningpath-row-', '');
+      const ownerid = await page.evaluate(() => (window as unknown as { M: { cfg: { userId?: number } } }).M.cfg.userId ?? 0);
+      const answer = await callService(page, 'local_adele_remove_lp_edit_users', {
+        contextid: 1, lpid: Number(rowid), userid: Number(ownerid),
+      });
+      expect(answer.error, 'removing the owner must be refused').toBe('editorremoveowner');
+      await openOwn(title);
+      await expect(app(page).locator('.card-user').filter({ hasText: assistantName }), 'still on the list').toHaveCount(1);
     });
 
     await test.step('the path is still the owner\'s to edit', async () => {

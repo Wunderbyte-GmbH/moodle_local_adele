@@ -47,7 +47,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { env, loginAs } from '../support/env';
 import { fixture, saveLearningPath, waitForEditorLoaded } from '../support/fixtures';
-import { knownDefect } from '../support/feedback';
 import { VIEWPORT, dropCourseAt, dropFirstCourse, storedPredecessorCriterion } from '../support/editor';
 import {
   chooseNode, closeCriteriaDiscarding, conditions, deleteCondition, dropCondition, insertWithKeyboard,
@@ -234,10 +233,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
       });
       await test.step('saved and reopened; X asks for 1 of its 2 predecessors', async () => {
         await saveAndReopen(page, title);
-        // Opening the criteria puts every predecessor into the condition
-        // (parent_courses.vue); see the known defect below for why that is
-        // needed here.
-        await openAccessCriteria(page, 'dndnode_3', true);
+        await openAccessCriteria(page, 'dndnode_3');
         await requirePredecessors(page, 'condition_1', 1);
         await saveCriteria(page);
       });
@@ -255,12 +251,10 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  // Known defect: a predecessor placed before a node with the keyboard
-  // dialog ("before") does not enter that node's predecessor criterion - the
-  // criterion keeps naming only the predecessor it had. The same gap #584
-  // closed for the parallel zone. Issue draft:
-  // local_adele-issue-before-predecessor-criterion.md.
-  knownDefect('a predecessor placed before a node counts in its criterion without opening the criteria', async ({ page }) => {
+  // Was a known defect: a predecessor placed "before" a node did not enter
+  // that node's predecessor criterion (the gap #584 closed for the parallel
+  // zone). Fixed with the E2E issue, addAutoRestrictions 'parent'.
+  test('a predecessor placed before a node counts in its criterion without opening the criteria', async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger davor ${Date.now()}`;
     await chainOfTwo(page, title);
@@ -276,12 +270,10 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  // Known defect: before the path is saved, the predecessor condition counts
-  // the predecessors the node had when the path was last loaded - after a
-  // parallel node was added it offers "1 / 1" while the header of the same
-  // page lists two predecessors. Issue draft:
-  // local_adele-issue-predecessor-count-stale.md.
-  knownDefect('the predecessor condition counts the predecessors drawn, saved or not', async ({ page }) => {
+  // Was a known defect: before saving, the predecessor condition counted the
+  // predecessors as last loaded ("1 / 1" while the page header listed two).
+  // Fixed with the E2E issue: parent_courses.vue reads the path being edited.
+  test('the predecessor condition counts the predecessors drawn, saved or not', async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger zählen ${Date.now()}`;
     await chainOfTwo(page, title);
@@ -294,10 +286,10 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  // Known defect: placed "before" a node that already has a predecessor, the
-  // new node is drawn exactly where that node is - on top of it, hiding it
-  // and its buttons. Issue draft: local_adele-issue-before-node-covers-target.md.
-  knownDefect('a node placed before another with the keyboard does not cover it', async ({ page }) => {
+  // Was a known defect: placed "before" a node that already had a
+  // predecessor, the new node was drawn exactly on top of it. Fixed with the
+  // E2E issue: it goes next to the existing predecessors, in their row.
+  test('a node placed before another with the keyboard does not cover it', async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger verdeckt ${Date.now()}`;
     await chainOfTwo(page, title);
