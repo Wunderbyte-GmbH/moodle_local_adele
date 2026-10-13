@@ -21,6 +21,11 @@ import { screenReaderConfig } from '@guidepup/playwright';
  * - Its own Playwright version: @guidepup/playwright requires 1.57 or newer,
  *   while the other suites are pinned to 1.49.1. Separate directory,
  *   separate lockfile, no interference.
+ * - Exact Guidepup versions (package.json): library 0.33.0 with the
+ *   Playwright integration 0.19.1, and setup 0.24.1 in the workflow - the
+ *   combination Guidepup's own Playwright project runs. With a newer library
+ *   the setup tool installs an NVDA the integration does not find ("NVDA not
+ *   installed"), as local_stackmatheditor found out.
  *
  * Slow by nature - NVDA speaks in real time - so the timeouts are generous.
  */
@@ -63,7 +68,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,
   },
+  // Playwright's own Chromium, installed by the workflow: the same browser
+  // the reference workflow (local_stackmatheditor, a11y-nvda.yml) runs NVDA
+  // against. Not headless - screenReaderConfig says so.
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'], channel: 'chrome' } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
 });

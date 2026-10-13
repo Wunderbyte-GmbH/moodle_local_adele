@@ -7,8 +7,8 @@
     "test": "playwright test"
   },
   "devDependencies": {
-    "@guidepup/playwright": "^0.19.1",
-    "@guidepup/setup": "^0.29.1",
+    "@guidepup/guidepup": "0.33.0",
+    "@guidepup/playwright": "0.19.1",
     "@playwright/test": "1.57.0"
   }
 }

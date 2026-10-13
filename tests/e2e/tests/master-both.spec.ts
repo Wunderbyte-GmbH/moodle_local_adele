@@ -115,7 +115,7 @@ async function expectCombination(page: Page, expected: string, t02open: boolean,
 test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-O4 — both master checkboxes, all four combinations', () => {
-  test('0/0 -> 0/1 -> 1/1 -> 1/0 -> 0/0', { tag: ['@story:O4'] }, async ({ page }) => {
+  test('0/0 -> 0/1 -> 1/1 -> 1/0 -> 0/0', { tag: ['@story:O4', '@withdrawal'] }, async ({ page }) => {
     await test.step('access 0, completion 0: normal logic', async () => {
       await expectCombination(page, 'accessible not_accessible not_accessible | 0/3 | 0', false, false,
         'nothing set');

@@ -94,7 +94,7 @@ async function expectLearnerSees(page: Page, state: string, why: string): Promis
 test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-C3 — a teacher releases a node manually, and withdraws it', () => {
-  test('not released -> released -> release withdrawn', { tag: ['@story:C3'] }, async ({ page }) => {
+  test('not released -> released -> release withdrawn', { tag: ['@story:C3', '@withdrawal'] }, async ({ page }) => {
     await test.step('not released: T02 locked and closed', async () => {
       await expectLearnerSees(page, 'not_accessible', 'nobody has released node 2 yet');
       await expectCourseClosed(page, fixtureCourse('T02'), 'nobody has released node 2 yet');

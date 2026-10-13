@@ -123,7 +123,7 @@ test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-L3/O1 — manual completion, set and withdrawn', () => {
 
-  test('regular -> completed manually -> withdrawn', { tag: ['@story:L3', '@story:O1'] }, async ({ page }) => {
+  test('regular -> completed manually -> withdrawn', { tag: ['@story:L3', '@story:O1', '@withdrawal'] }, async ({ page }) => {
     const learner = fixture('ADELE_FIXTURE_L3_LEARNER');
 
     await test.step('regular: node 1 open, node 2 locked, 0 of 3', async () => {

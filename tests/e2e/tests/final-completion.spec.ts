@@ -170,7 +170,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
   // Tall enough for the editor's canvas (Z1 extends its path by drag and drop).
   test.use({ viewport: VIEWPORT });
 
-  test('Z1: regular completion', { tag: ['@story:Z1'] }, async ({ page }) => {
+  test('Z1: regular completion', { tag: ['@story:Z1', '@withdrawal'] }, async ({ page }) => {
     const story: Story = { key: 'Z1', lastname: 'Final regular', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
 
     await test.step('at the start: nothing completed', async () => {
@@ -230,7 +230,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
     });
   });
 
-  test('Z3: manual completion', { tag: ['@story:Z3'] }, async ({ page }) => {
+  test('Z3: manual completion', { tag: ['@story:Z3', '@withdrawal'] }, async ({ page }) => {
     const story: Story = { key: 'Z3', lastname: 'Final manual', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
 
     await test.step('at the start: nothing completed', async () => {
@@ -253,7 +253,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
     });
   });
 
-  test('Z4: master completion', { tag: ['@story:Z4'] }, async ({ page }) => {
+  test('Z4: master completion', { tag: ['@story:Z4', '@withdrawal'] }, async ({ page }) => {
     const story: Story = { key: 'Z4', lastname: 'Final master', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
     const master = async (nodes: string[], on: boolean) => {
       await loginAs(page, env.adminUser, env.adminPassword);

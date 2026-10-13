@@ -92,7 +92,7 @@ const editorCards = (page: Page): Locator => app(page).locator('.card-user');
 test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-R4b — editing rights are handed over and taken back', () => {
-  test('granting lets the assistant edit, revoking stops them again', { tag: ['@story:R4'] }, async ({ page }) => {
+  test('granting lets the assistant edit, revoking stops them again', { tag: ['@story:R4', '@withdrawal'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');

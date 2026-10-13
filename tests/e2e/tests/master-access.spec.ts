@@ -151,7 +151,7 @@ test.describe('ADELE-E2E-O2 — master access opens a node, it never completes i
     });
   });
 
-  test('variant 5: master access overrides a time condition, and only while it is on', { tag: ['@story:O2'] }, async ({ page }) => {
+  test('variant 5: master access overrides a time condition, and only while it is on', { tag: ['@story:O2', '@withdrawal'] }, async ({ page }) => {
     const name = 'Master access time';
     const t01 = fixtureCourse('T01');
 
