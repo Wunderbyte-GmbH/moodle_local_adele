@@ -102,7 +102,7 @@ async function expectLearnerSees(page: Page, key: string, lastname: string, expe
 }
 
 test.describe('ADELE-E2E-O2 — master access opens a node, it never completes it', () => {
-  test('variants 1-4: condition false/true, master off/on', async ({ page }) => {
+  test('variants 1-4: condition false/true, master off/on', { tag: ['@story:O2'] }, async ({ page }) => {
     const name = 'Master access';
     const t02 = fixtureCourse('T02');
 
@@ -146,7 +146,7 @@ test.describe('ADELE-E2E-O2 — master access opens a node, it never completes i
     });
   });
 
-  test('variant 5: master access overrides a time condition, and only while it is on', async ({ page }) => {
+  test('variant 5: master access overrides a time condition, and only while it is on', { tag: ['@story:O2'] }, async ({ page }) => {
     const name = 'Master access time';
     const t01 = fixtureCourse('T01');
 

@@ -55,7 +55,7 @@ async function editButton(page: Page) {
 }
 
 test.describe('ADELE-E2E-E — the editor keeps what was typed (#585)', () => {
-  test('opening a path for editing loads it exactly once', async ({ page }) => {
+  test('opening a path for editing loads it exactly once', { tag: ['@story:E1'] }, async ({ page }) => {
     let loads = 0;
     page.on('request', (request) => {
       if (LOAD.test(request.url())) {
@@ -69,7 +69,7 @@ test.describe('ADELE-E2E-E — the editor keeps what was typed (#585)', () => {
     expect(loads, 'requests for the path while the editor opens').toBe(1);
   });
 
-  test('the title is offered when the path has arrived, and stays as typed', async ({ page }) => {
+  test('the title is offered when the path has arrived, and stays as typed', { tag: ['@story:E1'] }, async ({ page }) => {
     let release: () => void = () => undefined;
     const held = new Promise<void>((resolve) => { release = resolve; });
     let loads = 0;

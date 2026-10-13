@@ -142,7 +142,7 @@ async function enrolmentInT02(page: Page): Promise<string> {
 test.describe('ADELE-E2E-M — changing a path learners are already on', () => {
   test.use({ viewport: { width: 1920, height: 1400 } });
 
-  test('M1 adding a condition takes access away, M2 removing it gives it back', async ({ page }) => {
+  test('M1 adding a condition takes access away, M2 removing it gives it back', { tag: ['@story:M1', '@story:M2'] }, async ({ page }) => {
     page.on('dialog', (dialog) => dialog.accept());
 
     await test.step('before: node 2 freely accessible, the learner in T02, route 1 of 3', async () => {

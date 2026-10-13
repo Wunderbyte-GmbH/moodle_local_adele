@@ -72,7 +72,7 @@ async function expectNodeState(page: Page, variant: string, nodeid: string, stat
 }
 
 test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
-  test('1 of 1: the successor opens once its predecessor is completed', async ({ page }) => {
+  test('1 of 1: the successor opens once its predecessor is completed', { tag: ['@story:C1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_C1_SINGLE_LEARNER'), fixturePassword());
 
     await test.step('before: T02 is shown locked and the course is closed', async () => {
@@ -91,7 +91,7 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
     });
   });
 
-  test('1 of 2: either predecessor opens the successor', async ({ page }) => {
+  test('1 of 2: either predecessor opens the successor', { tag: ['@story:C1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_C1_ANY_LEARNER'), fixturePassword());
 
     await test.step('before: T03 is locked', async () => {
@@ -109,7 +109,7 @@ test.describe('ADELE-E2E-C1 — access by completed predecessors', () => {
     });
   });
 
-  test('2 of 2: one predecessor is not enough, both are', async ({ page }) => {
+  test('2 of 2: one predecessor is not enough, both are', { tag: ['@story:C1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_C1_ALL_LEARNER'), fixturePassword());
 
     await test.step('the learner completes T01', async () => {

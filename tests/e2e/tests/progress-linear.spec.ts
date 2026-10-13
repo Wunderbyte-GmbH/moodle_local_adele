@@ -86,7 +86,7 @@ async function expectProgress(page: Page, k: number): Promise<void> {
 }
 
 test.describe('ADELE-E2E-L1 — progress on a linear path, step by step', () => {
-  test('0/4 -> 1/4 -> 2/4 -> 3/4 -> 4/4: message, percentage, label and bar', async ({ page }) => {
+  test('0/4 -> 1/4 -> 2/4 -> 3/4 -> 4/4: message, percentage, label and bar', { tag: ['@story:L1'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_L1_LEARNER'), fixturePassword());
 
     await test.step('0/4: nothing completed yet', async () => {

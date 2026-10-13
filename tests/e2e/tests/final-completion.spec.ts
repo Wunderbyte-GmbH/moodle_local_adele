@@ -156,7 +156,7 @@ async function setManualCompletion(page: Page, story: Story, nodes: string[], co
 }
 
 test.describe('ADELE-E2E-Z — the path is finished, the activity is completed', () => {
-  test('Z1: regular completion', async ({ page }) => {
+  test('Z1: regular completion', { tag: ['@story:Z1'] }, async ({ page }) => {
     const story: Story = { key: 'Z1', lastname: 'Final regular', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
 
     await test.step('at the start: nothing completed', async () => {
@@ -174,7 +174,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
     });
   });
 
-  test('Z2: alternative route - the branch not taken does not stand in the way', async ({ page }) => {
+  test('Z2: alternative route - the branch not taken does not stand in the way', { tag: ['@story:Z2'] }, async ({ page }) => {
     const story: Story = {
       key: 'Z2',
       lastname: 'Final route',
@@ -192,7 +192,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
     });
   });
 
-  test('Z3: manual completion', async ({ page }) => {
+  test('Z3: manual completion', { tag: ['@story:Z3'] }, async ({ page }) => {
     const story: Story = { key: 'Z3', lastname: 'Final manual', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
 
     await test.step('two nodes completed manually: not finished', async () => {
@@ -211,7 +211,7 @@ test.describe('ADELE-E2E-Z — the path is finished, the activity is completed',
     });
   });
 
-  test('Z4: master completion', async ({ page }) => {
+  test('Z4: master completion', { tag: ['@story:Z4'] }, async ({ page }) => {
     const story: Story = { key: 'Z4', lastname: 'Final master', nodes: ['dndnode_1', 'dndnode_2', 'dndnode_3'] };
     const master = async (nodes: string[], on: boolean) => {
       await loginAs(page, env.adminUser, env.adminPassword);

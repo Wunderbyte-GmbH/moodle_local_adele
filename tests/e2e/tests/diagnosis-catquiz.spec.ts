@@ -77,7 +77,7 @@ test.describe('ADELE-E2E-D — a CAT result decides the route at the threshold',
   ];
 
   for (const [key, delta, passes] of cases) {
-    test(`ability x${delta === 0 ? '' : delta > 0 ? ' + ε' : ' - ε'}: ${passes ? 'next route opens' : 'stays on the diagnosis node'}`, async ({ page }) => {
+    test(`ability x${delta === 0 ? '' : delta > 0 ? ' + ε' : ' - ε'}: ${passes ? 'next route opens' : 'stays on the diagnosis node'}`, { tag: ['@story:D'] }, async ({ page }) => {
       const learner = fixture(`ADELE_FIXTURE_D_${key}_LEARNER`);
       await loginAs(page, learner, fixturePassword());
 

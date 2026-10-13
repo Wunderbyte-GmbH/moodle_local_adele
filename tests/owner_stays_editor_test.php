@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * The owner always stands on the list of editors of their path
  * (decision 2026-10-08, "Regel B").

@@ -127,7 +127,7 @@ async function renameAndReload(page: Page, id: string, name: string): Promise<vo
 }
 
 test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', () => {
-  test('revoking the collaboration leaves manager access untouched', async ({ page }) => {
+  test('revoking the collaboration leaves manager access untouched', { tag: ['@story:R5'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
@@ -151,7 +151,7 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
     await renameAndReload(page, referencePath.id, referencePath.name);
   });
 
-  test('an assistant keeps the editor but loses this path', async ({ page }) => {
+  test('an assistant keeps the editor but loses this path', { tag: ['@story:R5'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
@@ -198,7 +198,7 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
     });
   });
 
-  test('without the assistant role the collaboration still opens its path - and without that, nothing is left', async ({ page }) => {
+  test('without the assistant role the collaboration still opens its path - and without that, nothing is left', { tag: ['@story:R5'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
@@ -276,7 +276,7 @@ test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', (
   // - so the row "owner + collaborator, collaboration revoked" cannot arise:
   // the owner keeps the path. (Before, the owner could take themselves off
   // and lost their own path - found with this chain.)
-  test('the owner cannot be taken off the list of editors and keeps the path', async ({ page }) => {
+  test('the owner cannot be taken off the list of editors and keeps the path', { tag: ['@story:R5'] }, async ({ page }) => {
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');

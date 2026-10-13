@@ -67,7 +67,7 @@ async function openOverview(page: Page): Promise<void> {
 }
 
 test.describe('ADELE-E2E-R1 — the administrator manages every learning path', () => {
-  test('create, rename, duplicate and delete a path', async ({ page }) => {
+  test('create, rename, duplicate and delete a path', { tag: ['@story:R1'] }, async ({ page }) => {
     const stamp = Date.now();
     const title = `E2E R1 ${stamp}`;
     const renamed = `E2E R1 umbenannt ${stamp}`;
@@ -129,7 +129,7 @@ test.describe('ADELE-E2E-R1 — the administrator manages every learning path', 
     });
   });
 
-  test('a learner gets none of these controls', async ({ page }) => {
+  test('a learner gets none of these controls', { tag: ['@story:R1'] }, async ({ page }) => {
     await loginAs(page, controlUser(), fixturePassword());
     await page.goto('/local/adele/index.php');
     await expect(app(page)).toBeVisible({ timeout: 30_000 });

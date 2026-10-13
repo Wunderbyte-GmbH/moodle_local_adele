@@ -344,6 +344,14 @@ foreach ($imported as $name => $pathid) {
         'learning_path_id' => $pathid,
         'user_id' => $student->id,
     ]);
+    // So are the enrolments an earlier run produced: left in place, they
+    // would let a chain see "access" that this run's reconciliation never
+    // granted - the seed would anticipate the very effect under test
+    // (E2E issue, section 3B; shown by a mutation that suppressed the
+    // enrolment and still left the access chain green).
+    if (class_exists('\\enrol_adele\\local\\reconciler')) {
+        \enrol_adele\local\reconciler::purge_user($pathid, $student->id);
+    }
     \local_adele\enrollment::subscribe_user_to_learning_path($path, (object) [
         'relateduserid' => $student->id,
         'userid' => get_admin()->id,

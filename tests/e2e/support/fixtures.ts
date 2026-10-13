@@ -53,30 +53,136 @@ export const fixtureCourse = (shortname: string) =>
 export const fixturePassword = () => fixture('ADELE_FIXTURE_PASSWORD');
 
 /**
+ * Moodle's answers that do mean "no access" when they come as an error page
+ * rather than as the enrolment page. Anything else on an error page is a
+ * failure of the test, not a refusal.
+ */
+const REFUSALS = [
+  /currently unavailable|derzeit nicht verfügbar|zur zeit nicht verfügbar/i, // coursehidden
+  /not enrolled|nicht eingeschrieben/i,
+];
+
+/**
+ * The person's enrolments in a course, read on the server - independent of
+ * what the browser shows.
+ *
+ * @param user The person: username, or user id as a number.
+ * @param courseid The course.
+ * @returns username; siteadmin; active: whether Moodle counts them as
+ *          actively enrolled right now; methods: every enrolment with its
+ *          method and status.
+ */
+export function enrolmentState(user: string | number, courseid: string): {
+  username: string;
+  siteadmin: boolean;
+  active: boolean;
+  methods: { enrol: string; userstatus: number; instancestatus: number; timestart: number; timeend: number }[];
+} {
+  const script = `
+    define('CLI_SCRIPT', true);
+    require('config.php');
+    $field = ctype_digit($argv[1]) ? 'id' : 'username';
+    $user = $DB->get_record('user', [$field => $argv[1], 'deleted' => 0], 'id, username', MUST_EXIST);
+    $context = context_course::instance((int) $argv[2]);
+    $methods = $DB->get_records_sql(
+      "SELECT ue.id, e.enrol, ue.status AS userstatus, e.status AS instancestatus, ue.timestart, ue.timeend
+         FROM {user_enrolments} ue JOIN {enrol} e ON e.id = ue.enrolid
+        WHERE ue.userid = ? AND e.courseid = ?", [$user->id, (int) $argv[2]]);
+    echo json_encode([
+      'username' => $user->username,
+      'siteadmin' => is_siteadmin($user->id),
+      'active' => is_enrolled($context, $user->id, '', true),
+      'methods' => array_values(array_map(fn($m) => [
+        'enrol' => $m->enrol, 'userstatus' => (int) $m->userstatus, 'instancestatus' => (int) $m->instancestatus,
+        'timestart' => (int) $m->timestart, 'timeend' => (int) $m->timeend], $methods)),
+    ]);`;
+  const out = execFileSync('php', ['-r', script, '--', String(user), courseid], {
+    cwd: fixture('ADELE_MOODLE_ROOT'),
+    encoding: 'utf8',
+    // Same clock as the web server: an enrolment that starts "now" must be
+    // judged by the same now.
+    env: { ...process.env, ...serverTimeEnv() },
+  });
+  return JSON.parse(out.trim().split('\n').pop() || '{}');
+}
+
+/**
  * What happened when this user opened this course.
  *
- * Moodle answers an unauthorised course view with a redirect to the
- * enrolment page, and a forbidden one with an exception page. Both mean "no
- * access", but they are different situations, so the outcome is reported
- * rather than asserted here.
+ * Strict on purpose (E2E issue, section 3A): "open" needs the course page OF
+ * THIS COURSE, rendered for a person who is not a site administrator and
+ * whom the server counts as actively enrolled; "enrolment-page" needs
+ * Moodle's enrolment page for this course and a server that agrees there is
+ * no active enrolment; "denied" needs one of the known refusal messages.
+ * Everything else - a lost session, a server error, a foreign course, an
+ * unknown error page, a contradiction between browser and server - fails
+ * the test instead of passing as a refusal.
  *
  * @param page The page, already authenticated as the person under test.
  * @param courseid The course to open.
- * @returns 'open' when the course page itself is shown, otherwise why not.
+ * @returns 'open', or which refusal.
  */
 export async function courseAccess(
   page: Page,
   courseid: string
 ): Promise<'open' | 'enrolment-page' | 'denied'> {
-  await page.goto(`/course/view.php?id=${courseid}`);
-  const url = page.url();
-  if (url.includes('/enrol/index.php')) {
+  const response = await page.goto(`/course/view.php?id=${courseid}`);
+  const where = `course ${courseid}`;
+  if (!response) {
+    throw new Error(`${where}: no response at all`);
+  }
+  if (response.status() >= 500) {
+    throw new Error(`${where}: server error ${response.status()}`);
+  }
+  const url = new URL(page.url());
+  if (url.pathname.startsWith('/login/')) {
+    throw new Error(`${where}: landed on the login page - the session is gone, that is no refusal`);
+  }
+  const body = page.locator('body');
+  const bodyid = (await body.getAttribute('id')) || '';
+  const bodyclass = ((await body.getAttribute('class')) || '').split(/\s+/);
+  // Who is logged in, as the page itself says (Moodle's M.cfg), and what the
+  // server knows about that person and this course.
+  const cfg = await page.evaluate(() => {
+    const m = (window as unknown as { M?: { cfg?: { userId?: number; courseId?: number } } }).M;
+    return { userId: Number(m?.cfg?.userId || 0), courseId: Number(m?.cfg?.courseId || 0) };
+  }).catch(() => ({ userId: 0, courseId: 0 }));
+  if (!cfg.userId) {
+    throw new Error(`${where}: nobody is logged in on this page (${page.url()})`);
+  }
+  const server = enrolmentState(cfg.userId, courseid);
+  if (server.siteadmin) {
+    throw new Error(`${where}: checked as a site administrator, who may enter every course - that proves nothing`);
+  }
+
+  if (url.pathname === '/enrol/index.php') {
+    if (url.searchParams.get('id') !== courseid || bodyid !== 'page-enrol-index') {
+      throw new Error(`${where}: an enrolment page, but not this course's (${page.url()})`);
+    }
+    if (server.active) {
+      throw new Error(`${where}: the browser shows the enrolment page, the server counts ${server.username} as enrolled `
+        + JSON.stringify(server.methods));
+    }
     return 'enrolment-page';
   }
-  if (url.includes('/login/') || await page.locator('.errorbox, #notice').first().isVisible().catch(() => false)) {
-    return 'denied';
+  const error = page.locator('.errorbox');
+  if (await error.count()) {
+    const text = ((await error.first().innerText().catch(() => '')) || '').replace(/\s+/g, ' ').trim();
+    if (REFUSALS.some((refusal) => refusal.test(text))) {
+      return 'denied';
+    }
+    throw new Error(`${where}: Moodle error page that is no known refusal: "${text.slice(0, 200)}"`);
   }
-  return url.includes(`/course/view.php?id=${courseid}`) ? 'open' : 'denied';
+  if (url.pathname === '/course/view.php' && url.searchParams.get('id') === courseid
+      && bodyid.startsWith('page-course-view') && bodyclass.includes(`course-${courseid}`)
+      && String(cfg.courseId) === courseid) {
+    if (!server.active) {
+      throw new Error(`${where}: the browser shows the course, the server does not count ${server.username} as enrolled `
+        + JSON.stringify(server.methods));
+    }
+    return 'open';
+  }
+  throw new Error(`${where}: unexpected page ${page.url()} (body ${bodyid})`);
 }
 
 /**
@@ -166,7 +272,7 @@ export async function expectCourseOpenAfterTasks(
 ): Promise<void> {
   await expect.poll(async () => {
     drainTaskQueue();
-    return await courseAccess(page, courseid);
+    return await accessThroughAdele(page, courseid);
   }, { message: because, timeout: 60_000, intervals: [1000, 2000, 3000, 5000] }).toBe('open');
 }
 
@@ -194,20 +300,49 @@ export async function expectCourseClosedAfterTasks(
 }
 
 /**
- * Assert that this person really can work in this course.
+ * Assert that this person really can work in this course - through ADELE.
  *
  * @param page The page, authenticated as the person under test.
  * @param courseid The course.
  * @param because What this proves, for the failure message.
  */
 export async function expectCourseOpen(page: Page, courseid: string, because: string): Promise<void> {
-  expect(await courseAccess(page, courseid), because).toBe('open');
+  expect(await accessThroughAdele(page, courseid), because).toBe('open');
+}
+
+/**
+ * courseAccess, plus: an "open" course has to be open through ADELE.
+ *
+ * A course the learner reaches through some other enrolment - a manual one
+ * left over from a fixture, a cohort, guest access - proves nothing about
+ * the path (E2E issue, section 3A: "ADELE- vs. Fremdeinschreibung"). The
+ * person must hold an ADELE enrolment that is active on both levels: the
+ * user enrolment and the enrol instance.
+ *
+ * @param page The page, authenticated as the person under test.
+ * @param courseid The course.
+ * @returns What courseAccess returned, or 'open-not-through-adele'.
+ */
+export async function accessThroughAdele(page: Page, courseid: string): Promise<string> {
+  const access = await courseAccess(page, courseid);
+  if (access !== 'open') {
+    return access;
+  }
+  const userid = await page.evaluate(() =>
+    Number((window as unknown as { M?: { cfg?: { userId?: number } } }).M?.cfg?.userId || 0));
+  if (!userid) {
+    return 'open-but-nobody-logged-in';
+  }
+  const server = enrolmentState(userid, courseid);
+  const adele = server.methods.some((m) => m.enrol === 'adele' && m.userstatus === 0 && m.instancestatus === 0);
+  return adele ? 'open' : 'open-not-through-adele';
 }
 
 /**
  * Assert that this person cannot get into this course.
  *
- * Either answer counts as refused; what must not happen is the course page.
+ * Only a recognised refusal counts (see courseAccess); anything unexpected
+ * already fails inside courseAccess.
  *
  * @param page The page, authenticated as the person under test.
  * @param courseid The course.

@@ -110,7 +110,7 @@ async function enrolmentInT02(page: Page): Promise<string> {
 }
 
 test.describe('ADELE-E2E-L4/O3 — master completion, set and removed', () => {
-  test('regular -> node 1 -> whole path -> removed', async ({ page }) => {
+  test('regular -> node 1 -> whole path -> removed', { tag: ['@story:L4', '@story:O3'] }, async ({ page }) => {
     await test.step('regular: node 1 open, nothing completed', async () => {
       await expectLearnerSees(page, 'accessible not_accessible not_accessible | 0/3 | 0', 'nothing is completed');
       expect(await enrolmentInT02(page)).toBe('not listed');

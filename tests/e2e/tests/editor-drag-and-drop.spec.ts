@@ -56,7 +56,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
   // every target the pointer is aiming at.
   test.use({ viewport: VIEWPORT });
 
-  test('the reference path T01 -> T02 -> T03 is built by drag and drop alone', async ({ page }) => {
+  test('the reference path T01 -> T02 -> T03 is built by drag and drop alone', { tag: ['@story:E1'] }, async ({ page }) => {
     const title = `E1 Referenzpfad ${Date.now()}`;
     page.on('dialog', (dialog) => dialog.accept());
     await loginAs(page, env.adminUser, env.adminPassword);
@@ -107,7 +107,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
   });
 
-  test('the drop zones follow the pointer from node to node (#580)', async ({ page }) => {
+  test('the drop zones follow the pointer from node to node (#580)', { tag: ['@story:E1'] }, async ({ page }) => {
     // Somebody dragging a course from the sidebar to a node further down
     // passes other nodes on the way. The zones used to stay at the node
     // passed first; they have to be at the node the pointer is at.
@@ -146,7 +146,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
   });
 
-  test('a zone that lies nearer to a neighbouring node stays under the pointer (#580)', async ({ page }) => {
+  test('a zone that lies nearer to a neighbouring node stays under the pointer (#580)', { tag: ['@story:E1'] }, async ({ page }) => {
     // The exception to "the zones are at the nearest node": T01 and T02 side
     // by side, both leading to T03. The zone for "parallel to T01" is drawn
     // to the right of T01 - where T02 is. Aiming at it brings the pointer
@@ -193,7 +193,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
   });
 
-  test('a course dropped into the editor is still there after reopening', async ({ page }) => {
+  test('a course dropped into the editor is still there after reopening', { tag: ['@story:E1'] }, async ({ page }) => {
     const title = `E1 Drag und Drop ${Date.now()}`;
 
     // Deleting a node asks through the browser's own confirm(); accepted
@@ -254,7 +254,7 @@ test.describe('ADELE-E2E-E1 — a path is built in the graphical editor', () => 
     });
   });
 
-  test('a learner cannot build anything', async ({ page }) => {
+  test('a learner cannot build anything', { tag: ['@story:E1'] }, async ({ page }) => {
     // The negative control for the authoring story: the editor is not merely
     // hidden, it is not reachable.
     await loginAs(page, fixture('ADELE_FIXTURE_CONTROL_USER'), fixturePassword());

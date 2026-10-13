@@ -109,7 +109,7 @@ test.describe('ADELE-E2E-E2 — logical combinations by drag and drop', () => {
     await loginAs(page, env.adminUser, env.adminPassword);
   });
 
-  test('A ODER B: the second course joins the node as an alternative', async ({ page }) => {
+  test('A ODER B: the second course joins the node as an alternative', { tag: ['@story:E2'] }, async ({ page }) => {
     const title = `E2 ODER ${Date.now()}`;
     await newPath(page, title);
     try {
@@ -127,7 +127,7 @@ test.describe('ADELE-E2E-E2 — logical combinations by drag and drop', () => {
     }
   });
 
-  test('A UND B: a parallel node shares the successor', async ({ page }) => {
+  test('A UND B: a parallel node shares the successor', { tag: ['@story:E2'] }, async ({ page }) => {
     const title = `E2 UND ${Date.now()}`;
     await newPath(page, title);
     try {

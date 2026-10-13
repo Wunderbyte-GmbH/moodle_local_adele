@@ -61,7 +61,7 @@ const PREDECESSOR_2 = 'Completion of the predecessor „Testkurs 02“';
 const INFO_COMPLETION = 'Completion criteria: • Complete this course.';
 
 test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', () => {
-  test('F1/F2 predecessor, 1 of 1: before and after the predecessor is completed', async ({ page }) => {
+  test('F1/F2 predecessor, 1 of 1: before and after the predecessor is completed', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {
     await test.step('before: node 2 names its predecessor, node 3 names its own', async () => {
       const first = await learnerReads(page, 'LINEAR', 'dndnode_1');
       expect(first.status).toBe('accessible');
@@ -108,7 +108,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     });
   });
 
-  test('F1 predecessors, 2 of 2: before, partly met, met', async ({ page }) => {
+  test('F1 predecessors, 2 of 2: before, partly met, met', { tag: ['@story:F1', '@story:F3'] }, async ({ page }) => {
     const both = 'Completion of the predecessors „Testkurs 01“ and „Testkurs 02“';
 
     await test.step('before: node 3 names both predecessors', async () => {
@@ -141,7 +141,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     });
   });
 
-  test('F1/F2 manual release: before, released, withdrawn', async ({ page }) => {
+  test('F1/F2 manual release: before, released, withdrawn', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {
     const locked = `${EN.locked} manual release by the teacher. ${EN.todo} ${EN.completeCourse}`;
 
     await test.step('before: node 2 waits for the teacher', async () => {
@@ -166,7 +166,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     });
   });
 
-  test('F1/F2 manual completion: before, recorded, withdrawn', async ({ page }) => {
+  test('F1/F2 manual completion: before, recorded, withdrawn', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {
     const waiting = `${EN.unlocked} ${EN.todo} a manual completion is recorded by the teacher.`;
 
     await test.step('before: node 1 waits for the teacher to record a completion', async () => {
@@ -197,7 +197,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     });
   });
 
-  test('F1 the author\'s own text is what the learner reads', async ({ page }) => {
+  test('F1 the author\'s own text is what the learner reads', { tag: ['@story:F1'] }, async ({ page }) => {
     // Node 2 of this path: the author unticked "use default" and wrote a text.
     const node = await learnerReads(page, 'CUSTOM', 'dndnode_2');
     expect(node.status).toBe('not_accessible');
@@ -208,7 +208,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     );
   });
 
-  test('F language: the author\'s own text reaches a learner with another language', async ({ page }) => {
+  test('F language: the author\'s own text reaches a learner with another language', { tag: ['@story:F1'] }, async ({ page }) => {
     test.skip(!seeded('CUSTOM_DE'), 'needs the German language pack');
     // Was a defect (local_adele #589): the German learner read the default
     // text instead of what the author wrote.
@@ -222,7 +222,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     );
   });
 
-  test('F language: a German learner reads German - before and after their own action', async ({ page }) => {
+  test('F language: a German learner reads German - before and after their own action', { tag: ['@story:F1'] }, async ({ page }) => {
     test.skip(!seeded('DE'), 'needs the German language pack (seed_fixtures.php installs it where the network allows)');
     const info = 'Zugangskriterien: - Abschluss des Vorgängers „Testkurs 01“ Abschlusskriterien: • diesen Kurs bearbeiten.';
 
@@ -253,7 +253,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
 });
 
 test.describe('ADELE-E2E-F — the texts are reachable without a mouse (local_adele #591)', () => {
-  test('F2 keyboard: i symbol and speech bubble are named buttons - Enter opens, Escape closes', async ({ page }) => {
+  test('F2 keyboard: i symbol and speech bubble are named buttons - Enter opens, Escape closes', { tag: ['@story:F2'] }, async ({ page }) => {
     // Was a defect: both took the focus, but only a mouse click opened them.
     await loginAs(page, fixture('ADELE_FIXTURE_F_LINEAR_LEARNER'), fixturePassword());
     await nodeStatus(page, fixture('ADELE_FIXTURE_F_LINEAR_HOST'), 'E2E F linear', 'dndnode_1');

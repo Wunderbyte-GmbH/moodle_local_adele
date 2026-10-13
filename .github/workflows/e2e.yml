@@ -17,6 +17,9 @@ name: E2E
 #   run.log             console output
 #   environment.md      Moodle, PHP and the exact commit of every plugin
 #   summary.md          one row per test, also shown in the job summary
+#   coverage.md/.json   story -> test -> status -> evidence -> commit; the
+#                       job is red unless every required story passed and
+#                       nothing was skipped, fixme or flaky
 # The video of a PASSING run is part of the point: the plan uses these
 # recordings as evidence that the intended journey works, and they are reused
 # as documentation.
@@ -320,7 +323,7 @@ jobs:
 
           cd "$MOODLE_WEBROOT/$PLUGIN/adele/tests/e2e"
           ADELE_E2E_EXPORT_DIR="$EXPORT_DIR" npx playwright test \
-            ${TEST_GREP:+--grep "$TEST_GREP" --pass-with-no-tests} 2>&1 \
+            ${TEST_GREP:+--grep "$TEST_GREP"} 2>&1 \
             | tee "$EXPORT_DIR/run.log"
           exit "${PIPESTATUS[0]}"
 
@@ -346,6 +349,20 @@ jobs:
           if [ -s "$RUNNER_TEMP/moodle-server.log" ]; then
             gzip -c "$RUNNER_TEMP/moodle-server.log" > "$EXPORT_DIR/moodle-server.log.gz"
           fi
+
+      # The acceptance: every required story of the test plan has a passed
+      # test, and nothing was skipped, marked fixme or flaky. A grep run is
+      # diagnostic (missing stories are listed, not counted against it); a
+      # grep that matches nothing fails already in the run step - there is
+      # no --pass-with-no-tests.
+      - name: Check the story coverage
+        if: always()
+        run: |
+          [ -n "${EXPORT_DIR:-}" ] || { echo "::error::No export directory - the suite did not run."; exit 1; }
+          node "plugin/tests/e2e/support/story-coverage.mjs" \
+            "$EXPORT_DIR/results.json" "plugin/tests/e2e/stories.json" "$EXPORT_DIR" \
+            ${TEST_GREP:+--filtered} | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
 
       - name: Show the tail of the server log on failure
         if: failure()

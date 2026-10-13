@@ -89,7 +89,7 @@ async function renameThroughEditor(page: Page, id: string, name: string): Promis
 }
 
 test.describe('ADELE-E2E-R2 — the manager administers paths they did not create', () => {
-  test('the manager renames a path created by somebody else', async ({ page }) => {
+  test('the manager renames a path created by somebody else', { tag: ['@story:R2'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const renamed = `Linear A1 vom Manager ${Date.now()}`;
 
@@ -112,7 +112,7 @@ test.describe('ADELE-E2E-R2 — the manager administers paths they did not creat
     }
   });
 
-  test('a learner sees no learning path administration at all', async ({ page }) => {
+  test('a learner sees no learning path administration at all', { tag: ['@story:R2'] }, async ({ page }) => {
     await loginAs(page, referencePath.learner, fixturePassword());
     await openOverview(page);
 
@@ -122,7 +122,7 @@ test.describe('ADELE-E2E-R2 — the manager administers paths they did not creat
 });
 
 test.describe('ADELE-E2E-R4a — the collaborator edits only what they were given', () => {
-  test('the assistant renames the path they are an editor of', async ({ page }) => {
+  test('the assistant renames the path they are an editor of', { tag: ['@story:R4'] }, async ({ page }) => {
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const renamed = `Linear A2 vom Assistenten ${Date.now()}`;
 
@@ -135,7 +135,7 @@ test.describe('ADELE-E2E-R4a — the collaborator edits only what they were give
     }
   });
 
-  test('the assistant gets no editing route to the other path', async ({ page }) => {
+  test('the assistant gets no editing route to the other path', { tag: ['@story:R4'] }, async ({ page }) => {
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
 
     await loginAs(page, assistant, fixturePassword());

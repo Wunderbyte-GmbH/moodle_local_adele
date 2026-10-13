@@ -79,7 +79,7 @@ test.describe('ADELE-E2E-T — a fixed time window opens and closes the entry co
   // then T4/T5 with a window of their own (2031). For the same reason
   // this file has to run after every chain that does not move the clock -
   // the "zz-" prefix sorts it last in the suite, whatever files are added.
-  test('T3: a relative period - open from the assignment, closed one day later', async ({ page }) => {
+  test('T3: a relative period - open from the assignment, closed one day later', { tag: ['@story:T3'] }, async ({ page }) => {
     // Fixture "E2E Zeitdauer": the entry node is open for one day counted
     // from the learner's assignment to the path.
     const learner = fixture('ADELE_FIXTURE_DURATION_LEARNER');
@@ -98,7 +98,7 @@ test.describe('ADELE-E2E-T — a fixed time window opens and closes the entry co
     });
   });
 
-  test('T1/T2: closed before, open inside, closed after the window', async ({ page }) => {
+  test('T1/T2: closed before, open inside, closed after the window', { tag: ['@story:T1', '@story:T2'] }, async ({ page }) => {
     const learner = fixture('ADELE_FIXTURE_TIME_LEARNER');
     const start = Number(fixture('ADELE_FIXTURE_TIMEWINDOW_START'));
     const end = Number(fixture('ADELE_FIXTURE_TIMEWINDOW_END'));
@@ -124,7 +124,7 @@ test.describe('ADELE-E2E-T — a fixed time window opens and closes the entry co
     });
   });
 
-  test('T4/T5: the window AND / OR a completed predecessor', async ({ page }) => {
+  test('T4/T5: the window AND / OR a completed predecessor', { tag: ['@story:T4', '@story:T5'] }, async ({ page }) => {
     // Node 2 (T02) of two fixture paths: "E2E Zeit UND Vorgänger" and
     // "E2E Zeit ODER Vorgänger". Two learners each - "first" completes T01
     // before the window, "late" only inside it - so every row of the plan's

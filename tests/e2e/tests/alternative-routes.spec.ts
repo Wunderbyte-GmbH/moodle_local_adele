@@ -107,7 +107,7 @@ async function expectT04(page: Page, variant: string, state: string, why: string
 
 test.describe('ADELE-E2E-A — alternative routes', () => {
   for (const [variant, alternatives] of [['T02', ['T02']], ['T03', ['T03']], ['BOTH', ['T02', 'T03']]] as const) {
-    test(`${variant.toLowerCase()}: T04 opens, and the route completes without the other alternative`, async ({ page }) => {
+    test(`${variant.toLowerCase()}: T04 opens, and the route completes without the other alternative`, { tag: ['@story:A', '@story:L2'] }, async ({ page }) => {
       await loginAs(page, fixture(`ADELE_FIXTURE_A_${variant}_LEARNER`), fixturePassword());
 
       await test.step(`the learner completes T01 and ${alternatives.join(' and ')}`, async () => {
@@ -135,7 +135,7 @@ test.describe('ADELE-E2E-A — alternative routes', () => {
     });
   }
 
-  test('none: without an alternative T04 stays locked; progress 1 of 3', async ({ page }) => {
+  test('none: without an alternative T04 stays locked; progress 1 of 3', { tag: ['@story:A', '@story:L2'] }, async ({ page }) => {
     await loginAs(page, fixture('ADELE_FIXTURE_A_NONE_LEARNER'), fixturePassword());
     await completeCourse(page, fixtureCourse('T01'));
     await expectT04(page, 'NONE', 'not_accessible', 'neither alternative is completed');

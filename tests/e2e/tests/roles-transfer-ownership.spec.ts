@@ -72,7 +72,7 @@ const cardOf = (page: Page, name: string): Locator =>
 const ownerLine = (page: Page): Locator => app(page).locator('.owner-label');
 
 test.describe('ADELE-E2E-R6 — a learning path is handed to a new owner', () => {
-  test('the manager transfers ownership, and it sticks', async ({ page }) => {
+  test('the manager transfers ownership, and it sticks', { tag: ['@story:R6'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const assistant = fixture('ADELE_FIXTURE_ASSISTANT');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');

@@ -72,7 +72,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
     resetServerTime();
   });
 
-  test('F1/F2 a fixed window, 2032-01-15 10:00 to 12:00 UTC: before, inside, after', async ({ page }) => {
+  test('F1/F2 a fixed window, 2032-01-15 10:00 to 12:00 UTC: before, inside, after', { tag: ['@story:F1', '@story:F2', '@story:T2'] }, async ({ page }) => {
     await test.step('before: the window is named, with date and time - in the learner\'s own zone', async () => {
       const node = await learnerReads(page, 'TIME', 'dndnode_1');
       expect(node.status).toBe('not_accessible');
@@ -140,7 +140,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
     });
   });
 
-  test('F3 window AND / OR predecessor: the text names what is still missing', async ({ page }) => {
+  test('F3 window AND / OR predecessor: the text names what is still missing', { tag: ['@story:F3', '@story:T4', '@story:T5'] }, async ({ page }) => {
     // Node 2 of two paths, window 2033-01-15 10:00 to 12:00 UTC. AND has two
     // learners: one completes Testkurs 01 before the window, one only in it.
     const window = '15/01/33, 10:00 to 15/01/33, 12:00';

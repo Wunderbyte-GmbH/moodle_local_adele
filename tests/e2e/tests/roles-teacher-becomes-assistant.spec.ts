@@ -78,7 +78,7 @@ async function openOverview(page: Page): Promise<void> {
 }
 
 test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', () => {
-  test('the teaching role opens the editor, and the person can create a path', async ({ page }) => {
+  test('the teaching role opens the editor, and the person can create a path', { tag: ['@story:R3', '@story:R5'] }, async ({ page }) => {
     const teacher = fixture('ADELE_FIXTURE_TEACHER');
     const teachername = fixture('ADELE_FIXTURE_TEACHER_NAME');
     const course = fixture('ADELE_FIXTURE_HOST_COURSE');
@@ -169,7 +169,7 @@ test.describe('ADELE-E2E-R3 — a course teacher becomes an ADELE assistant', ()
     });
   });
 
-  test('refusing to create a path, the server names the missing permission', async ({ page }) => {
+  test('refusing to create a path, the server names the missing permission', { tag: ['@story:R3'] }, async ({ page }) => {
     // The refusal used to be a PHP error ("generalexceptionmessage"): the
     // exception the service means to throw was not imported in
     // save_learningpath.php (local_adele #594).

@@ -113,7 +113,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     await loginAs(page, env.adminUser, env.adminPassword);
   });
 
-  test('condition level: (A AND B) OR C', async ({ page }) => {
+  test('condition level: (A AND B) OR C', { tag: ['@story:E2'] }, async ({ page }) => {
     const title = `E2 Bedingung (A und B) oder C ${Date.now()}`;
     await chainOfTwo(page, title);
     try {
@@ -130,7 +130,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  test('condition level: A AND (B OR C), multiplied out', async ({ page }) => {
+  test('condition level: A AND (B OR C), multiplied out', { tag: ['@story:E2'] }, async ({ page }) => {
     const title = `E2 Bedingung A und (B oder C) ${Date.now()}`;
     await chainOfTwo(page, title);
     try {
@@ -147,7 +147,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  test('condition level: add, remove, and throw changes away', async ({ page }) => {
+  test('condition level: add, remove, and throw changes away', { tag: ['@story:E2'] }, async ({ page }) => {
     const title = `E2 Bedingung ändern ${Date.now()}`;
     await chainOfTwo(page, title);
     try {
@@ -180,7 +180,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  test('node level: A AND (B OR C)', async ({ page }) => {
+  test('node level: A AND (B OR C)', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Knoten A und (B oder C) ${Date.now()}`;
     await page.goto('/local/adele/index.php');
@@ -216,7 +216,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
     }
   });
 
-  test('node level: (A AND B) OR C', async ({ page }) => {
+  test('node level: (A AND B) OR C', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Knoten (A und B) oder C ${Date.now()}`;
     await page.goto('/local/adele/index.php');
@@ -254,7 +254,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // Was a known defect: a predecessor placed "before" a node did not enter
   // that node's predecessor criterion (the gap #584 closed for the parallel
   // zone). Fixed with the E2E issue, addAutoRestrictions 'parent'.
-  test('a predecessor placed before a node counts in its criterion without opening the criteria', async ({ page }) => {
+  test('a predecessor placed before a node counts in its criterion without opening the criteria', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger davor ${Date.now()}`;
     await chainOfTwo(page, title);
@@ -273,7 +273,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // Was a known defect: before saving, the predecessor condition counted the
   // predecessors as last loaded ("1 / 1" while the page header listed two).
   // Fixed with the E2E issue: parent_courses.vue reads the path being edited.
-  test('the predecessor condition counts the predecessors drawn, saved or not', async ({ page }) => {
+  test('the predecessor condition counts the predecessors drawn, saved or not', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger zählen ${Date.now()}`;
     await chainOfTwo(page, title);
@@ -289,7 +289,7 @@ test.describe('ADELE-E2E-E2 — bracketed combinations', () => {
   // Was a known defect: placed "before" a node that already had a
   // predecessor, the new node was drawn exactly on top of it. Fixed with the
   // E2E issue: it goes next to the existing predecessors, in their row.
-  test('a node placed before another with the keyboard does not cover it', async ({ page }) => {
+  test('a node placed before another with the keyboard does not cover it', { tag: ['@story:E2'] }, async ({ page }) => {
     test.setTimeout(300_000);
     const title = `E2 Vorgänger verdeckt ${Date.now()}`;
     await chainOfTwo(page, title);

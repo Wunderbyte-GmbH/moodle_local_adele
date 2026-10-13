@@ -86,7 +86,7 @@ async function expectZones(page: Page, expected: Record<string, DropZone[]>): Pr
 test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
   test.use({ viewport: VIEWPORT });
 
-  test('a chain: no second successor, no second predecessor, every zone offered is reachable', async ({ page }) => {
+  test('a chain: no second successor, no second predecessor, every zone offered is reachable', { tag: ['@story:E1'] }, async ({ page }) => {
     test.setTimeout(300_000);
     page.on('dialog', (dialog) => dialog.accept());
     await loginAs(page, env.adminUser, env.adminPassword);
@@ -106,7 +106,7 @@ test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
     await expect(app(page).locator('[data-testid^="learningpath-node-"]'), 'nothing was dropped').toHaveCount(3);
   });
 
-  test('a zone the pointer is on stays - also where the starting marker lies beneath it', async ({ page }) => {
+  test('a zone the pointer is on stays - also where the starting marker lies beneath it', { tag: ['@story:E1'] }, async ({ page }) => {
     // With a single node the starting marker is drawn to its right, under
     // the right part of the zone for "parallel". Moving along the zone onto
     // that part used to count as "on the marker": the zones vanished under
@@ -154,7 +154,7 @@ test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
       .toHaveCount(2, { timeout: 30_000 });
   });
 
-  test('two parallel nodes before a third: the same rule', async ({ page }) => {
+  test('two parallel nodes before a third: the same rule', { tag: ['@story:E1'] }, async ({ page }) => {
     test.setTimeout(300_000);
     page.on('dialog', (dialog) => dialog.accept());
     await loginAs(page, env.adminUser, env.adminPassword);
@@ -174,7 +174,7 @@ test.describe('ADELE-E2E-E1 — the drop zones a node offers (#595)', () => {
     await expect(app(page).locator('[data-testid^="learningpath-node-"]'), 'nothing was dropped').toHaveCount(3);
   });
 
-  test('a branch is built from the side zone of the successor, and each arm continues on its own', async ({ page }) => {
+  test('a branch is built from the side zone of the successor, and each arm continues on its own', { tag: ['@story:E1'] }, async ({ page }) => {
     // The way to a second successor now that its zone is gone: "parallel" at
     // the successor that is already there.
     page.on('dialog', (dialog) => dialog.accept());
