@@ -95,6 +95,9 @@ final class uc20_enrollment_test extends adele_learningpath_testcase {
      * @return stdClass
      */
     private function make_enrolment_event(int $courseid, int $userid): stdClass {
+        // The person really is a participant of the course: being enrolled
+        // alone no longer subscribes anybody (#587) - a teacher is enrolled too.
+        self::getDataGenerator()->enrol_user($userid, $courseid, 'student');
         $event = new stdClass();
         $event->courseid       = $courseid;
         $event->relateduserid  = $userid;

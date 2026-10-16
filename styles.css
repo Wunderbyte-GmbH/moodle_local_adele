@@ -84,3 +84,33 @@
     cursor: pointer;
     margin-right: 0;
 }
+
+/*
+ * Focus visibility (#575 B6, WCAG 2.4.7 Focus Visible and 1.4.11 Non-text
+ * Contrast).
+ *
+ * The learning path is a Vue application drawn on a canvas; several of its
+ * controls sit on coloured card headers, on cover images or on the graph
+ * background, where a browser's default outline can vanish. One rule for the
+ * whole application, on :focus-visible only, so nothing changes for mouse
+ * users - which is what this issue requires.
+ *
+ * The double ring (dark outline plus light halo) keeps the indicator visible
+ * on light and dark surroundings alike without relying on either.
+ */
+[id^="local-adele-app"] :focus-visible {
+    outline: 3px solid #12324a;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.85);
+    border-radius: 2px;
+}
+
+/*
+ * Vue Flow gives every node tabindex="0" and role="button", so nodes are
+ * already in the tab order; without an indicator that focus was invisible.
+ */
+[id^="local-adele-app"] .vue-flow__node:focus-visible {
+    outline: 3px solid #12324a;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.85);
+}

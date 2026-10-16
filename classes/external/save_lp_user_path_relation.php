@@ -81,20 +81,46 @@ class save_lp_user_path_relation extends external_api {
         require_login();
 
         $context = context::instance_by_id($contextid);
-        // See the identical comment in
-        // get_lp_user_path_relation.php — canmanage/teacheredit is
-        // system-/course-role-based, not course-enrolment-based; a manager
-        // acting on a course they are not enrolled in is the normal case.
-        // Managers keep full access; editing-teachers may set a user's node status
-        // (manual completion / master toggle) via teacheredit, without canmanage (#431).
-        if (!has_capability('local/adele:canmanage', $context)) {
-            require_capability('local/adele:teacheredit', $context);
+        // No validate_context(): for a course context it requires an
+        // ENROLMENT, and a right held through a role assigned above the
+        // course (or by a site administrator) comes without one.
+        // Teachers may set a user's node status (manual completion / master
+        // toggle) via teacheredit, without canmanage (#431).
+        // The context is client input: a right that comes from a course counts
+        // only in a course that EMBEDS this path. It used to count in any course,
+        // so a teacher of an unrelated course could complete nodes for the
+        // learners of every path - and thereby open their courses.
+        // The path that is actually written is named INSIDE the payload
+        // (route.learningpathId); the check below must be about that path.
+        $payload = json_decode($params['params']);
+        if (
+            !is_object($payload)
+            || (int) ($payload->route->learningpathId ?? 0) !== (int) $params['learningpathid']
+        ) {
+            throw new \invalid_parameter_exception('The payload does not belong to the learning path given.');
         }
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            $params['courseid'] = $context->instanceid;
-        } else {
-            $coursecontext = $context->get_course_context();
-            $params['courseid'] = $coursecontext->instanceid;
+        $coursecontext = $context->get_course_context(false);
+        $params['courseid'] = $coursecontext ? (int) $coursecontext->instanceid : 0;
+        // Only a site administrator acts without a course. An ADELE manager
+        // (local/adele:canmanage) used to as well; managing paths gives no
+        // right over the learners of a course (#586, addendum).
+        if (!learning_paths::has_learner_data_authority()) {
+            if (
+                !$coursecontext
+                || !learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid'])
+            ) {
+                throw new \required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');
+            }
+            // Changing a learner's path is local/adele:teacheredit - and nothing
+            // else. The check used to accept local/adele:canmanage in the given
+            // context as well, which a teacher WITHOUT editing rights holds in
+            // the own course by archetype (mod_adele #39).
+            require_capability('local/adele:teacheredit', $context);
+            // A course right covers the learners of that course - not the
+            // ones another course brought to the same path (#588).
+            if (!learning_paths::is_roster_member((int) $params['courseid'], (int) ($payload->route->userId ?? 0))) {
+                throw new \required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');
+            }
         }
         return learning_paths::save_learning_user_relation($params);
     }

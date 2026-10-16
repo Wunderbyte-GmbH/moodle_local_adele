@@ -265,6 +265,7 @@ const onCancelConfirmation = (toggle) => {
       v-if="current_user_view"
       id="save-learning-path"
       class="btn btn-primary m-2"
+      data-testid="learningpath-save"
       @click="onSave"
     >
       {{ store.state.strings.save }}
@@ -272,6 +273,7 @@ const onCancelConfirmation = (toggle) => {
     <button
       id="cancel-learning-path"
       class="btn btn-secondary m-2"
+      data-testid="learningpath-close"
       :disabled="showCancelConfirmation"
       @click="onCancel"
     >
@@ -354,6 +356,7 @@ const onCancelConfirmation = (toggle) => {
     <button
       id="cancel-learning-path"
       class="btn btn-secondary m-2"
+      data-testid="learningpath-close"
       :disabled="showCancelConfirmation"
       @click="onCancelConfirmation(false)"
     >

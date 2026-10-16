@@ -40,7 +40,9 @@
 
   function capitalize(text, index, length) {
     if (!text) return ''
-    else if (index == 0) text.charAt(0).toUpperCase() + text.slice(1);
+    // The capital letter has to be kept: computed and thrown away, the first
+    // entry reached the learner as the server wrote it (#596).
+    if (index == 0) text = text.charAt(0).toUpperCase() + text.slice(1);
     if (
       index == length - 1 &&
       !text.endsWith('</ul>')

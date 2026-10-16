@@ -28,6 +28,7 @@
       class="dndflow mt-4"
       :class="{ 'adele-flow-expanded': store.state.userlistcollapsed }"
       @drop="onDrop"
+      @keydown="onCanvasKeydown"
       @wheel="onWheel($event, zoomLockVaraible, viewport, zoomTo)"
     >
       <Modal
@@ -136,6 +137,14 @@
         :style="{ backgroundColor: backgroundSidebar }"
         @nodesIntersected="handleNodesIntersected"
         @changedModule="onChangedModule"
+        @insertCourse="openInsertDialog"
+      />
+      <KeyboardInsertDialog
+        v-if="insertCandidate"
+        :course="insertCandidate"
+        :nodes="nodes"
+        @insert="insertFromDialog"
+        @cancel="insertCandidate = null"
       />
     </div>
     <p />
@@ -160,6 +169,7 @@ import { ref, watch, nextTick, onMounted, computed, onUnmounted } from 'vue'
 import { VueFlow, useVueFlow, Panel } from '@vue-flow/core'
 import { useStore } from 'vuex'
 import Sidebar from './SidebarPath.vue'
+import KeyboardInsertDialog from './KeyboardInsertDialog.vue'
 import Controls from './ControlsPath.vue'
 import CustomNode from '../nodes/CustomNode.vue'
 import { Background } from '@vue-flow/background'
@@ -180,6 +190,7 @@ import addAutoCompletions from '../../composables/conditions/addAutoCompletions'
 import addStagCompletions from '../../composables/conditions/addStagCompletions'
 import addAutoRestrictions from '../../composables/conditions/addAutoRestrictions'
 import addAndConditions from '../../composables/conditions/addAndConditions'
+import linkParallelNode from '../../composables/conditions/linkParallelNode'
 import drawModules from '../../composables/nodesHelper/drawModules'
 import ExpandNodeEdit from '../nodes/ExpandNodeEdit.vue'
 import onNodeClick from '../../composables/flowHelper/onNodeClick'
@@ -384,11 +395,97 @@ watch(
   { deep: true }
 );
 
+// The course the keyboard dialog is open for, null when it is closed (#575 B5).
+const insertCandidate = ref(null)
+
+/**
+ * Open the keyboard insertion dialog for one course.
+ *
+ * @param {object} course The course the sidebar handed over.
+ */
+function openInsertDialog(course) {
+  insertCandidate.value = course
+}
+
+/**
+ * Insert the course where the dialog says, through the drop path.
+ *
+ * The pointer expresses "attach HERE, like THIS" as a position over a
+ * dropzone; the dialog expresses the same thing as a node plus a relation.
+ * Both end up in intersectedNode, so insertCourseNode does not need to know
+ * which of the two it was.
+ *
+ * @param {object} choice The node and relation the user picked.
+ */
+function insertFromDialog(choice) {
+  const target = findNode(choice.targetId)
+  insertCandidate.value = null
+  if (!target) {
+    return
+  }
+  const dropzoneid = choice.dropzone === 'starting_node' ? 'dropzone_child' : choice.dropzone
+  intersectedNode.value = {
+    closestnode: target,
+    // A synthetic dropzone: the drop path reads its id, its position and its
+    // height. Zero dimensions simply mean "no gap to bridge"; the insertion
+    // rounds the position to the grid afterwards anyway.
+    dropzone: {
+      id: dropzoneid,
+      position: { x: target.position.x, y: target.position.y },
+      dimensions: { width: 0, height: 0 },
+    },
+  }
+  insertCourseNode('custom', JSON.parse(JSON.stringify(choice.course)))
+  intersectedNode.value = null
+  store.commit('announce', store.state.strings.insert_dialog_inserted + ' ' +
+    (choice.course.fullname || ''))
+}
+
+/**
+ * Delete the node the keyboard focus is on.
+ *
+ * Vue Flow gives every node wrapper tabindex="0" and carries the node id in
+ * data-id, so the focused node is known without a selection model of our
+ * own. The deletion itself goes through onRemoveNode, the same routine the
+ * node's own delete control uses - including its confirmation.
+ *
+ * @param {KeyboardEvent} event The keydown on the canvas.
+ */
+function onCanvasKeydown(event) {
+  if (event.key !== 'Delete') {
+    return
+  }
+  const wrapper = document.activeElement ? document.activeElement.closest('.vue-flow__node') : null
+  const nodeid = wrapper ? wrapper.getAttribute('data-id') : null
+  if (!nodeid || nodeid === 'starting_node' || nodeid.startsWith('dropzone')) {
+    return
+  }
+  event.preventDefault()
+  onRemoveNode({ node_id: nodeid })
+}
+
 // Adding setting up nodes and potentional edges
 function onDrop(event) {
-  if(intersectedNode.value){
-    const type = event.dataTransfer?.getData('application/vueflow')
-    const data = JSON.parse(event.dataTransfer?.getData('application/data'));
+  const type = event.dataTransfer?.getData('application/vueflow')
+  const raw = event.dataTransfer?.getData('application/data')
+  insertCourseNode(type, raw ? JSON.parse(raw) : null)
+}
+
+/**
+ * Insert a course into the path at the currently intersected drop target.
+ *
+ * Split out of onDrop so that the mouse and the keyboard take the SAME path
+ * into the graph (#575 B5). Everything below used to sit inside the drop
+ * handler and read the drag event; it now reads only intersectedNode, which
+ * the drag handler fills from the pointer and the keyboard dialog fills from
+ * the node and the relation the user chose. A second, keyboard-only
+ * insertion routine would have to be kept in step with this one forever.
+ *
+ * @param {string} type The vue-flow node type to create.
+ * @param {object} data The course the sidebar handed over.
+ */
+function insertCourseNode(type, data) {
+  if(intersectedNode.value && data){
     if (data.selected_course_image) {
       data.imagepaths = {
         [data.course_node_id]: data.selected_course_image, // Corrected this line
@@ -420,6 +517,11 @@ function onDrop(event) {
     else if (intersectedNode.value.dropzone.id == 'dropzone_parent'){
         childCourse.push(intersectedNode.value.closestnode.id)
         parentCourse.push('starting_node')
+        // The predecessors the node has already, before the new one joins.
+        const existing = intersectedNode.value.closestnode.parentCourse
+          .filter((id) => id !== 'starting_node')
+          .map((id) => findNode(id))
+          .filter((node) => node)
         intersectedNode.value.closestnode.parentCourse.push(data.node_id)
         // Check if the array contains the value
         const index = intersectedNode.value.closestnode.parentCourse.indexOf('starting_node');
@@ -427,6 +529,12 @@ function onDrop(event) {
         if (index !== -1) {
           intersectedNode.value.closestnode.parentCourse.splice(index, 1)
           shiftNodesDown(data, nodes.value)
+        } else if (existing.length) {
+          // A further predecessor (keyboard dialog, #595): next to the ones
+          // there are, in their row - not on top of the node it precedes.
+          const rightmost = existing.reduce((a, b) => (a.position.x >= b.position.x ? a : b))
+          position.x = rightmost.position.x + (rightmost.dimensions?.width || 400) + 150
+          position.y = rightmost.position.y
         }
     }else if(intersectedNode.value.dropzone.id == 'dropzone_child'){
       parentCourse.push(intersectedNode.value.closestnode.id)
@@ -436,8 +544,10 @@ function onDrop(event) {
     }else if(intersectedNode.value.dropzone.id == 'dropzone_and'){
       addConditions = addAndConditions(intersectedNode.value, getEdges, id)
       position.x += 200
-      parentCourse = addConditions.parentNodes
-      childCourse = addConditions.childNodes
+      // Copies: the lists of the node dropped next to must not be shared.
+      parentCourse = [...(addConditions.parentNodes || [])]
+      childCourse = [...(addConditions.childNodes || [])]
+      linkParallelNode(findNode, id, parentCourse, childCourse)
       newNode.restriction = addConditions.newRestrictions
       newNode.completion = addConditions.newCompletions
       newNode.data = data

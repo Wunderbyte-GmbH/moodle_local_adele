@@ -75,7 +75,14 @@ const props = defineProps({
   restriction: {
     type: Object,
     required: true,
-  }
+  },
+  // The path as the editor holds it right now. The store keeps the path as
+  // it was last loaded: a predecessor added since (and not saved yet) is
+  // missing there, and "n of m" would offer too few numbers.
+  learningpath: {
+    type: Object,
+    default: null,
+  },
 });
 const data = ref({
   min_courses: 1,
@@ -96,7 +103,8 @@ onMounted(() => {
     data.value.min_courses = props.restriction.value.min_courses
   }
   let parentCoursesId = null;
-  store.state.learningpath.json.tree.nodes.forEach((node) => {
+  const path = props.learningpath?.json?.tree?.nodes ? props.learningpath : store.state.learningpath
+  path.json.tree.nodes.forEach((node) => {
     if (node.id == store.state.node.node_id) {
       if (node.parentCourse == undefined ||
         node.parentCourse.includes('starting_node')) {

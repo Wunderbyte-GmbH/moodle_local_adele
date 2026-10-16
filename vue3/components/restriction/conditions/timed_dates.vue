@@ -37,7 +37,7 @@
           width: 80%;
           border-radius: 0.5rem !important;
         "
-        :value="data.start"
+        :value="toDatetimeLocal(data.start)"
         @input="updateSelectedDateTime('start', $event)"
       >
     </div>
@@ -55,7 +55,7 @@
           width: 80%;
           border-radius: 0.5rem !important;
         "
-        :value="data.end"
+        :value="toDatetimeLocal(data.end)"
         @input="updateSelectedDateTime('end', $event)"
       >
     </div>
@@ -65,6 +65,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import TimeWarning from '../../nodes_items/TimeWarning.vue'
+import { toDatetimeLocal, toEpochSeconds } from '../../../composables/timeValue.js'
 
 const props = defineProps({
   modelValue: {
@@ -86,8 +87,10 @@ const descriptions = ref({
 });
 const emit = defineEmits(['update:modelValue'])
 
+// Stored as Unix seconds (#581): the input speaks the browser's local time,
+// the stored value is one instant regardless of who looks at it.
 const updateSelectedDateTime = (type, event) => {
-  data.value[type] = event.target.value;
+  data.value[type] = toEpochSeconds(event.target.value);
   emit('update:modelValue', data.value);
 };
 

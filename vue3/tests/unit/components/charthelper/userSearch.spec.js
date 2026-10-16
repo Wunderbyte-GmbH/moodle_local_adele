@@ -298,5 +298,21 @@ describe('userSearch.vue owner indication (#488)', () => {
     const wrapper = await doMount('teacheredit', 2);
     expect(wrapper.find('.owner-label').text()).toContain('Jane Smith');
   });
+
+  // Decision 2026-10-08 ("Regel B"): the owner always stays on the list;
+  // ownership is handed over with the crown, not by removal.
+  it.each(['manager', 'assistant', 'teacheredit'])(
+    'offers no remove button on the owner card (view %s), but on the others',
+    async (view) => {
+      const wrapper = await doMount(view, 2);
+      const cards = wrapper.findAll('.card-user');
+      const owner = cards.filter((card) => card.find('.owner-crown').exists());
+      const others = cards.filter((card) => !card.find('.owner-crown').exists());
+      expect(owner).toHaveLength(1);
+      expect(owner[0].find('button.text-danger').exists()).toBe(false);
+      expect(others.length).toBeGreaterThan(0);
+      others.forEach((card) => expect(card.find('button.text-danger').exists()).toBe(true));
+    },
+  );
 });
 

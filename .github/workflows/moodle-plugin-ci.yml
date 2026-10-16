@@ -3,157 +3,9 @@ name: Moodle Plugin CI
 "on": [push, pull_request]
 
 jobs:
-  moodle500to501:
-    uses: Wunderbyte-GmbH/catalyst-moodle-workflows/.github/workflows/ci.yml@main
-    with:
-      # Change these based on your plugin's requirements
-      disable_release: true  # Use true if using the tag-based release workflow
-      moodle_branches: "MOODLE_500_STABLE MOODLE_501_STABLE"  # Optional: Only test specific Moodle versions
-      min_php: '8.2'  # Optional: Set minimum PHP version
-
-      # Command to install more dependencies
-      #
-      # enrol_adele added (Session 003, Teil 14): without it, local_adele's
-      # own test suite runs with enrol_adele genuinely absent - correct in
-      # principle (local_adele deliberately has no hard dependency on it,
-      # decision G-Q1a), but G-Q1a also means every reconcile attempt then
-      # calls debugging() to say so loudly, which advanced_testcase treats
-      # as an unexpected-debugging failure in tests that do not already
-      # anticipate it. Installing enrol_adele here matches the realistic
-      # "fully deployed ADELE ecosystem" case instead, avoiding that
-      # debugging() path entirely rather than retrofitting
-      # assertDebuggingCalled() into every affected test.
-      # Companion plugins come from the Wunderbyte upstream, deliberately.
-      # Note the inconsistent naming that this has to match exactly:
-      # local uses an underscore (moodle_local_adele) on branch "main",
-      # mod uses a hyphen on branch "master", enrol a hyphen on "main".
-      #
-      # PREREQUISITE: this only works once the corresponding changes are
-      # merged upstream. version.php declares hard dependencies on specific
-      # sibling versions, so an upstream that is behind makes Moodle refuse
-      # to install with "Dependencies check failed" - before a single test
-      # runs. If that happens, the branches here are ahead of upstream, not
-      # the code broken.
-      extra_plugin_runners: |
-        moodle-plugin-ci add-plugin --branch MOODLE_405_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
-        moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
-        moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-enrol_adele
-        # --- catquiz ecosystem temporarily disabled in CI ---
-        # The adaptive-catquiz-v3 branch of local_catquiz declares a 'catquizcentralhub'
-        # subplugin type whose directory is missing, so Moodle's component scan throws
-        # "Invalid subtype directory 'local/catquiz/catquizcentralhub'" and every test that
-        # instantiates an external service fails. catquiz is OPTIONAL for local_adele (the
-        # catquiz completion condition is class_exists-guarded and version.php has no
-        # dependency on it), so we skip installing the catquiz family here.
-        # To re-enable: uncomment the three lines below (once the catquiz branch set is fixed).
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-local_catquiz
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-mod_adaptivequiz
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
-
-      # If you need to ignore specific paths (third-party libraries are ignored by default)
-      ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'
-
-      # Specify paths to ignore for mustache lint
-      mustache_ignore_names: 'initview.mustache'
-
-      # Specify paths to ignore for code checker
-      # codechecker_ignore_paths: 'OpenTBS, TinyButStrong'
-
-      # Specify paths to ignore for PHPDoc checker
-      # phpdocchecker_ignore_paths: 'OpenTBS, TinyButStrong'
-
-      # If you need to disable specific tests
-      # disable_phpcpd: true
-      # disable_mustache: true
-      # disable_phpunit: true
-      disable_grunt: true
-      # disable_phpdoc: true
-      # disable_phpcs: true
-      # disable_phplint: true
-      # disable_ci_validate: true
-
-      # If you need to enable PHPMD
-      enable_phpmd: true
-
-      # For strict code quality checks
-      codechecker_max_warnings: 0
-
-      # Override to exclude stale AMD file check (similar to your current workaround)
-#      workarounds: |
-#        # WORKAROUND 17/04/2025: The following code is a workaround for the "File is stale and needs to be rebuilt" error
-#        # This occurs when AMD modules import Moodle core dependencies
-#        # See issue: https://github.com/moodlehq/moodle-plugin-ci/issues/350
-#        # This workaround should be removed once the issue is fixed upstream
-#        # Load NVM and use the version from .nvmrc
-#        export NVM_DIR="$HOME/.nvm"
-#        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-#
-#        # Go to moodle directory
-#        cd moodle
-#
-#        # Use NVM to set Node version and ensure grunt-cli is installed
-#        nvm use
-#        npm install
-#        npm install -g grunt-cli
-#
-#        # Go back to plugin directory
-#        cd ../plugin
-#
-#        # Pre-build AMD files to avoid stale file warnings
-#        echo "=== Building AMD files before CI check ==="
-#        grunt --gruntfile ../moodle/Gruntfile.js amd
-#        echo "AMD files built successfully"
-#        # Go Back to main directory
-#        cd ..
-#        # END OF WORKAROUND
-
-      custom_steps: |
-        # Set up Node.js
-        echo "::group::Vue3 Testing"
-
-        # Set up Node.js
-        NODE_VERSION="20"
-        echo "Setting up Node.js ${NODE_VERSION}"
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        nvm install ${NODE_VERSION}
-        nvm use ${NODE_VERSION}
-
-        # Check if Vue3 directory exists
-        if [ -d "plugin/vue3" ]; then
-          echo "Vue3 directory found at plugin/vue3"
-
-          # Install Vue dependencies
-          cd plugin/vue3
-          echo "Installing dependencies in Vue3 directory with legacy peer deps"
-          npm install --force
-          npm install --save-dev @babel/plugin-syntax-dynamic-import --force
-
-          # Run Vue tests
-          echo "Available npm scripts:"
-          npm run || true
-
-          # Check if test script exists
-          if grep -q '"test":' package.json; then
-            echo "Running npm test"
-            export NODE_OPTIONS="--max-old-space-size=4096"
-            # NOT "|| echo ... continuing". Jest ran here from the start, but
-            # its exit code was swallowed, so a red Vue3 suite left the job
-            # green and the 50 spec files under vue3/tests/unit/ guarded
-            # nothing. Failing here is the point of running them at all.
-            npm test -- --ci --coverage
-          else
-            # A missing test script is a broken checkout, not a valid state:
-            # vue3/package.json has always defined one.
-            echo "No test script found in vue3/package.json."
-            exit 1
-          fi
-
-          cd ../..
-        else
-          echo "Vue3 directory not found. Skipping Vue3 tests."
-        fi
-        echo "::endgroup::"
+  # Moodle 4.5 only: local_adele is released for 4.5 and nothing newer yet
+  # (decision 2026-10-06). The 5.x job was removed; to bring it back, copy
+  # the job below with moodle_branches "MOODLE_500_STABLE ..." and min_php 8.2.
   moodle405:
     uses: Wunderbyte-GmbH/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     with:
@@ -163,10 +15,13 @@ jobs:
       min_php: '8.1'  # Optional: Set minimum PHP version
 
       # Command to install more dependencies
-      # Companion plugins come from the Wunderbyte upstream, deliberately.
-      # Note the inconsistent naming that this has to match exactly:
-      # local uses an underscore (moodle_local_adele) on branch "main",
-      # mod uses a hyphen on branch "master", enrol a hyphen on "main".
+      # Companion plugins come from the SAME owner as the repository under
+      # test - the Wunderbyte upstream when CI runs there, the fork when it
+      # runs in a fork - and from the branch of the same name if the
+      # companion has one, otherwise "main". All three repositories are
+      # named moodle-<type>_adele and default to "main" (local_adele was
+      # renamed from moodle_local_adele, mod_adele's "master" became
+      # "main").
       #
       # PREREQUISITE: this only works once the corresponding changes are
       # merged upstream. version.php declares hard dependencies on specific
@@ -176,19 +31,20 @@ jobs:
       # the code broken.
       extra_plugin_runners: |
         moodle-plugin-ci add-plugin --branch MOODLE_405_DEV Wunderbyte-GmbH/moodle-local_wunderbyte_table
-        moodle-plugin-ci add-plugin --branch master Wunderbyte-GmbH/moodle-mod_adele
-        moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-enrol_adele
-        # --- catquiz ecosystem temporarily disabled in CI ---
-        # The adaptive-catquiz-v3 branch of local_catquiz declares a 'catquizcentralhub'
-        # subplugin type whose directory is missing, so Moodle's component scan throws
-        # "Invalid subtype directory 'local/catquiz/catquizcentralhub'" and every test that
-        # instantiates an external service fails. catquiz is OPTIONAL for local_adele (the
-        # catquiz completion condition is class_exists-guarded and version.php has no
-        # dependency on it), so we skip installing the catquiz family here.
-        # To re-enable: uncomment the three lines below (once the catquiz branch set is fixed).
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-local_catquiz
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-mod_adaptivequiz
-        # moodle-plugin-ci add-plugin --branch adaptive-catquiz-v3 Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
+        OWNER="${{ github.repository_owner }}"; REF="${{ github.head_ref || github.ref_name }}"; for sib in enrol mod; do url="https://github.com/$OWNER/moodle-${sib}_adele.git"; br=main; git ls-remote --exit-code --heads "$url" "$REF" >/dev/null 2>&1 && br="$REF"; echo "companion ${sib}_adele: $OWNER@$br"; moodle-plugin-ci add-plugin --branch "$br" "$OWNER/moodle-${sib}_adele"; done
+        # --- catquiz ecosystem (Moodle 4.5 line) ---
+        # Branch ALiSe-v-1.2.0-legacy of the ralferlebach forks, for now the only
+        # source of the 4.5 line (decision 2026-10-06). Disabled earlier because
+        # Moodle's component scan threw "Invalid subtype directory
+        # 'local/catquiz/catquizcentralhub'": that directory holds two GIT
+        # SUBMODULES, and add-plugin clones without them (git clone --depth 1
+        # into moodle-plugin-ci-plugins/<repository>). So they are fetched
+        # right after. moodle-plugin-ci orders plugins by dependency and
+        # subplugin type, so the adapter is installed after mod_adaptivequiz.
+        moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-mod_adaptivequiz
+        moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-adaptivequizcatmodel_catquiz
+        moodle-plugin-ci add-plugin --branch ALiSe-v-1.2.0-legacy ralferlebach/moodle-local_catquiz
+        git -C moodle-plugin-ci-plugins/moodle-local_catquiz submodule update --init --depth 1
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
       ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3'

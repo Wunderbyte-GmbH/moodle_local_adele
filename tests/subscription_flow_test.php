@@ -240,6 +240,9 @@ final class subscription_flow_test extends advanced_testcase {
             'learningpathid' => $lp->id,
         ]);
 
+        // The user takes part in the home course: being enrolled alone no
+        // longer subscribes anybody (#587) - a teacher is enrolled too.
+        $gen->enrol_user($user->id, $homecourse->id, 'student');
         // Shape of the payload enrollment::enrolled() reads off the event.
         $event = (object) [
             'courseid' => (int) $homecourse->id,

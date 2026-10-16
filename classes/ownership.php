@@ -71,14 +71,14 @@ class ownership {
         $DB->update_record('local_adele_learning_paths', (object) [
             'id' => $lpid,
             'createdby' => $newownerid,
-            'timemodified' => time(),
+            'timemodified' => \core\di::get(\core\clock::class)->time(),
         ]);
         if (!$DB->record_exists('local_adele_lp_editors', ['learningpathid' => $lpid, 'userid' => $newownerid])) {
             $DB->insert_record('local_adele_lp_editors', (object) [
                 'learningpathid' => $lpid,
                 'userid' => $newownerid,
-                'timecreated' => time(),
-                'timemodified' => time(),
+                'timecreated' => \core\di::get(\core\clock::class)->time(),
+                'timemodified' => \core\di::get(\core\clock::class)->time(),
             ]);
         }
         // Deliberately NO learnpath_updated event: that event means "the tree
@@ -86,6 +86,37 @@ class ownership {
         // expects a 'json' payload the transfer does not carry - live crash on
         // paths with subscribers). Ownership is metadata; timemodified is the
         // audit trace.
+    }
+
+    /**
+     * Put every owner on the list of editors of their path (decision
+     * 2026-10-08: the owner always stands on that list).
+     *
+     * Paths whose owner was taken off the list before removing the owner was
+     * refused could exist; this repairs them. Owners whose account is gone
+     * are left to the successor rule (handle_vanished_owner()).
+     *
+     * @return int The number of owners put back.
+     */
+    public static function ensure_owners_are_editors(): int {
+        global $DB;
+        $missing = $DB->get_records_sql(
+            "SELECT lp.id, lp.createdby
+               FROM {local_adele_learning_paths} lp
+               JOIN {user} u ON u.id = lp.createdby AND u.deleted = 0
+          LEFT JOIN {local_adele_lp_editors} e ON e.learningpathid = lp.id AND e.userid = lp.createdby
+              WHERE e.id IS NULL"
+        );
+        $now = \core\di::get(\core\clock::class)->time();
+        foreach ($missing as $path) {
+            $DB->insert_record('local_adele_lp_editors', (object) [
+                'learningpathid' => (int) $path->id,
+                'userid' => (int) $path->createdby,
+                'timecreated' => $now,
+                'timemodified' => $now,
+            ]);
+        }
+        return count($missing);
     }
 
     /**

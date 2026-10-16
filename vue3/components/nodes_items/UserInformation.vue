@@ -101,6 +101,19 @@ const iconColor = computed(() => {
   return color;
 });
 
+// The trigger is a button with a name and a state, so that the feedback is
+// reachable without a mouse (#591): Enter and Space open and close, Escape closes.
+const feedbackId = computed(() => 'adele-node-feedback-' + props.data.node_id);
+const toggleLabel = computed(() => {
+  const what = store.state.strings.a11y_node_feedback || '';
+  return props.data.fullname ? what + ': ' + props.data.fullname : what;
+});
+const closeFeedbackarea = () => {
+  if (showFeedbackarea.value) {
+    toggleFeedbackarea();
+  }
+};
+
 const toggleFeedbackarea = () => {
   showFeedbackarea.value = !showFeedbackarea.value;
   if (!showFeedbackarea.value) {
@@ -156,15 +169,18 @@ const handleBlur = () => {
 </script>
 
 <template>
-  <div class="card-container" tabindex="0" :style="cardStyle"
+  <div class="card-container" :style="cardStyle"
     :class="{ 'no-bottom-radius': showFeedbackarea, [data.node_id + '_user_info_listener']: true }" @click.stop
-    @focus="handleFocus" @blur="handleBlur">
-    <div class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }" @click.stop="toggleFeedbackarea">
-      <i class="fas fa-comment" :class="{ 'fa-comment-mobile': mobile }" :style="{ color: iconColor }" />
-    </div>
+    @focusin="handleFocus" @focusout="handleBlur" @keydown.esc="closeFeedbackarea">
+    <button type="button" class="toggle-button" :class="{ 'no-bottom-radius': showFeedbackarea }"
+      :aria-label="toggleLabel" :aria-expanded="showFeedbackarea ? 'true' : 'false'" :aria-controls="feedbackId"
+      @click.stop="toggleFeedbackarea" @keydown.enter.stop @keydown.space.stop>
+      <i class="fas fa-comment" :class="{ 'fa-comment-mobile': mobile }" :style="{ color: iconColor }"
+        aria-hidden="true" />
+    </button>
     <transition name="fade">
-      <div v-if="showFeedbackarea" :style="feedbackStyle" class="selectable" @mousedown.stop @mousemove.stop
-        @mouseup.stop>
+      <div v-if="showFeedbackarea" :id="feedbackId" :style="feedbackStyle" class="selectable" @mousedown.stop
+        @mousemove.stop @mouseup.stop>
         <!-- Render status for feedback. -->
         <div
           v-if="data.completion && data.completion.feedback.status_restriction && data.completion.feedback.restriction.before_valid"
@@ -285,6 +301,11 @@ const handleBlur = () => {
 
 .toggle-button {
   cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   border-radius: 8px;
   /* This is the default state */
   transition: background-color 0.3s ease, border-radius 0.3s ease;

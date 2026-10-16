@@ -118,6 +118,11 @@ final class hidden_feedback_visibility_test extends advanced_testcase {
                                         'id' => 160,
                                         'label' => 'manual',
                                         'description_before' => 'complete this manually',
+                                        // The author's own information text, as the
+                                        // editor stores it (manual_check.vue): on the
+                                        // condition, marked as edited.
+                                        'information' => self::COMPLETION_INFO,
+                                        'informationedited' => true,
                                     ],
                                 ],
                                 [

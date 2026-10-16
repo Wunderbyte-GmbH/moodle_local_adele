@@ -79,14 +79,13 @@ class adhoc_task_helper {
             $label = $restrictionnode['data']['label'] ?? '';
 
             if ($label === 'timed') {
-                // Fixed start/end datetime-local strings: one boundary per slot.
+                // Fixed start/end boundaries: one task per slot. Read through
+                // time_value so the task is planned for exactly the second the
+                // evaluation switches (#581) - strtotime() read a legacy value
+                // in a different way than the evaluation did.
                 foreach (['start', 'end'] as $slot) {
-                    $date = $restrictionnode['data']['value'][$slot] ?? '';
-                    if ($date === '' || $date === null) {
-                        continue;
-                    }
-                    $timestamp = strtotime((string)$date);
-                    if ($timestamp === false) {
+                    $timestamp = time_value::to_timestamp($restrictionnode['data']['value'][$slot] ?? null);
+                    if ($timestamp === null) {
                         continue;
                     }
                     self::schedule_boundary($userpath, $restrictionnode['id'], $slot, $timestamp);
@@ -115,7 +114,7 @@ class adhoc_task_helper {
         // access is granted synchronously by the recompute that is running right now.
         // Scheduling an immediate task would create a perpetual loop (task fires ->
         // recompute -> sees past boundary -> schedules another immediate task).
-        if ($boundary <= time()) {
+        if ($boundary <= \core\di::get(\core\clock::class)->time()) {
             return;
         }
 

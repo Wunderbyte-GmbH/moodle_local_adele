@@ -56,18 +56,20 @@
 
 <script setup lang="ts">
   import { useStore } from 'vuex';
+  import { toDate } from '../../composables/timeValue.js';
   const store = useStore();
 
+  // Unix seconds since #581; legacy wall-clock strings are still understood.
   interface StartEndDate {
-    start: string;
-    end: string;
+    start: number | string | null;
+    end: number | string | null;
   }
 
   const props = defineProps<{
     date: StartEndDate;
   }>();
 
-  const formatDate = (dateString: string): string  => {
+  const formatDate = (value: number | string | null): string  => {
     const options: Intl.DateTimeFormatOptions =
       {
         year: 'numeric',
@@ -77,7 +79,8 @@
         minute: 'numeric',
         hour12: false
       };
-    const formattedDate = new Date(dateString).toLocaleString('en-US', options);
-    return formattedDate;
+    // new Date(number) would read the seconds as MILLISECONDS and show 1970.
+    const date = toDate(value);
+    return date ? date.toLocaleString('en-US', options) : '';
   }
 </script>

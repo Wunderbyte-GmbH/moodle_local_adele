@@ -382,4 +382,65 @@ final class uc09_catquiz_completion_test extends adele_learningpath_testcase {
 
         $this->sink->close();
     }
+
+    /**
+     * Ability exactly at, just below and just above the threshold (plan
+     * section 13, chain D): the rule is "ability >= threshold", so the
+     * boundary itself passes.
+     *
+     * @return array [ability, expected status]
+     */
+    public static function boundary_provider(): array {
+        $x = self::SCALE_THRESHOLD;
+        // Both validation modes of the site setting "quizsettings": the default
+        // all_quiz_global once required a share-of-right-answers result even
+        // when no percentage threshold was set, so an ability-only threshold
+        // could never be met there.
+        $cases = [];
+        foreach (['single_quiz', 'all_quiz_global'] as $mode) {
+            $cases["{$mode}: x - epsilon"] = [$x - 0.01, 'not completed', $mode];
+            $cases["{$mode}: x"] = [$x, 'completed', $mode];
+            $cases["{$mode}: x + epsilon"] = [$x + 0.01, 'completed', $mode];
+        }
+        return $cases;
+    }
+
+    /**
+     * The ability threshold decides at its boundary as the rule says.
+     *
+     * @dataProvider boundary_provider
+     * @param float $ability The person ability stored in the attempt.
+     * @param string $expected "completed" or "not completed".
+     * @param string $mode The site's quiz validation mode.
+     */
+    public function test_ability_threshold_boundary(float $ability, string $expected, string $mode): void {
+        global $DB;
+        $this->subscribe_users_to_lp();
+        foreach ($this->get_update_events() as $event) {
+            relation_update::updated_single($event);
+        }
+        set_config('quizsettings', $mode, 'local_adele');
+        foreach ($DB->get_records('local_adele_path_user') as $record) {
+            $this->insert_catquiz_attempt_in_db((int) $record->user_id, $ability);
+        }
+        foreach ($DB->get_records('local_adele_path_user') as $fresh) {
+            $fresh->json = json_decode($fresh->json, true);
+            relation_update::updated_single(user_path_updated::create([
+                'objectid' => $fresh->id,
+                'context' => context_system::instance(),
+                'other' => ['userpath' => $fresh],
+            ]));
+        }
+        $records = $DB->get_records('local_adele_path_user');
+        $this->assertNotEmpty($records);
+        foreach ($records as $record) {
+            $status = json_decode($record->json, true)['user_path_relation']['dndnode_1']['feedback']['status'] ?? '';
+            if ($expected === 'completed') {
+                $this->assertEquals('completed', $status, "ability {$ability} meets the threshold " . self::SCALE_THRESHOLD);
+            } else {
+                $this->assertNotEquals('completed', $status, "ability {$ability} is below the threshold " . self::SCALE_THRESHOLD);
+            }
+        }
+        $this->sink->close();
+    }
 }

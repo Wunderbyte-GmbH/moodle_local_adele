@@ -85,32 +85,45 @@ class get_lp_user_path_relations extends external_api {
         // get_lp_user_path_relation.php (singular) — same reasoning.
         require_capability('local/adele:view', $context);
 
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            $params['courseid'] = $context->instanceid;
-        } else {
-            $coursecontext = $context->get_course_context();
-            $params['courseid'] = $coursecontext->instanceid;
-        }
+        // The context is client input. Its course matters only as far as the
+        // path is embedded there (see below); a context outside any course
+        // (system, user) carries no course rights at all.
+        $coursecontext = $context->get_course_context(false);
+        $params['courseid'] = $coursecontext ? (int) $coursecontext->instanceid : 0;
 
         // Local/adele:view is held by every authenticated user, so it is not a
         // boundary. This leaderboard returns the whole participant roster (names +
-        // progress) for the path/course, so restrict it to course teachers / managers /
-        // path editors, or a user actually enrolled in the course it belongs to. The
-        // leaderboard is shown to participants (StudentView.vue) and teachers
-        // (TeacherView.vue), so enrolled participants must still pass; this only blocks
-        // enumeration of unrelated courses/paths.
-        $coursecontext = \context_course::instance($params['courseid']);
-        $isprivileged = has_capability('local/adele:teacheredit', $coursecontext)
-            || learning_paths::check_access();
-        if (!$isprivileged && !is_enrolled($coursecontext, $USER->id)) {
+        // progress) of the path. Who may read it:
+        // - site administrators (has_learner_data_authority()). NOT the people
+        // who build or manage paths - ADELE managers, the owner and the
+        // editors of this path, assistants: building a path gives no view of
+        // the learners (#586, addendum);
+        // - teachers of a course (local/adele:viewparticipants) and its enrolled
+        // participants (StudentView.vue) - but only of a course that EMBEDS
+        // this path. The check used to accept any course: a participant or
+        // teacher of an unrelated course read the roster of every path by
+        // passing the context of their own course, and a learner whose
+        // activity says 'Only own results' got the full roster through the
+        // context of a node course ADELE itself had enrolled them in.
+        $embedded = $coursecontext
+            && learning_paths::is_embedded_in_course((int) $params['learningpathid'], (int) $params['courseid']);
+        $isprivileged = learning_paths::has_learner_data_authority()
+            || ($embedded && learning_paths::can_view_participants($coursecontext));
+        if (!$isprivileged && !($embedded && is_enrolled($coursecontext, $USER->id))) {
             throw new \required_capability_exception(
-                $coursecontext,
+                $coursecontext ?: $context,
                 'local/adele:teacheredit',
                 'nopermissions',
                 ''
             );
         }
 
+        // Asked for through a course that embeds the path, the roster is that
+        // course's: its enrolled learners of the path, ranked among themselves
+        // (#588). An administrator asking outside such a course gets the path's roster.
+        if ($embedded) {
+            $params['scopecourseid'] = (int) $params['courseid'];
+        }
         $relations = learning_paths::get_learning_user_relations($params);
 
         // The mod_adele setting 'Participant results' = 'Only own results' must
@@ -134,9 +147,9 @@ class get_lp_user_path_relations extends external_api {
     /**
      * Whether the calling context demands the 'Only own results' filter (#569).
      *
-     * Called from a mod_adele activity (module context) the instance's own
-     * userlist setting decides; for course-level calls the strictest embedding
-     * of this path in the course wins.
+     * Called from the mod_adele activity that shows this path (module context)
+     * the instance's own userlist setting decides; for every other call the
+     * strictest embedding of this path in the course wins.
      *
      * @param context $context The context the SPA was booted with.
      * @param array $params Validated parameters (learningpathid, courseid).
@@ -147,9 +160,12 @@ class get_lp_user_path_relations extends external_api {
         if ($context->contextlevel == CONTEXT_MODULE) {
             $cm = get_coursemodule_from_id('adele', $context->instanceid);
             if ($cm) {
-                $userlist = $DB->get_field('adele', 'userlist', ['id' => $cm->instance]);
-                if ($userlist !== false) {
-                    return (int) $userlist == 2;
+                // Only the activity that shows THIS path speaks for it: another
+                // ADELE activity of the course, set to 'all results' for a
+                // different path, must not lift the restriction.
+                $instance = $DB->get_record('adele', ['id' => $cm->instance], 'id, learningpathid, userlist');
+                if ($instance && (int) $instance->learningpathid === (int) $params['learningpathid']) {
+                    return (int) $instance->userlist == 2;
                 }
             }
         }

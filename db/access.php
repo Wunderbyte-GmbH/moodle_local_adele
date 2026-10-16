@@ -42,12 +42,26 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
             ],
         ],
+        // SEE the learners of an embedded learning path and their paths
+        // (mod_adele #39). Seeing is not changing: a teacher without editing
+        // rights holds this one, not local/adele:teacheredit.
+        'local/adele:viewparticipants' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_COURSE,
+            'archetypes' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW,
+            ],
+        ],
+        // CHANGE a learner's path: manual completion, manual release, master
+        // checkboxes. Not for the 'teacher' archetype - that is the teacher
+        // WITHOUT editing rights (mod_adele #39).
         'local/adele:teacheredit' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_COURSE,
             'archetypes' => [
                 'editingteacher' => CAP_ALLOW,
-                'teacher' => CAP_ALLOW,
                 // A course Manager must operate a learning path like an editing teacher
                 // (#482): grant them the same course-level editor capability.
                 'manager' => CAP_ALLOW,

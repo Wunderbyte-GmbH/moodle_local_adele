@@ -28,7 +28,7 @@
 
       role="progressbar"
        :style="[progressStyle, { width: props.progress + '%' }]"
-      aria-valuenow="{{ props.progress }}"
+      :aria-valuenow="props.progress"
       aria-valuemin="0"
       aria-valuemax="100"
     />

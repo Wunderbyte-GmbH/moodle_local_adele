@@ -81,7 +81,7 @@ class get_completions extends external_api {
         // edit their own path's completions - all without the over-broad canmanage.
         if (
             !has_capability('local/adele:canmanage', $context)
-                && !has_capability('local/adele:teacheredit', $context)
+                && !learning_paths::can_view_participants($context)
                 && !learning_paths::check_access()
         ) {
             throw new required_capability_exception($context, 'local/adele:teacheredit', 'nopermissions', '');

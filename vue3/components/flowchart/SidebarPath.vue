@@ -27,6 +27,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useVueFlow } from '@vue-flow/core'
 import drawDropzone from '../../composables/nodesHelper/drawDropzone'
 import formatIntersetingNodes from '../../composables/nodesHelper/formatIntersetingNodes'
+import zoneOwner from '../../composables/nodesHelper/zoneOwner'
 import LearningModule from './LearningModule.vue'
 import { useStore } from 'vuex';
 import truncatedText from '../../composables/nodesHelper/truncatedText';
@@ -43,6 +44,9 @@ const activeNode = ref('');
 const emit = defineEmits([
   'nodesIntersected',
   'changedModule',
+  // Keyboard route: the editor opens a dialog for this course instead of
+  // waiting for a drag (#575 B5).
+  'insertCourse',
 ]);
 
 function throttle(fn, delay) {
@@ -114,12 +118,28 @@ const filteredCourses = computed(() => {
 async function onDrag(event) {
   //find closestNode node
   const startingNode = findNode('starting_node');
-  const dz_check_node = findNode('dropzone_parent');
+  // Whether zones are drawn: asked of a zone every node has. The zones for
+  // predecessor and successor are not always offered (#595).
+  const dz_check_node = findNode('dropzone_or');
+  // A zone the pointer has reached stays, whatever else is true - the
+  // distance to its node included (#595).
+  const onZone = pointerOnDropzone(event);
   if (dz_check_node == undefined) {
     closestNode.value = findClosestNode(event);
-  } else if (!checkDistance(event, closestNode.value)) {
+  } else if (!onZone && !checkDistance(event, closestNode.value)) {
     activeNode.value = null
     closestNode.value = null
+  } else {
+    // The zones follow the pointer to the nearest node (#580) instead of
+    // staying at the node it came near first; see zoneOwner for the two
+    // exceptions. Removed here, they are drawn around the new node below.
+    const owner = zoneOwner(
+      pointerPosition(event), closestNode.value, findClosestNode(event), onZone)
+    if (owner.id !== closestNode.value.id) {
+      removeNodes(DROPZONE_IDS)
+      activeNode.value = null
+      closestNode.value = owner
+    }
   }
   //add drop zones to this node
   let startingNodeIntersecting = checkIntersetcion(event, startingNode)
@@ -137,11 +157,32 @@ async function onDrag(event) {
   }
 
   // Check if the closest node has changed
-  if (closestNode.value !== prevClosestNode.value && (dropzoneShown() ||aboveDistance())) {
+  if (closestNode.value !== prevClosestNode.value && !onZone && (dropzoneShown() ||aboveDistance())) {
     activeNode.value = null
     removeNodes(['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or'])
     prevClosestNode.value = closestNode.value;
   }
+}
+
+const DROPZONE_IDS = ['dropzone_parent', 'dropzone_child', 'dropzone_and', 'dropzone_or']
+
+// The pointer of a drag event in canvas coordinates. Some browsers report
+// 0/0 on drag events; the last dragover position stands in then.
+function pointerPosition(event) {
+  const { left, top } = vueFlowRef.value.getBoundingClientRect();
+  let x = event.clientX
+  let y = event.clientY
+  if (x == 0 && y == 0) {
+    x = mousePosition.value.x
+    y = mousePosition.value.y
+  }
+  return project({ x: x - left, y: y - top })
+}
+
+// Whether the pointer is on one of the four zones currently drawn.
+function pointerOnDropzone(event) {
+  const position = pointerPosition(event)
+  return nodes.value.some((node) => DROPZONE_IDS.includes(node.id) && areNodesIntersecting(position, node))
 }
 
 function checkDistance(event, closestNode) {
@@ -187,6 +228,11 @@ function checkIntersetcion(event, closestNode) {
     event_clientY = mousePosition.value.y
   }
   intersectingNode.value = null;
+  // A zone the pointer is on wins over the starting marker beneath it: with
+  // a single node the marker lies under the right part of the zone for
+  // "parallel", and the pointer reaching that part must not count as having
+  // left the zone for the marker (#595).
+  const zoneHit = pointerOnDropzone(event)
   nodes.value.forEach((node) => {
     if(node.type == 'dropzone' ||node.type == 'conditionaldropzone'){
       const { left, top } = vueFlowRef.value.getBoundingClientRect();
@@ -194,7 +240,8 @@ function checkIntersetcion(event, closestNode) {
         x: event_clientX - left,
         y: event_clientY - top,
       });
-      const nodesIntersecting = areNodesIntersecting(position, node)
+      const nodesIntersecting = areNodesIntersecting(position, node) &&
+        !(zoneHit && !DROPZONE_IDS.includes(node.id))
       const nodeFormat = formatIntersetingNodes(
         nodesIntersecting, node, intersectingNode.value,
         closestNode, insideStartingNode, store)
@@ -404,6 +451,21 @@ function changeTab(index) {
               </a>
               {{ truncatedText(course.fullname, 32) }}
             </div>
+            <!--
+              Equivalent to dragging this entry onto the canvas, for anyone
+              who cannot drag: it asks where the course should go instead of
+              reading that from the pointer (#575 B5).
+            -->
+            <button
+              type="button"
+              class="btn btn-sm btn-link local-adele-insert-button"
+              :aria-label="strings.insert_dialog_title + ' ' + course.fullname"
+              :title="strings.insert_dialog_title"
+              :data-testid="'learningpath-sidebar-insert-' + course.course_node_id[0]"
+              @click="emit('insertCourse', course)"
+            >
+              <i class="fas fa-plus" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>

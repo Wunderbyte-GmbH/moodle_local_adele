@@ -76,18 +76,84 @@ describe('addAutoRestrictions', () => {
     expect(result.restriction.nodes).toHaveLength(1); // Should not be expanded
   });
 
-  it('should return oldNode unchanged when relation is and', () => {
-    const result = addAutoRestrictions(newNode, oldNode, 'and', store);
+  // #584: a node dropped on the side zone runs in parallel and shares the
+  // successors; each shared successor must name it as a predecessor, with
+  // min_courses left as it is (default 1, as in the criterion editor).
+  describe('relation "and" (#584)', () => {
+    const successorWith = (ids, min = 1) => ({
+      id: 'dndnode_2',
+      parentCourse: ['dndnode_1', 'dndnode_3'],
+      restriction: { nodes: [
+        { id: 'condition_1', data: { label: 'parent_courses', value: { courses_id: ids, min_courses: min } } },
+        { id: 'condition_1_feedback', type: 'feedback', data: { childCondition: 'condition_1' } },
+      ], edges: [] },
+    });
+    const parallel = { id: 'dndnode_3' };
+    const criterionOf = (node) => node.restriction.nodes.find((n) => n.data.label === 'parent_courses').data.value;
 
-    // When the relation is 'and', the function should just return the oldNode
-    expect(result).toBe(oldNode);
+    it('adds the parallel node to the successor criterion', () => {
+      const result = addAutoRestrictions(parallel, successorWith(['dndnode_1']), 'and', store);
+      expect(criterionOf(result).courses_id).toEqual(['dndnode_1', 'dndnode_3']);
+    });
+
+    it('leaves min_courses as it is', () => {
+      expect(criterionOf(addAutoRestrictions(parallel, successorWith(['dndnode_1']), 'and', store)).min_courses).toBe(1);
+      expect(criterionOf(addAutoRestrictions(parallel, successorWith(['dndnode_1'], 2), 'and', store)).min_courses).toBe(2);
+    });
+
+    it('does not add the same predecessor twice', () => {
+      const result = addAutoRestrictions(parallel, successorWith(['dndnode_1', 'dndnode_3']), 'and', store);
+      expect(criterionOf(result).courses_id).toEqual(['dndnode_1', 'dndnode_3']);
+    });
+
+    it('creates a criterion naming all predecessors when there is none', () => {
+      const bare = { id: 'dndnode_2', parentCourse: ['dndnode_1', 'dndnode_3'], restriction: undefined };
+      const result = addAutoRestrictions(parallel, bare, 'and', store);
+      expect(criterionOf(result).courses_id).toEqual(['dndnode_1', 'dndnode_3']);
+      expect(criterionOf(result).min_courses).toBe(1);
+    });
   });
 
-  it('should return oldNode unchanged when relation is and', () => {
-    const result = addAutoRestrictions(newNode, oldNode, 'or', store);
+  // A course placed "before" a node that already has a predecessor (keyboard
+  // dialog, #595): the node's criterion must name the new predecessor too.
+  describe('relation "parent" with a predecessor already there', () => {
+    const nodeWith = (restriction) => ({
+      id: 'dndnode_2',
+      parentCourse: ['dndnode_1', 'dndnode_3'],
+      restriction,
+    });
+    const criterion = (ids, min = 1) => ({ nodes: [
+      { id: 'condition_1', data: { label: 'parent_courses', value: { courses_id: ids, min_courses: min } } },
+      { id: 'condition_1_feedback', type: 'feedback', data: { childCondition: 'condition_1' } },
+    ], edges: [] });
+    const before = { id: 'dndnode_3' };
+    const criterionOf = (node) => node.restriction.nodes.find((n) => n.data.label === 'parent_courses').data.value;
 
-    // When the relation is 'and', the function should just return the oldNode
-    expect(result).toBe(null);
+    it.each([
+      ['1 of [T01]', ['dndnode_1'], 1, ['dndnode_1', 'dndnode_3'], 1],
+      ['2 of [T01, T05]', ['dndnode_1', 'dndnode_5'], 2, ['dndnode_1', 'dndnode_5', 'dndnode_3'], 2],
+      ['already named', ['dndnode_1', 'dndnode_3'], 1, ['dndnode_1', 'dndnode_3'], 1],
+    ])('criterion %s: names the new predecessor, keeps min_courses', (_, ids, min, expectedIds, expectedMin) => {
+      const result = addAutoRestrictions(before, nodeWith(criterion(ids, min)), 'parent', store);
+      expect(criterionOf(result).courses_id).toEqual(expectedIds);
+      expect(criterionOf(result).min_courses).toBe(expectedMin);
+    });
+
+    it('creates a criterion naming all predecessors when there is none', () => {
+      const result = addAutoRestrictions(before, nodeWith(undefined), 'parent', store);
+      expect(criterionOf(result).courses_id).toEqual(['dndnode_1', 'dndnode_3']);
+      expect(criterionOf(result).min_courses).toBe(1);
+    });
+
+    it('leaves criteria written by hand without a predecessor condition alone', () => {
+      const manual = { nodes: [{ id: 'condition_1', data: { label: 'manual' } }], edges: [] };
+      const result = addAutoRestrictions(before, nodeWith(manual), 'parent', store);
+      expect(result.restriction.nodes.map((n) => n.data.label)).toEqual(['manual']);
+    });
+  });
+
+  it('should return null for a relation it does not handle', () => {
+    expect(addAutoRestrictions(newNode, oldNode, 'or', store)).toBe(null);
   });
 
 });

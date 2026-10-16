@@ -70,9 +70,9 @@ jobs:
             local sib="$1" dest="$2" src="/tmp/src_$1"
             rm -rf "$src" "moodle/$dest"
             git clone --depth 1 --branch "$SIBLING_REF" \
-              "https://github.com/ralferlebach/moodle-${sib}_adele.git" "$src" \
+              "https://github.com/${GITHUB_REPOSITORY_OWNER}/moodle-${sib}_adele.git" "$src" \
               || git clone --depth 1 \
-                 "https://github.com/ralferlebach/moodle-${sib}_adele.git" "$src"
+                 "https://github.com/${GITHUB_REPOSITORY_OWNER}/moodle-${sib}_adele.git" "$src"
             mkdir -p "$(dirname "moodle/$dest")"
             cp -a "$src" "moodle/$dest"
             rm -rf "moodle/$dest/.git"
@@ -150,6 +150,32 @@ jobs:
             exit 1
           fi
 
+      - name: Seed the shipped test fixtures
+        run: |
+          cd moodle
+          # The fixture courses, accounts and learning paths ship with the
+          # plugin (tests/playwright/fixtures), so nothing is fetched here:
+          # a suite that clones its own data is green or red depending on a
+          # repository nobody in this run is watching.
+          #
+          # Same transfer as above: strip "export " and the quotes, because
+          # $GITHUB_ENV takes bare KEY=value.
+          ADELE_SEED_I_KNOW=1 php "$PLUGIN_PATH/tests/playwright/seed_fixtures.php" \
+            > /tmp/adele-fixtures.env
+          echo "Fixture variables:"
+          sed -n "s/^export \([A-Z_][A-Z0-9_]*\)=.*/  \1/p" /tmp/adele-fixtures.env
+          sed -n "s/^export \([A-Z_][A-Z0-9_]*\)='\(.*\)'$/\1=\2/p" \
+            /tmp/adele-fixtures.env >> "$GITHUB_ENV"
+
+          # The fixture seed must produce at least the path the specs name;
+          # an empty transfer would otherwise surface much later as a
+          # missing environment variable in an unrelated test.
+          if ! grep -q "^export ADELE_FIXTURE_PATH_" /tmp/adele-fixtures.env; then
+            echo "The fixture seed imported no learning path."
+            cat /tmp/adele-fixtures.env
+            exit 1
+          fi
+
       - name: Install Playwright and browsers
         run: |
           cd "moodle/$PLUGIN_PATH/tests/playwright"
@@ -173,7 +199,7 @@ jobs:
           PHP_CLI_SERVER_WORKERS=8 php -S 127.0.0.1:8000 -t "$GITHUB_WORKSPACE/moodle" \
             >/tmp/moodle-server.log 2>&1 &
           ready=0
-          for i in $(seq 1 40); do
+          for _ in $(seq 1 40); do
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
               http://127.0.0.1:8000/login/index.php || true)
             if [ "$code" = "200" ]; then ready=1; break; fi
@@ -230,31 +256,19 @@ jobs:
           fi
           echo "Eingesammelt:"; ls -1 "$dest"
 
-      - name: Upload failures only
-        if: failure()
+      # ONE artefact, always: passed, failed or cancelled - and with the
+      # videos in every case. The previous design uploaded the full report on
+      # green and a stripped, video-less subset on red, which is exactly the
+      # wrong way round: on a red run the recording is what explains the
+      # failure. Size is bounded by the suite being a smoke test.
+      - name: Upload report with videos
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-failures
-          path: ${{ runner.temp }}/playwright-failures
-          retention-days: 7
-          if-no-files-found: ignore
-
-      # Two mutually exclusive artefacts, chosen by outcome.
-      #
-      # Green: the full report including videos. It documents the intended
-      # journey and its screenshots are reused as illustrations, so a passing
-      # run has to leave something to look at.
-      #
-      # Red: only the directories of the tests that actually failed, above,
-      # and without videos - a failed run's evidence is a small subset of a
-      # report that otherwise runs to tens of megabytes.
-      - name: Upload full report with videos
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-with-videos
+          name: playwright-report-local_adele-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             moodle/${{ env.PLUGIN_PATH }}/tests/playwright/playwright-report
             moodle/${{ env.PLUGIN_PATH }}/tests/playwright/test-results
-          retention-days: 7
-          if-no-files-found: ignore
+            ${{ runner.temp }}/playwright-failures
+          retention-days: 14
+          if-no-files-found: warn

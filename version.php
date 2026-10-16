@@ -25,15 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_adele';
-$plugin->release = '0.5.5';
-$plugin->version = 2026082902;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
-// The CI matrix builds against 4.5 AND 5.0; [405, 405] declared the
-// plugin unsupported on the very version it is tested on.
-$plugin->supported = [405, 502];
-// Requires a mod_adele version that provides mod_adele\local\host_policy,
-// which enrol_state delegates every host-course question to.
+$plugin->release = '0.7.0';
+$plugin->version = 2026100728;
+$plugin->requires = 2024100700;
+$plugin->maturity = MATURITY_BETA;
+$plugin->supported = [405, 405];
 $plugin->dependencies = [
     'mod_adele' => 2026082902,
     'enrol_adele' => 2026072500,

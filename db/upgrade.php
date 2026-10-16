@@ -186,7 +186,7 @@ function xmldb_local_adele_upgrade($oldversion) {
                     'roleid' => $role->id,
                     'capability' => $cap,
                     'permission' => 1,
-                    'timemodified' => time(),
+                    'timemodified' => \core\di::get(\core\clock::class)->time(),
                     'modifierid' => 2,
                 ]);
             }
@@ -441,7 +441,7 @@ function xmldb_local_adele_upgrade($oldversion) {
                     'participantoption1' => in_array('1', $options, true) ? 1 : 0,
                     'participantoption2' => in_array('2', $options, true) ? 1 : 0,
                     'participantoption3' => in_array('3', $options, true) ? 1 : 0,
-                    'timemodified' => time(),
+                    'timemodified' => \core\di::get(\core\clock::class)->time(),
                 ]);
             }
         }
@@ -463,6 +463,80 @@ function xmldb_local_adele_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2026082800, 'local', 'adele');
+    }
+
+    // Timed access conditions store their window as Unix timestamps instead
+    // of wall-clock strings (#581). The strings had no time zone and were
+    // compared with the seconds taken from the current time. Each legacy
+    // value is converted in the site's time zone - the zone the evaluation
+    // used for it until now - so every existing window keeps its meaning.
+    // Both the learning paths and the per-user copies carry the conditions.
+    // Idempotent: values that already are timestamps are left alone.
+    if ($oldversion < 2026100502) {
+        foreach (['local_adele_learning_paths', 'local_adele_path_user'] as $tablename) {
+            $records = $DB->get_recordset($tablename, null, 'id', 'id, json');
+            foreach ($records as $record) {
+                $decoded = json_decode((string) $record->json, true);
+                if (!is_array($decoded) || !isset($decoded['tree']) || !is_array($decoded['tree'])) {
+                    continue;
+                }
+                if (\local_adele\helper\time_value::migrate_tree($decoded['tree']) > 0) {
+                    $DB->set_field($tablename, 'json', json_encode($decoded), ['id' => $record->id]);
+                }
+            }
+            $records->close();
+        }
+        upgrade_plugin_savepoint(true, 2026100502, 'local', 'adele');
+    }
+
+    // Seeing a learner's path and changing it are two rights now (mod_adele
+    // #39). local/adele:viewparticipants is new; Moodle assigns it by
+    // archetype (teacher, editingteacher, manager) when it registers the
+    // capability, after this step. local/adele:teacheredit lost the 'teacher'
+    // archetype - the teacher WITHOUT editing rights. Archetype defaults only
+    // apply to fresh installs, so the grant is taken from the existing roles
+    // of that archetype here; course-level overrides are left to the people
+    // who set them.
+    if ($oldversion < 2026100707) {
+        \local_adele\helper\capability_migration::remove_teacheredit_from_nonediting_teachers();
+        upgrade_plugin_savepoint(true, 2026100707, 'local', 'adele');
+    }
+
+    // Issue #587 introduced local/adele:participate here and gave it to the
+    // site's gradebook roles.
+    // Since #593 the capability is gone again (see the next step); a site
+    // coming from before 2026100708 has nothing to do here.
+    if ($oldversion < 2026100708) {
+        upgrade_plugin_savepoint(true, 2026100708, 'local', 'adele');
+    }
+
+    // Who takes part is decided by the site's graded roles now (#593), not by
+    // local/adele:participate; Moodle removes the capability after these
+    // steps. Roles that had it without being a graded role are named - their
+    // holders stop taking part, and nothing here decides that for the site.
+    if ($oldversion < 2026100713) {
+        $losing = \local_adele\helper\capability_migration::roles_losing_participation();
+        if ($losing) {
+            $message = 'local_adele: participation in learning paths now follows the graded roles '
+                . '(Site administration > Grades > General settings > Graded roles). '
+                . 'These roles took part so far and are not graded roles: ' . implode(', ', $losing)
+                . '. Their holders stop being learners of embedded learning paths; add the roles to the '
+                . 'graded roles if they are to stay.';
+            upgrade_log(UPGRADE_LOG_NOTICE, 'local_adele', $message);
+            mtrace($message);
+        }
+        upgrade_plugin_savepoint(true, 2026100713, 'local', 'adele');
+    }
+
+    // The owner always stands on the list of editors of their path (decision
+    // 2026-10-08); owners taken off it before removing them was refused are
+    // put back.
+    if ($oldversion < 2026100721) {
+        $restored = \local_adele\ownership::ensure_owners_are_editors();
+        if ($restored) {
+            mtrace("local_adele: {$restored} learning path owner(s) put back on the list of editors.");
+        }
+        upgrade_plugin_savepoint(true, 2026100721, 'local', 'adele');
     }
 
     return true;

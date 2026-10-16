@@ -30,6 +30,8 @@ export const env = {
   // fixed, never randomised: several assertions are about the exact title.
   get fixturePassword() { return required('ADELE_FIXTURE_PASSWORD'); },
   get managerUsername() { return required('ADELE_MANAGER_USERNAME'); },
+  get studentUsername() { return required('ADELE_STUDENT_USERNAME'); },
+  get b4ActivityCmid() { return required('ADELE_B4_ACTIVITY_CMID'); },
   get assistantUsername() { return required('ADELE_ASSISTANT_USERNAME'); },
   get visiblePathTitle() { return required('ADELE_VISIBLE_PATH_TITLE'); },
   get invisiblePathTitle() { return required('ADELE_INVISIBLE_PATH_TITLE'); },
@@ -74,6 +76,10 @@ export async function loginAsAdmin(page: Page): Promise<void> {
  * @param password The password.
  */
 export async function loginAs(page: Page, username: string, password: string): Promise<void> {
+  // Leave the current page first: requests it still has in flight can set
+  // the previous session's cookie after this login and silently undo it
+  // (page and API share one cookie jar). See tests/e2e/support/env.ts.
+  await page.goto('about:blank');
   const api = page.context().request;
   await page.context().clearCookies();
 

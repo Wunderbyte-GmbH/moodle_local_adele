@@ -232,18 +232,20 @@ final class issue569_userlist_privacy_test extends advanced_testcase {
     }
 
     /**
-     * A path that is not embedded via mod_adele at all has no setting to
-     * enforce - the roster stays complete (unchanged, documented behaviour;
-     * the setting is a per-activity choice).
+     * A path that the course does not embed is none of the course's business:
+     * being enrolled there gives no right to its roster. (This used to return
+     * the complete roster - "no setting to enforce" - and thereby let every
+     * learner step around 'Only own results' through the context of any other
+     * course they were enrolled in.)
      *
      * @return void
      */
-    public function test_unembedded_path_keeps_current_behaviour(): void {
+    public function test_unembedded_path_has_no_roster_for_participants(): void {
         $this->resetAfterTest(true);
         $this->build_world(null);
         $coursecontextid = context_course::instance($this->course->id)->id;
 
-        $relations = $this->fetch($this->student1, $coursecontextid);
-        $this->assertCount(2, $relations);
+        $this->expectException(\required_capability_exception::class);
+        $this->fetch($this->student1, $coursecontextid);
     }
 }

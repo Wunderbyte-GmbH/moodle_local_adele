@@ -250,7 +250,8 @@ final class feedback_rendering_both_languages_test extends advanced_testcase {
                             'value' => ['courses_id' => $parentids, 'min_courses' => $min],
                             'description_before' => 'parent']],
                     ['id' => 'condition_1_feedback', 'parentCondition' => null, 'childCondition' => null,
-                        'data' => ['label' => 'feedback', 'visibility' => true, 'feedback_before' => 'parent']],
+                        'data' => ['label' => 'feedback', 'visibility' => true,
+                            'feedback_before_checkmark' => true, 'feedback_before' => 'parent']],
                 ],
                 'edges' => [],
             ],
@@ -371,7 +372,8 @@ final class feedback_rendering_both_languages_test extends advanced_testcase {
                     'data' => ['id' => 170, 'label' => 'course_completed',
                         'value' => ['min_courses' => 1], 'description_before' => 'x']],
                 ['id' => 'condition_1_feedback', 'parentCondition' => ['condition_1'], 'childCondition' => [],
-                    'data' => ['label' => 'feedback', 'visibility' => true,
+                    // As the editor stores a feedback node left on "use default".
+                    'data' => ['label' => 'feedback', 'visibility' => true, 'feedback_before_checkmark' => true,
                         'information' => 'FOREIGN {item} FOREIGN', 'feedback_before' => '{item}']],
             ], 'edges' => []],
         ];
