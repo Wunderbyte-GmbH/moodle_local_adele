@@ -111,6 +111,37 @@ test.describe('ADELE-E2E-D — a CAT result decides the route at the threshold [
             .toBe('completed 1/3 33.33');
           await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), 'the diagnosis opens the next node');
         });
+
+        if (key === 'ABOVE') {
+          // Decision of 2026-10-15: the best result counts - once unlocked is
+          // unlocked. A later attempt below the threshold is a new attempt,
+          // not a correction of the old one, and takes nothing back.
+          // The others, as they are right before - compared afterwards, so the
+          // check does not depend on which of their tests ran before.
+          const others: Record<string, string> = {};
+          await test.step('the other learners, before', async () => {
+            for (const other of ['BELOW', 'AT']) {
+              await loginAs(page, fixture(`ADELE_FIXTURE_D_${other}_LEARNER`), fixturePassword());
+              others[other] = await learnerView(page, other);
+            }
+            await loginAs(page, learner, fixturePassword());
+          });
+
+          await test.step(`a later, worse attempt: ability ${(x() - 0.01).toFixed(2)} - nothing is taken back`, async () => {
+            catquizSignal(learner, Number((x() - 0.01).toFixed(2)));
+            drainTaskQueue();
+            await expect.poll(() => learnerView(page, key), { timeout: 60_000, message: 'the best result still counts' })
+              .toBe('completed 1/3 33.33');
+            await expectCourseOpenAfterTasks(page, fixtureCourse('T02'), 'T02 stays open');
+          });
+
+          await test.step('only this learner was concerned: the others are as they were', async () => {
+            for (const other of ['BELOW', 'AT']) {
+              await loginAs(page, fixture(`ADELE_FIXTURE_D_${other}_LEARNER`), fixturePassword());
+              expect(await learnerView(page, other), `${other} unchanged`).toBe(others[other]);
+            }
+          });
+        }
       } else {
         await test.step('node 1 stays open, T02 closed, no progress', async () => {
           await expect.poll(() => learnerView(page, key), { timeout: 30_000, message: 'just below the threshold' })

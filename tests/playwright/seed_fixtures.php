@@ -1514,8 +1514,10 @@ foreach ($imported as $pathid) {
 // E2EHOST11: the same for "any course of the path".
 // E2EHOST12: sources "this course" + "starting node"; "this course" removed
 // afterwards and restored (H2, addendum of 2026-10-13).
+// E2EHOST13: "this course"; the embedding is deleted and restored from the
+// recycle bin (H1, decision of 2026-10-15: deleted is cleanly gone).
 $extrahosts = [];
-foreach ([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as $number) {
+foreach ([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as $number) {
     $shortname = 'E2EHOST' . $number;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
     if (!$course) {
@@ -1623,11 +1625,17 @@ if ($entrylearner) {
 // E2EHOST11 - an enrolment of their own that a mode change of ADELE's must
 // leave alone (H3);
 // - "source": manually in E2EHOST12 only - on the path only through the
-// source "this course", which the chain removes (H2).
+// source "this course", which the chain removes (H2);
+// - "delete": manually in E2EHOST13 only - on the path only through the
+// embedding the chain deletes (H1).
+// Both complete T01 in the chain, so their completions in the fixture courses
+// are forgotten here: a new subscription reads progress from the courses.
 $changepeople = [
     'DUAL' => [local_adele_fixture_person('fx_h_dual', 'Host Dual', $fixturepassword), ['T01', 'E2EHOST10', 'E2EHOST11']],
     'SOURCE' => [local_adele_fixture_person('fx_h_source', 'Host Source', $fixturepassword), ['E2EHOST12']],
+    'DELETE' => [local_adele_fixture_person('fx_h_delete', 'Host Delete', $fixturepassword), ['E2EHOST13']],
 ];
+$changecourseids = $DB->get_fieldset_select('course', 'id', $DB->sql_like('shortname', ':t'), ['t' => 'T__']);
 foreach ($changepeople as [$changeperson, $changeshortnames]) {
     foreach ($changeshortnames as $changeshortname) {
         $changecourse = $DB->get_record('course', ['shortname' => $changeshortname]);
@@ -1638,6 +1646,19 @@ foreach ($changepeople as [$changeperson, $changeshortnames]) {
         if ($manual && $changeinstance && $studentroleid) {
             $manual->enrol_user($changeinstance, $changeperson->id, $studentroleid, 0, 0, ENROL_USER_ACTIVE);
         }
+    }
+    foreach ($changecourseids as $changecourseid) {
+        $changecmids = $DB->get_fieldset_select('course_modules', 'id', 'course = ?', [$changecourseid]);
+        if ($changecmids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($changecmids);
+            $DB->delete_records_select(
+                'course_modules_completion',
+                "userid = ? AND coursemoduleid {$insql}",
+                array_merge([$changeperson->id], $inparams)
+            );
+        }
+        $DB->delete_records('course_completion_crit_compl', ['userid' => $changeperson->id, 'course' => $changecourseid]);
+        $DB->delete_records('course_completions', ['userid' => $changeperson->id, 'course' => $changecourseid]);
     }
     foreach ($imported as $pathid) {
         $DB->delete_records('local_adele_path_user', [
@@ -1650,6 +1671,8 @@ foreach ($changepeople as [$changeperson, $changeshortnames]) {
         }
     }
 }
+\cache::make('core', 'completion')->purge();
+\cache::make('core', 'coursecompletion')->purge();
 
 printf("export ADELE_BASE_URL='%s'\n", $CFG->wwwroot);
 printf("export ADELE_ADMIN_USER='%s'\n", $admin->username);
