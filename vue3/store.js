@@ -698,15 +698,18 @@ export function createAppStore() {
               });
               return result;
             },
+            // Both return the request (#599): the caller changes its list
+            // only once the server agreed. A refusal is reported by ajax()
+            // and reaches the caller as a rejection.
             createLpEditUsers(context, params) {
-              ajax('local_adele_create_lp_edit_users', {
+              return ajax('local_adele_create_lp_edit_users', {
                 contextid: context.state.contextid,
                 lpid: params.lpid,
                 userid: params.userid,
               });
             },
             removeLpEditUsers(context, params) {
-              ajax('local_adele_remove_lp_edit_users', {
+              return ajax('local_adele_remove_lp_edit_users', {
                 contextid: context.state.contextid,
                 lpid: params.lpid,
                 userid: params.userid,

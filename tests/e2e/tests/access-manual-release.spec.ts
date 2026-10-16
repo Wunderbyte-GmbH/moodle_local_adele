@@ -62,6 +62,8 @@ async function setRelease(page: Page, released: boolean): Promise<void> {
   await expect(node).toBeVisible({ timeout: 60_000 });
   const box = node.getByLabel('Unlock node manually');
   await expect(box, 'the teacher must be offered the manual release on node 2').toBeVisible();
+  // The label leads to the release box, not to the completion box (#598).
+  await expect(box).toHaveAttribute('id', /_manual_restriction$/);
   if ((await box.isChecked()) !== released) {
     await box.click();
   }

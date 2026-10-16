@@ -151,6 +151,8 @@ async function setManualCompletion(page: Page, story: Story, nodes: string[], co
     await expect(node).toBeVisible({ timeout: 60_000 });
     const box = node.getByLabel('Finish node manually');
     await expect(box, `the teacher must be offered the manual completion on ${nodeid}`).toBeVisible();
+    // The label leads to the completion box, not to the release box (#598).
+    await expect(box).toHaveAttribute('id', /_manual_completion$/);
     if ((await box.isChecked()) !== completed) {
       // A real click: a clipped or covered control makes the test red.
       await box.click({ timeout: 15_000 });

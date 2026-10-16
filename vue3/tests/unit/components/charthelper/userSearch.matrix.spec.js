@@ -28,7 +28,6 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import userSearch from '../../../../components/charthelper/userSearch.vue';
 import { makeStore } from '../../fixtures/storeFactory';
-import { knownDefect } from '../../fixtures/knownDefect';
 
 jest.mock('lodash', () => ({ debounce: jest.fn((fn) => fn) }));
 
@@ -139,7 +138,7 @@ describe('userSearch - search and list', () => {
 describe('userSearch - when the server refuses', () => {
   afterEach(() => jest.restoreAllMocks());
 
-  knownDefect('[known defect, draft local_adele-issue-editor-list-optimistic] a refused removal leaves the person on the list', async () => {
+  it('a refused removal leaves the person on the list (#599)', async () => {
     // removeUser() takes the card away without waiting for the answer; the
     // store action does not even return the request.
     jest.spyOn(window, 'confirm').mockReturnValue(true);
@@ -150,12 +149,76 @@ describe('userSearch - when the server refuses', () => {
     e.wrapper.unmount();
   });
 
-  knownDefect('[known defect, draft local_adele-issue-editor-list-optimistic] a refused addition does not show the person as an editor', async () => {
+  it('a refused addition does not show the person as an editor (#599)', async () => {
     const e = await editors('manager', { createLpEditUsers: jest.fn().mockRejectedValue(new Error('nopermissions')) });
     await search(e.wrapper, 'Nina');
     await e.wrapper.find('.user-item').trigger('click');
     await flushPromises();
     expect(e.card(NEWBIE)).toBeUndefined();
     e.wrapper.unmount();
+  });
+});
+
+describe('userSearch - the suggestion list', () => {
+  it('a click inside the field or the list keeps it open, a click anywhere else closes it', async () => {
+    const e = await editors('manager');
+    await search(e.wrapper, 'Nina');
+    expect(e.wrapper.find('.user-list').exists()).toBe(true);
+
+    // Inside: the field itself, then the list.
+    e.wrapper.find('input.user-search-input').element.click();
+    await e.wrapper.vm.$nextTick();
+    expect(e.wrapper.find('.user-list').exists()).toBe(true);
+    e.wrapper.find('.user-list').element.click();
+    await e.wrapper.vm.$nextTick();
+    expect(e.wrapper.find('.user-list').exists()).toBe(true);
+
+    // Outside.
+    document.body.click();
+    await e.wrapper.vm.$nextTick();
+    expect(e.wrapper.find('.user-list').exists()).toBe(false);
+    e.wrapper.unmount();
+  });
+});
+
+describe('userSearch - handing the path over (#488)', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('a declined confirmation hands nothing over: no request, the owner stays', async () => {
+    jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const e = await editors('manager');
+    await e.card(EDITOR).find('.setowner-btn').trigger('click');
+    await flushPromises();
+    expect(e.actions.setLpOwner).not.toHaveBeenCalled();
+    expect(e.store.state.learningpath.ownerid).toBe(2);
+    expect(e.card(OWNER).find('.owner-crown').exists()).toBe(true);
+    e.wrapper.unmount();
+  });
+});
+
+describe('userSearch - who owns the path (#571)', () => {
+  const ownerLabel = async (learningpath) => {
+    const actions = {
+      getLpEditUsers: jest.fn().mockResolvedValue([{ ...EDITOR }]),
+      getFoundUsers: jest.fn().mockResolvedValue({ list: [], warnings: '' }),
+    };
+    const store = makeStore({
+      view: 'manager', learningPathID: 1, learningpath,
+      strings: { main_ownerless: 'No owner', owner_label: 'Owner:' },
+    }, { actions });
+    const wrapper = mount(userSearch, { global: { plugins: [store] } });
+    await flushPromises();
+    const label = wrapper.find('.owner-label');
+    const result = { name: label.find('b').exists() ? label.find('b').text() : '', badge: label.find('.badge').exists() };
+    wrapper.unmount();
+    return result;
+  };
+
+  it.each([
+    ['an owner: named', { ownerid: 2, ownername: 'Olga Owner', ownerless: false }, { name: 'Olga Owner', badge: false }],
+    ['ownerless: the warning badge instead of a name', { ownerid: 0, ownername: '', ownerless: true }, { name: '', badge: true }],
+    ['not known yet: neither', { ownerid: 0, ownername: '', ownerless: false }, { name: '', badge: false }],
+  ])('%s', async (_label, learningpath, expected) => {
+    expect(await ownerLabel(learningpath)).toEqual(expected);
   });
 });

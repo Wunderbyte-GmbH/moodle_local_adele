@@ -81,18 +81,18 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
       expect(node.status).toBe('not_accessible');
       expect(node.info).toBe(`Access criteria: - 15/01/32, 10:00 to 15/01/32, 12:00 ${INFO_COMPLETION}`);
       expect(node.feedback, 'no promise of access while the node is locked (#590)').toBe(
-        `${EN.locked} from 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
+        `${EN.locked} From 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
       );
       expectNoRawPlaceholders(node, 'before');
 
       const tokyo = await learnerReads(page, 'TIME_TOKYO', 'dndnode_1');
       expect(tokyo.info, 'UTC+9').toBe(`Access criteria: - 15/01/32, 19:00 to 15/01/32, 21:00 ${INFO_COMPLETION}`);
-      expect(tokyo.feedback).toBe(`${EN.locked} from 15/01/32, 19:00. ${EN.todo} ${EN.completeCourse}`);
+      expect(tokyo.feedback).toBe(`${EN.locked} From 15/01/32, 19:00. ${EN.todo} ${EN.completeCourse}`);
 
       const openend = await learnerReads(page, 'TIME_START', 'dndnode_1');
       expect(openend.status).toBe('not_accessible');
       expect(openend.feedback, 'a window without an end').toBe(
-        `${EN.locked} from 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
+        `${EN.locked} From 15/01/32, 10:00. ${EN.todo} ${EN.completeCourse}`
       );
       expect(openend.info, 'the open end reads as words (#590)').toBe(
         `Access criteria: - 15/01/32, 10:00 to open end ${INFO_COMPLETION}`
@@ -172,7 +172,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node with a condition o
       const node = await learnerReads(page, 'AND', 'dndnode_2');
       expect(node.status).toBe('not_accessible');
       expect(node.feedback, 'what is met is no longer asked for').toBe(
-        `${EN.locked} from 15/01/33, 10:00. ${EN.todo} ${EN.completeCourse}`
+        `${EN.locked} From 15/01/33, 10:00. ${EN.todo} ${EN.completeCourse}`
       );
 
       await learnerCompletes(page, 'OR', 'T01');
