@@ -51,7 +51,9 @@ describe('manual_output.vue', () => {
     })
     const checkbox = wrapper.find('input[type="checkbox"]')
     expect(checkbox.exists()).toBe(true)
-    expect(checkbox.element.id).toBe('test-node-id')
+    // Its own id - the release box of the same node has another (#598).
+    expect(checkbox.element.id).toBe('test-node-id_manual_completion')
+    expect(wrapper.find('label').attributes('for')).toBe('test-node-id_manual_completion')
 
     const label = wrapper.find('label')
     expect(label.text()).toBe('Finish Course')

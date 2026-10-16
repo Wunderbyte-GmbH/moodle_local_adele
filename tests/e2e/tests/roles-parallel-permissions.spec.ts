@@ -139,7 +139,7 @@ async function renameAndReload(page: Page, id: string, name: string): Promise<vo
 test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-R5 — one reason falls away, the other still holds', () => {
-  test('revoking the collaboration leaves manager access untouched', { tag: ['@story:R5'] }, async ({ page }) => {
+  test('revoking the collaboration leaves manager access untouched', { tag: ['@story:R5', '@withdrawal'] }, async ({ page }) => {
     const manager = fixture('ADELE_FIXTURE_MANAGER');
     const managerName = fixture('ADELE_FIXTURE_MANAGER_NAME');
     const assistantName = fixture('ADELE_FIXTURE_ASSISTANT_NAME');

@@ -24,13 +24,13 @@
 <template>
   <div class="form-check">
     <input
-      :id="data.node_id"
+      :id="data.node_id + '_manual_restriction'"
       class="form-check-input"
       type="checkbox"
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
     >
-    <label :for="data.node_id">
+    <label :for="data.node_id + '_manual_restriction'">
       {{ store.state.strings.restriction_access_manually }}
     </label>
   </div>

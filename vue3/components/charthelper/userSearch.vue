@@ -46,16 +46,22 @@ watch(searchQuery, () => {
   debouncedSearchUser();
 });
 
-const addUser = (user) => {
-  store.dispatch('createLpEditUsers',
-  {
-    lpid: store.state.learningPathID,
-    userid: user.id,
-  });
+// The list shows what the server holds (#599): a change appears once the
+// server has accepted it. A refusal (nopermissions, editorremoveowner on stale
+// data ...) is reported by the store's ajax() and leaves the list as it was.
+const addUser = async (user) => {
+  isListVisible.value = false;
+  try {
+    await store.dispatch('createLpEditUsers', {
+      lpid: store.state.learningPathID,
+      userid: user.id,
+    });
+  } catch (e) {
+    return;
+  }
   if (!selectedUsers.value.some(selected => selected.id === user.id)) {
     selectedUsers.value.push(user);
   }
-  isListVisible.value = false;
 };
 
 // Current owner of the path (delivered by get_learningpath, #488/#571).
@@ -86,18 +92,23 @@ const setOwner = async (user) => {
 
 const isManager = computed(() => store.state.view == 'manager');
 
-const removeUser = (userId) => {
+const removeUser = async (userId) => {
   const confirmation = confirm(store.state.strings.editordeleteconfirmation);
   if (
-    confirmation &&
-    selectedUsers.value.length >= 2
+    !confirmation ||
+    selectedUsers.value.length < 2
   ) {
-    store.dispatch('removeLpEditUsers', {
+    return;
+  }
+  try {
+    await store.dispatch('removeLpEditUsers', {
       lpid: store.state.learningPathID,
       userid: userId,
     });
-    selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
+  } catch (e) {
+    return;
   }
+  selectedUsers.value = selectedUsers.value.filter(user => user.id !== userId);
 };
 
 // Hide the list if clicking outside of the input or list

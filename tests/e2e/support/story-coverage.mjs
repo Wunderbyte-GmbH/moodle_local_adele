@@ -28,7 +28,13 @@
  *   - a test was skipped, marked fixme, or flaky - a run that leaves out a
  *     story or needed a second attempt is no acceptance;
  *   - a test carries no story tag (nobody could tell what it proves);
- *   - and, on a FULL run only, a required story has no passed test.
+ *   - and, on a FULL run only, a required story has no passed test;
+ *   - and, on a FULL run only, a story listed under "withdrawal" in
+ *     stories.json has no passed test that ALSO carries the tag @withdrawal.
+ *     A tag alone says a story is touched, not that taking a setting back
+ *     was proven (E2E issue, addendum of 2026-10-13, acceptance rule): where
+ *     a story is reversible, the test that reverses it - setting changed or
+ *     taken back, reconcile, fresh session, real access - is what counts.
  * A filtered run (--filtered, i.e. the workflow's grep input) is diagnostic:
  * missing stories are reported, not counted against it.
  *
@@ -86,6 +92,7 @@ function collect(suite, titles, rows) {
           .map((tag) => tag.replace(/^@/, ''))
           .filter((tag) => tag.startsWith('story:'))
           .map((tag) => tag.slice('story:'.length)),
+        withdrawal: (spec.tags ?? []).some((tag) => tag.replace(/^@/, '') === 'withdrawal'),
         // Playwright: expected | unexpected | flaky | skipped. fixme counts as skipped.
         status: annotations.some((a) => a.type === 'fixme') ? 'fixme' : test.status,
         evidence: video ? path.relative(base, video.path).split(path.sep).join('/') : '',
@@ -126,6 +133,14 @@ const missing = matrix.filter((row) => !row.passed).map((row) => row.story);
 if (missing.length && !filtered) {
   problems.push(`required stories without a passed test: ${missing.join(', ')}`);
 }
+const withdrawals = (stories.withdrawal ?? []).map((story) => {
+  const proving = tests.filter((test) => test.withdrawal && test.stories.includes(story));
+  return { story, proving, passed: proving.some((test) => test.status === 'expected') };
+});
+const unproven = withdrawals.filter((row) => !row.passed).map((row) => row.story);
+if (unproven.length && !filtered) {
+  problems.push(`stories without a passed withdrawal control (@withdrawal): ${unproven.join(', ')}`);
+}
 const unknown = [...new Set(tests.flatMap((test) => test.stories))]
   .filter((story) => !(stories.required ?? []).includes(story) && !(stories.alsoCovered ?? []).includes(story));
 if (unknown.length) {
@@ -145,6 +160,17 @@ for (const row of matrix) {
     md += `| ${row.story} | ${STATUS[test.status] ?? test.status} | ${cell(test.title)} | ${cell(test.spec)} | ${cell(test.evidence)} |\n`;
   }
 }
+if (withdrawals.length) {
+  md += '\n| Withdrawal control | Result | Test |\n|---|---|---|\n';
+  for (const row of withdrawals) {
+    if (!row.proving.length) {
+      md += `| ${row.story} | **missing** | |\n`;
+    }
+    for (const test of row.proving) {
+      md += `| ${row.story} | ${STATUS[test.status] ?? test.status} | ${cell(test.title)} |\n`;
+    }
+  }
+}
 if (problems.length) {
   md += `\n**Why not accepted:**\n\n${problems.map((problem) => `- ${cell(problem)}`).join('\n')}\n`;
 }
@@ -156,6 +182,11 @@ fs.writeFileSync(path.join(outDir, 'coverage.json'), JSON.stringify({
     story: row.story,
     passed: row.passed,
     tests: row.covering.map((test) => ({ spec: test.spec, title: test.title, status: test.status, evidence: test.evidence })),
+  })),
+  withdrawal: withdrawals.map((row) => ({
+    story: row.story,
+    passed: row.passed,
+    tests: row.proving.map((test) => ({ spec: test.spec, title: test.title, status: test.status })),
   })),
 }, null, 2));
 process.stdout.write(md);

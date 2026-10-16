@@ -33,7 +33,6 @@ import RestrictionOutPutItem from '../../../../components/restriction/Restrictio
 import CompletionOutPutItem from '../../../../components/completion/CompletionOutPutItem.vue';
 import { makeStore } from '../../fixtures/storeFactory';
 import { makeNode } from '../../fixtures/nodeFactory';
-import { knownDefect } from '../../fixtures/knownDefect';
 
 const STRINGS = { restriction_access_manually: 'Unlock node manually', conditions_finish_course: 'Finish node manually' };
 
@@ -93,7 +92,7 @@ describe('manual access and completion - the four combinations', () => {
 });
 
 describe('manual access and completion - labels lead to their own checkbox', () => {
-  knownDefect('[known defect, draft local_adele-issue-manual-checkboxes-share-id] each label points to a checkbox of its own', () => {
+  it('each label points to a checkbox of its own (#598)', () => {
     // Both controls use the node id as the checkbox id, so the two labels
     // point to the SAME id - a click on "Finish node manually" toggles the
     // first checkbox with that id: the manual ACCESS.

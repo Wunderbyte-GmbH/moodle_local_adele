@@ -125,17 +125,6 @@ onMounted(() => {
     active.value = true
   }
 
-  // No lock->play attention animation any more (#570): the flipping icon (and
-  // its flipping tooltip) made accessible nodes read as locked. An accessible
-  // node shows a steady play symbol from the first paint on.
-  if (
-    props.data.completion.feedback &&
-    props.data.completion.feedback.status !== 'closed' &&
-    props.data.completion.feedback.status !== 'not_accessible' &&
-    props.data.completion.feedback.status_restriction !== 'after'
-  ) {
-    iconClass.value = 'fa-play';
-  }
 })
 
 const { statusMessage } = useStatusMessage(computed(() => props.data));
@@ -244,7 +233,17 @@ const goToCourse = () => {
     window.open(course_link, '_blank');
   }
 }
-const iconClass = ref('fa-lock');
+// The icon follows the same derivation as data-status and the accessible
+// name (useNodeStatus): play only for a node that is known to be open -
+// accessible or completed - and whose restriction is not over ("after").
+// Decided on its own before, everything that was not closed / not_accessible
+// got the play symbol and a course link, an unknown state included (#597).
+// Computed rather than set once on mount: it follows the state, and there is
+// still no lock->play attention animation (#570) - the first paint is right.
+const iconClass = computed(() => (
+  (nodeStatus.value === 'accessible' || nodeStatus.value === 'completed')
+    && props.data.completion?.feedback?.status_restriction !== 'after'
+) ? 'fa-play' : 'fa-lock');
 const hasTimedCondition = ref(false);
 
 // The play button only navigates when the node is reachable (fa-play); when it is

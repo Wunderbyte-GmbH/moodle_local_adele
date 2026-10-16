@@ -226,6 +226,7 @@ without a time zone.
 |---|---|---|
 | PHPUnit | `tests/` | the domain logic on the server: evaluation of conditions, time boundaries to the second, truth tables of combined criteria (`tests/usecases/uc21`–`uc23`), permissions, enrolments |
 | Jest | `vue3/tests/unit/` | how the Vue frontend reacts to every state the server can deliver: status codes, progress display, master and manual checkboxes, feedback texts and their joining, editor inputs - as data-driven matrices (`it.each`) |
+| Behat | `mod_adele: tests/behat/` | the activity from the teacher's form to the student's view: an administrator adds it, chooses the path, sees the user list (graded roles only) and a learner's locked nodes - inside Moodle Plugin CI of mod_adele |
 | Playwright smoke | `tests/playwright/` | a quick check on every push |
 | Playwright E2E | `tests/e2e/` | whole user stories across all three ADELE plugins on a real Moodle: roles, editor, real enrolment and course access, recompute, time on a test clock - started by hand (`e2e.yml`) |
 

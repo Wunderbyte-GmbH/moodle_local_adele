@@ -1509,8 +1509,15 @@ foreach ($imported as $pathid) {
 // E2EHOST9: two embeddings - another path for "this course", Linear A1 for
 // "starting node": the host enrolment ADELE creates for the second must not
 // subscribe anybody to the first (H2, #37).
+// E2EHOST10: "starting node", mode changed afterwards visible -> hidden ->
+// none -> visible (H3, addendum of 2026-10-13).
+// E2EHOST11: the same for "any course of the path".
+// E2EHOST12: sources "this course" + "starting node"; "this course" removed
+// afterwards and restored (H2, addendum of 2026-10-13).
+// E2EHOST13: "this course"; the embedding is deleted and restored from the
+// recycle bin (H1, decision of 2026-10-15: deleted is cleanly gone).
 $extrahosts = [];
-foreach ([2, 3, 4, 5, 6, 7, 8, 9] as $number) {
+foreach ([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as $number) {
     $shortname = 'E2EHOST' . $number;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
     if (!$course) {
@@ -1612,6 +1619,60 @@ if ($entrylearner) {
     }
 }
 
+// The addendum of 2026-10-13 changes embeddings AFTER they took effect, and
+// needs two people of its own, back to the start on every run:
+// - "dual": manually in the entry course T01 AND manually in E2EHOST10 and
+// E2EHOST11 - an enrolment of their own that a mode change of ADELE's must
+// leave alone (H3);
+// - "source": manually in E2EHOST12 only - on the path only through the
+// source "this course", which the chain removes (H2);
+// - "delete": manually in E2EHOST13 only - on the path only through the
+// embedding the chain deletes (H1).
+// Both complete T01 in the chain, so their completions in the fixture courses
+// are forgotten here: a new subscription reads progress from the courses.
+$changepeople = [
+    'DUAL' => [local_adele_fixture_person('fx_h_dual', 'Host Dual', $fixturepassword), ['T01', 'E2EHOST10', 'E2EHOST11']],
+    'SOURCE' => [local_adele_fixture_person('fx_h_source', 'Host Source', $fixturepassword), ['E2EHOST12']],
+    'DELETE' => [local_adele_fixture_person('fx_h_delete', 'Host Delete', $fixturepassword), ['E2EHOST13']],
+];
+$changecourseids = $DB->get_fieldset_select('course', 'id', $DB->sql_like('shortname', ':t'), ['t' => 'T__']);
+foreach ($changepeople as [$changeperson, $changeshortnames]) {
+    foreach ($changeshortnames as $changeshortname) {
+        $changecourse = $DB->get_record('course', ['shortname' => $changeshortname]);
+        $changeinstance = $changecourse ? $DB->get_record('enrol', [
+            'courseid' => $changecourse->id,
+            'enrol' => 'manual',
+        ], '*', IGNORE_MULTIPLE) : null;
+        if ($manual && $changeinstance && $studentroleid) {
+            $manual->enrol_user($changeinstance, $changeperson->id, $studentroleid, 0, 0, ENROL_USER_ACTIVE);
+        }
+    }
+    foreach ($changecourseids as $changecourseid) {
+        $changecmids = $DB->get_fieldset_select('course_modules', 'id', 'course = ?', [$changecourseid]);
+        if ($changecmids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($changecmids);
+            $DB->delete_records_select(
+                'course_modules_completion',
+                "userid = ? AND coursemoduleid {$insql}",
+                array_merge([$changeperson->id], $inparams)
+            );
+        }
+        $DB->delete_records('course_completion_crit_compl', ['userid' => $changeperson->id, 'course' => $changecourseid]);
+        $DB->delete_records('course_completions', ['userid' => $changeperson->id, 'course' => $changecourseid]);
+    }
+    foreach ($imported as $pathid) {
+        $DB->delete_records('local_adele_path_user', [
+            'learning_path_id' => $pathid,
+            'user_id' => $changeperson->id,
+        ]);
+        if (class_exists('\\enrol_adele\\local\\reconciler')) {
+            \enrol_adele\local\reconciler::purge_user($pathid, $changeperson->id);
+            \enrol_adele\local\reconciler::purge_all_host_user($pathid, $changeperson->id);
+        }
+    }
+}
+\cache::make('core', 'completion')->purge();
+\cache::make('core', 'coursecompletion')->purge();
 
 printf("export ADELE_BASE_URL='%s'\n", $CFG->wwwroot);
 printf("export ADELE_ADMIN_USER='%s'\n", $admin->username);
@@ -1814,6 +1875,10 @@ if ($privacypath && $privacysecond) {
             $privacyhost->id
         )->id,
         'ALL' => local_adele_fixture_embed($privacyhost, 'E2E P all results', $privacyid, 1),
+        // Starts as "all results"; the chain turns it to "only own results"
+        // and back (P1/P2, addendum of 2026-10-13). An embedding of its own,
+        // so OWN and ALL keep meaning what P1-P4 assume.
+        'SWITCHABLE' => local_adele_fixture_embed($privacyhost, 'E2E P switchable results', $privacyid, 1),
     ];
     $privacyother = $DB->get_record('course', ['shortname' => 'E2EPX']);
     if (!$privacyother) {
@@ -2137,6 +2202,10 @@ foreach (array_values($hostmembers) as $index => $member) {
 }
 if ($hostoutsider) {
     printf("export ADELE_FIXTURE_HOST_OUTSIDER='%s'\n", $hostoutsider->username);
+}
+foreach ($changepeople as $key => [$changeperson]) {
+    printf("export ADELE_FIXTURE_HOST_%s='%s'\n", $key, $changeperson->username);
+    printf("export ADELE_FIXTURE_HOST_%s_NAME='%s'\n", $key, fullname($changeperson));
 }
 foreach ($imported as $name => $id) {
     // One variable per path, keyed by its name in upper snake case, so a spec

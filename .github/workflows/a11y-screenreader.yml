@@ -1,42 +1,49 @@
 name: Accessibility Screenreader
 
-# Screen reader tests with NVDA (Guidepup), as a suite of their own.
+# Screen reader evidence with a real NVDA, entirely inside GitHub Actions.
+# Built like local_stackmatheditor's a11y-nvda.yml.
 #
 # MANUAL ONLY: Actions tab -> "Accessibility Screenreader" -> "Run workflow".
-# No push trigger and no schedule.
+# No push trigger and no schedule. Nothing to type in: no site address, no
+# account - the site is built and seeded inside the run.
 #
-# Why this is separate from e2e.yml:
-# - NVDA exists on Windows only, so this runs on a windows runner. Service
-#   containers (the PostgreSQL the other workflows use) are Linux-only, which
-#   is why this workflow does NOT build a Moodle site; it runs against one
-#   that already exists and whose address is given below.
-# - A screen reader is a single instance on a visible desktop: one worker, no
-#   parallelism, no headless browser.
-# - Guidepup needs Playwright 1.57 or newer, while the other suites are
-#   pinned to 1.49.1. Separate directory, separate lockfile.
+# Two facts make this a two-job workflow. NVDA exists only on Windows. The
+# test site is built on Linux, exactly as e2e.yml builds it (PostgreSQL as a
+# service container, which Windows runners do not offer). So:
 #
-# EVERY run uploads ONE artefact, whatever the outcome - passed, failed or
-# cancelled: HTML report, video of every test, the spoken phrase log NVDA
-# produced, results.json, junit.xml and the console output. For this suite
-# the recording of a PASSING run is the point: it is what lets a sighted
-# reviewer follow what a blind user would have heard.
+#   site  (ubuntu)   builds, seeds and serves the same site as e2e.yml, opens
+#                    a temporary public tunnel to it, hands the address and
+#                    the seed values to the Windows job as an artefact, and
+#                    stays up until that job says it is done
+#   nvda  (windows)  waits for that artefact, then runs
+#                    tests/a11y-screenreader against the tunnel with NVDA
+#                    listening
+#
+# The site is a throwaway built for this run; its accounts and the tunnel
+# address end with the run.
+#
+# EVERY run uploads ONE artefact, whatever the outcome: HTML report, video of
+# every test, the spoken phrase log of every test as a plain transcript,
+# results.json, junit.xml and the console output. For this suite the
+# recording of a PASSING run is the point: it lets a sighted reviewer follow
+# what a blind user would have heard.
 #
 # NOTE: workflow_dispatch only appears in the Actions UI once this file is on
 # the repository's DEFAULT branch.
 "on":
   workflow_dispatch:
     inputs:
-      base_url:
-        description: >-
-          Address of the Moodle site to test, e.g. https://adele.example.org.
-          It must already carry the three ADELE plugins and the fixtures
-          (tests/playwright/seed_fixtures.php).
-        type: string
-        required: true
       grep:
         description: >-
           Only run tests whose title matches this regular expression, e.g.
           ADELE-SR-01. Empty: the whole suite.
+        type: string
+        default: ''
+      sibling_ref:
+        description: >-
+          Branch, tag or commit for the two companion plugins. Empty: a branch
+          of the same name as this run's if the companion has one, otherwise
+          its default branch.
         type: string
         default: ''
       retention_days:
@@ -44,111 +51,401 @@ name: Accessibility Screenreader
         type: number
         default: 30
 
+concurrency:
+  group: a11y-screenreader-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
+  # The two jobs talk through artefacts of this run, read with the API.
+  actions: read
 
 jobs:
-  screenreader:
-    name: NVDA (${{ inputs.base_url }})
-    # Windows, because NVDA is a Windows application. This is not a
-    # preference; the suite cannot run anywhere else.
-    runs-on: windows-latest
-    timeout-minutes: 60
+  site:
+    name: Test site behind a tunnel
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    defaults:
+      run:
+        shell: bash
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moodle
+          POSTGRES_PASSWORD: moodle
+          POSTGRES_DB: moodle
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready" --health-interval=10s
+          --health-timeout=5s --health-retries=5
 
     env:
+      PLUGIN: local
       # Inputs reach the scripts through the environment only, never by
       # interpolating ${{ }} into a run block.
-      ADELE_BASE_URL: ${{ inputs.base_url }}
-      TEST_GREP: ${{ inputs.grep || '' }}
-      # The account the suite logs in with. Stored as repository secrets:
-      # the site under test is a real installation, not a throwaway built
-      # inside the job.
-      ADELE_ADMIN_USER: ${{ secrets.ADELE_A11Y_USER }}
-      ADELE_ADMIN_PASSWORD: ${{ secrets.ADELE_A11Y_PASSWORD }}
+      SIBLING_REF: ${{ inputs.sibling_ref || '' }}
+      MOODLE_BRANCH: MOODLE_405_STABLE
+      MOODLE_WWWROOT: http://127.0.0.1:8000
 
     steps:
-      - name: Check the inputs
-        shell: bash
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pgsql, gd, intl, zip, soap, mbstring, curl, xml, exif
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Check out Moodle
         run: |
-          if [ -z "${ADELE_ADMIN_USER:-}" ] || [ -z "${ADELE_ADMIN_PASSWORD:-}" ]; then
-            echo "::error::The secrets ADELE_A11Y_USER and ADELE_A11Y_PASSWORD are not set."
-            echo "This workflow runs against an existing site and needs an account on it."
-            exit 1
+          git clone --depth 1 --branch "$MOODLE_BRANCH" https://github.com/moodle/moodle.git moodle
+          echo "MOODLE_WEBROOT=$GITHUB_WORKSPACE/moodle" >> "$GITHUB_ENV"
+
+      # Same sources as e2e.yml: all three ADELE plugins (the dependency
+      # graph is circular) from the same owner, plus wunderbyte_table and the
+      # catquiz family the fixture seed needs.
+      - name: Install the plugin ecosystem into Moodle
+        run: |
+          declare -A REPO=(
+            [local]="${GITHUB_REPOSITORY_OWNER}/moodle-local_adele"
+            [enrol]="${GITHUB_REPOSITORY_OWNER}/moodle-enrol_adele"
+            [mod]="${GITHUB_REPOSITORY_OWNER}/moodle-mod_adele"
+          )
+          dest="$MOODLE_WEBROOT/$PLUGIN/adele"
+          rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+          cp -a plugin "$dest"; rm -rf "$dest/.git"
+          echo "${PLUGIN}_adele (under test): $GITHUB_REPOSITORY $GITHUB_REF_NAME $GITHUB_SHA"
+
+          for sib in local enrol mod; do
+            [ "$sib" = "$PLUGIN" ] && continue
+            url="https://github.com/${REPO[$sib]}.git"
+            src="$RUNNER_TEMP/src_$sib"
+            ref="$SIBLING_REF"
+            if [ -z "$ref" ] && git ls-remote --exit-code --heads "$url" "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+              ref="$GITHUB_REF_NAME"
+            fi
+            rm -rf "$src"
+            git clone --quiet "$url" "$src"
+            if [ -n "$ref" ]; then
+              git -C "$src" checkout --quiet "$ref" || {
+                echo "::error::${sib}_adele: ref '$ref' does not exist in ${REPO[$sib]}."
+                exit 1
+              }
+            fi
+            echo "${sib}_adele: ${REPO[$sib]} ${ref:-default} $(git -C "$src" rev-parse HEAD)"
+            dest="$MOODLE_WEBROOT/$sib/adele"
+            rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+            cp -a "$src" "$dest"; rm -rf "$dest/.git"
+          done
+
+          CATQUIZ_REF=ALiSe-v-1.2.0-legacy
+          declare -A EXTRA=(
+            [local/wunderbyte_table]="Wunderbyte-GmbH/moodle-local_wunderbyte_table|MOODLE_405_DEV"
+            [mod/adaptivequiz]="ralferlebach/moodle-mod_adaptivequiz|$CATQUIZ_REF"
+            [mod/adaptivequiz/catmodel/catquiz]="ralferlebach/moodle-adaptivequizcatmodel_catquiz|$CATQUIZ_REF"
+            [local/catquiz]="ralferlebach/moodle-local_catquiz|$CATQUIZ_REF"
+          )
+          # Order matters: the adapter lives INSIDE mod/adaptivequiz.
+          for path in local/wunderbyte_table mod/adaptivequiz mod/adaptivequiz/catmodel/catquiz local/catquiz; do
+            repo="${EXTRA[$path]%%|*}"
+            ref="${EXTRA[$path]##*|}"
+            src="$RUNNER_TEMP/src_$(basename "$repo")"
+            rm -rf "$src"
+            git clone --quiet --depth 1 --branch "$ref" --recurse-submodules --shallow-submodules \
+              "https://github.com/$repo.git" "$src"
+            dest="$MOODLE_WEBROOT/$path"
+            rm -rf "$dest"; mkdir -p "$(dirname "$dest")"
+            cp -a "$src" "$dest"
+            find "$dest" -name .git -prune -exec rm -rf {} +
+          done
+
+      - name: Install Moodle site
+        run: |
+          cd moodle
+          mkdir -p "$RUNNER_TEMP/moodledata"
+          php admin/cli/install.php \
+            --non-interactive --agree-license \
+            --dbtype=pgsql --dbhost=127.0.0.1 --dbport=5432 --dbname=moodle \
+            --dbuser=moodle --dbpass=moodle \
+            --wwwroot="$MOODLE_WWWROOT" --dataroot="$RUNNER_TEMP/moodledata" \
+            --fullname="ADELE NVDA" --shortname="adelenvda" \
+            --adminpass="Admin!23" --adminemail=ci@example.invalid
+
+      - name: Seed (same seeds as playwright.yml and e2e.yml)
+        run: |
+          cd moodle
+          { ADELE_SEED_I_KNOW=1 php local/adele/tests/playwright/seed.php
+            ADELE_SEED_I_KNOW=1 php local/adele/tests/playwright/seed_fixtures.php
+          } > "$RUNNER_TEMP/seed.env" \
+            || { echo "Seed failed. Its output:"; cat "$RUNNER_TEMP/seed.env"; exit 1; }
+          sed -n "s/^export \([A-Z_][A-Z0-9_]*\)=.*/  \1/p" "$RUNNER_TEMP/seed.env"
+          php admin/cli/adhoc_task.php --execute
+
+      - name: Open a tunnel and point Moodle at it
+        run: |
+          curl -sSL -o "$RUNNER_TEMP/cloudflared" \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x "$RUNNER_TEMP/cloudflared"
+
+          # Server and tunnel have to outlive this step - the site stays up
+          # while the Windows job runs. setsid gives them a session of their
+          # own, nohup ignores the hang-up.
+          PHP_CLI_SERVER_WORKERS=8 setsid nohup php -S 127.0.0.1:8000 -t "$MOODLE_WEBROOT" \
+            > "$RUNNER_TEMP/moodle-server.log" 2>&1 < /dev/null &
+          code=000
+          for _ in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+              http://127.0.0.1:8000/login/index.php || true)
+            [ "$code" = "200" ] && break
+            sleep 3
+          done
+          echo "Local server: HTTP $code"
+
+          setsid nohup "$RUNNER_TEMP/cloudflared" tunnel --no-autoupdate --url http://127.0.0.1:8000 \
+            > "$RUNNER_TEMP/cloudflared.log" 2>&1 < /dev/null &
+
+          url=''
+          for _ in $(seq 1 60); do
+            # || true: while the tunnel is still starting grep finds nothing,
+            # and with -e and pipefail that would end the step at once.
+            url=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$RUNNER_TEMP/cloudflared.log" \
+              2>/dev/null | head -1 || true)
+            [ -n "$url" ] && break
+            sleep 2
+          done
+          if [ -z "$url" ]; then
+            echo "::error::The tunnel did not come up."; tail -40 "$RUNNER_TEMP/cloudflared.log"; exit 1
           fi
-          case "$ADELE_BASE_URL" in
-            http://*|https://*) ;;
-            *) echo "::error::base_url must start with http:// or https://"; exit 1 ;;
-          esac
+          echo "Tunnel: $url"
+
+          # Moodle redirects every request to wwwroot, so it has to be the
+          # address the Windows runner uses. The tunnel terminates TLS and PHP
+          # sees plain HTTP: sslproxy says so.
+          cfg="$MOODLE_WEBROOT/config.php"
+          sed -i "s#^\$CFG->wwwroot *=.*#\$CFG->wwwroot = '$url';\n\$CFG->sslproxy = true;#" "$cfg"
+          grep -n "wwwroot\|sslproxy" "$cfg"
+          php "$MOODLE_WEBROOT/admin/cli/purge_caches.php"
+
+          code=000
+          for _ in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url/login/index.php" || true)
+            [ "$code" = "200" ] && break
+            sleep 3
+          done
+          echo "Through the tunnel: HTTP $code"
+          [ "$code" = "200" ] || { tail -40 "$RUNNER_TEMP/moodle-server.log"; exit 1; }
+
+          # The seeds print ADELE_BASE_URL too - the address the site had
+          # when it was seeded, 127.0.0.1. In GITHUB_ENV the last assignment
+          # wins, so that line would send the Windows browser to its own
+          # localhost. It is dropped; the tunnel is the only one.
+          mkdir -p handoff
+          {
+            sed -n "s/^export \([A-Z_][A-Z0-9_]*\)='\(.*\)'$/\1=\2/p" "$RUNNER_TEMP/seed.env" \
+              | grep -v '^ADELE_BASE_URL=' | grep -v '^ADELE_MOODLE_ROOT='
+            echo "ADELE_BASE_URL=$url"
+          } > handoff/site.env
+          [ "$(grep -c '^ADELE_BASE_URL=' handoff/site.env)" = "1" ] \
+            || { echo "::error::handoff/site.env must name exactly one ADELE_BASE_URL"; exit 1; }
+          sed 's/PASSWORD=.*/PASSWORD=***/' handoff/site.env
+
+      - name: Hand the site to the Windows job
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvda-site
+          path: handoff/site.env
+          retention-days: 1
+
+      - name: Stay up until NVDA is done
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The Windows job uploads "nvda-done" when it has finished, whatever
+          # the outcome.
+          for _ in $(seq 1 280); do
+            curl -s -o /dev/null --max-time 10 http://127.0.0.1:8000/login/index.php \
+              || echo "::warning::the local server stopped answering"
+            done=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+              --jq '.artifacts[] | select(.name=="nvda-done") | .name' 2>/dev/null || true)
+            if [ "$done" = "nvda-done" ]; then
+              echo "NVDA finished; closing the site."
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::warning::NVDA did not finish in time; closing the site anyway."
+
+      - name: Server and tunnel logs
+        if: always()
+        run: |
+          tail -80 "$RUNNER_TEMP/moodle-server.log" || true
+          tail -40 "$RUNNER_TEMP/cloudflared.log" || true
+
+  nvda:
+    name: NVDA on Windows
+    # Named, not "latest": Guidepup lists the Windows versions it supports.
+    runs-on: windows-2025
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      TEST_GREP: ${{ inputs.grep || '' }}
+
+    steps:
+      - name: Prepare
+        run: |
           echo "EXPORT_DIR=$RUNNER_TEMP/a11y-export" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/a11y-export"
 
       - name: Check out plugin
         uses: actions/checkout@v4
-        with:
-          path: plugin
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
+      # Guidepup comes in three parts that have to fit: the library the tests
+      # use, the setup tool that prepares Windows, and the NVDA build that
+      # tool downloads FOR that library. Library 0.33.0, integration 0.19.1
+      # (pinned in package.json) and setup 0.24.1 are what Guidepup's own
+      # Playwright project runs together.
+      - name: Prepare Windows for screen reader automation
+        run: npx -y @guidepup/setup@0.24.1 setup --ci
+
       - name: Install the suite
-        shell: bash
+        working-directory: tests/a11y-screenreader
         run: |
-          cd plugin/tests/a11y-screenreader
           # npm ci, not npm install: it fails loudly when the lockfile is
           # missing rather than resolving whatever is current that day.
-          npm ci
-          # A real browser, not the headless shell: a screen reader attaches
-          # to the browser window a person would see.
-          npx playwright install --with-deps chrome
+          npm ci --no-audit --no-fund
+          npx playwright install chromium
 
-      - name: Install and configure NVDA
-        shell: bash
+      # After npm ci and in the suite's directory: the tool reads the
+      # installed library to decide which NVDA build it needs.
+      - name: Install NVDA for the installed Guidepup
+        working-directory: tests/a11y-screenreader
         run: |
-          cd plugin/tests/a11y-screenreader
-          # Guidepup's own installer: it fetches NVDA and writes the settings
-          # the automation needs (speech viewer, no welcome dialog). Without
-          # it the run would stop at a screen reader that is not there.
-          npx guidepup setup --no-interactive
+          npx -y @guidepup/setup@0.24.1 install nvda
+          # Ask the library whether it finds what was just installed - here,
+          # in one line, rather than as "NVDA not installed" in every test.
+          node -e "
+            let check;
+            try { check = require('@guidepup/guidepup/lib/windows/NVDA/isNVDAInstalled'); }
+            catch (e) { console.log('::notice::could not ask Guidepup about NVDA: ' + e.message); process.exit(0); }
+            if (!check.isNVDAInstalled()) {
+              console.log('::error::Guidepup ' + require('@guidepup/guidepup/package.json').version
+                + ' does not find the NVDA the setup tool installed');
+              process.exit(1);
+            }
+            console.log('Guidepup finds NVDA.');
+          "
+
+      - name: Wait for the test site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for _ in $(seq 1 160); do
+            id=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+              --jq '.artifacts[] | select(.name=="nvda-site") | .id' 2>/dev/null || true)
+            if [ -n "$id" ]; then
+              gh api "repos/${{ github.repository }}/actions/artifacts/$id/zip" > site.zip
+              unzip -o -q site.zip -d handoff
+              cat handoff/site.env >> "$GITHUB_ENV"
+              sed 's/PASSWORD=.*/PASSWORD=***/' handoff/site.env
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::The test site never came up."; exit 1
+
+      # Fail here, with a sentence, if this runner cannot reach the site - not
+      # once per test with a connection error.
+      - name: Check the site from this runner
+        run: |
+          case "$ADELE_BASE_URL" in
+            https://*.trycloudflare.com) ;;
+            *) echo "::error::ADELE_BASE_URL is '$ADELE_BASE_URL', not the tunnel"; exit 1 ;;
+          esac
+          code=000
+          for _ in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
+              "$ADELE_BASE_URL/login/index.php" || true)
+            [ "$code" = "200" ] && break
+            sleep 5
+          done
+          echo "Through the tunnel, from Windows: HTTP $code"
+          [ "$code" = "200" ] \
+            || { echo "::error::the test site answers HTTP $code through $ADELE_BASE_URL"; exit 1; }
 
       - name: Run the screen reader suite
-        shell: bash
+        working-directory: tests/a11y-screenreader
+        # The account comes with the handoff: seed.php sets the admin
+        # password of the site it seeds and prints it (ADELE_ADMIN_*).
         run: |
-          cd plugin/tests/a11y-screenreader
+          set -o pipefail
           ADELE_A11Y_EXPORT_DIR="$EXPORT_DIR" npx playwright test \
-            ${TEST_GREP:+--grep "$TEST_GREP" --pass-with-no-tests} 2>&1 \
+            ${TEST_GREP:+--grep "$TEST_GREP"} 2>&1 \
             | tee "$EXPORT_DIR/run.log"
-          exit "${PIPESTATUS[0]}"
 
       - name: Summarise the results
         if: always()
-        shell: bash
         run: |
-          [ -n "${EXPORT_DIR:-}" ] || exit 0
           summary="$EXPORT_DIR/summary.md"
           {
             echo "# Screen reader results (NVDA)"
             echo
             echo "| Item | Value |"
             echo "|---|---|"
-            echo "| Site | $ADELE_BASE_URL |"
+            echo "| Site | built in this run, reached through ${ADELE_BASE_URL:-?} |"
             echo "| Started by | $GITHUB_ACTOR |"
             echo "| Title filter | ${TEST_GREP:-none} |"
             echo
-            node "support/summarize-results.mjs" "NVDA" "$EXPORT_DIR/results.json"
-            echo "The spoken phrase log of every test is attached to the HTML report" \
-              "(\`nvda-spoken-phrases.txt\`) and is what a review should read first;" \
-              "the videos show the same run from the outside."
+            node "tests/a11y-screenreader/support/summarize-results.mjs" "NVDA" "$EXPORT_DIR/results.json"
+            echo "What NVDA said is in \`transcripts/*.txt\` and attached to every test in the" \
+              "HTML report (\`nvda-spoken-phrases.txt\`); read that first. The videos show the" \
+              "same run from the outside."
           } > "$summary"
           cat "$summary" >> "$GITHUB_STEP_SUMMARY"
 
       # One artefact, always: passed, failed or cancelled.
-      - name: Upload report, videos and spoken phrase logs
+      - name: Upload report, videos and transcripts
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: a11y-screenreader-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/a11y-export
           retention-days: ${{ inputs.retention_days || 30 }}
           if-no-files-found: warn
+
+      - name: Tell the site job it can stop
+        if: always()
+        run: mkdir -p done && echo finished > done/done.txt
+
+      - name: Signal completion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvda-done
+          path: done/done.txt
+          retention-days: 1
+
+      - name: What a person still has to say
+        if: always()
+        run: |
+          echo "Read transcripts/*.txt in the artefact and answer, with the date,"
+          echo "the browser and the NVDA version:"
+          echo "  [ ] is what NVDA says understandable, not merely present?"
+          echo "  [ ] does the order of announcements match the order of the task?"
+          echo "  [ ] is anything read out twice, or read when it should be silent?"

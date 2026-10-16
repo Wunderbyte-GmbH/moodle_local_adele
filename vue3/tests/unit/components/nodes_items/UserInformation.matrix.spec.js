@@ -33,7 +33,6 @@ import UserInformation from '../../../../components/nodes_items/UserInformation.
 import UserFeedbackBlock from '../../../../components/nodes_items/UserFeedbackBlock.vue';
 import { makeStore } from '../../fixtures/storeFactory';
 import { makeNode } from '../../fixtures/nodeFactory';
-import { knownDefect } from '../../fixtures/knownDefect';
 
 const OR = 'or';
 
@@ -84,7 +83,7 @@ describe('UserInformation - OR between columns', () => {
       restriction: { before_active: { c1: 'complete A and B', c3: 'be released manually' }, before_valid: {} },
     });
     const items = wrapper.findAll('ul.feedback-list')[0].findAll('li.feedback-item');
-    expect(items.map((item) => item.find('span').text())).toEqual(['complete A and B', 'be released manually.']);
+    expect(items.map((item) => item.find('span').text())).toEqual(['Complete A and B', 'be released manually.']);
     expect(items[0].find('.or-text').text()).toBe(OR);
     expect(items[1].find('.or-text').exists()).toBe(false);
   });
@@ -100,17 +99,19 @@ describe('UserInformation - OR between columns', () => {
         inbetween: { c3: 'you were released manually' },
       },
     });
-    const text = wrapper.text();
+    // Case-blind: the first text of a list starts with a capital letter
+    // (#596), and an absence must not pass just because of that.
+    const text = wrapper.text().toLowerCase();
     expect(text).toContain('you were released manually');
-    expect(text).not.toContain('complete A and B');
+    expect(text).not.toContain('complete a and b');
   });
 });
 
 describe('UserInformation - the completion texts per state', () => {
   it.each([
-    ['before', { before: ['complete this course'] }, ['complete this course.']],
-    ['inbetween', { inbetween: ['finish the quiz', 'or wait to be released'] }, ['finish the quiz', 'or wait to be released.']],
-    ['after', { after: ['completed this course'], after_all: [] }, ['completed this course.']],
+    ['before', { before: ['complete this course'] }, ['Complete this course.']],
+    ['inbetween', { inbetween: ['finish the quiz', 'or wait to be released'] }, ['Finish the quiz', 'or wait to be released.']],
+    ['after', { after: ['completed this course'], after_all: [] }, ['Completed this course.']],
   ])('%s: the texts of that state, nothing else', async (state, completion, expected) => {
     const wrapper = await bubble({
       status_restriction: 'inbetween',
@@ -129,7 +130,7 @@ describe('UserInformation - the completion texts per state', () => {
       completion: { after: ['completed T01'], after_all: { dndnode_2: 'T02 is open now' } },
       restriction: { inbetween: {} },
     });
-    expect(lists(wrapper)).toEqual([['completed T01.'], ['T02 is open now.']]);
+    expect(lists(wrapper)).toEqual([['Completed T01.'], ['T02 is open now.']]);
     expect(wrapper.text()).toContain('node_access_completion_after_all');
   });
 
@@ -170,9 +171,9 @@ describe('UserFeedbackBlock - texts as they arrive', () => {
     expect(wrapper.text()).toContain('{node_name}');
   });
 
-  knownDefect('[known defect, draft local_adele-issue-feedback-first-letter] the first text starts with a capital letter', () => {
-    // capitalize() computes the capitalised text for the first item and
-    // throws it away (no return, no assignment).
+  it('the first text starts with a capital letter (#596)', () => {
+    // capitalize() used to compute the capitalised text for the first item
+    // and throw it away (no return, no assignment).
     const wrapper = block(['complete this course']);
     expect(wrapper.find('li.feedback-item span').text()).toBe('Complete this course.');
   });

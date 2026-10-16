@@ -115,10 +115,12 @@ $lpid = (int) $DB->insert_record('local_adele_learning_paths', (object) [
     'json' => json_encode($json),
 ]);
 
+$fixturepassword = 'Playwright!23';
 $student = $generator->create_user([
     'username' => 'pwstudent' . $suffix,
     'firstname' => 'Playwright',
     'lastname' => 'Student',
+    'password' => $fixturepassword,
 ]);
 
 $DB->insert_record('local_adele_path_user', (object) [
@@ -136,8 +138,35 @@ $DB->insert_record('local_adele_path_user', (object) [
     ]),
 ]);
 
+// B4 fixture: a normal course activity that embeds this learning path.
+$hostcourse = $generator->create_course([
+    'shortname' => $courseshortname . 'H',
+    'fullname' => 'Playwright-Hostkurs ' . $suffix,
+]);
 
-$fixturepassword = 'Playwright!23';
+$module = $generator->create_module('adele', [
+    'course' => (int) $hostcourse->id,
+    'name' => 'Playwright-Lernpfadaktivität',
+    'learningpathid' => $lpid,
+    'participantslist' => '1',
+    'hostenrolmentmode' => 'visible',
+    'userlist' => 1,
+    'view' => 1,
+]);
+
+$cm = get_coursemodule_from_instance(
+    'adele',
+    (int) $module->id,
+    (int) $hostcourse->id,
+    false,
+    MUST_EXIST
+);
+
+$generator->enrol_user(
+    (int) $student->id,
+    (int) $hostcourse->id,
+    'student'
+);
 
 /**
  * Create or reuse a user with a fixed username.
@@ -255,6 +284,8 @@ printf("export ADELE_LP_ID='%d'\n", $lpid);
 printf("export ADELE_COURSE_SHORTNAME='%s'\n", $courseshortname);
 printf("export ADELE_FIXTURE_PASSWORD='%s'\n", $fixturepassword);
 printf("export ADELE_MANAGER_USERNAME='%s'\n", $manager->username);
+printf("export ADELE_STUDENT_USERNAME='%s'\n", $student->username);
+printf("export ADELE_B4_ACTIVITY_CMID='%d'\n", (int) $cm->id);
 printf("export ADELE_ASSISTANT_USERNAME='%s'\n", $assistant->username);
 printf("export ADELE_VISIBLE_PATH_TITLE='%s'\n", $visibletitle);
 printf("export ADELE_INVISIBLE_PATH_TITLE='%s'\n", $invisibletitle);
@@ -277,7 +308,8 @@ printf("export ADELE_NAV_COURSE_URL='%s'\n", $CFG->wwwroot . '/course/view.php?i
 $expected = [
     'ADELE_BASE_URL', 'ADELE_ADMIN_USER', 'ADELE_ADMIN_PASSWORD',
     'ADELE_LP_NAME', 'ADELE_LP_ID', 'ADELE_COURSE_SHORTNAME',
-    'ADELE_FIXTURE_PASSWORD', 'ADELE_MANAGER_USERNAME', 'ADELE_ASSISTANT_USERNAME',
+    'ADELE_FIXTURE_PASSWORD', 'ADELE_MANAGER_USERNAME', 'ADELE_STUDENT_USERNAME', 'ADELE_B4_ACTIVITY_CMID',
+    'ADELE_ASSISTANT_USERNAME',
     'ADELE_VISIBLE_PATH_TITLE', 'ADELE_INVISIBLE_PATH_TITLE',
     'ADELE_VISIBLE_PATH_ID', 'ADELE_INVISIBLE_PATH_ID',
     'ADELE_VISIBLE_PATH_B_TITLE', 'ADELE_INVISIBLE_PATH_B_TITLE',

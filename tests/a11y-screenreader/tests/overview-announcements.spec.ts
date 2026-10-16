@@ -36,10 +36,36 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { nvdaTest } from '@guidepup/playwright';
 import { env, loginAs } from '../support/env';
 
 const { expect } = nvdaTest;
+
+// Everything NVDA says after a command, not only its first utterance: role
+// and state often come as a second one ("toggle button", then "pressed").
+nvdaTest.use({ nvdaStartOptions: { capture: true } });
+
+/**
+ * Keep what NVDA said as a plain file next to the report, with commit, date
+ * and site on top - a dated record rather than something remembered.
+ *
+ * @param name File name without extension.
+ * @param phrases The spoken phrases.
+ */
+function archive(name: string, phrases: string[]): void {
+  const dir = path.join(process.env.ADELE_A11Y_EXPORT_DIR || __dirname, 'transcripts');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `${name}.txt`), [
+    `# ${name}`,
+    `# recorded ${new Date().toISOString()}`,
+    `# commit ${process.env.GITHUB_SHA || 'local'}`,
+    `# site ${process.env.ADELE_BASE_URL || 'unknown'}`,
+    '',
+    ...phrases,
+  ].join('\n'), 'utf8');
+}
 
 /** How many reading steps one page is walked. Enough for the overview. */
 const READING_STEPS = 40;
@@ -71,6 +97,7 @@ nvdaTest.describe('ADELE-SR-01 — the overview is readable with NVDA', () => {
     });
 
     const spoken = await nvda.spokenPhraseLog();
+    archive('ADELE-SR-01-overview', spoken);
 
     // Attached whatever the outcome: on a failure it is the evidence, on a
     // pass it is the documentation.

@@ -34,7 +34,6 @@ import { makeStore } from '../../fixtures/storeFactory';
 import { makeNode } from '../../fixtures/nodeFactory';
 import { makeLearningPath, makeTreeNode } from '../../fixtures/learningPathFactory';
 import { makeCondition } from '../../fixtures/conditionFactory';
-import { knownDefect } from '../../fixtures/knownDefect';
 
 const STRINGS = {
   go_to_course: 'Go to course',
@@ -137,10 +136,10 @@ describe('CustomNodeEdit - view x status x time condition', () => {
     expect(wrapper.find('[role="group"]').attributes('data-status')).toBe('unknown');
   });
 
-  knownDefect.each([
+  it.each([
     ['unknown status from the server', 'error: loop limit exceeded'],
     ['no status yet', undefined],
-  ])('[known defect, draft local_adele-issue-unknown-status-shows-play] %s: locked, not "go to course"', async (_label, status) => {
+  ])('%s: locked, not "go to course" (#597)', async (_label, status) => {
     // The icon is decided on its own (onMounted: everything that is not
     // closed / not_accessible / after gets the play symbol), not from
     // useNodeStatus - so a node whose state is unknown shows the play

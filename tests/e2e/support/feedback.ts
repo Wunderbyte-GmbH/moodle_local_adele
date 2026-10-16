@@ -47,8 +47,9 @@ export const EN = {
   gone: 'This course/stack can no longer be unlocked by you.',
   todo: 'To complete this course/stack, you need to:',
   done: 'This course/stack is considered completed because you:',
-  completeCourse: 'successfully complete this course.',
-  completedCourse: 'successfully completed this course.',
+  // The first entry of a list starts with a capital letter (#596).
+  completeCourse: 'Successfully complete this course.',
+  completedCourse: 'Successfully completed this course.',
 };
 
 /** The same in German, as far as chain F reads them. */
@@ -56,7 +57,7 @@ export const DE = {
   unlocked: 'Dieser Kurs/Stapel ist freigeschaltet.',
   locked: 'Sie haben keinen Zugang zu diesem Kurs/Stapel. Eine Freischaltung erfolgt, wenn:',
   todo: 'Um diesen Kurs/Stapel abzuschließen, müssen Sie:',
-  completeCourse: 'diesen Kurs erfolgreich bearbeiten.',
+  completeCourse: 'Diesen Kurs erfolgreich bearbeiten.',
 };
 
 /** The speech bubble's colour for a completed node and for one that can no longer be unlocked. */
@@ -135,6 +136,9 @@ export async function teacherSets(page: Page, key: string, nodeid: string, box: 
   await expect(node).toBeVisible({ timeout: 60_000 });
   const checkbox = node.getByLabel(box);
   await expect(checkbox, `the teacher must be offered "${box}" on ${nodeid}`).toBeVisible();
+  // Each label leads to a box of its own kind (#598): release and completion
+  // used to share one id, so a label could tick the other box.
+  await expect(checkbox).toHaveAttribute('id', /^Unlock/.test(box) ? /_manual_restriction$/ : /_manual_completion$/);
   if ((await checkbox.isChecked()) !== checked) {
     await checkbox.click();
   }

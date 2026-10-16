@@ -68,6 +68,8 @@ async function setManualCompletion(page: Page, completed: boolean): Promise<void
   await expect(node).toBeVisible({ timeout: 60_000 });
   const box = node.getByLabel('Finish node manually');
   await expect(box, 'the teacher must be offered the manual completion on node 1').toBeVisible();
+  // The label leads to the completion box, not to the release box (#598).
+  await expect(box).toHaveAttribute('id', /_manual_completion$/);
   if ((await box.isChecked()) !== completed) {
     await box.click();
   }
@@ -123,7 +125,7 @@ test.beforeAll(() => reseedFixtures());
 
 test.describe('ADELE-E2E-L3/O1 — manual completion, set and withdrawn', () => {
 
-  test('regular -> completed manually -> withdrawn', { tag: ['@story:L3', '@story:O1'] }, async ({ page }) => {
+  test('regular -> completed manually -> withdrawn', { tag: ['@story:L3', '@story:O1', '@withdrawal'] }, async ({ page }) => {
     const learner = fixture('ADELE_FIXTURE_L3_LEARNER');
 
     await test.step('regular: node 1 open, node 2 locked, 0 of 3', async () => {

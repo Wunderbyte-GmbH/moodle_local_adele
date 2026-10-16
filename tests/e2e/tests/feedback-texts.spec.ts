@@ -146,7 +146,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
   });
 
   test('F1/F2 manual release: before, released, withdrawn', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {
-    const locked = `${EN.locked} manual release by the teacher. ${EN.todo} ${EN.completeCourse}`;
+    const locked = `${EN.locked} Manual release by the teacher. ${EN.todo} ${EN.completeCourse}`;
 
     await test.step('before: node 2 waits for the teacher', async () => {
       const node = await learnerReads(page, 'ACCESS', 'dndnode_2');
@@ -171,7 +171,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
   });
 
   test('F1/F2 manual completion: before, recorded, withdrawn', { tag: ['@story:F1', '@story:F2'] }, async ({ page }) => {
-    const waiting = `${EN.unlocked} ${EN.todo} a manual completion is recorded by the teacher.`;
+    const waiting = `${EN.unlocked} ${EN.todo} A manual completion is recorded by the teacher.`;
 
     await test.step('before: node 1 waits for the teacher to record a completion', async () => {
       const node = await learnerReads(page, 'MANUAL', 'dndnode_1');
@@ -186,7 +186,7 @@ test.describe('ADELE-E2E-F — what a learner reads on a node, state by state', 
     await test.step('recorded: node 1 counts as completed, node 2 is unlocked', async () => {
       await teacherSets(page, 'MANUAL', 'dndnode_1', 'Finish node manually', true);
       const first = await learnerReads(page, 'MANUAL', 'dndnode_1', 'completed');
-      expect(first.feedback).toBe(`${EN.unlocked} ${EN.done} completed it successfully.`);
+      expect(first.feedback).toBe(`${EN.unlocked} ${EN.done} Completed it successfully.`);
       expect(first.colour).toBe(COLOUR.completed);
       const second = await learnerReads(page, 'MANUAL', 'dndnode_2', 'accessible');
       expect(second.feedback).toBe(waiting);
